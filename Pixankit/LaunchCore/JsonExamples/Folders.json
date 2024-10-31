@@ -1,0 +1,9 @@
+﻿{
+  "children": [
+    {
+      "path": "D:/Program Files/PCL2/Of/.minecraft",
+      "alias": "MyFolder"
+    }
+  ],
+  "target": ""
+}

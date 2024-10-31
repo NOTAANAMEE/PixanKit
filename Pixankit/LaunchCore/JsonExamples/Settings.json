@@ -1,0 +1,6 @@
+{
+  "//": "This JSON config file is for the launcher",
+  "java": "closest",
+  "arguments": "-XX:+UseG1GC -XX:-UseAdaptiveSizePolicy -XX:-OmitStackTraceInFastThrow -Dfml.ignoreInvalidMinecraftCertificates=True -Dfml.ignorePatchDiscrepancies=True -Dlog4j2.formatMsgNoLookups=true",
+  "runningfolder": "self"
+}
