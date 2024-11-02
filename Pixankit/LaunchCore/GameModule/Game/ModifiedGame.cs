@@ -7,17 +7,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PixanKit.LaunchCore.GameModule.LibraryData;
 
 namespace PixanKit.LaunchCore.GameModule.Game
 {
+    /// <summary>
+    /// Modified Game. Game With ModLoader/ Optifine
+    /// </summary>
     public class ModifiedGame: GameBase
     {
+        /// <summary>
+        /// Whether It Is PCL2 Created
+        /// </summary>
         protected bool PCL2;
 
-        public ModifiedGame(string path, JObject jData) : base(jData)
+        /// <summary>
+        /// Init A <c>ModifiedGame</c> 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="jData"></param>
+        public ModifiedGame(string path, JObject jData) : base(path, jData)
         {
-            _gameType = GameType.Mod;
-            _path = path;
+            _gameType = GameType.Optifine;
             if (!jData.ContainsKey("inheritsFrom"))
             {
                 PCL2 = true;
@@ -29,37 +40,53 @@ namespace PixanKit.LaunchCore.GameModule.Game
             }
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="folder"><inheritdoc/></param>
         public override void SetOwner(Folder folder)
         {
             base.SetOwner(folder);
             if (PCL2) return;
         }
 
-        internal override string GetCPArgs()
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
+        protected override string GetCPArgs()
         {
-            if (PCL2) return base.GetCPArgs();
-            else
-            {
-                return Owner.FindGame(Version).GetCPArgs() + Localize.LocalParser + base.GetCPArgs();
-            }
+            return base.SameVersionCPArgs() + base.GetCPArgs();
         }
 
-        internal override string GetGameArguments()
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
+        protected override string GetGameArguments()
         {
             if (PCL2) return PCLGameArgProcess(base.GetGameArguments());
-            return Owner.FindGame(Version).GetGameArguments() + " " + base.GetGameArguments();
+            return base.SameVersionGameArguments() + " " + base.GetGameArguments();
         }
 
-        internal override string GetJVMArguments()
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
+        protected override string GetJVMArguments()
         {
             if (PCL2) return base.GetJVMArguments();
             return base.GetJVMArguments();
         }
 
-        internal override string GetAssetsID()
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
+        protected override string GetAssetsID()
         {
             if (PCL2) return base.GetAssetsID();
-            return Owner.FindGame(Version).GetAssetsID();
+            return base.SameVersionAssetsID();
         }
 
         internal string PCLGameArgProcess(string args)

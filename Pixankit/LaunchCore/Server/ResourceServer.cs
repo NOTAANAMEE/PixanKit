@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.Server
 {
+    /// <summary>
+    /// Resource Server Base
+    /// </summary>
     public abstract class ResourceServer
     {
         /// <summary>

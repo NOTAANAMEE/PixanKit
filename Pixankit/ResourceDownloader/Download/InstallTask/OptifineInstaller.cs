@@ -5,14 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.GameModule.Game;
-using PixanKit.LaunchCore.Tasks;
-using PixanKit.LaunchCore.Tasks.MultiTasks;
+using PixanKit.ResourceDownloader.Tasks;
+using PixanKit.ResourceDownloader.Tasks.MultiTasks;
 using HtmlAgilityPack;
 
-namespace PixanKit.LaunchCore.Download.InstallTask
+namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
     public class OptifineInstaller: MultiSequenceTask
-    {//中文注释：
+    {
+        //中文注释：
         /*
          *  本类需要实现的功能
          *  1.检测是否有该版本Minecraft

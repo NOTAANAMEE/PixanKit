@@ -71,22 +71,30 @@ namespace PixanKit.LaunchCore.JavaModule.Java
         }
 
         /// <summary>
-        /// Init a JavaRuntime instance with 
+        /// Init a JavaRuntime instance with Directory And Version
         /// </summary>
-        /// <param name="javafolder"></param>
-        /// <param name="version"></param>
+        /// <param name="javafolder">Directory Of /bin/java.exe</param>
+        /// <param name="version">Java Version (8-23)</param>
         public JavaRuntime(string javafolder, ushort version)
         {
             _javaFolder = javafolder;
             _version = version;
         }
 
+        /// <summary>
+        /// Init A JavaRuntime Instance With JSON Data
+        /// </summary>
+        /// <param name="jData"></param>
         public JavaRuntime(JObject jData)
         {
             _javaFolder = jData["path"].ToString();
             _version = (ushort)jData["version"];
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
         public JObject ToJSON()
         {
             return new JObject()

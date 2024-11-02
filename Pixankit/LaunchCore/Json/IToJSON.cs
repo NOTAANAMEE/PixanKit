@@ -12,6 +12,10 @@ namespace PixanKit.LaunchCore.Json
     /// </summary>
     public interface IToJSON
     {
+        /// <summary>
+        /// Store The Data By JSON
+        /// </summary>
+        /// <returns>The JSON Object</returns>
         public JObject ToJSON(); 
     }
 }

@@ -91,6 +91,7 @@ namespace PixanKit.LaunchCore.Core
             };
             Logger.Info("Game Launched");
             Process? p = Process.Start(info);
+            if (p == null) return new ProcessResult();
             MemoryStream ms = new();
             sw = new(ms);
             while (!p.HasExited)
@@ -220,7 +221,9 @@ namespace PixanKit.LaunchCore.Core
         {
             string folderpath = path.Remove(path.LastIndexOf("/versions/"));
             string? name = Path.GetDirectoryName(path) ?? throw new ArgumentException(path);
-            return FindFolder(folderpath).FindGame(name);
+            var res = FindFolder(folderpath);
+            if (res == null) return null;
+            return res.FindGame(name);
         }
 
         /// <summary>
@@ -286,7 +289,7 @@ namespace PixanKit.LaunchCore.Core
         public string GenerateLaunchCmd(GameBase game)
         {
             string cmd = game.GetLaunchArgument();
-            cmd = cmd.Replace("${arguments}", Settings["argument"].ToString());
+            cmd = cmd.Replace("${arguments}", (Settings["argument"] ?? new JObject()).ToString());
 
             return cmd;
         }

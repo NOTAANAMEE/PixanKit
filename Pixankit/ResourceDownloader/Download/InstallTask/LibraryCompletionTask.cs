@@ -1,7 +1,4 @@
-﻿using PixanKit.LaunchCore.GameModule.Game;
-using PixanKit.LaunchCore.Tasks;
-using PixanKit.LaunchCore.Tasks.MultiTasks;
-using PixanKit.LaunchCore;
+﻿using PixanKit.LaunchCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,50 +6,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PixanKit.LaunchCore.SystemInf;
-using PixanKit.LaunchCore.Downloads;
+using PixanKit.ResourceDownloader.Tasks.MultiTasks;
+using PixanKit.ResourceDownloader.Download;
+using PixanKit.LaunchCore.GameModule.Game;
 
-namespace PixanKit.LaunchCore.Download.InstallTask
+namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
-    public class LibraryCompletionTask:MultiAsyncTask
+    /// <summary>
+    /// The Task That Downloads Libraries 
+    /// </summary>
+    public class LibraryCompletionTask:MultiFileDownload
     {
-        public static short ThreadNum = 64;
-
-        GameBase? _game;
-
-        public LibraryCompletionTask(GameBase game):base()
+        /// <summary>
+        /// Init A <c>LibraryCompletionTask</c>
+        /// </summary>
+        public LibraryCompletionTask() : base() { }
+        
+        /// <summary>
+        /// Set The Minecraft Game
+        /// </summary>
+        /// <param name="game">The GameBase That Needs To Complete</param>
+        public void SetMinecraft(GameBase game)
         {
-            for (int i = 0; i < ThreadNum; i++)
+            var libraries = game.GetLibraries();
+            foreach (var library in libraries) 
             {
-                Add(new MultiDownload());
-            }
-            _game = game;
-            Init();
-        }
-
-        public LibraryCompletionTask()
-        {
-            for (int i = 0; i < ThreadNum; i++)
-            {
-                Add(new MultiDownload());
-            }
-        }
-
-        public void SetGame(GameBase game)
-        {
-            _game = game;
-            Init();
-        }
-
-        private void Init()
-        {
-            if (_game == null) throw new NullReferenceException();
-            int ind = 0;
-            foreach (var library in _game.libraries)
-            {
-                string path = _game.LibraryDir + '/' + library.Path;
-                if (File.Exists(Localize.PathLocalize(path))) continue;
-                (processes[ind % ThreadNum] as MultiDownload).Add(new DownloadTask(library.Url, path));
-                ind++;
+                if (!File.Exists(library.Path))
+                    Add(library.Url, library.Path);
             }
         }
     }

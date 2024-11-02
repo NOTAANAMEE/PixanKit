@@ -1,6 +1,6 @@
-﻿using PixanKit.LaunchCore.Downloads;
+﻿using PixanKit.ResourceDownloader.Download;
 using PixanKit.LaunchCore.GameModule;
-using PixanKit.LaunchCore.Tasks.MultiTasks;
+using PixanKit.ResourceDownloader.Tasks.MultiTasks;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -12,8 +12,9 @@ using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.Extention;
 using PixanKit.LaunchCore.Log;
 using PixanKit.LaunchCore.Server;
+using PixanKit.ResourceDownloader.Tasks;
 
-namespace PixanKit.LaunchCore.Download.InstallTask
+namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
     /// <summary>
     /// 
@@ -21,7 +22,7 @@ namespace PixanKit.LaunchCore.Download.InstallTask
     public class OrdinaryInstallTask:MultiSequenceTask
     {
         /// <summary>
-        /// 
+        /// The Return Game
         /// </summary>
         public GameBase? Game
         {
@@ -31,11 +32,11 @@ namespace PixanKit.LaunchCore.Download.InstallTask
         GameBase? _game;
 
         /// <summary>
-        /// 
+        /// Initor
         /// </summary>
-        /// <param name="folder"></param>
-        /// <param name="name"></param>
-        /// <param name="version"></param>
+        /// <param name="folder">The Owner Of The Game</param>
+        /// <param name="name">The Name Of The Game</param>
+        /// <param name="version">The Version Of Minecraft</param>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="Exception"></exception>
         public OrdinaryInstallTask(Folder folder, string name, string version) 
@@ -43,15 +44,16 @@ namespace PixanKit.LaunchCore.Download.InstallTask
             JObject? jData = (JObject?)ServerList.MinecraftVersionServer.GetVersions()
                 [version] ?? throw new ArgumentException($"Does not exist {version}");
             string path = folder.VersionDir + '/' + name;
+            if (Directory.Exists(path)) throw new IOException($"Already Exists {path}");
             MultiAsyncTask asyncTask = new();
             LibraryCompletionTask lct;
-            DownloadTask dt;
+            MultiThreadDownload dt;
             AssetCompletionTask act;
             Directory.CreateDirectory(path);
 
-            Add(new DownloadTask(jData["url"].ToString(), path + $"/{name}.json"));
+            Add(new MultiThreadDownload("", path + $"/{name}.json"));
            
-            asyncTask.Add(dt = new DownloadTask(path + $"/{name}.jar"));
+            asyncTask.Add(dt = new MultiThreadDownload("", path + $"/{name}.jar"));
             asyncTask.Add(lct = new LibraryCompletionTask());
             asyncTask.Add(act = new AssetCompletionTask(folder));
             Add(asyncTask);
@@ -71,13 +73,14 @@ namespace PixanKit.LaunchCore.Download.InstallTask
                     return;
                 }
                 StreamReader sr = new(fs);
-                JObject jData = JObject.Parse(sr.ReadToEnd());
-                _game = new OrdinaryGame(path, jData);
+                JObject mcjData = JObject.Parse(sr.ReadToEnd());
+                _game = new OrdinaryGame(path, mcjData);
                 fs.Close();
                 if(_game == null) throw new Exception();
-                dt.SetURL(ServerList.MinecraftVersionServer.GetMinecraftJarUrl(jData));
-                lct.SetGame(_game);
-                act.SetJData(jData);
+                dt = new MultiThreadDownload(mcjData["downloads"]["client"]["url"].ToString(), 
+                    path + $"/{name}.jar");
+                lct.SetMinecraft(_game);
+                act.SetJData(mcjData);
             };
         }
 
@@ -87,11 +90,11 @@ namespace PixanKit.LaunchCore.Download.InstallTask
         /// <returns></returns>
         protected override async Task Running()
         {
-            Logger.Info("Start Installing Minecraft");
+            Logger.Info("PixanKit.ResourceDownloader", "Start Installing Minecraft");
             processes[0].Start();
             await processes[0].MainTask;
-            if (Status != PixanKit.LaunchCore.Tasks.ProcessStatus.Running) return;
-            Logger.Info("Process 0 finished. Start running process 1 2 3");
+            if (Status != ProcessStatus.Running) return;
+            Logger.Info("PixanKit.ResourceDownloader", "Process 0 finished. Start running process 1 2 3");
             processes[1].Start();
             processes[2].Start();
             processes[3].Start();

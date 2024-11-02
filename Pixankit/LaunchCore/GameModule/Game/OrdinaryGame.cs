@@ -8,14 +8,21 @@ using Newtonsoft.Json.Linq;
 
 namespace PixanKit.LaunchCore.GameModule.Game
 {
+    /// <summary>
+    /// Ordinary Game. Minecraft Game Without Optifine Or Mod Loaders
+    /// </summary>
     public class OrdinaryGame: GameBase
     {
-        public OrdinaryGame(string path, JObject jData): base(jData)
+        /// <summary>
+        /// Initor
+        /// </summary>
+        /// <param name="path"><inheritdoc/></param>
+        /// <param name="jData"><inheritdoc/></param>
+        public OrdinaryGame(string path, JObject jData): base(path, jData)
         {
-            _path = path;
             _gameType = GameType.Ordinary;
-            assetsID = jData["assetIndex"]["id"].ToString();
-            javaVersion = (short)(int)jData["minimumLauncherVersion"];
+            assetsID = ((jData["assetIndex"] ?? new JObject())["id"]?? "").ToString();
+            javaVersion = (short)(int)(jData["minimumLauncherVersion"]?? 0);
         }
     }
 }

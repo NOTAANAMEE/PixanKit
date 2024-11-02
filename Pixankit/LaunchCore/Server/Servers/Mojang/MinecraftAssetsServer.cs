@@ -7,8 +7,14 @@ using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.Server.Servers.Mojang
 {
+    /// <summary>
+    /// Assets Server Abstraction Download Assets From The Server
+    /// </summary>
     public class MinecraftAssetsServer:ResourceServer
     {
+        /// <summary>
+        /// Initor With 1 Default Official Server
+        /// </summary>
         public MinecraftAssetsServer() 
         {
             Mirrors = new List<MirrorServer>

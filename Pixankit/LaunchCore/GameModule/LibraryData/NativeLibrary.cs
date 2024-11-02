@@ -10,10 +10,19 @@ using Newtonsoft.Json.Linq;
 
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
+    /// <summary>
+    /// Native Library Type. This Kind Of Library Need To Extract The Files In Jar
+    /// </summary>
     public class NativeLibrary:LibraryBase
     {
         private string[] Exclude = Array.Empty<string>();
 
+        bool NotExtract = false;
+
+        /// <summary>
+        /// Initor
+        /// </summary>
+        /// <param name="libraryJData"></param>
         public NativeLibrary(JToken libraryJData) : base()
         {
             libraryType = LibraryType.Native;
@@ -38,11 +47,18 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
             Exclude = excludelist.ToArray();
         }
 
-        protected NativeLibrary():base(){ libraryType = LibraryType.Native; }
+        /// <summary>
+        /// Nothing. Just For Fun
+        /// </summary>
+        protected internal NativeLibrary():base(){ libraryType = LibraryType.Native; NotExtract = true; }
 
-        public void Extract(string libraryPath,string nativesPath)
+        /// <summary>
+        /// Extract The Files In The Jar File
+        /// </summary>
+        /// <param name="nativesPath">Directory That Files Needed To Be Extracted To</param>
+        public void Extract(string nativesPath)
         {
-
+            if (NotExtract) return;
             FileStream fs = new(libraryPath + "/" +  Path, FileMode.Open);
             ZipArchive archive = new(fs);
             foreach (ZipArchiveEntry entry in archive.Entries) 

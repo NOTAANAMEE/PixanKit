@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.SystemInf
 {
+    /// <summary>
+    /// Provides Information Like Operating System And Computer Architecture
+    /// </summary>
     public static class SystemInformation
     {
         /// <summary>
@@ -20,9 +23,9 @@ namespace PixanKit.LaunchCore.SystemInf
 
         /// <summary>
         /// System Arch
-        /// x86 x86_64 arm64
-        /// x86: x86
-        /// x86_64: x86_64, AMD64
+        /// <br/>
+        /// x86: x86<br/>
+        /// x86_64: x86_64, AMD64<br/>
         /// arm64: Arm64 AArch64
         /// </summary>
         public static string CPUArch = "x86";

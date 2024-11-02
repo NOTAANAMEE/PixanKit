@@ -20,7 +20,15 @@ namespace PixanKit.ResourceDownloader.Download
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public long Size { get => 0; }
+        public long Size
+        { 
+            get
+            {
+                long res = 0;
+                foreach (var item in files) res += item.Size;
+                return res;
+            }
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -36,12 +44,19 @@ namespace PixanKit.ResourceDownloader.Download
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public int FileNum { get => 1; }
+        public int FileNum { get => files.Count; }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public int DownloadedFiles { get => DownloadedChars == Size ? 1 : 0; }
+        public int DownloadedFiles { 
+            get
+            {
+                int res = 0;
+                foreach (var item in files) res += item.DownloadedFiles;
+                return res;
+            }
+        }
 
         /// <summary>
         /// <inheritdoc/>

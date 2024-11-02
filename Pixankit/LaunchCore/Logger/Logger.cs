@@ -14,7 +14,8 @@ namespace PixanKit.LaunchCore.Log
         /// <summary>
         /// Add A Info Data
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="from">The Package Name</param>
+        /// <param name="message">The Message</param>
         public static void Info(string from, string message)
         {
             Record(from, "Info", message);
@@ -23,7 +24,8 @@ namespace PixanKit.LaunchCore.Log
         /// <summary>
         /// Add A Warn Data
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="from">The Package Name</param>
+        /// <param name="message">The Message</param>
         public static void Warn(string from, string message) 
         {
             Record(from, "Warn", message);
@@ -32,7 +34,8 @@ namespace PixanKit.LaunchCore.Log
         /// <summary>
         /// Add An Error Message
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="from">The Package Name</param>
+        /// <param name="message">The Message</param>
         public static void Error(string from, string message) 
         {
             Record(from, "Error", message);

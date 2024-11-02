@@ -85,6 +85,7 @@ namespace PixanKit.ResourceDownloader.Download
         {
             url = URL;
             path = Path;
+            Directory.CreateDirectory(Localize.GetLocalDirectory(Path));
             Return = new FileStream(Localize.PathLocalize(Path), FileMode.Create);
             OnFinish += FinishTask;
             OnCancel += CancelTask;

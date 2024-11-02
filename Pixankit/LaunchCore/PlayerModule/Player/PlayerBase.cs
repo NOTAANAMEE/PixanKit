@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.PlayerModule.Player
 {
+    /// <summary>
+    /// Player Base. Base Class For Players
+    /// </summary>
     public class PlayerBase:IToJSON
     {
         /// <summary>
@@ -37,31 +40,59 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
             get => _accesstoken;
         }
 
+        /// <summary>
+        /// Login Type
+        /// </summary>
         public PlayerType LoginType
         {
             get => _type;
         }
 
+        /// <summary>
+        /// Player ID
+        /// </summary>
         protected string _uid = "";
 
+        /// <summary>
+        /// Player Name
+        /// </summary>
         protected string _name = "";
 
+        /// <summary>
+        /// Player Login Type
+        /// </summary>
         protected PlayerType _type;
 
+        /// <summary>
+        /// Player Mojang AccessToken
+        /// </summary>
         protected string _accesstoken = "";
 
+        /// <summary>
+        /// Player Microsoft Refresh Token
+        /// </summary>
         protected string refreshToken = "";
 
+        /// <summary>
+        /// Last Login Time
+        /// </summary>
         protected DateTime lastLogin;
 
+        /// <summary>
+        /// Initor
+        /// </summary>
+        /// <param name="jData">jData Of A Player</param>
         public PlayerBase(JObject? jData)
         {
             if (jData == null) return;
-            _uid = jData["uid"].ToString();
-            _name = jData["name"].ToString();
-            _accesstoken = jData["accesstoken"].ToString();
+            _uid = (jData["uid"]?? "").ToString();
+            _name = (jData["name"] ?? "").ToString();
+            _accesstoken = (jData["accesstoken"] ?? "").ToString();
         }
 
+        /// <summary>
+        /// Initor
+        /// </summary>
         protected PlayerBase() { }
 
         /// <summary>
@@ -78,11 +109,23 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
             return arg;
         }
 
-        protected static bool SamePlayer(PlayerBase? player1, PlayerBase? player2)
+        /// <summary>
+        /// Test Whether The Players Are The Same
+        /// </summary>
+        /// <param name="player1">Player1</param>
+        /// <param name="player2">Player2</param>
+        /// <returns>bool</returns>
+        protected static bool SamePlayer(PlayerBase player1, PlayerBase player2)
         {
             return player1._uid == player2._uid;
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="player1"><inheritdoc/></param>
+        /// <param name="player2"><inheritdoc/></param>
+        /// <returns><inheritdoc/></returns>
         public static bool operator ==(PlayerBase? player1, PlayerBase? player2)
         {
             if (player1 is null)return player2 is null;
@@ -90,11 +133,21 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
             return SamePlayer(player1, player2);
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="player1"><inheritdoc/></param>
+        /// <param name="player2"><inheritdoc/></param>
+        /// <returns><inheritdoc/></returns>
         public static bool operator !=(PlayerBase? player1, PlayerBase? player2)
         {
             return !(player1 == player2);
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
         public virtual JObject ToJSON()
         {
             JObject jobj = new()
@@ -129,10 +182,22 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         }
     }
 
+    /// <summary>
+    /// Player Login Type
+    /// </summary>
     public enum PlayerType 
     {
+        /// <summary>
+        /// Microsoft Login
+        /// </summary>
         microsoft,
+        /// <summary>
+        /// Offline Login
+        /// </summary>
         offline,
+        /// <summary>
+        /// Third-Party Yggdrasil Server
+        /// </summary>
         yggdrasil
     }
 }

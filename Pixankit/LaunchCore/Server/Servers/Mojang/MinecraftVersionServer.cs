@@ -18,6 +18,9 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
 
         private record Cache(JArray Versions, DateTime UpdateTime);
 
+        /// <summary>
+        /// Init A MinecraftVersionServer
+        /// </summary>
         public MinecraftVersionServer() {
             Mirrors = new List<MirrorServer>() 
             { new("", "https://piston-meta.mojang.com") };

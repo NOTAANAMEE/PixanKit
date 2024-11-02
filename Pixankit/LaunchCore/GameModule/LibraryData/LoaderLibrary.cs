@@ -7,21 +7,38 @@ using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
+    /// <summary>
+    /// Library That ModLoader Installer Generated
+    /// </summary>
     public class LoaderLibrary: LibraryBase
     {
-        public LoaderLibrary(JToken libraryJData):base(libraryJData) 
+        /// <summary>
+        /// Initor
+        /// </summary>
+        /// <param name="folder">The Library Dir</param>
+        /// <param name="libraryJData">The JSON Data Of A Library</param>
+        public LoaderLibrary(string folder, JToken libraryJData):base(libraryJData, folder) 
         { 
             libraryType = LibraryType.Mod;
-            //string pathInf = libraryJData["name"].ToString();
-            //string[] pathInfs = pathInf.Split(":");
-            //_path = $"{pathInfs[^3].Replace('.', '/')}/{pathInfs[^2]}/{pathInfs[^1]}/{pathInfs[^2]}-{pathInfs[^1]}.jar";
             if (libraryJData["url"] != null) _url = libraryJData["url"].ToString();
-            //if (pathInfs.Length == 4) _path = pathInfs[0].Replace('.', '/') + '/' + _path;
         }
 
+        /// <summary>
+        /// Initor. Please Set The Folder
+        /// </summary>
+        /// <param name="libraryJData"></param>
+        public LoaderLibrary(JToken libraryJData):this("", libraryJData) { }
+
+        /// <summary>
+        /// For Copy
+        /// </summary>
         protected LoaderLibrary():base() { libraryType = LibraryType.Mod; }
 
-        public LoaderLibrary Copy()
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
+        public override LoaderLibrary Copy()
         {
             return new LoaderLibrary()
             {

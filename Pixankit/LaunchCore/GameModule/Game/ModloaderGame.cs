@@ -12,10 +12,11 @@ using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.GameModule.Game
 {
+    /// <summary>
+    /// Minecraft Game With Mod Loader
+    /// </summary>
     public class ModloaderGame : ModifiedGame
     {
-        public static ushort LaunchType;
-
         /// <summary>
         /// The mods in the folder
         /// </summary>
@@ -32,18 +33,17 @@ namespace PixanKit.LaunchCore.GameModule.Game
             get => _path + "/mods";
         }
 
+        /// <summary>
+        /// Mod Dictionary.
+        /// </summary>
         protected Dictionary<string, ModFile?> _mods = new();
 
-        public ModloaderGame(string path, JObject jData):base(path, jData) 
-        {
-            
-        }
-
-        public override void SetOwner(Folder folder)
-        {
-            base.SetOwner(folder);
-            InitMod();
-        }
+        /// <summary>
+        /// Initor
+        /// </summary>
+        /// <param name="path"><inheritdoc/></param>
+        /// <param name="jData"><inheritdoc/></param>
+        public ModloaderGame(string path, JObject jData):base(path, jData) { }
 
         /// <summary>
         /// This method adds a modfile to the modloader game
@@ -54,7 +54,63 @@ namespace PixanKit.LaunchCore.GameModule.Game
             if (file.ModInformation != null && Owner.Owner.FindMod(file.ID) == null)
                 Owner.Owner.AddMod(file.ModInformation);
             _mods.Add(file.ID, file);
-        }        
+        }
+
+        /// <summary>
+        /// Recursively check the dependencies.
+        /// </summary>
+        /// <returns>The Missing Project ID</returns>
+        public string[] CheckMissingDependencies()
+        {
+            List<string> list = new();
+            Dictionary<string, ModFile?> _modsCopy = new(_mods);
+            if (_modsCopy == null) return list.ToArray();
+            foreach (var mod in _modsCopy)
+            {
+                if (mod.Value == null) continue;
+                string[] tmp = mod.Value.CheckMissingDependenciesR(_modsCopy, true);
+                var set = new HashSet<string>(list);
+                set.UnionWith(tmp);
+                list = set.ToList();
+            }
+            return list.ToArray();
+        }
+
+        /// <summary>
+        /// Check whether the dependencies exist
+        /// </summary>
+        /// <returns>true if </returns>
+        public bool CheckDependencies()
+        {
+            string[] tmp = CheckMissingDependencies();
+            return tmp.Length == 0;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
+        /// <exception cref="DependencyException"><inheritdoc/></exception>
+        public override bool LaunchCheck()
+        {
+            if (!CheckDependencies())
+            {
+                string[] tmp = CheckMissingDependencies();
+                throw new DependencyException("Some of the mods need dependency libraries. That might cause crashes or unexpected results",
+                    tmp);
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="folder"><inheritdoc/></param>
+        public override void SetOwner(Folder folder)
+        {
+            base.SetOwner(folder);
+            InitMod();
+        }
 
         private void InitMod()
         {
@@ -113,49 +169,9 @@ namespace PixanKit.LaunchCore.GameModule.Game
         }
 
         /// <summary>
-        /// Check whether the dependencies exist
+        /// <inheritdoc/>
         /// </summary>
-        /// <returns>true if </returns>
-        public bool CheckDependencies()
-        {
-            string[] tmp = CheckMissingDependencies();
-            return tmp.Length == 0;
-        }
-
-        public override bool LaunchCheck(){
-            if (!CheckDependencies())
-            {
-                string[] tmp = CheckMissingDependencies();
-                throw new DependencyException("Some of the mods need dependency libraries. That might cause crashes or unexpected results",
-                    tmp);
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Recursively check the dependencies.
-        /// </summary>
-        /// <returns>The Missing Project ID</returns>
-        public string[] CheckMissingDependencies()
-        {
-            List<string> list = new();
-            Dictionary<string, ModFile?> _modsCopy = new (_mods);
-            if (_modsCopy == null) return list.ToArray();
-            foreach (var mod in _modsCopy)
-            {
-                if (mod.Value == null) continue;
-                string[] tmp = mod.Value.CheckMissingDependenciesR(_modsCopy, true);
-                var set = new HashSet<string>(list);
-                set.UnionWith(tmp);
-                list = set.ToList();
-            }
-            return list.ToArray();
-        }
-
-        /// <summary>
-        /// To JSON
-        /// </summary>
-        /// <returns></returns>
+        /// <returns><inheritdoc/></returns>
         public JArray ModToJSON()
         {
             JArray mods = new();

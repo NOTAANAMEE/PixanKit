@@ -17,6 +17,9 @@ namespace PixanKit.LaunchCore.GameModule
 {
     internal delegate void FinishInited();
 
+    /// <summary>
+    /// Folder Class<br/> An Abstraction For A .minecraft Folder
+    /// </summary>
     public class Folder:IToJSON
     {
         internal static List<Folder> Folders = new();
@@ -46,7 +49,7 @@ namespace PixanKit.LaunchCore.GameModule
         }
 
         /// <summary>
-        /// The path of the version folder. Path + "/versions"
+        /// The path of the version folder. <c>Path</c> + "/versions"
         /// </summary>
         public string VersionDir
         {
@@ -54,18 +57,22 @@ namespace PixanKit.LaunchCore.GameModule
         }
 
         /// <summary>
-        /// An alias. Better for user
+        /// An Alias Of The Folder<br/>
+        /// Alias Will Help User Manage Their Games
         /// </summary>
         public string Alias { get; set; } = "";
 
         /// <summary>
-        /// The set of Minecraft games
+        /// The Array Of The Minecraft Games In The <c>Folder</c>
         /// </summary>
         public GameBase[] Games
         {
             get => _games.ToArray();
         }
 
+        /// <summary>
+        /// The Count Of Minecraft Games In The <c>Folder</c>
+        /// </summary>
         public int Count
         {
             get => _games.Count;
@@ -74,7 +81,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// <summary>
         /// Provides the first Minecraft in the folder
         /// </summary>
-        public GameBase First
+        internal GameBase First
         {
             get => _games[0];
         }
@@ -82,13 +89,13 @@ namespace PixanKit.LaunchCore.GameModule
         /// <summary>
         /// Provide the last Minecraft in the folder
         /// </summary>
-        public GameBase Last
+        internal GameBase Last
         {
             get => _games[^1];
         }
 
         /// <summary>
-        /// The Launcher
+        /// The <c>Launcher</c> That The <c>Folder</c> Belongs To
         /// </summary>
         public Launcher? Owner
         {
@@ -106,23 +113,26 @@ namespace PixanKit.LaunchCore.GameModule
         private Launcher? _owner;
 
         /// <summary>
-        /// Init directly
+        /// Init The <c>Folder</c> With The Path.
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="path">Folder Path, For Example:
+        /// <c>"C:\\Users\\Admin\\AppData\\Roaming\\.minecrafy"</c></param>
         public Folder(string path)
         {
             _path = path;
-            
             AddSelf();
         }
 
         /// <summary>
-        /// {
-        /// "path":"C:/Users/Admin/AppData/Roaming/.minecraft"
-        /// "alias":"New Folder"
-        /// }
+        /// Init A <c>Folder</c> With JSON Object
         /// </summary>
-        /// <param name="jData"></param>
+        /// <param name="jData">
+        /// JSON Object Of The Folder, For Example:
+        /// <br/>
+        /// <c>{<br/>
+        /// "path":"C:/Users/Admin/AppData/Roaming/.minecraft",<br/>
+        /// "alias":"New Folder"<br/>
+        /// }</c></param>
         public Folder(JObject jData) 
         {
             _path = jData["path"].ToString();
@@ -131,92 +141,63 @@ namespace PixanKit.LaunchCore.GameModule
             InitGames();
         }
 
+        /// <summary>
+        /// Set The Owner <c>Launcher</c> Of The <c>Folder</c>
+        /// </summary>
+        /// <param name="launcher">The Owner <c>Launcher</c></param>
         public void SetOwner(Launcher launcher)
         {
             _owner = launcher;
         }
 
         /// <summary>
-        /// Get the library from the name
+        /// Get The Library In The Folder With The Name
         /// </summary>
-        /// <param name="name">org.lwjgl:lwjgl-freetype:3.3.3</param>
-        /// <returns></returns>
+        /// <param name="name">The Name Of A Library From The Minecraft JSON File, For Example:
+        /// <br/><c>"org.lwjgl:lwjgl-freetype:3.3.3"</c></param>
+        /// <returns>If Exists, Return The Library. Else, Return <c>null</c></returns>
         public LibraryBase? FindLibrary(string name)
         {
             return (_libraries.ContainsKey(name))? _libraries[name] : null;
         }
 
         /// <summary>
-        /// Add the library
+        /// Remove A Library Reference.<br/>
+        /// It Will Make The <c>LibraryBase.ReferenceCount</c> Decrement By 1
         /// </summary>
-        /// <param name="library"></param>
-        public void AddLibrary(LibraryBase library)
-        {
-            if (FindLibrary(library.Name) != null) return;
-            _libraries.Add(library.Name, library);
-        }
-
-        /// <summary>
-        /// Remove the library
-        /// </summary>
-        /// <param name="library"></param>
-        public void RemoveLibrary(LibraryBase library) 
-        {
-            if (library.ReferenceCount > 0) throw new ArgumentException();
-            if (FindLibrary(library.Name) == null) return;
-            _libraries.Remove(library.Name);
-            File.Delete(LibraryDir + $"/{library.Path}");
-        }
-
-        /// <summary>
-        /// Remove the library reference.
-        /// </summary>
-        /// <param name="library"></param>
-        public void RemoveLibraryReference(LibraryBase library)
+        /// <param name="library">The <c>LibraryBase</c> Reference That You Want To Remove</param>
+        public void RemoveLibrary(LibraryBase library)
         {
             if (!_libraries.ContainsValue(library)) throw new ArgumentException();
             library.ReferenceCount--;
-            if (library.ReferenceCount == 0) RemoveLibrary(library);
+            if (library.ReferenceCount == 0) _libraries.Remove(library.Name);
         }
 
         /// <summary>
-        /// If the library exists, add the reference. Else, add the library to _libraries and set the reference to 1
+        /// If the library exists, add the reference.<br/>
+        /// Else, add the library to <c>_libraries</c> and set the reference to 1<br/>
+        /// As The Program Cannot Decide Which Library the <c>LibraryBase</c> Is, You Need To Init It 
+        /// On Your Own
         /// </summary>
-        /// <param name="library"></param>
-        public void AddLibraryReference(LibraryBase library)
+        /// <param name="library"><c>LibraryBase</c> You Want To Add Reference</param>
+        public LibraryBase AddLibrary(LibraryBase library)
         {
-            if (!_libraries.ContainsValue(library))
+            if (_libraries.ContainsKey(library.Name))
             {
-                AddLibrary(library);
+                _libraries[library.Name].ReferenceCount++;
+                return library;
+            }
+            else
+            {
+                if (!library.Path.StartsWith(this.LibraryDir)) 
+                { 
+                    library = library.Copy();
+                    library.SetFolder(this);
+                }
+                _libraries.Add(library.Name, library);
                 library.ReferenceCount = 1;
+                return library;
             }
-            else library.ReferenceCount ++;
-        }
-
-        /// <summary>
-        /// Get the same name library. If exists, the reference will ++. Else, it will duplicate another instance.
-        /// </summary>
-        /// <param name="library"></param>
-        /// <returns></returns>
-        public LibraryBase? SameLibraryReference(LibraryBase library)
-        {
-            if (_libraries.ContainsKey(library.Name)) return _libraries[library.Name];
-            LibraryBase tmp;
-            switch (library.LibraryType)
-            {
-                case LibraryType.Ordinary:
-                    tmp = (library as OrdinaryLibrary).Copy();
-                    break;
-                case LibraryType.Native:
-                    tmp = (library as NativeLibrary).Copy();
-                    break;
-                case LibraryType.Mod:
-                    tmp = (library as LoaderLibrary).Copy();
-                    break;
-                default: return null;
-            }
-            AddLibraryReference(tmp);
-            return tmp;
         }
 
         /// <summary>
@@ -261,7 +242,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// <summary>
         /// This method adds the game
         /// </summary>
-        /// <param name="game"></param>
+        /// <param name="game">The <c>GameBase</c> That You Need To Add</param>
         public void AddGame(GameBase game)
         {
             if (Owner != null) Owner.AddGame(game);
@@ -271,7 +252,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// <summary>
         /// This method removes the game.
         /// </summary>
-        /// <param name="game"></param>
+        /// <param name="game">The <c>GameBase</c> That You Need To Remove</param>
         public void RemoveGame(GameBase game) 
         {
             if (Owner != null) Owner.RemoveGame(game);
@@ -281,7 +262,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// <summary>
         /// This method will return whether the game exists in this folder
         /// </summary>
-        /// <param name="game"></param>
+        /// <param name="game">The <c>GameBase</c> You Want To Check</param>
         /// <returns></returns>
         public bool HasGame(GameBase game) 
             => _games.Contains(game);
@@ -289,8 +270,8 @@ namespace PixanKit.LaunchCore.GameModule
         /// <summary>
         /// This method will return the game with specific name if exists.
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
+        /// <param name="name">The Name Of The Game</param>
+        /// <returns>If Exists, Return The Game. Else, Return <c>null</c></returns>
         public GameBase? FindGame(string name)
         {
             foreach(GameBase game in _games)
@@ -300,6 +281,12 @@ namespace PixanKit.LaunchCore.GameModule
             return null;
         }
 
+        /// <summary>
+        /// Find The Specific Version And Type Of A Game In The Folder
+        /// </summary>
+        /// <param name="version">The Version. Like <c>"1.14"</c></param>
+        /// <param name="type">Type Of The Game. Like <c>GameType.Ordinary</c></param>
+        /// <returns>Return The GameBase If Exists</returns>
         public GameBase? FindVersion(string version, GameType type) 
         {
             foreach (GameBase game in _games) 
@@ -310,7 +297,7 @@ namespace PixanKit.LaunchCore.GameModule
         }
 
         /// <summary>
-        /// This method will scan the folder again and add the game that does not exist in the _games 
+        /// This method will scan the folder again and add the game that does not exist in the <c>_games</c> 
         /// </summary>
         public void Scan()
         {
@@ -335,6 +322,10 @@ namespace PixanKit.LaunchCore.GameModule
             foreach (GameBase game in _games) { game.Close(); }
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
         public JObject ToJSON()
         {
             return new JObject()
@@ -358,7 +349,7 @@ namespace PixanKit.LaunchCore.GameModule
             _games.Remove(game);
             foreach (var library in game.libraries)
             {
-                RemoveLibraryReference(library);//Why did I do this?
+                RemoveLibrary(library);//Why did I do this?
             }
             Directory.Delete(game.GameFolder);
         }

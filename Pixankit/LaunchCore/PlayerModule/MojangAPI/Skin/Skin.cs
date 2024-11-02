@@ -14,9 +14,12 @@ using System.ComponentModel;
 
 namespace PixanKit.LaunchCore.PlayerModule.MojangAPI.Skin
 {
+    /// <summary>
+    /// Skin Class For Launchers To Change The Skin
+    /// </summary>
     public static class MojangSkin
     {
-        private static HttpClient client = new HttpClient()
+        private static HttpClient client = new()
         {
             Timeout = TimeSpan.FromSeconds(20)
         };

@@ -30,15 +30,9 @@ namespace PixanKit.ResourceDownloader.SystemInf
             }
         }
 
-        public static string CPLocalize(string cparg)
+        public static string GetLocalDirectory(string path)
         {
-            switch (SystemInformation.OSName) 
-            {
-                case "windows":
-                    return PathLocalize(cparg).Replace(":", ";");
-                default:
-                    return cparg;
-            }
+            return PathLocalize(path.Remove(path.LastIndexOf('/')));
         }
 
         public static string LocalParser

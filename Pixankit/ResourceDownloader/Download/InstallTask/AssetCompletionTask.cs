@@ -1,5 +1,5 @@
 ﻿using PixanKit.LaunchCore.GameModule.Game;
-using PixanKit.LaunchCore.Tasks.MultiTasks;
+using PixanKit.ResourceDownloader.Tasks.MultiTasks;
 using PixanKit.LaunchCore;
 using System;
 using System.Collections.Generic;
@@ -8,49 +8,30 @@ using System.Text;
 using System.Threading.Tasks;
 using PixanKit.LaunchCore.SystemInf;
 using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Downloads;
+using PixanKit.ResourceDownloader.Download;
 using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.Server;
+using PixanKit.ResourceDownloader.SystemInf;
 
-namespace PixanKit.LaunchCore.Download.InstallTask
+namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
     /// <summary>
     /// Complete Installing The Assets
     /// </summary>
-    public class AssetCompletionTask:MultiThreadDownloadTask
+    public class AssetCompletionTask:MultiFileDownload
     {
-        /// <summary>
-        /// Maximum Thread Num
-        /// </summary>
-        public static short ThreadNum = 64;
-
         Folder folder;
 
         JObject? JData;
-
-        /// <summary>
-        /// Finished Files
-        /// </summary>
-        public int FinishedCount = 0;
-
-        /// <summary>
-        /// Total Assets
-        /// </summary>
-        public int Total;
 
         /// <summary>
         /// Assets Completion Task
         /// </summary>
         /// <param name="folder">The Folder Of Minecraft</param>
         /// <param name="jData">Minecraft Version JSON File</param>
-        public AssetCompletionTask(Folder folder, JObject jData):base() 
+        public AssetCompletionTask(Folder folder, JObject jData):this(folder) 
         {
-            this.folder = folder;
             JData = jData;
-            for (int i = 0; i < ThreadNum; i++)
-            {
-                Add(new MultiDownload());
-            }
             Init().Wait();
         }
 
@@ -61,10 +42,6 @@ namespace PixanKit.LaunchCore.Download.InstallTask
         public AssetCompletionTask(Folder folder): base()
         {
             this.folder = folder;
-            for (int i = 0; i < ThreadNum; i++)
-            {
-                Add(new MultiDownload());
-            }
         }
 
         /// <summary>
@@ -81,32 +58,30 @@ namespace PixanKit.LaunchCore.Download.InstallTask
         {
             if (folder == null || JData == null) throw new NullReferenceException();
             var lists = await GetAssets();
-            int ind = 0;
-            foreach (var list in lists) 
+            foreach (var item in lists) 
             {
-                if (File.Exists(Localize.PathLocalize(list.Item2))) continue;
-                var tmp = processes[ind % ThreadNum] as MultiDownload;
-                tmp.Add(new DownloadTask(list.Item1, list.Item2));
-                ind++;
-                tmp.OnFinish += () => {
-                    FinishedCount++;
-                };
+                if (File.Exists(Localize.PathLocalize(item.Path))) continue;
+                Add(item.Url, folder.LibraryDir +  item.Path);
             }
-            Total = ind;
         }
 
-        private async Task<List<(string, string)>> GetAssets() 
+        private async Task<List<FileInf>> GetAssets() 
         {
             HttpClient client = new();
             var response = await client.GetAsync(JData["assetIndex"]["url"].ToString());
             JData = JObject.Parse(await response.Content.ReadAsStringAsync());
-            List<(string, string)> ret = new();
+            List<FileInf> ret = new();
             foreach (var item in JData["objects"])
             {
-                ret.Add((ServerList.MinecraftAssetsServer.GetAssetsUrl(item as JObject),
-                    ServerList.MinecraftAssetsServer.GetAssetsUrl(item as JObject)));
+                ret.Add(
+                    new FileInf(
+                        ServerList.MinecraftAssetsServer.GetAssetsUrl(item as JObject),
+                        ServerList.MinecraftAssetsServer.GetFileLocation(item as JObject)
+                        ));
             }
             return ret;
         }
+
+        private record FileInf(string Url, string Path);
     }
 }
