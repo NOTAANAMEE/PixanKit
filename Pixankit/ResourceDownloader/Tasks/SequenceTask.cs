@@ -13,6 +13,9 @@ namespace PixanKit.ResourceDownloader.Tasks
     /// </summary>
     public class SequenceTask: ProcessTask
     {
+        /// <summary>
+        /// Initor Add Tasks Later
+        /// </summary>
         public SequenceTask() : base() { }
 
         /// <summary>

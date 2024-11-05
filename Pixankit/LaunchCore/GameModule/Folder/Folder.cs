@@ -235,6 +235,7 @@ namespace PixanKit.LaunchCore.GameModule
                 {
                     _games.Add(tmp);
                     tmp.SetOwner(this);
+                    Launcher.GameLoad?.Invoke(tmp);
                 }
             }
         }
@@ -341,6 +342,7 @@ namespace PixanKit.LaunchCore.GameModule
             if (HasGame(game)) return;
             _games.Add(game);
             game.SetOwner(this);
+            Launcher.GameAdd?.Invoke(game);
         }
 
         internal void InternalRemoveGame(GameBase game)
@@ -352,6 +354,7 @@ namespace PixanKit.LaunchCore.GameModule
                 RemoveLibrary(library);//Why did I do this?
             }
             Directory.Delete(game.GameFolder);
+            Launcher.GameRemove?.Invoke(game);
         }
     }
 }

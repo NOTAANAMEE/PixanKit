@@ -102,6 +102,9 @@ namespace PixanKit.ResourceDownloader.Download
             ThreadNum = threadnum;
         }
 
+        /// <summary>
+        /// Pre Initor. Set The Files Later
+        /// </summary>
         public MultiFileDownload() : this(ThreadCount) { }
 
         /// <summary>

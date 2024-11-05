@@ -40,7 +40,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// </summary>
         /// <param name="folder">The Target Minecraft Folder</param>
         /// <param name="name">The Actual Minecraft Name. The path will be folder\name\name.jar</param>
-        /// <param name="version">The Optifine Version</param>
+        /// <param name="optifineversion">The Optifine Version</param>
         public OptifineInstaller(Folder folder, string name, string optifineversion) 
         {
             Owner = folder;

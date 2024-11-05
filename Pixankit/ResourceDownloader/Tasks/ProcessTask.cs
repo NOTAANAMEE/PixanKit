@@ -14,9 +14,14 @@ namespace PixanKit.ResourceDownloader.Tasks
         protected List<Task> Tasks = new();
 
         //protected TaskCompletionSource<bool> Starting = new TaskCompletionSource<bool>(false);
-
+        /// <summary>
+        /// The Process Is Finished
+        /// </summary>
         protected TaskCompletionSource<bool> Finishing = new(false);
 
+        /// <summary>
+        /// The Process Is Not Running
+        /// </summary>
         protected TaskCompletionSource<bool> TaskStopped = new(false);
 
         /// <summary>
@@ -72,6 +77,9 @@ namespace PixanKit.ResourceDownloader.Tasks
             }
         }
 
+        /// <summary>
+        /// Protected Initor
+        /// </summary>
         protected ProcessTask() { }
 
         /// <summary>

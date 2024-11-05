@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.GameModule.Exceptions
 {
-    public class HasAddedException:Exception
+   /* public class HasAddedException:Exception
     {
         public HasAddedException(string message) : base(message) { }
 
         public HasAddedException() { }
-    }
+    }*/
 }

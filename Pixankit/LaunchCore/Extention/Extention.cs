@@ -14,48 +14,61 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace PixanKit.LaunchCore.Extention
 {
-    public delegate GameBase? InitGame(string path);
-
-    public delegate PlayerBase? InitPlayer(JObject? jData);
-
-    public delegate JArray? ModListGetter(ModloaderGame game);
-
-    public delegate long MemoryGetter();
-
+    /// <summary>
+    /// Custom initialization method
+    /// </summary>
     public static class Initors
     {
-        public static InitGame GameInitor;
+        /// <summary>
+        /// Custom Game Initor
+        /// </summary>
+        public static Func<string, GameBase?> GameInitor;
 
-        public static InitPlayer PlayerInitor;
+        /// <summary>
+        /// Custom Player Initor
+        /// </summary>
+        public static Func<JObject, PlayerBase?> PlayerInitor;
 
-        public static MemoryGetter GetMemory;
+        /// <summary>
+        /// Custom Get Memory
+        /// </summary>
+        public static Func<long> GetMemory;
 
-        public static ModListGetter GetModList;
+        /// <summary>
+        /// Custom Get ModList
+        /// </summary>
+        public static Func<ModloaderGame,JArray> GetModList;
 
         static Initors()
         {
-            GameInitor += InitG;
-            PlayerInitor += InitP;
+            GameInitor += DefaultGameInitor;
+            PlayerInitor += DefaultPlayerInitor;
             GetMemory += GetMem;
-            GetModList += GetMod;
+            GetModList += DefaultModGetter;
         }
 
-        private static GameBase? InitG(string path)
+        /// <summary>
+        /// Default Game Initor
+        /// </summary>
+        /// <param name="path">The Path Of The Game</param>
+        /// <returns>Game Inited</returns>
+        public static GameBase DefaultGameInitor(string path)
         {
             path = Localize.DeLocalize(path);
             string jsonPath = path + "/" + Path.GetFileName(path) + ".json";
             JObject jobj;
-            try
-            {
                 jobj = JObject.Parse(File.ReadAllText(Localize.PathLocalize(jsonPath)));
-            }
-            catch { return null; }
+
 
             if (jobj["mainClass"].ToString() != "net.minecraft.client.main.Main") return new ModloaderGame(path, jobj);
             else return new OrdinaryGame(path, jobj);
         }
 
         /// <summary>
+        /// Default Player Initor
+        /// </summary>
+        /// <param name="jData">Example:
+        /// <code>
         /// {
         /// "name":"",
         /// "uid":"",
@@ -63,11 +76,9 @@ namespace PixanKit.LaunchCore.Extention
         /// "refreshtoken":"",
         /// "accesstoken":"",
         /// 
-        /// }
-        /// </summary>
-        /// <param name="jData"></param>
+        /// }</code></param>
         /// <returns></returns>
-        private static PlayerBase? InitP(JObject? jData) 
+        public static PlayerBase? DefaultPlayerInitor(JObject? jData) 
         {
             switch (jData["type"].ToString())
             {
@@ -81,15 +92,24 @@ namespace PixanKit.LaunchCore.Extention
             }
         }
 
-        private static long GetMem()
+        /// <summary>
+        /// Default Memory Setting
+        /// </summary>
+        /// <returns>6000 MB</returns>
+        public static long GetMem()
         {
             return 6000;
         }
 
-        private static JArray? GetMod(ModloaderGame game)
+        /// <summary>
+        /// Default Mod Getter For One Game
+        /// </summary>
+        /// <param name="game">Mod Loader Game</param>
+        /// <returns>JArray Of Games</returns>
+        public static JArray DefaultModGetter(ModloaderGame game)
         {
-            if (game.Owner == null || game.Owner.Owner == null) return null;
-            return (JArray?)game.Owner.Owner.GameModCache[game.GameFolder];
+            if (game.Owner == null || game.Owner.Owner == null) return new JArray();
+            return (JArray?)game.Owner.Owner.GameModCache[game.GameFolder]?? new JArray();
         }
 
         private static void ExtentionInit()
@@ -129,20 +149,6 @@ namespace PixanKit.LaunchCore.Extention
             }
             method.Invoke(null, null);
             Logger.Info($"{file} Loaded Successfully");
-        }
-
-        public static void DefaultInit()
-        {
-            JObject jobj = new()
-            {
-                {"children", new JArray() },
-                { "target", "" },
-                { "games", new JObject() }
-            };
-            Files.FolderJData = jobj;
-            Files.RuntimeJData = jobj;
-            Files.PlayerJData = jobj;
-            Files.ModJData = jobj;
         }
     }
 }

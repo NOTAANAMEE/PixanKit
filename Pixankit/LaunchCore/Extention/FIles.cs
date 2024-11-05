@@ -9,8 +9,14 @@ using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.Extention
 {
+    /// <summary>
+    /// Some Settings About Files
+    /// </summary>
     public static class Files
     {
+        /// <summary>
+        /// Folder JSON Data  
+        /// </summary>
         public static JObject FolderJData
         {
             get
@@ -21,6 +27,9 @@ namespace PixanKit.LaunchCore.Extention
             set => _folderJData = value;
         }
 
+        /// <summary>
+        /// Mod JSON Data
+        /// </summary>
         public static JObject ModJData
         {
             get
@@ -31,6 +40,9 @@ namespace PixanKit.LaunchCore.Extention
             set => _modJData = value;
         }
 
+        /// <summary>
+        /// Runtime JSON Data
+        /// </summary>
         public static JObject RuntimeJData
         {
             get
@@ -41,6 +53,9 @@ namespace PixanKit.LaunchCore.Extention
             set => _runtimeJData = value;
         }
 
+        /// <summary>
+        /// Player JSON Data
+        /// </summary>
         public static JObject PlayerJData
         {
             get
@@ -51,6 +66,9 @@ namespace PixanKit.LaunchCore.Extention
             set => _playerJData = value;
         }
 
+        /// <summary>
+        /// Setting JSON Data
+        /// </summary>
         public static JObject? SettingsJData
         {
             get
@@ -61,6 +79,9 @@ namespace PixanKit.LaunchCore.Extention
             set => _settingsJData = value;
         }
 
+        /// <summary>
+        /// Directory For Launcher Configuration Files.
+        /// </summary>
         public static string LauncherConfigDir = "./Launcher/Config";
 
         /// <summary>
@@ -69,8 +90,14 @@ namespace PixanKit.LaunchCore.Extention
         /// </summary>
         public static string GameSettingName = "/settings.json";
 
-        public static string ManifestSavePlace = $"{LauncherConfigDir}/manifest.json";
+        /// <summary>
+        /// Dir For Minecraft Version Manifest
+        /// </summary>
+        public static string ManifestSavePlace = $"{LauncherConfigDir}/Cache/manifest.json";
 
+        /// <summary>
+        /// Dir For Skin Cache
+        /// </summary>
         public static string SkinCache = $"{LauncherConfigDir}/Cache/Skin";
 
         private static JObject? _folderJData = null;
@@ -83,6 +110,11 @@ namespace PixanKit.LaunchCore.Extention
 
         private static JObject? _settingsJData = null;
 
+        /// <summary>
+        /// Get SHA1 From File
+        /// </summary>
+        /// <param name="path">File Path</param>
+        /// <returns>SHA1 String</returns>
         public static string GetSha1(string path)
         {
             FileStream fs = new(path, FileMode.Open);
@@ -91,5 +123,97 @@ namespace PixanKit.LaunchCore.Extention
             fs.Close();
             return BitConverter.ToString(ret).Replace("-", "");
         }
+
+        /// <summary>
+        /// Generate Default JSON Data
+        /// </summary>
+        public static void Generate()
+        {
+            ModJData = (JObject)DefaultJSON.JData.DeepClone();
+            FolderJData = (JObject)DefaultJSON.JData.DeepClone();
+            FolderJData.Remove("games");
+            PlayerJData = (JObject)FolderJData.DeepClone();
+            RuntimeJData = (JObject)FolderJData.DeepClone();
+            RuntimeJData.Remove("target");
+            SettingsJData = (JObject)DefaultJSON.SettingJData.DeepClone();
+        }
+
+        /// <summary>
+        /// Save JSON To Default Path
+        /// </summary>
+        public static void Save()
+        {
+            FileStream modFS = new ($"{LauncherConfigDir}/ModInf.json", FileMode.Create),
+                       folderFS = new($"{LauncherConfigDir}/Folders.json", FileMode.Create),
+                       playerFS = new($"{LauncherConfigDir}/Players.json", FileMode.Create),
+                       runtimeFS = new($"{LauncherConfigDir}/JavaRuntime.json", FileMode.Create),
+                       settingsFS = new($"{LauncherConfigDir}/Settings.json", FileMode.Create);
+            StreamWriter modsw = new(modFS),
+                         foldersw = new(folderFS),
+                         playersw = new(playerFS),
+                         runtimesw = new(runtimeFS),
+                         settingsw = new(settingsFS);
+            Task t0 = modsw.WriteAsync(ModJData.ToString()),
+                 t1 = foldersw.WriteAsync(FolderJData.ToString()),
+                 t2 = playersw.WriteAsync(PlayerJData.ToString()),
+                 t3 = runtimesw.WriteAsync(RuntimeJData.ToString()),
+                 t4 = settingsw.WriteAsync(SettingsJData.ToString());
+            Task.WaitAll(t0, t1, t2, t3, t4);
+            modFS.Close();
+            folderFS.Close();
+            playerFS.Close();
+            runtimeFS.Close();
+            settingsFS.Close();
+        }
+
+        /// <summary>
+        /// Load Data From Default Path
+        /// </summary>
+        public static void Load() 
+        {
+            FileStream modFS = new($"{LauncherConfigDir}/ModInf.json", FileMode.Create),
+                       folderFS = new($"{LauncherConfigDir}/Folders.json", FileMode.Create),
+                       playerFS = new($"{LauncherConfigDir}/Players.json", FileMode.Create),
+                       runtimeFS = new($"{LauncherConfigDir}/JavaRuntime.json", FileMode.Create),
+                       settingsFS = new($"{LauncherConfigDir}/Settings.json", FileMode.Create);
+            StreamReader modsr = new(modFS),
+                         foldersr = new(folderFS),
+                         playersr = new(playerFS),
+                         runtimesr = new(runtimeFS),
+                         settingsr = new(settingsFS);
+            Task<string> t0 = modsr.ReadToEndAsync(),
+                         t1 = foldersr.ReadToEndAsync(),
+                         t2 = playersr.ReadToEndAsync(),
+                         t3 = runtimesr.ReadToEndAsync(),
+                         t4 = settingsr.ReadToEndAsync();
+            Task.WaitAll(t0, t1, t2, t3, t4);
+            _modJData = JObject.Parse(t0.Result);
+            _folderJData = JObject.Parse(t1.Result);
+            _playerJData = JObject.Parse(t2.Result);
+            _runtimeJData = JObject.Parse(t3.Result);
+            _settingsJData = JObject.Parse(t4.Result);
+            modFS.Close();
+            folderFS.Close();
+            playerFS.Close();
+            runtimeFS.Close();
+            settingsFS.Close();
+        }
+    }
+
+    internal static class DefaultJSON
+    {
+        public static JObject JData = new()
+        {
+            { "children", new JArray() },
+            { "games", new JArray() },
+            { "target", "" }
+        };
+
+        public static JObject SettingJData = new()
+        {
+            { "java", "closest" },
+            { "arguments", "-XX:+UseG1GC -XX:-UseAdaptiveSizePolicy -XX:-OmitStackTraceInFastThrow -Dfml.ignoreInvalidMinecraftCertificates=True -Dfml.ignorePatchDiscrepancies=True -Dlog4j2.formatMsgNoLookups=true" },
+            { "runningfolder", "self" }
+        };
     }
 }

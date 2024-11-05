@@ -80,6 +80,9 @@ namespace PixanKit.LaunchCore.GameModule.Mod
             get => _import;
         }
 
+        /// <summary>
+        /// Whether the mod is not using
+        /// </summary>
         public bool NotUsing
         {
             get => referenceCount == 0;
@@ -97,24 +100,52 @@ namespace PixanKit.LaunchCore.GameModule.Mod
 
         //public long DownloadCount;
 
+        /// <summary>
+        /// website of the mod
+        /// </summary>
         protected string _website = "";
 
+        /// <summary>
+        /// mod id  curseforge.id == modrinth.id
+        /// </summary>
         protected string _id = "";
 
+        /// <summary>
+        /// mod name
+        /// </summary>
         protected string _name = "";
 
+        /// <summary>
+        /// mod description
+        /// </summary>
         protected string _description = "";
 
+        /// <summary>
+        /// icon uri
+        /// </summary>
         protected string _iconuri = "";
 
+        /// <summary>
+        /// user import or from internet
+        /// </summary>
         protected bool _import = false;
 
+        /// <summary>
+        /// reference count
+        /// </summary>
         protected ushort referenceCount = 0;
 
+        /// <summary>
+        /// the authors of the mod
+        /// </summary>
         protected List<string> _authors = new();
 
         /// <summary>
-        /// {
+        /// Initor with JSON Data<br/>
+        /// 
+        /// </summary>
+        /// <param name="jData">
+        /// Example<code>{
         /// "name":"",
         /// "id":"",
         /// "description":"",
@@ -127,9 +158,7 @@ namespace PixanKit.LaunchCore.GameModule.Mod
         ///         2
         ///     ],
         /// ...others like file name and verification
-        /// }
-        /// </summary>
-        /// <param name="jData"></param>
+        /// }</code></param>
         public ModBase(JObject jData)
         {
             _name = jData["name"].ToString();
@@ -142,6 +171,9 @@ namespace PixanKit.LaunchCore.GameModule.Mod
             
         }
 
+        /// <summary>
+        /// Initor Do Nothing
+        /// </summary>
         public ModBase() { }
 
         /// <summary>
@@ -155,6 +187,10 @@ namespace PixanKit.LaunchCore.GameModule.Mod
         }
 
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
         public virtual JObject ToJSON()
         {
             return new JObject()
@@ -170,12 +206,30 @@ namespace PixanKit.LaunchCore.GameModule.Mod
         }
     }
 
+    /// <summary>
+    /// Mod Type
+    /// </summary>
     public enum ModType
     {
+        /// <summary>
+        /// Forge Mod
+        /// </summary>
         Forge,
+        /// <summary>
+        /// NeoForge Mod
+        /// </summary>
         NeoForge,
+        /// <summary>
+        /// Fabric Mod
+        /// </summary>
         Fabric,
+        /// <summary>
+        /// Quilt Mod
+        /// </summary>
         Quilt,
+        /// <summary>
+        /// LiteLoader Mod
+        /// </summary>
         LiteLoader,
     }
 }

@@ -1,0 +1,6 @@
+1. Extension Package?
+I hope this launcher can be flexible.
+Future Extension:
+	Resource Downloader(Producing)
+	Java Extension(Just joking)
+	Crash Log Analyzer

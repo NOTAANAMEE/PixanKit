@@ -11,8 +11,14 @@ using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.GameModule.Mod
 {
+    /// <summary>
+    /// Actual Mod File Class
+    /// </summary>
     public class ModFile:IToJSON
     {
+        /// <summary>
+        /// The Base Information Of The Mod
+        /// </summary>
         public ModBase? ModInformation;
 
         /// <summary>
@@ -47,22 +53,44 @@ namespace PixanKit.LaunchCore.GameModule.Mod
             get => _dependencies.ToArray();
         }
 
+        /// <summary>
+        /// List Of Support Mo Loaders
+        /// </summary>
         public List<ModType> SupportModLoaders = new();
 
+        /// <summary>
+        /// The Published Time Of The File
+        /// </summary>
         public DateTime PublishedTime;
 
         internal string ID = "";
 
         internal string _name = "";
-
+        
+        /// <summary>
+        /// SHA1 To Check The File
+        /// </summary>
         protected string _sha1 = "";
-
+        
+        /// <summary>
+        /// The Parent Game Of This File
+        /// </summary>
         protected ModloaderGame? modloaderGame;
 
+        /// <summary>
+        /// Dependency Mods. They will be recorded as ModID
+        /// </summary>
         protected List<string> _dependencies = new();
 
+        /// <summary>
+        /// Mod Status, Is that valid or invalid
+        /// </summary>
         public ModStatus Status;
 
+        /// <summary>
+        /// Mod File Init
+        /// </summary>
+        /// <param name="jData">The JSON Data Of The Mod</param>
         public ModFile(JObject jData)
         {
             _name = jData["path"].ToString();
@@ -129,7 +157,7 @@ namespace PixanKit.LaunchCore.GameModule.Mod
         }
 
         /// <summary>
-        /// 
+        /// Check The Dependencies Recursively
         /// </summary>
         /// <param name="mods">This Method Will Change The Value Of The Dictionary! Copy The Dictionary!</param>
         /// <param name="recursively"></param>
@@ -143,6 +171,7 @@ namespace PixanKit.LaunchCore.GameModule.Mod
                 if (!mods.ContainsKey(tmp)) result.Add(tmp);
                 else if (mods[tmp] != null)
                 {
+                    if (mods[tmp].Status == ModStatus.NotFound) result.Add(tmp);
                     result.AddRange(mods[tmp].CheckMissingDependenciesR(mods, recursively));
                     mods[tmp] = null;
                 }
@@ -158,6 +187,10 @@ namespace PixanKit.LaunchCore.GameModule.Mod
             }
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
         public JObject ToJSON()
         {
             JObject jobj = new()
@@ -172,21 +205,47 @@ namespace PixanKit.LaunchCore.GameModule.Mod
         }
     }
 
+    /// <summary>
+    /// Status Of A Mod File
+    /// </summary>
     public enum ModStatus
     {
+        /// <summary>
+        /// No Exception Just regular status
+        /// </summary>
         Regular, //The same file name, The same SHA1
+        /// <summary>
+        /// The Name Of The File Changed, Just OK
+        /// </summary>
         NameChanged, //Not the same name, But the same SHA1
+        /// <summary>
+        /// The SHA1 Of The File Changed But The Name Does Not Change. Be Careful With These Files
+        /// </summary>
         ContentChanged, //The same name, But not the same SHA1
+        /// <summary>
+        /// Mod Could Not Found
+        /// </summary>
         NotFound//Not found
     }
 
+    /// <summary>
+    /// Dependency Exception As One Or More Dependencies Not Found
+    /// </summary>
     public class DependencyException : Exception
     {
+        /// <summary>
+        /// Initor
+        /// </summary>
+        /// <param name="message">Message</param>
+        /// <param name="needmods">Dependencies Missing</param>
         public DependencyException(string message, string[] needmods) : base(message)
         {
             NeedMods = needmods;
         }
 
+        /// <summary>
+        /// Missing Dependencies
+        /// </summary>
         public readonly string[] NeedMods;
     }
 }

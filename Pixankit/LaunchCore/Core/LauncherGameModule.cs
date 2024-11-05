@@ -128,16 +128,17 @@ namespace PixanKit.LaunchCore.Core
         /// Add a folder to the Launcher
         /// </summary>
         /// <param name="folder"></param>
-        /// <exception cref="HasAddedException"></exception>
+        /// <exception cref="InvalidOperationException"> Do not add a folder which is added</exception>
         public void AddFolder(Folder folder)
         {
             foreach(Folder f in _folders)
             {
-                if (f.Path == folder.Path) throw new HasAddedException("Folder has added before");
+                if (f.Path == folder.Path) throw new InvalidOperationException("Folder has added before");
             }
             _folders.Add(folder);
             if (_folders.Count > 0) nogame = false;            
             ResetTargetGame();
+            FolderAdd?.Invoke(folder);
         }
 
         /// <summary>
@@ -146,7 +147,12 @@ namespace PixanKit.LaunchCore.Core
         /// <param name="folder"></param>
         public void RemoveFolder(Folder folder) 
         {
-            RemoveFolder(folder.Path);
+            if (!_folders.Contains(folder)) return;
+            _folders.Remove(folder);
+            FolderRemove?.Invoke(folder);
+            if (TargetGame == null || !folder.HasGame(TargetGame)) return;
+            TargetGame = null;
+            ResetTargetGame();
         }
 
         /// <summary>
@@ -155,16 +161,8 @@ namespace PixanKit.LaunchCore.Core
         /// <param name="path"></param>
         public void RemoveFolder(string path)
         {
-            foreach (Folder f in _folders)
-            {
-                if (f.Path == path)
-                {
-                    _folders.Remove(f);
-                    if (TargetGame == null || !f.HasGame(TargetGame)) return;
-                    TargetGame = null;
-                    ResetTargetGame();
-                }
-            }
+            Folder? f = FindFolder(path);
+            if (f != null) RemoveFolder(f);
         }
 
         /// <summary>
@@ -207,6 +205,7 @@ namespace PixanKit.LaunchCore.Core
         /// <param name="game"></param>
         public void RemoveGame(GameBase game)
         {
+            if (game.Owner == null) return;
             game.Owner.InternalRemoveGame(game);
             if (TargetGame == game) ResetTargetGame();
         }
@@ -234,6 +233,7 @@ namespace PixanKit.LaunchCore.Core
         {
             if (_modCache.ContainsKey(mod.ID)) return;
             _modCache.Add(mod.ID, mod);
+            ModBaseAdd?.Invoke(mod);
         }
 
         /// <summary>
@@ -275,6 +275,7 @@ namespace PixanKit.LaunchCore.Core
         /// <param name="folder"></param>
         public static void MoveGame(GameBase game, Folder folder)
         {
+            if (game.folder == null) return;
             if (folder.HasGame(game)) return;
             game.folder.RemoveGame(game);
             folder.AddGame(game);

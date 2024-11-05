@@ -51,6 +51,7 @@ namespace PixanKit.LaunchCore.Core
                 var tmp = new Folder((JObject)jData);
                 tmp.SetOwner(this);
                 folders.Add(tmp);
+                FolderAdd?.Invoke(tmp);
             }
             _folders = folders;
             string tmpstr = Files.FolderJData["target"].ToString();
@@ -65,6 +66,7 @@ namespace PixanKit.LaunchCore.Core
             {
                 PlayerBase? ret = Initors.PlayerInitor((JObject)jData) ?? throw new NullReferenceException();
                 players.Add(ret);
+                PlayerLoad?.Invoke(ret);
             }
             _players = players;
             string tmpstr = Files.PlayerJData["target"].ToString();

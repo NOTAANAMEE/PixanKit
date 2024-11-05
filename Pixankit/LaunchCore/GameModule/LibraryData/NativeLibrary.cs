@@ -97,7 +97,11 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
             return true; 
         }
 
-        public NativeLibrary Copy()
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
+        public override NativeLibrary Copy()
         {
             return new NativeLibrary()
             {
