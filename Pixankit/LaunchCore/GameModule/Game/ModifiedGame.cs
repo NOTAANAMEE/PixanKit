@@ -56,6 +56,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <returns><inheritdoc/></returns>
         protected override string GetCPArgs()
         {
+            if (PCL2) return base.GetCPArgs();
             return base.SameVersionCPArgs() + base.GetCPArgs();
         }
 

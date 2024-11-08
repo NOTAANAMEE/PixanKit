@@ -1,4 +1,5 @@
-﻿using PixanKit.LaunchCore.PlayerModule.Player;
+﻿using PixanKit.LaunchCore.Log;
+using PixanKit.LaunchCore.PlayerModule.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,6 +59,7 @@ namespace PixanKit.LaunchCore.Core
                     throw new ArgumentException("Player Has Added");
             }
             _players.Add(player);
+            Logger.Info($"Player {player.Name} Added");
             ResetTargetPlayer();
         }
 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PixanKit.LaunchCore.Log;
 
 namespace PixanKit.LaunchCore.PlayerModule.Player
 {
@@ -88,6 +89,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
             _uid = (jData["uid"]?? "").ToString();
             _name = (jData["name"] ?? "").ToString();
             _accesstoken = (jData["accesstoken"] ?? "").ToString();
+            Logger.Info($"Player Init, Name:{Name} UID:{UID}");
         }
 
         /// <summary>

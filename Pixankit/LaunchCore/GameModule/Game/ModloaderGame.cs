@@ -32,6 +32,11 @@ namespace PixanKit.LaunchCore.GameModule.Game
         {
             get => _path + "/mods";
         }
+        
+        /// <summary>
+        /// Check Whether The Mod Is Inited
+        /// </summary>
+        public TaskCompletionSource<bool> ModInited = new(false);
 
         /// <summary>
         /// Mod Dictionary.
@@ -109,7 +114,12 @@ namespace PixanKit.LaunchCore.GameModule.Game
         public override void SetOwner(Folder folder)
         {
             base.SetOwner(folder);
-            InitMod();
+            _ = ModInitTask();
+        }
+
+        private async Task ModInitTask()
+        {
+            await Task.Run(() => { InitMod(); });
         }
 
         private void InitMod()
@@ -137,6 +147,8 @@ namespace PixanKit.LaunchCore.GameModule.Game
             }
             ImportMods(files);
             if (mods.Count != 0)mods.Remove();
+            ModInited.SetResult(true);
+            Logger.Info($"Mod Game {Path} Inited Mod Module, Altogether {_mods.Count} Mods");
         }
 
         private Dictionary<string, string> GetFilesAndSha1()

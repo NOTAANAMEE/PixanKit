@@ -60,26 +60,26 @@ namespace PixanKit.LaunchCore.Core
         /// <exception cref="DependencyException"></exception>
         public ProcessResult Launch(GameBase game)
         {
-            game.LaunchCheck();
-            long timeStamp = DateTime.Now.Ticks;
-            string cmd = GenerateLaunchCmd(game);
+            string cmd = CMD(game);
+
+
             JavaRuntime? java = ChooseRuntime(game);
-            cmd = PlayerInLine(cmd);
-            cmd = Localize.PathLocalize(cmd);
-            string pth = game.Path[game.Path.LastIndexOf(".minecraft/versions/")..];
-            cmd = $"-Xmx{Initors.GetMemory()}m " + cmd;
-            cmd = cmd.Replace("${launcher_name}", LauncherName);
-            cmd = cmd.Replace("${launcher_version}", VersionName);
             if (java == null) throw new NullReferenceException();
-            //game.Decompress().Wait();
+
+
             Logger.Info("Game Arg Generated Successfully. Stored in a.bat");
-            //int a = p.ExitCode;
             FileStream fs = new("./a.bat", FileMode.Create);
             StreamWriter sw = new(fs);
             sw.Write("\"" + java.JavaEXE + "\" " + cmd);
             sw.Close();
             fs.Close();
+
+
             game.Decompress().Wait();
+            string runningdir = 
+                string.Concat(AppDomain.CurrentDomain.BaseDirectory, 
+                Localize.PathLocalize(Files.LauncherConfigDir.Substring(2)));
+
             ProcessStartInfo info = new()
             {
                 CreateNoWindow = true,
@@ -87,7 +87,7 @@ namespace PixanKit.LaunchCore.Core
                 Arguments = cmd,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
-                WorkingDirectory = Localize.PathLocalize(Files.LauncherConfigDir),
+                WorkingDirectory = runningdir
             };
             Logger.Info("Game Launched");
             Process? p = Process.Start(info);
@@ -99,18 +99,42 @@ namespace PixanKit.LaunchCore.Core
                 sw.Write(p.StandardOutput.ReadToEnd());
             }
             sw.Write(p.StandardOutput.ReadToEnd());
+
+
             DateTime now = DateTime.Now;
-            Logger.Info("Game Exited");
+            Logger.Info($"Game Exited with code {p.ExitCode}");
             if (p.ExitCode != 0) Logger.Warn("Error happened to the game!");
-            Dictionary<long, string> files = GetTimestampAndFilePath(game.CrashReportDir);
+            ms.Position = 0;
+
+
+            Dictionary<long, string> files;
+            try
+            {
+                files = GetTimestampAndFilePath(game.CrashReportDir);
+            }
+            catch { files = new Dictionary<long, string>(); }
             return new ProcessResult()
             {
                 ReturnCode = p.ExitCode,
-                //Successful = p.ExitCode == 0,
-                LogGZPath = GetTimestampAndFilePath(Files.LauncherConfigDir + "/logs").Last().Value,
+                LogGZPath = GetTimestampAndFilePath(runningdir + "/logs").Last().Value,
                 OutputStream = ms,
-                CrashFilePath = files.ContainsKey(now.Ticks) ? null : files[now.Ticks]
+                CrashFilePath = "",
             };
+        }
+
+        private string CMD(GameBase game)
+        {
+            game.LaunchCheck();
+            long timeStamp = DateTime.Now.Ticks;
+            string cmd = GenerateLaunchCmd(game);
+
+            cmd = PlayerInLine(cmd);
+            cmd = Localize.PathLocalize(cmd);
+            string pth = game.Path[game.Path.LastIndexOf(".minecraft/versions/")..];
+            cmd = $"-Xmx{Initors.GetMemory()}m " + cmd;
+            cmd = cmd.Replace("${launcher_name}", LauncherName);
+            cmd = cmd.Replace("${launcher_version}", VersionName);
+            return cmd;
         }
 
         /// <summary>
@@ -136,9 +160,11 @@ namespace PixanKit.LaunchCore.Core
                 if (f.Path == folder.Path) throw new InvalidOperationException("Folder has added before");
             }
             _folders.Add(folder);
+            folder.SetOwner(this);
             if (_folders.Count > 0) nogame = false;            
             ResetTargetGame();
             FolderAdd?.Invoke(folder);
+            Logger.Info($"Folder {folder.Path} Added");
         }
 
         /// <summary>
@@ -290,7 +316,7 @@ namespace PixanKit.LaunchCore.Core
         public string GenerateLaunchCmd(GameBase game)
         {
             string cmd = game.GetLaunchArgument();
-            cmd = cmd.Replace("${arguments}", (Settings["argument"] ?? new JObject()).ToString());
+            cmd = cmd.Replace("${arguments}", (Settings["arguments"] ?? new JObject()).ToString());
 
             return cmd;
         }

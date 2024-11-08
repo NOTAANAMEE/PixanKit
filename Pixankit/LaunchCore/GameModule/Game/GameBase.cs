@@ -22,7 +22,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <summary>
         /// Minecraft Game Name
         /// </summary>
-        public string Name { get => System.IO.Path.GetDirectoryName(_path) ?? ""; }
+        public string Name { get => System.IO.Path.GetFileName(_path) ?? ""; }
 
         /// <summary>
         /// Minecraft Game Description
@@ -123,6 +123,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         #endregion
 
         #region Fields
+        internal JObject tmpdata = new JObject();
 
         internal Folder? folder = null;
 
@@ -155,7 +156,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <param name="jData">The JSON file.</param>
         public GameBase(string path, JObject jData):this(path, false)
         {
-            InitJData(jData);
+            tmpdata = jData;
         }
 
         /// <summary>
@@ -168,8 +169,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             _path = path;
             if (initFromFile)
             {
-                JObject jData = ReadJObj(path);
-                InitJData(jData);
+                tmpdata = ReadJObj(path);
             }
             Logger.Info($"Game Base Added. Path:{_path}");
         }
@@ -188,17 +188,25 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <param name="jData"></param>
         public void InitJData(JObject jData)
         {
+            tmpdata = jData;
+            InitJData();
+        }
+
+        private void InitJData()
+        { 
+            var jData = tmpdata;
             className = (jData["mainClass"] ?? "net.minecraft.client.main.Main.").ToString();
             SetLibrary(jData);
             SetGameArgument(jData);
             SetJVMArguments(jData);
 
             //Set The Version. Real Version
-            if (jData["inheritsfrom"] != null) _version = ((jData["inheritsfrom"] ?? "")).ToString();
+            if (jData["inheritsfrom"] != null) _version = (jData["inheritsfrom"] ?? "").ToString();
             _version = (jData["id"] ?? "").ToString();
             releaseType = (jData["type"] ?? "release").ToString();
 
             SetSettings();
+            tmpdata = new();
         }
 
         /// <summary>
@@ -209,13 +217,17 @@ namespace PixanKit.LaunchCore.GameModule.Game
         {
             if (_path.StartsWith(owner.Path))
             folder = owner;
+            InitJData();
+            
             //Launcher.GameInit?.Invoke(Owner.Owner, this);
         }
 
         private void SetSettings()
         {
-            if (File.Exists(Localize.PathLocalize(SettingsPath)))
-                Settings = JObject.Parse(File.ReadAllText( _path + Files.GameSettingName));
+            string path = Localize.PathLocalize(SettingsPath);
+            if (File.Exists(path))
+                Settings = JObject.Parse(
+                    File.ReadAllText(path));
         }
 
         private void SetLibrary(JObject jData)
@@ -498,11 +510,17 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </summary>
         public virtual void Close()
         {
-            FileStream fs = new(Localize.PathLocalize(SettingsPath), FileMode.Create);
-            StreamWriter sw = new(fs);
+            FileStream fs;
+            StreamWriter sw;
+            string settingpath = Localize.PathLocalize(SettingsPath);
+            Logger.Info($"{Path} Closing");
+            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(settingpath)?? "");
+            fs = new(settingpath, FileMode.Create);
+            sw = new(fs);
             if (Settings != null) sw.Write(Settings.ToString());
             sw.Close();
             fs.Close();
+            Logger.Info($"{Path} Closed. File Saved");
         }
     }
 

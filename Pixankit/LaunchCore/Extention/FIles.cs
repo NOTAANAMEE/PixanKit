@@ -88,7 +88,7 @@ namespace PixanKit.LaunchCore.Extention
         /// The native setting for every game. 
         /// For example:C:\Users\admin\AppData\Roaming\.minecraft\versions\1.20.4\settings.json
         /// </summary>
-        public static string GameSettingName = "/settings.json";
+        public static string GameSettingName = "/Launcher/settings.json";
 
         /// <summary>
         /// Dir For Minecraft Version Manifest
@@ -153,12 +153,16 @@ namespace PixanKit.LaunchCore.Extention
                          playersw = new(playerFS),
                          runtimesw = new(runtimeFS),
                          settingsw = new(settingsFS);
-            Task t0 = modsw.WriteAsync(ModJData.ToString()),
-                 t1 = foldersw.WriteAsync(FolderJData.ToString()),
-                 t2 = playersw.WriteAsync(PlayerJData.ToString()),
-                 t3 = runtimesw.WriteAsync(RuntimeJData.ToString()),
-                 t4 = settingsw.WriteAsync(SettingsJData.ToString());
-            Task.WaitAll(t0, t1, t2, t3, t4);
+            modsw.Write(ModJData.ToString());
+            foldersw.Write(FolderJData.ToString());
+            playersw.Write(PlayerJData.ToString());
+            runtimesw.Write(RuntimeJData.ToString());
+            settingsw.Write(SettingsJData.ToString());
+            modsw.Close();
+            foldersw.Close();
+            playersw.Close();
+            runtimesw.Close();
+            settingsw.Close();
             modFS.Close();
             folderFS.Close();
             playerFS.Close();
@@ -171,11 +175,11 @@ namespace PixanKit.LaunchCore.Extention
         /// </summary>
         public static void Load() 
         {
-            FileStream modFS = new($"{LauncherConfigDir}/ModInf.json", FileMode.Create),
-                       folderFS = new($"{LauncherConfigDir}/Folders.json", FileMode.Create),
-                       playerFS = new($"{LauncherConfigDir}/Players.json", FileMode.Create),
-                       runtimeFS = new($"{LauncherConfigDir}/JavaRuntime.json", FileMode.Create),
-                       settingsFS = new($"{LauncherConfigDir}/Settings.json", FileMode.Create);
+            FileStream modFS = new($"{LauncherConfigDir}/ModInf.json", FileMode.Open),
+                       folderFS = new($"{LauncherConfigDir}/Folders.json", FileMode.Open),
+                       playerFS = new($"{LauncherConfigDir}/Players.json", FileMode.Open),
+                       runtimeFS = new($"{LauncherConfigDir}/JavaRuntime.json", FileMode.Open),
+                       settingsFS = new($"{LauncherConfigDir}/Settings.json", FileMode.Open);
             StreamReader modsr = new(modFS),
                          foldersr = new(folderFS),
                          playersr = new(playerFS),
@@ -205,7 +209,7 @@ namespace PixanKit.LaunchCore.Extention
         public static JObject JData = new()
         {
             { "children", new JArray() },
-            { "games", new JArray() },
+            { "games", new JObject() },
             { "target", "" }
         };
 

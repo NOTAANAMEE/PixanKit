@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PixanKit.LaunchCore.SystemInf;
 using System.Diagnostics.Tracing;
+using PixanKit.LaunchCore.Log;
 
 namespace PixanKit.LaunchCore.GameModule
 {
@@ -121,6 +122,7 @@ namespace PixanKit.LaunchCore.GameModule
         {
             _path = path;
             AddSelf();
+            InitGames();
         }
 
         /// <summary>
@@ -235,9 +237,11 @@ namespace PixanKit.LaunchCore.GameModule
                 {
                     _games.Add(tmp);
                     tmp.SetOwner(this);
+                    Logger.Info($"Folder {Path} Add Game {tmp.Path}");
                     Launcher.GameLoad?.Invoke(tmp);
                 }
             }
+            Logger.Info($"Folder {Path} Added");
         }
 
         /// <summary>

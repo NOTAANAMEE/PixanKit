@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PixanKit.LaunchCore.Log;
 
 namespace PixanKit.LaunchCore.Core
 {
@@ -16,14 +17,17 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         public void Close()
         {
+            Logger.Info("Launcher Closing");
             Files.ModJData = SaveModData();
             Files.FolderJData = SaveFolderData();
             Files.RuntimeJData = SaveJavaData();
             Files.PlayerJData = SavePlayerData();
+            Logger.Info("Launcher Closed. Call Files.Save() To Save Or Handle It Yourself");
         }
 
         private JObject SaveModData()
         {
+            Logger.Info("Mod Module Closing");
             JArray modinfs = new();
             foreach (var mod in Mods) 
             { 
@@ -32,11 +36,12 @@ namespace PixanKit.LaunchCore.Core
             JObject jobj = new JObject();
             foreach (var folder in _folders) 
             {
-                foreach (var game in folder.Games) if (game.GameType == GameModule.Game.GameType.Mod)
+                foreach (var game in folder.Games) if (game.GameType == GameType.Mod)
                 {
                     jobj.Add(game.Path, ((ModloaderGame)game).ModToJSON());
                 }
             }
+            Logger.Info("Mod Module Colsed");
             return new JObject()
             {
                 { "children", modinfs},
@@ -46,6 +51,7 @@ namespace PixanKit.LaunchCore.Core
 
         private JObject SaveFolderData()
         {
+            Logger.Info("Game Module Closing");
             JArray folders = new();
             foreach (var folder in _folders) 
             {
