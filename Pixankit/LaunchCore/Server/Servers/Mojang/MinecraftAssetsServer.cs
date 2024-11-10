@@ -28,7 +28,8 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <returns>The URL</returns>
         public string GetAssetsUrl(string hash)
         {
-            return $"{Current.ReplacedURL}/{hash[0..2]}/{hash}";
+            return Current.Replace(
+                $"https://resources.download.minecraft.net/{hash[0..2]}/{hash}");
         }
 
         /// <summary>
@@ -39,7 +40,8 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         public string GetAssetsUrl(JObject jData)
         {
             string hash = jData.First["hash"].ToString();
-            return $"{Current.ReplacedURL}/{hash[0..2]}/{hash}";
+            return Current.Replace(
+                $"https://resources.download.minecraft.net/{hash[0..2]}/{hash}");
         }
 
         /// <summary>

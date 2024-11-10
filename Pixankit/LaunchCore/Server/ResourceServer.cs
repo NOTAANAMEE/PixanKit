@@ -30,7 +30,7 @@ namespace PixanKit.LaunchCore.Server
             List<KeyValuePair<long, MirrorServer>> dict = new();
             foreach (var item in Mirrors)
             {
-                long pingtime = GetPing(item.ReplacedURL);
+                long pingtime = GetPing(item.BaseURL);
                 if (pingtime > 0)
                     dict.Add(new(pingtime, item));
             }
@@ -53,7 +53,7 @@ namespace PixanKit.LaunchCore.Server
         /// <returns>The Time Needs To Ping</returns>
         public long Ping()
         {
-            return GetPing(Current.ReplacedURL);
+            return GetPing(Current.BaseURL);
         }
 
         /// <summary>
@@ -84,11 +84,7 @@ namespace PixanKit.LaunchCore.Server
         /// </summary>
         /// <param name="OriginUrl">The Origin Url For The Resource</param>
         /// <returns>The URL Of The Resource On The Current MirrorServer</returns>
-        protected string Replace(string OriginUrl)
-        {
-            if (Current.OriginURL == "") return OriginUrl;
-            return OriginUrl.Replace(Current.OriginURL, Current.ReplacedURL);
-        }
+        protected string Replace(string OriginUrl) => Current.Replace(OriginUrl);
 
         private static string GetHost(string OriginUrl)
         {

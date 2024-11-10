@@ -11,6 +11,9 @@ using HtmlAgilityPack;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
+    /// <summary>
+    /// Optifine Install Task
+    /// </summary>
     public class OptifineInstaller: MultiSequenceTask
     {
         //中文注释：
@@ -66,16 +69,6 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         private void Init_DownloadOptifine(string optifineVersion)
         {
             
-        }
-
-        public static async Task<Dictionary<string, string>> GetOptifineVersion() 
-        {
-            using HttpClient client = new() { BaseAddress = new Uri("https://optifine.net") };
-            var response = await client.GetAsync("/downloads");
-            HtmlDocument document = new();
-            document.Load(response.Content.ReadAsStream());
-            
-            return null;
         }
     }
 }

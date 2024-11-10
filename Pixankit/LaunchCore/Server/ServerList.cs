@@ -1,4 +1,5 @@
 ﻿using PixanKit.LaunchCore.Server.Servers.Microsoft;
+using PixanKit.LaunchCore.Server.Servers.ModLoader;
 using PixanKit.LaunchCore.Server.Servers.Mojang;
 using System;
 using System.Collections.Generic;
@@ -42,12 +43,12 @@ namespace PixanKit.LaunchCore.Server
         /// Server Instance For Minecraft Assets
         /// </summary>
         public static MinecraftAssetsServer MinecraftAssetsServer = new();
+
+        /// <summary>
+        /// Mod Loader Servers
+        /// </summary>
+        public static Dictionary<string, ModLoaderServer> ModLoaderServers = new();
     }
 
-    /// <summary>
-    /// Mirror Server
-    /// </summary>
-    /// <param name="OriginURL">The Url Part That Needs To Replace(If No, Make It "")</param>
-    /// <param name="ReplacedURL">The Url That Replacing(Include https://)</param>
-    public record MirrorServer(string OriginURL, string ReplacedURL);
+    
 }
