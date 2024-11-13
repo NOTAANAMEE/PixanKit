@@ -57,6 +57,16 @@ namespace PixanKit.LaunchCore.JavaModule
         /// <returns>Returns A JavaRuntime If Exisits. Else Return null</returns>
         public static JavaRuntime? Newest(JavaRuntime[] runtimes, GameBase game)
         {
+            return Newest(runtimes);
+        }
+
+        /// <summary>
+        /// Choose The Newest
+        /// </summary>
+        /// <param name="runtimes">Java Runtime Array</param>
+        /// <returns>Newest Java Runtime</returns>
+        public static JavaRuntime? Newest(JavaRuntime[] runtimes)
+        {
             List<JavaRuntime> runtimes_ = runtimes.ToList();
             runtimes_.Sort((x, y) =>
             {
@@ -65,4 +75,6 @@ namespace PixanKit.LaunchCore.JavaModule
             return runtimes_[^1];
         }
     }
+
+
 }

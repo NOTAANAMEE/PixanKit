@@ -81,14 +81,31 @@ namespace PixanKit.ResourceDownloader.Download
         /// </summary>
         /// <param name="URL">The URL Of The File</param>
         /// <param name="Path">The Destination</param>
-        public MultiThreadDownload(string URL, string Path)
+        public MultiThreadDownload(string URL, string Path) : this(Path)
         {
-            url = URL;
+            SetURL(URL);
+        }
+
+        /// <summary>
+        /// Initor
+        /// </summary>
+        /// <param name="Path"></param>
+        public MultiThreadDownload(string Path)
+        {
             path = Path;
             Directory.CreateDirectory(Localize.GetLocalDirectory(Path));
             Return = new FileStream(Localize.PathLocalize(Path), FileMode.Create);
             OnFinish += FinishTask;
             OnCancel += CancelTask;
+        }
+
+        /// <summary>
+        /// Set URL
+        /// </summary>
+        /// <param name="URL"></param>
+        public void SetURL(string URL) 
+        {
+            url = URL;
             Init().Wait();
         }
 

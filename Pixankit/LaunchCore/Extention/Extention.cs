@@ -34,17 +34,11 @@ namespace PixanKit.LaunchCore.Extention
         /// </summary>
         public static Func<long> GetMemory;
 
-        /// <summary>
-        /// Custom Get ModList
-        /// </summary>
-        public static Func<ModloaderGame,JArray> GetModList;
-
         static Initors()
         {
             GameInitor += DefaultGameInitor;
             PlayerInitor += DefaultPlayerInitor;
             GetMemory += GetMem;
-            GetModList += DefaultModGetter;
         }
 
         /// <summary>
@@ -99,17 +93,6 @@ namespace PixanKit.LaunchCore.Extention
         public static long GetMem()
         {
             return 6000;
-        }
-
-        /// <summary>
-        /// Default Mod Getter For One Game
-        /// </summary>
-        /// <param name="game">Mod Loader Game</param>
-        /// <returns>JArray Of Games</returns>
-        public static JArray DefaultModGetter(ModloaderGame game)
-        {
-            if (game.Owner == null || game.Owner.Owner == null) return new JArray();
-            return (JArray?)game.Owner.Owner.GameModCache[game.GameFolder]?? new JArray();
         }
 
         private static void ExtentionInit()

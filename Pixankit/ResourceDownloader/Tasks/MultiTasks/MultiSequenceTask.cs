@@ -19,13 +19,13 @@ namespace PixanKit.ResourceDownloader.Tasks.MultiTasks
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public override void Cancel()
+        public override async Task Cancel()
         {
             foreach (var process in processes) 
             {
-                if (process.Status < ProcessStatus.Canceling) process.Cancel();
+                if (process.Status < ProcessStatus.Canceling) await process.Cancel();
             }
-            base.Cancel();
+            await base.Cancel();
         }
 
         /// <summary>

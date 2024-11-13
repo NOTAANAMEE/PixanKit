@@ -149,6 +149,11 @@ namespace PixanKit.LaunchCore.GameModule.Game
         #endregion
 
         #region Initors
+        protected GameBase(string path):this(path, true)
+        {
+
+        }
+
         /// <summary>
         /// Initor
         /// </summary>
@@ -192,7 +197,10 @@ namespace PixanKit.LaunchCore.GameModule.Game
             InitJData();
         }
 
-        private void InitJData()
+        /// <summary>
+        /// Init JSON Data From tmpdata
+        /// </summary>
+        protected void InitJData()
         { 
             var jData = tmpdata;
             className = (jData["mainClass"] ?? "net.minecraft.client.main.Main.").ToString();

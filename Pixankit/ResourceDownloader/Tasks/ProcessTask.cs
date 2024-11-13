@@ -13,7 +13,6 @@ namespace PixanKit.ResourceDownloader.Tasks
         /// </summary>
         protected List<Task> Tasks = new();
 
-        //protected TaskCompletionSource<bool> Starting = new TaskCompletionSource<bool>(false);
         /// <summary>
         /// The Process Is Finished
         /// </summary>
@@ -90,7 +89,6 @@ namespace PixanKit.ResourceDownloader.Tasks
         {
             if (Status != ProcessStatus.Initing) throw new InvalidOperationException();
             OnStart?.Invoke();
-            //Starting.SetResult(true);
             _ = Running();
             _status = ProcessStatus.Running;
         }
@@ -99,7 +97,7 @@ namespace PixanKit.ResourceDownloader.Tasks
         /// This method cancels the process
         /// </summary>
         /// <exception cref="InvalidOperationException"></exception>
-        public virtual async void Cancel()
+        public virtual async Task Cancel()
         {
             if (_status >= ProcessStatus.Canceling) throw new InvalidOperationException();
             _status = ProcessStatus.Canceling;
@@ -133,6 +131,15 @@ namespace PixanKit.ResourceDownloader.Tasks
             TaskStopped.SetResult(true);
             if (Status == ProcessStatus.Running) Finish();
         }
+
+        /// <summary>
+        /// Add A Task
+        /// </summary>
+        /// <param name="task"></param>
+        public void AddTask(Task task)
+        {
+            Tasks.Add(task);
+        }
     }
 
     /// <summary>
@@ -143,10 +150,25 @@ namespace PixanKit.ResourceDownloader.Tasks
     /// </summary>
     public enum ProcessStatus
     {
+        /// <summary>
+        /// Task Initing
+        /// </summary>
         Initing,
+        /// <summary>
+        /// Task Running
+        /// </summary>
         Running,
+        /// <summary>
+        /// Task Canceling
+        /// </summary>
         Canceling,
+        /// <summary>
+        /// Task Canceled
+        /// </summary>
         Canceled,
+        /// <summary>
+        /// Task Finished
+        /// </summary>
         Finished
     }
 }

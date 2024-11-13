@@ -28,19 +28,6 @@ namespace PixanKit.LaunchCore.Extention
         }
 
         /// <summary>
-        /// Mod JSON Data
-        /// </summary>
-        public static JObject ModJData
-        {
-            get
-            {
-                if (_modJData == null) throw new NullReferenceException();
-                return _modJData;
-            }
-            set => _modJData = value;
-        }
-
-        /// <summary>
         /// Runtime JSON Data
         /// </summary>
         public static JObject RuntimeJData
@@ -93,16 +80,19 @@ namespace PixanKit.LaunchCore.Extention
         /// <summary>
         /// Dir For Minecraft Version Manifest
         /// </summary>
-        public static string ManifestSavePlace = $"{LauncherConfigDir}/Cache/manifest.json";
+        public static string ManifestSavePlace = $"{CacheDir}/manifest.json";
 
         /// <summary>
         /// Dir For Skin Cache
         /// </summary>
-        public static string SkinCache = $"{LauncherConfigDir}/Cache/Skin";
+        public static string SkinCache = $"{CacheDir}/Skin";
+
+        /// <summary>
+        /// Dir For Cache
+        /// </summary>
+        public static string CacheDir = $"{LauncherConfigDir}/Cache";
 
         private static JObject? _folderJData = null;
-
-        private static JObject? _modJData = null;
 
         private static JObject? _runtimeJData = null;
 
@@ -129,9 +119,7 @@ namespace PixanKit.LaunchCore.Extention
         /// </summary>
         public static void Generate()
         {
-            ModJData = (JObject)DefaultJSON.JData.DeepClone();
             FolderJData = (JObject)DefaultJSON.JData.DeepClone();
-            FolderJData.Remove("games");
             PlayerJData = (JObject)FolderJData.DeepClone();
             RuntimeJData = (JObject)FolderJData.DeepClone();
             RuntimeJData.Remove("target");
@@ -143,27 +131,22 @@ namespace PixanKit.LaunchCore.Extention
         /// </summary>
         public static void Save()
         {
-            FileStream modFS = new ($"{LauncherConfigDir}/ModInf.json", FileMode.Create),
-                       folderFS = new($"{LauncherConfigDir}/Folders.json", FileMode.Create),
+            FileStream folderFS = new($"{LauncherConfigDir}/Folders.json", FileMode.Create),
                        playerFS = new($"{LauncherConfigDir}/Players.json", FileMode.Create),
                        runtimeFS = new($"{LauncherConfigDir}/JavaRuntime.json", FileMode.Create),
                        settingsFS = new($"{LauncherConfigDir}/Settings.json", FileMode.Create);
-            StreamWriter modsw = new(modFS),
-                         foldersw = new(folderFS),
+            StreamWriter foldersw = new(folderFS),
                          playersw = new(playerFS),
                          runtimesw = new(runtimeFS),
                          settingsw = new(settingsFS);
-            modsw.Write(ModJData.ToString());
             foldersw.Write(FolderJData.ToString());
             playersw.Write(PlayerJData.ToString());
             runtimesw.Write(RuntimeJData.ToString());
             settingsw.Write(SettingsJData.ToString());
-            modsw.Close();
             foldersw.Close();
             playersw.Close();
             runtimesw.Close();
             settingsw.Close();
-            modFS.Close();
             folderFS.Close();
             playerFS.Close();
             runtimeFS.Close();
@@ -175,28 +158,23 @@ namespace PixanKit.LaunchCore.Extention
         /// </summary>
         public static void Load() 
         {
-            FileStream modFS = new($"{LauncherConfigDir}/ModInf.json", FileMode.Open),
-                       folderFS = new($"{LauncherConfigDir}/Folders.json", FileMode.Open),
+            FileStream folderFS = new($"{LauncherConfigDir}/Folders.json", FileMode.Open),
                        playerFS = new($"{LauncherConfigDir}/Players.json", FileMode.Open),
                        runtimeFS = new($"{LauncherConfigDir}/JavaRuntime.json", FileMode.Open),
                        settingsFS = new($"{LauncherConfigDir}/Settings.json", FileMode.Open);
-            StreamReader modsr = new(modFS),
-                         foldersr = new(folderFS),
+            StreamReader foldersr = new(folderFS),
                          playersr = new(playerFS),
                          runtimesr = new(runtimeFS),
                          settingsr = new(settingsFS);
-            Task<string> t0 = modsr.ReadToEndAsync(),
-                         t1 = foldersr.ReadToEndAsync(),
+            Task<string> t1 = foldersr.ReadToEndAsync(),
                          t2 = playersr.ReadToEndAsync(),
                          t3 = runtimesr.ReadToEndAsync(),
                          t4 = settingsr.ReadToEndAsync();
-            Task.WaitAll(t0, t1, t2, t3, t4);
-            _modJData = JObject.Parse(t0.Result);
+            Task.WaitAll(t1, t2, t3, t4);
             _folderJData = JObject.Parse(t1.Result);
             _playerJData = JObject.Parse(t2.Result);
             _runtimeJData = JObject.Parse(t3.Result);
             _settingsJData = JObject.Parse(t4.Result);
-            modFS.Close();
             folderFS.Close();
             playerFS.Close();
             runtimeFS.Close();
@@ -209,7 +187,6 @@ namespace PixanKit.LaunchCore.Extention
         public static JObject JData = new()
         {
             { "children", new JArray() },
-            { "games", new JObject() },
             { "target", "" }
         };
 

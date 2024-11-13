@@ -1,5 +1,4 @@
 ﻿using PixanKit.LaunchCore.Extention;
-using PixanKit.LaunchCore.GameModule.Mod;
 using PixanKit.LaunchCore.SystemInf;
 using Newtonsoft.Json.Linq;
 using System;
@@ -8,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PixanKit.LaunchCore.GameModule.LibraryData;
+using System.Xml.Linq;
 
 namespace PixanKit.LaunchCore.GameModule.Game
 {
@@ -38,6 +38,26 @@ namespace PixanKit.LaunchCore.GameModule.Game
             {
                 _version = jData["inheritsFrom"].ToString();
             }
+            InitJData(jData);
+        }
+
+        /// <summary>
+        /// Init A Modified Game With Its Path
+        /// </summary>
+        /// <param name="path"></param>
+        public ModifiedGame(string path):base(path, true)
+        {
+            _gameType = GameType.Optifine;
+            if (!tmpdata.ContainsKey("inheritsFrom"))
+            {
+                PCL2 = true;
+                assetsID = tmpdata["assetIndex"]["id"].ToString();
+            }
+            else
+            {
+                _version = tmpdata["inheritsFrom"].ToString();
+            }
+            InitJData();
         }
 
         /// <summary>

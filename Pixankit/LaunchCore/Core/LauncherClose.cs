@@ -18,35 +18,10 @@ namespace PixanKit.LaunchCore.Core
         public void Close()
         {
             Logger.Info("Launcher Closing");
-            Files.ModJData = SaveModData();
             Files.FolderJData = SaveFolderData();
             Files.RuntimeJData = SaveJavaData();
             Files.PlayerJData = SavePlayerData();
             Logger.Info("Launcher Closed. Call Files.Save() To Save Or Handle It Yourself");
-        }
-
-        private JObject SaveModData()
-        {
-            Logger.Info("Mod Module Closing");
-            JArray modinfs = new();
-            foreach (var mod in Mods) 
-            { 
-                modinfs.Add(mod.ToJSON());
-            }
-            JObject jobj = new JObject();
-            foreach (var folder in _folders) 
-            {
-                foreach (var game in folder.Games) if (game.GameType == GameType.Mod)
-                {
-                    jobj.Add(game.Path, ((ModloaderGame)game).ModToJSON());
-                }
-            }
-            Logger.Info("Mod Module Colsed");
-            return new JObject()
-            {
-                { "children", modinfs},
-                { "games", jobj} 
-            };
         }
 
         private JObject SaveFolderData()

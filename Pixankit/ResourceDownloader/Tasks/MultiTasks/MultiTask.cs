@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -62,16 +63,16 @@ namespace PixanKit.ResourceDownloader.Tasks.MultiTasks
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public override void Cancel()
+        public override async Task Cancel()
         {
             if (Status == ProcessStatus.Running)
             {
                 foreach (var process in processes)
                 {
-                    if (process.Status < ProcessStatus.Canceling) process.Cancel();
+                    if (process.Status < ProcessStatus.Canceling) await process.Cancel();
                 }
             }
-            base.Cancel();
+            await base.Cancel();
         }
     }
 }

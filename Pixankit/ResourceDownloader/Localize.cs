@@ -48,5 +48,11 @@ namespace PixanKit.ResourceDownloader.SystemInf
         {
             return path.Replace('\\', '/');
         }
+
+        public static void CheckDir(string path)
+        {
+            string dir = Path.GetDirectoryName(path);
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+        }
     }
 }

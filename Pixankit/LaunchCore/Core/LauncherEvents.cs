@@ -1,6 +1,5 @@
 ﻿using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.GameModule.Game;
-using PixanKit.LaunchCore.GameModule.Mod;
 using PixanKit.LaunchCore.PlayerModule.Player;
 using System;
 using System.Collections.Generic;
@@ -57,36 +56,6 @@ namespace PixanKit.LaunchCore.Core
         /// Game Exit Event
         /// </summary>
         public static Action<GameBase, ProcessResult>? GameExit;
-
-        /// <summary>
-        /// Mod Information Load
-        /// </summary>
-        public static Action<ModBase>? ModBaseLoad;
-
-        /// <summary>
-        /// Mod Load To A Game
-        /// </summary>
-        public static Action<ModFile, ModloaderGame>? ModLoad;
-
-        /// <summary>
-        /// Mod Information Add Event
-        /// </summary>
-        public static Action<ModBase>? ModBaseAdd;
-
-        /// <summary>
-        /// Mod Information Remove Event
-        /// </summary>
-        public static Action<ModBase>? ModBaseRemove;
-
-        /// <summary>
-        /// Mod File Add Event
-        /// </summary>
-        public static Action<ModFile, ModloaderGame>? ModAdd;
-
-        /// <summary>
-        /// Mod File Remove Event
-        /// </summary>
-        public static Action<ModFile, ModloaderGame>? ModRemove;
         #endregion
 
         #region PlayerEvents

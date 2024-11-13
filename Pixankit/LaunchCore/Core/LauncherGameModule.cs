@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PixanKit.LaunchCore.GameModule.Mod;
 using System.Runtime.CompilerServices;
 using PixanKit.LaunchCore.SystemInf;
 using PixanKit.LaunchCore.Extention;
@@ -32,22 +31,7 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         public GameBase? TargetGame { get; set; }
 
-        /// <summary>
-        /// Mod Informations. Mod Cache
-        /// </summary>
-        public ModBase[] Mods
-        {
-            get => _modCache.Values.ToArray();
-        }
-
-        /// <summary>
-        /// Game Cache For Mods
-        /// </summary>
-        public JObject GameModCache = new();
-
         private List<Folder> _folders = new();
-
-        private Dictionary<string, ModBase> _modCache = new();
 
         private bool nogame;//Judge whether there is a game. It will be changed automatically  
 
@@ -252,49 +236,6 @@ namespace PixanKit.LaunchCore.Core
         }
 
         /// <summary>
-        /// Add A Mod Information
-        /// </summary>
-        /// <param name="mod"></param>
-        public void AddMod(ModBase mod)
-        {
-            if (_modCache.ContainsKey(mod.ID)) return;
-            _modCache.Add(mod.ID, mod);
-            ModBaseAdd?.Invoke(mod);
-        }
-
-        /// <summary>
-        /// Remove A Mod Information
-        /// </summary>
-        /// <param name="mod"></param>
-        public void RemoveMod(ModBase mod)
-        {
-            _modCache.Remove(mod.ID);
-        }
-
-        /// <summary>
-        /// Set the information of the file by ID and the mod information count will add 1
-        /// </summary>
-        /// <param name="file"></param>
-        /// <exception cref="Exception"></exception>
-        public void SetModInformation(ModFile file)
-        {
-            string index = file.ID;
-            if (!_modCache.ContainsKey(index)) throw new Exception($"Could not find the id:{file.ID}");
-            _modCache[index].SetModInformation(file);
-        }
-
-        /// <summary>
-        /// Set the information of the file.
-        /// </summary>
-        /// <param name="file"></param>
-        /// <param name="ModInf"></param>
-        public void SetModInformation(ModFile file, ModBase ModInf)
-        {
-            file.ID = ModInf.ID;
-            ModInf.SetModInformation(file);
-        }
-
-        /// <summary>
         /// Move game to another folder. Not implemented yet
         /// </summary>
         /// <param name="game"></param>
@@ -320,14 +261,6 @@ namespace PixanKit.LaunchCore.Core
 
             return cmd;
         }
-
-        /// <summary>
-        /// Get The Mod ID
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public ModBase FindMod(string id)
-            => _modCache[id];
 
         private void ResetTargetGame()
         {
