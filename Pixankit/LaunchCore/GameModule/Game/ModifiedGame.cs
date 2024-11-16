@@ -17,9 +17,9 @@ namespace PixanKit.LaunchCore.GameModule.Game
     public class ModifiedGame: GameBase
     {
         /// <summary>
-        /// Whether It Is PCL2 Created
+        /// Whether It Is useBaseGeneration Created
         /// </summary>
-        protected bool PCL2;
+        protected bool useBaseGeneration;
 
         /// <summary>
         /// Init A <c>ModifiedGame</c> 
@@ -31,14 +31,14 @@ namespace PixanKit.LaunchCore.GameModule.Game
             _gameType = GameType.Optifine;
             if (!jData.ContainsKey("inheritsFrom"))
             {
-                PCL2 = true;
+                useBaseGeneration = true;
                 assetsID = jData["assetIndex"]["id"].ToString();
             }
             else
             {
                 _version = jData["inheritsFrom"].ToString();
             }
-            InitJData(jData);
+            //InitJData(jData);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             _gameType = GameType.Optifine;
             if (!tmpdata.ContainsKey("inheritsFrom"))
             {
-                PCL2 = true;
+                useBaseGeneration = true;
                 assetsID = tmpdata["assetIndex"]["id"].ToString();
             }
             else
@@ -67,7 +67,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         public override void SetOwner(Folder folder)
         {
             base.SetOwner(folder);
-            if (PCL2) return;
+            if (useBaseGeneration) return;
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <returns><inheritdoc/></returns>
         protected override string GetCPArgs()
         {
-            if (PCL2) return base.GetCPArgs();
+            if (useBaseGeneration) return base.GetCPArgs();
             return base.SameVersionCPArgs() + base.GetCPArgs();
         }
 
@@ -86,7 +86,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <returns><inheritdoc/></returns>
         protected override string GetGameArguments()
         {
-            if (PCL2) return PCLGameArgProcess(base.GetGameArguments());
+            if (useBaseGeneration) return PCLGameArgProcess(base.GetGameArguments());
             return base.SameVersionGameArguments() + " " + base.GetGameArguments();
         }
 
@@ -96,7 +96,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <returns><inheritdoc/></returns>
         protected override string GetJVMArguments()
         {
-            if (PCL2) return base.GetJVMArguments();
+            if (useBaseGeneration) return base.GetJVMArguments();
             return base.GetJVMArguments();
         }
 
@@ -106,7 +106,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <returns><inheritdoc/></returns>
         protected override string GetAssetsID()
         {
-            if (PCL2) return base.GetAssetsID();
+            if (useBaseGeneration) return base.GetAssetsID();
             return base.SameVersionAssetsID();
         }
 

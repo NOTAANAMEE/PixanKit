@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResourceDownloader", "Pixan
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LaunchCore", "Pixankit\LaunchCore\LaunchCore.csproj", "{65E1466F-F789-4C69-AF63-3D49454BB4D1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModKit", "ModKit\ModKit.csproj", "{C270D3C3-5DE1-4D60-B9B7-6C7B08DAB434}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{65E1466F-F789-4C69-AF63-3D49454BB4D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65E1466F-F789-4C69-AF63-3D49454BB4D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65E1466F-F789-4C69-AF63-3D49454BB4D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C270D3C3-5DE1-4D60-B9B7-6C7B08DAB434}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C270D3C3-5DE1-4D60-B9B7-6C7B08DAB434}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C270D3C3-5DE1-4D60-B9B7-6C7B08DAB434}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C270D3C3-5DE1-4D60-B9B7-6C7B08DAB434}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,6 +42,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{78689F85-A0A4-4175-A70E-A21CF4DF145C} = {2471B067-5C37-47BB-99AC-226143F0FF94}
 		{65E1466F-F789-4C69-AF63-3D49454BB4D1} = {2471B067-5C37-47BB-99AC-226143F0FF94}
+		{C270D3C3-5DE1-4D60-B9B7-6C7B08DAB434} = {2471B067-5C37-47BB-99AC-226143F0FF94}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C771E4FE-4D22-48D8-8AA4-5D5190508EFB}

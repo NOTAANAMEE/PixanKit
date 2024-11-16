@@ -149,6 +149,10 @@ namespace PixanKit.LaunchCore.GameModule.Game
         #endregion
 
         #region Initors
+        /// <summary>
+        /// Initor
+        /// </summary>
+        /// <param name="path">Path Of The Initor</param>
         protected GameBase(string path):this(path, true)
         {
 
@@ -226,8 +230,6 @@ namespace PixanKit.LaunchCore.GameModule.Game
             if (_path.StartsWith(owner.Path))
             folder = owner;
             InitJData();
-            
-            //Launcher.GameInit?.Invoke(Owner.Owner, this);
         }
 
         private void SetSettings()
@@ -242,32 +244,36 @@ namespace PixanKit.LaunchCore.GameModule.Game
         {
             foreach (JToken token in (jData["libraries"] ?? new JObject()))
             {
-                LibraryBase? tmp = null;
-
-                if (!LibraryBase.GetAllowedSystem(token).Contains(SystemInformation.OSName)) continue;//不支持就下一个
-
-                if (folder != null && (tmp = folder.FindLibrary((token["name"] ?? 1).ToString())) != null)
-                {
-                    libraries.Add(tmp);
-                    continue;
-                }
+                //System Support?
+                if (!SystemSupport(token)) continue;
 
                 switch (LibraryBase.GetLibraryType(token))
                 {
                     case LibraryType.Ordinary:
-                        libraries.Add(folder.AddLibrary(new OrdinaryLibrary(token)));
+                        libraries.Add(FolderAddLibrary(new OrdinaryLibrary(token)));
                         break;
                     case LibraryType.Native:
-                        libraries.Add(folder.AddLibrary(new NativeLibrary(token)));
+                        libraries.Add(FolderAddLibrary(new NativeLibrary(token)));
                         if ((token["downloads"] as JObject ?? new JObject()).Count > 1) 
-                            libraries.Add(folder.AddLibrary(new OrdinaryLibrary(token)));
+                            libraries.Add(FolderAddLibrary(new OrdinaryLibrary(token)));
                         break;
                     case LibraryType.Mod:
-                        libraries.Add(folder.AddLibrary(tmp = new LoaderLibrary(token)));
+                        libraries.Add(FolderAddLibrary(new LoaderLibrary(token)));
                         break;
                 }
             }
             Logger.Info($"Libraries Added. Number:{libraries.Count}");
+        }
+
+        private bool SystemSupport(JToken libraryToken)
+        {
+            return LibraryBase.GetAllowedSystem(libraryToken).Contains(SystemInformation.OSName);
+        }
+
+        private LibraryBase FolderAddLibrary(LibraryBase library)
+        {
+            if (folder == null) return library;
+            else return folder.AddLibrary(library);
         }
 
         internal virtual void SetGameArgument(JObject jData)
