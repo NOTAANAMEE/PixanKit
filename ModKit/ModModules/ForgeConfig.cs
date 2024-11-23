@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ModKit.ModModules
 {
-    public class ForgeModConfig
+    internal class ForgeModConfig
     {
         // Mandatory fields
         public string ModLoader { get; set; } = "";
@@ -24,7 +24,7 @@ namespace ModKit.ModModules
 
     }
 
-    public class ForgeMod
+    internal class ForgeMod
     {
         // Mandatory fields
         public string ModId { get; set; } = "";
@@ -47,14 +47,14 @@ namespace ModKit.ModModules
                 Name = DisplayName,
                 IconFile = LogoFile,
                 Authors = new string[] { Authors },
-                Descrpiton = Description,
+                Description = Description,
                 Version = Version,
             };
             return file;
         }
     }
 
-    public class ForgeDependency
+    internal class ForgeDependency
     {
         public string ModId { get; set; } = "";
         public bool Mandatory { get; set; }

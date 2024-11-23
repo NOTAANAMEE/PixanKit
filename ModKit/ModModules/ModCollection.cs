@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Extention;
 using PixanKit.LaunchCore.GameModule.Game;
+using PixanKit.LaunchCore.Log;
 using PixanKit.ModKit;
 using PixanKit.ModKit.ModModules;
 using System;
@@ -11,29 +12,60 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pixanit.ModKit.ModModules
+namespace PixanKit.ModKit.ModModules
 {
     /// <summary>
     /// Mod Collection Of A Game 
     /// </summary>
     public class ModCollection
     {
+        #region Fields
         /// <summary>
         /// The Mod Directory
         /// </summary>
-        public string ModDir;
+        public string ModDir = "";
 
         /// <summary>
         /// Mods Dictionary. String Is The Mod ID
         /// </summary>
         public Dictionary<string, ModFile?> Mods = new();
+        #endregion
 
+        #region Initors
         public ModCollection(string modDir) 
         {
             ModDir = modDir;
+            ModsLoad();
         }
 
+        public ModCollection() { }
+
         public ModCollection(ModloaderGame game):this(game.ModDir) { }
+        #endregion
+
+        #region InitorMethods
+        private void ModsLoad()
+        {
+            string[] files = Directory.GetFiles(Localize.PathLocalize(ModDir));
+            foreach (var file in files) 
+            {
+                if (!IsMod(file)) continue;
+                try
+                {
+                    LoadMod(file);
+                }
+                catch
+                {
+                    Logger.Warn("PixanKit.ModModule", $"File {file} Is Not A Mod But Located In A Mod Directory. Please Remove It");
+                }
+            }
+            Logger.Info("PixanKit.ModModule", $"Finish Reading {ModDir}. Loaded {Mods.Count} Mods");
+        }
+
+        private bool IsMod(string filePath)
+        {
+            return filePath.EndsWith(".jar") || filePath.EndsWith(".jar.disabled");
+        }
 
         private ModFile ModFileLoad(string file)
         {
@@ -43,11 +75,18 @@ namespace Pixanit.ModKit.ModModules
             return modFile;
         }
 
+        private void LoadMod(string filePath)
+        {
+            var tmp = ModFileLoad(filePath);
+            Mods.Add(tmp.ID, tmp);
+        }
+
         private static void ModCacheLoad(ModFile mod)
         {
             string sha1 = ModFile.GetSHA1(mod.Path);
             if ((ModModule.ModCache["mods"] as JObject).ContainsKey(sha1))
                 mod.JSONLoad(ModModule.ModCache["mods"][sha1] as JObject);
+            else Logger.Warn("PixanKit.ModModule", $"Could Not Find Mod Cache For {mod.Path}! This Is An Invalid Mod");
         }
 
         private void IconLoad(ModFile mod)
@@ -61,12 +100,13 @@ namespace Pixanit.ModKit.ModModules
         /// Enforce Update The Image
         /// </summary>
         /// <param name="mod"></param>
-        private void IconUpdate(ModFile mod)
+        private static void IconUpdate(ModFile mod)
         {
             if ((ModModule.ModCache["icon"] as JObject).ContainsKey(mod.ID))
                 (ModModule.ModCache["icon"] as JObject).Remove(mod.ID);
             (ModModule.ModCache["icon"] as JObject).Add(mod.ID, mod.ExtractIcon());
         }
+        #endregion
 
         public void AddMod(string filePath)
         {
@@ -83,6 +123,7 @@ namespace Pixanit.ModKit.ModModules
             Mods.Remove(mod.ID);
         }
 
+        #region Dependencies
         public bool CheckDependencies() 
         {
             return GetMissingDependencies().Count == 0;
@@ -120,5 +161,6 @@ namespace Pixanit.ModKit.ModModules
             }
             return ret;
         }
+        #endregion
     }
 }

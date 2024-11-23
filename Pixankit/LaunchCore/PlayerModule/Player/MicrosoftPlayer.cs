@@ -37,7 +37,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// </summary>
         public string SkinCachePath
         {
-            get => Files.SkinCache + $"/{UID}-skin.png";
+            get => Files.SkinCacheDir + $"/{UID}-skin.png";
         }
 
         private DateTime _latestLoginTime;

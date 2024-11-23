@@ -50,7 +50,7 @@ namespace PixanKit.LaunchCore.Core
         /// <summary>
         /// Post-launch Event
         /// </summary>
-        public static Func<GameBase>? GamePostLaunch;
+        public static Action<GameBase>? GamePostLaunch;
 
         /// <summary>
         /// Game Exit Event

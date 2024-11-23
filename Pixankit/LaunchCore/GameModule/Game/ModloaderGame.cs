@@ -29,6 +29,6 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </summary>
         /// <param name="path"><inheritdoc/></param>
         /// <param name="jData"><inheritdoc/></param>
-        public ModloaderGame(string path, JObject jData):base(path, jData) { }
+        public ModloaderGame(string path, JObject jData):base(path, jData) { _gameType = GameType.Mod; }
     }
 }

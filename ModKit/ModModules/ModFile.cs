@@ -19,6 +19,7 @@ namespace PixanKit.ModKit.ModModules
     /// </summary>
     public class ModFile
     {
+        #region Properties
         /// <summary>
         /// The File Path
         /// </summary>
@@ -81,7 +82,9 @@ namespace PixanKit.ModKit.ModModules
             get;
             private set;
         } = false;
+        #endregion
 
+        #region Fields
         public string[] Authors = Array.Empty<string>();
 
         public Dictionary<string, string> Dependencies = new();
@@ -94,19 +97,23 @@ namespace PixanKit.ModKit.ModModules
         private FileStream? file;
 
         private ZipArchive? zip;
+        #endregion
 
+        #region Initors
         /// <summary>
         /// Initor
         /// </summary>
         /// <param name="filepath">FilePath Of The Mod Loader</param>
         public ModFile(string filepath)
         {
+            Path = filepath;
             OpenZIP();
             Valid = FabricLoad() || ForgeLoad();
             CloseZIP();
         }
 
         internal ModFile() { }
+        #endregion
 
         #region InitorMethods
         private void LoadMod()
@@ -119,7 +126,7 @@ namespace PixanKit.ModKit.ModModules
         private void OpenZIP()
         {
             file = new FileStream(
-                Localize.PathLocalize(Path), FileMode.Open);
+                Localize.PathLocalize(Path), FileMode.Open, FileAccess.Read, FileShare.Read);
             zip = new ZipArchive(file);
         }
         
@@ -174,6 +181,7 @@ namespace PixanKit.ModKit.ModModules
 
         internal void JSONLoad(JObject modJData)
         {
+            Valid = true;
             Name = modJData["name"].ToString();
             ID = modJData["modid"].ToString();
             Version = modJData["version"].ToString();
@@ -187,6 +195,7 @@ namespace PixanKit.ModKit.ModModules
         }
         #endregion
 
+        #region Icons
         internal string ExtractIcon()
         {
             string iconpath = Localize.PathLocalize(
@@ -217,6 +226,7 @@ namespace PixanKit.ModKit.ModModules
             catch { File.Delete(iconpath); }
             return destination;
         }
+        #endregion
 
         private void Extract(string zippath, string filepath)
         {
@@ -226,7 +236,7 @@ namespace PixanKit.ModKit.ModModules
             if (entry == null)return;
             entry.ExtractToFile(Localize.PathLocalize(filepath));
         }
-
+        
         public static string GetSHA1(string Path)
         {
             using (SHA1 sha1 = SHA1.Create())
@@ -240,6 +250,22 @@ namespace PixanKit.ModKit.ModModules
                 }
                 return stringBuilder.ToString();
             }
+        }
+
+        public void Disable()
+        {
+            if (Path.EndsWith(".disabled")) return;
+            string origin = Path;
+            File.Move(Localize.PathLocalize(origin),
+                Localize.PathLocalize(Path += ".disabled"));
+        }
+
+        public void Enable() 
+        {
+            if (Path.EndsWith(".jar")) return;
+            string origin = Path;
+            File.Move(Localize.PathLocalize(origin),
+                Localize.PathLocalize(Path[..Path.LastIndexOf('.')]));
         }
     }
 }

@@ -34,6 +34,7 @@ namespace PixanKit.LaunchCore.Core
         public Launcher()
         {
             if (Instance != null) throw new InvalidOperationException("Launcher is a single instance class");
+            Instance = this;
             Logger.Info("Start Initing");
             InitGameModule();
             InitPlayerModule();
@@ -41,7 +42,7 @@ namespace PixanKit.LaunchCore.Core
             Logger.Info("Launcher Inited Successfully");
             InitSettings();
             LauncherInit?.Invoke(this);
-            Instance = this;
+            
         }
 
         private void InitGameModule()

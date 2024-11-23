@@ -98,7 +98,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <summary>
         /// The Settings Config Path
         /// </summary>
-        public string SettingsPath { get => _path + Files.GameSettingName; }
+        public string SettingsPath { get => _path + Files.SettingsPath; }
 
         /// <summary>
         /// The Actual path of crash report. tar.gz file

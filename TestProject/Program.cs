@@ -4,6 +4,7 @@ using PixanKit.LaunchCore.Extention;
 using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.Log;
 using PixanKit.LaunchCore.PlayerModule.Player;
+using PixanKit;
 
 namespace TestProject
 {
@@ -22,9 +23,11 @@ namespace TestProject
             //launcher.AddFolder(new Folder("D:/Program Files/Minecraft/.minecraft"));
             Logger.Info("TestProject.Program.Main", "Finished Folder");
             //launcher.AddPlayer(new OfflinePlayer("MyName"));
-            launcher.Launch();
+            var tmp = launcher.Launch();
             launcher.Close();
             Files.Save();
+
+            Console.WriteLine(tmp.LogGZPath);
         }
     }
 }

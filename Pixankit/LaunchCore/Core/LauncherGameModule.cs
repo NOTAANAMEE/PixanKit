@@ -62,7 +62,7 @@ namespace PixanKit.LaunchCore.Core
             game.Decompress().Wait();
             string runningdir = 
                 string.Concat(AppDomain.CurrentDomain.BaseDirectory, 
-                Localize.PathLocalize(Files.LauncherConfigDir.Substring(2)));
+                Localize.PathLocalize(Files.ConfigDir.Substring(2)));
 
             ProcessStartInfo info = new()
             {

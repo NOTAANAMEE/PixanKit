@@ -14,6 +14,15 @@ namespace PixanKit.LaunchCore.Extention
     /// </summary>
     public static class Files
     {
+        static Files()
+        {
+            ConfigDir = "./Launcher/Config";
+            CacheDir = "${ConfigDir}/Cache";
+            SettingsPath = "/Launcher/settings.json";
+            ManifestDir = "${CacheDir}/manifest.json";
+            SkinCacheDir = "${CacheDir}/Skin";
+        }
+
         /// <summary>
         /// Folder JSON Data  
         /// </summary>
@@ -69,28 +78,34 @@ namespace PixanKit.LaunchCore.Extention
         /// <summary>
         /// Directory For Launcher Configuration Files.
         /// </summary>
-        public static string LauncherConfigDir = "./Launcher/Config";
+        public static string ConfigDir 
+        { get => Paths.Get("ConfigDir"); set => Paths.TrySet("ConfigDir", value); }
+
+        /// <summary>
+        /// Dir For Cache
+        /// </summary>
+        public static string CacheDir 
+        { get => Paths.Get("CacheDir"); set => Paths.TrySet("CacheDir", value); }
 
         /// <summary>
         /// The native setting for every game. 
         /// For example:C:\Users\admin\AppData\Roaming\.minecraft\versions\1.20.4\settings.json
         /// </summary>
-        public static string GameSettingName = "/Launcher/settings.json";
+        public static string SettingsPath 
+        { get => Paths.Get("CacheDir"); set => Paths.TrySet("CacheDir", value); }
 
         /// <summary>
         /// Dir For Minecraft Version Manifest
         /// </summary>
-        public static string ManifestSavePlace = $"{CacheDir}/manifest.json";
+        public static string ManifestDir
+        { get => Paths.Get("CacheDir"); set => Paths.TrySet("CacheDir", value); }
 
         /// <summary>
         /// Dir For Skin Cache
         /// </summary>
-        public static string SkinCache = $"{CacheDir}/Skin";
+        public static string SkinCacheDir 
+        { get => Paths.Get("CacheDir"); set => Paths.TrySet("CacheDir", value); }
 
-        /// <summary>
-        /// Dir For Cache
-        /// </summary>
-        public static string CacheDir = $"{LauncherConfigDir}/Cache";
 
         private static JObject? _folderJData = null;
 
@@ -131,10 +146,10 @@ namespace PixanKit.LaunchCore.Extention
         /// </summary>
         public static void Save()
         {
-            FileStream folderFS = new($"{LauncherConfigDir}/Folders.json", FileMode.Create),
-                       playerFS = new($"{LauncherConfigDir}/Players.json", FileMode.Create),
-                       runtimeFS = new($"{LauncherConfigDir}/JavaRuntime.json", FileMode.Create),
-                       settingsFS = new($"{LauncherConfigDir}/Settings.json", FileMode.Create);
+            FileStream folderFS = new($"{ConfigDir}/Folders.json", FileMode.Create),
+                       playerFS = new($"{ConfigDir}/Players.json", FileMode.Create),
+                       runtimeFS = new($"{ConfigDir}/JavaRuntime.json", FileMode.Create),
+                       settingsFS = new($"{ConfigDir}/Settings.json", FileMode.Create);
             StreamWriter foldersw = new(folderFS),
                          playersw = new(playerFS),
                          runtimesw = new(runtimeFS),
@@ -158,10 +173,10 @@ namespace PixanKit.LaunchCore.Extention
         /// </summary>
         public static void Load() 
         {
-            FileStream folderFS = new($"{LauncherConfigDir}/Folders.json", FileMode.Open),
-                       playerFS = new($"{LauncherConfigDir}/Players.json", FileMode.Open),
-                       runtimeFS = new($"{LauncherConfigDir}/JavaRuntime.json", FileMode.Open),
-                       settingsFS = new($"{LauncherConfigDir}/Settings.json", FileMode.Open);
+            FileStream folderFS = new($"{ConfigDir}/Folders.json", FileMode.Open),
+                       playerFS = new($"{ConfigDir}/Players.json", FileMode.Open),
+                       runtimeFS = new($"{ConfigDir}/JavaRuntime.json", FileMode.Open),
+                       settingsFS = new($"{ConfigDir}/Settings.json", FileMode.Open);
             StreamReader foldersr = new(folderFS),
                          playersr = new(playerFS),
                          runtimesr = new(runtimeFS),
