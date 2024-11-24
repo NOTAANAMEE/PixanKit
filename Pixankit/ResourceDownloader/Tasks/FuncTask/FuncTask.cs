@@ -7,31 +7,121 @@ using System.Threading.Tasks;
 
 namespace PixanKit.ResourceDownloader.Tasks.FuncTask
 {
-    public delegate Task TaskAction();
+    /// <summary>
+    /// Trackable Task Method Without Return
+    /// </summary>
+    /// <param name="process">Ref Double Schedule</param>
+    /// <param name="cancelRequest">Cancel Request
+    /// <br/>Please Check Regularly
+    /// </param>
+    /// <returns>NULL</returns>
+    public delegate Task TrackableTaskAction(TrackActionTask process, 
+        CancellationToken cancelRequest);
 
-    public delegate Task<T> TaskFunc<T>();
+    /// <summary>
+    /// Trackable Task Method With Return
+    /// </summary>
+    /// <param name="process">Change Schedule With process</param>
+    /// <param name="cancelRequest">Cancel Request
+    /// <br/>Please Check Regularly
+    /// </param>
+    /// <typeparam name="T">Type T</typeparam>
+    /// <returns>Return Of The Method</returns>
+    public delegate Task<T> TrackableTaskFunc<T>(TrackFuncTask<T> process, 
+        CancellationToken cancelRequest);
 
-    public class ActionTask: ProcessTask
+    /// <summary>
+    /// Trackable Method Without Return
+    /// </summary>
+    public class TrackActionTask:ProcessTask
     {
-        public TaskAction Action;
+        /// <summary>
+        /// The Methods
+        /// </summary>
+        public TrackableTaskAction? Action;
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public override double Schedule => Sched;
+
+        /// <summary>
+        /// Outside Set Schedule
+        /// </summary>
+        public double Sched = 0;
+
+        CancellationTokenSource canceltoken = new();
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
+        public override Task Cancel()
+        {
+            canceltoken.Cancel();
+            return base.Cancel();
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
         protected override async Task Running()
         {
-            await Action();
+            if (Action != null)
+            await Action(this, canceltoken.Token);
             await base.Running();
         }
     }
 
-    public class FuncTask<T>: ProcessTask
+    /// <summary>
+    /// Trackable Functions With Returns
+    /// </summary>
+    /// <typeparam name="T">Type Of The Return</typeparam>
+    public class TrackFuncTask<T>:ProcessTask
     {
-        public T Return;
+        /// <summary>
+        /// Function Return
+        /// </summary>
+        public T? Return;
 
-        public TaskFunc<T> Function;
+        /// <summary>
+        /// The Delegate
+        /// </summary>
+        public TrackableTaskFunc<T>? Function;
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public override double Schedule => Sched;
+
+        /// <summary>
+        /// Outside Set Schedule
+        /// </summary>
+        public double Sched = 0;
+
+        CancellationTokenSource canceltoken = new();
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
+        public override Task Cancel()
+        {
+            canceltoken.Cancel();
+            return base.Cancel();
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
         protected override async Task Running()
         {
-            Return = await Function();
+            if (Function != null)
+            Return = await Function(this, canceltoken.Token);
             await base.Running();
         }
+
     }
 }

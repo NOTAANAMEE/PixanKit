@@ -33,15 +33,19 @@ namespace ResourceDownloader.Download.ModLoaders
             /// <inheritdoc/>
             /// </summary>
             /// <param name="mcversion"><inheritdoc/></param>
+            /// <param name="token"><inheritdoc/></param>
             /// <returns><inheritdoc/></returns>
-            public override async Task<bool> CheckBuild(string mcversion)
+            public override async Task<bool> CheckBuild(string mcversion, CancellationToken token)
             {
-                var response = await client.GetAsync("https://meta.quiltmc.org/v3/versions/game");
-                var content = await response.Content.ReadAsStringAsync();
+                var response = await client.GetAsync("https://meta.quiltmc.org/v3/versions/game", token);
+                if (token.IsCancellationRequested) return false;
+                var content = await response.Content.ReadAsStringAsync(token);
+                if (token.IsCancellationRequested) return false;
                 var array = JArray.Parse(content);
 
                 foreach (var item in array) 
                 {
+                    if (token.IsCancellationRequested) return false;
                     if (mcversion == item["version"].ToString()) return true;
                 }
                 return false;
@@ -51,11 +55,14 @@ namespace ResourceDownloader.Download.ModLoaders
             /// <inheritdoc/>
             /// </summary>
             /// <param name="mcversion"><inheritdoc/></param>
+            /// <param name="token"><inheritdoc/></param>
             /// <returns><inheritdoc/></returns>
-            public override async Task<JArray> GetBuild(string mcversion)
+            public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
-                var response = await client.GetAsync("https://meta.quiltmc.org/v3/versions/loader");
-                var content = await response.Content.ReadAsStringAsync();
+                var response = await client.GetAsync("https://meta.quiltmc.org/v3/versions/loader", token);
+                if (token.IsCancellationRequested) return new JArray();
+                var content = await response.Content.ReadAsStringAsync(token);
+                if (token.IsCancellationRequested) return new JArray();
                 return JArray.Parse(content);
             }
 
@@ -63,11 +70,14 @@ namespace ResourceDownloader.Download.ModLoaders
             /// <inheritdoc/>
             /// </summary>
             /// <param name="modloaderinf"><inheritdoc/></param>
+            /// <param name="token"><inheritdoc/></param>
             /// <returns><inheritdoc/></returns>
-            public override async Task<string> GetURL(JObject modloaderinf)
+            public override async Task<string> GetURL(JObject modloaderinf, CancellationToken token)
             {
-                var response = await client.GetAsync("https://meta.quiltmc.org/v3/versions/loader");
-                var content = await response.Content.ReadAsStringAsync();
+                var response = await client.GetAsync("https://meta.quiltmc.org/v3/versions/loader", token);
+                if (token.IsCancellationRequested) return "";
+                var content = await response.Content.ReadAsStringAsync(token);
+                if (token.IsCancellationRequested) return "";
                 return JArray.Parse(content)[0]["url"].ToString();
             }
         }

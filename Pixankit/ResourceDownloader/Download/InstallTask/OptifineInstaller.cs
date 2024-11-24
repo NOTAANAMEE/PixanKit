@@ -64,11 +64,13 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         private void InitDownload(JObject optifineversion)
         {
             string file = Localize.PathLocalize($"{Files.CacheDir}/Installer/optifine.jar");
-            FuncTask<string> funcTask = new();
-            funcTask.Function += async () =>
+            TrackFuncTask<string> funcTask = new();
+            funcTask.Function += async (a, b) =>
             {
-                return await (ServerList.ModLoaderServers["optifine"] as OptifineServer)
-                    .GetURL(optifineversion);
+                var tmp = await (ServerList.ModLoaderServers["optifine"] as OptifineServer)
+                    .GetURL(optifineversion, b);
+                a.Sched = 10;
+                return tmp;
             };
             MultiThreadDownload download = new(file);
             funcTask.OnFinish += () =>

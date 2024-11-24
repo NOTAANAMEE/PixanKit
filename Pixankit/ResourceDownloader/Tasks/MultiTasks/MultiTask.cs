@@ -43,7 +43,7 @@ namespace PixanKit.ResourceDownloader.Tasks.MultiTasks
         {
             foreach (var process in processes)
             {
-                if (_status != ProcessStatus.Running)process.Cancel();
+                if (_status != ProcessStatus.Running) _ = process.Cancel();
                 await process.MainTask;
             }
             TaskStopped.SetResult(true);

@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Json;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
 using ResourceDownloader.Download.ModLoaders;
 using System;
@@ -44,18 +45,22 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             ///  <inheritdoc/>
             /// </summary>
             /// <param name="mcversion"> <inheritdoc/></param>
+            /// <param name="token"><inheritdoc/></param>
             /// <returns> <inheritdoc/></returns>
-            public override async Task<bool> CheckBuild(string mcversion)
+            public override async Task<bool> CheckBuild(string mcversion, CancellationToken token)
             {
                 var response = await client.GetAsync(
-                    "https://files.minecraftforge.net/net/minecraftforge/forge/");
-                var content = await response.Content.ReadAsStringAsync();
+                    "https://files.minecraftforge.net/net/minecraftforge/forge/", token);
+                if (token.IsCancellationRequested) return false;
+                var content = await response.Content.ReadAsStringAsync(token);
+                if (token.IsCancellationRequested) return false;
                 HtmlDocument document = new();
                 document.LoadHtml(content);
                 var nodes = document.DocumentNode.SelectNodes(
                     "/html/body/main/div[1]/aside/section/ul/div/div[1]/ul/li/ul/li/a");
                 foreach (var node in nodes)
                 {
+                    if (token.IsCancellationRequested) return false;
                     if (node.InnerHtml == mcversion) return true;
                 }
                 return false;
@@ -65,12 +70,15 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <inheritdoc/>
             /// </summary>
             /// <param name="mcversion"> <inheritdoc/></param>
+            /// <param name="token"><inheritdoc/></param>
             /// <returns> <inheritdoc/></returns>
-            public override async Task<JArray> GetBuild(string mcversion)
+            public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
                 var response = await client.GetAsync(
-                    $"https://files.minecraftforge.net/net/minecraftforge/forge/index_{mcversion}.html");
-                var content = await response.Content.ReadAsStringAsync();
+                    $"https://files.minecraftforge.net/net/minecraftforge/forge/index_{mcversion}.html", token);
+                if (token.IsCancellationRequested) return new JArray();
+                var content = await response.Content.ReadAsStringAsync(token);
+                if (token.IsCancellationRequested) return new JArray();
                 HtmlDocument document = new();
                 document.Load(content);
                 var nodes = document.DocumentNode.SelectNodes(
@@ -78,6 +86,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 JArray array = new();
                 foreach (var node in nodes)
                 {
+                    if (token.IsCancellationRequested) return new JArray();
                     array.Add(Parse(node));
                 }
                 return array;
@@ -102,13 +111,11 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             ///  <inheritdoc/>
             /// </summary>
             /// <param name="modloaderinf"><inheritdoc/></param>
+            /// <param name="token"><inheritdoc/></param>
             /// <returns><inheritdoc/></returns>
-            public override async Task<string> GetURL(JObject modloaderinf)
-            {
-                string tmp = "";
-                await Task.Run(() => { tmp = modloaderinf["url"].ToString(); });
-                return Replace(tmp);
-            }
+            public override Task<string> GetURL(JObject modloaderinf, CancellationToken token)
+                => Task.FromResult(Replace(modloaderinf["url"].ToString()));
+
         }
     }
 

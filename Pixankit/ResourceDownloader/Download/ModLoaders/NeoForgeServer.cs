@@ -30,19 +30,19 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         {
             HttpClient client = new();
 
-            private async Task<List<string>> GetBuild()
+            private async Task<List<string>> GetBuild(CancellationToken token)
             {
                 //Get Later Versions
                 var response = await client.GetAsync(
-                    "https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/neoforge");
-                var content = await response.Content.ReadAsStringAsync();
+                    "https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/neoforge", token);
+                if (token.IsCancellationRequested) return new();
+                var content = await response.Content.ReadAsStringAsync(token);
+                if (token.IsCancellationRequested) return new();
                 var array = (JObject.Parse(content)["versions"] as JArray ??
                     new JArray()).ToObject<List<string>>();//Parse The Content To List<string>
-
-
                 if (array == null)
                     throw new Exception("Impossible exception");//This Exception Will Not Be Thrown
-
+                if (token.IsCancellationRequested) return new();
 
                 return array;
             }
@@ -76,19 +76,22 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <summary>
             /// Check Build Version
             /// </summary>
-            /// <param name="mcversion"></param>
+            /// <param name="mcversion"><inheritdoc/></param>
+            /// <param name="token"><inheritdoc/></param>
             /// <returns></returns>
-            public override async Task<bool> CheckBuild(string mcversion)
+            public override async Task<bool> CheckBuild(string mcversion, CancellationToken token)
             {
                 if (mcversion == "1.20.1") return true;//The First Supported Minecraft Of NeoForge
                 if (!mcversion.Contains('.')) return false; //No Snapshot Builds
-                var builds = await GetBuild();
+                var builds = await GetBuild(token);
+                if (token.IsCancellationRequested) return false;
                 var version = mcversion.Split('.');
                 int minor = int.Parse(version[1]), patch = int.Parse(
                     version.ElementAtOrDefault(2) ?? "0");
                 //Get Minor Version and Patch Version
                 foreach (var build in builds)
                 {
+                    if (token.IsCancellationRequested) return false;
                     var nfversion = mcversion.Split('.');
                     int nfminor = int.Parse(version[1]), nfpatch = int.Parse(version[2]);
                     if (nfminor == minor && nfpatch == patch) return true;
@@ -102,18 +105,21 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <inheritdoc/>
             /// </summary>
             /// <param name="mcversion"><inheritdoc/></param>
+            /// /// <param name="token"><inheritdoc/></param>
             /// <returns><inheritdoc/></returns>
-            public override async Task<JArray> GetBuild(string mcversion)
+            public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
                 var version = mcversion.Split('.');
                 int minor = int.Parse(version[1]), patch = int.Parse(
                     version.ElementAtOrDefault(2) ?? "0");
                 List<string> builds;
                 if (mcversion == "1.20.1") builds = await GetLagacyBuild();
-                else builds = await GetBuild();
+                else builds = await GetBuild(token);
+                if (token.IsCancellationRequested) return new JArray();
                 JArray ret = new();
                 foreach (string build in builds)
                 {
+                    if (token.IsCancellationRequested) return new JArray();
                     var nfversion = mcversion.Split('.');
                     int nfminor = int.Parse(version[1]), nfpatch = int.Parse(version[2]);
                     if (nfminor == minor && nfpatch == patch)
@@ -128,13 +134,11 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <inheritdoc/>
             /// </summary>
             /// <param name="modloaderinf"><inheritdoc/></param>
+            /// <param name="token"><inheritdoc/></param>
             /// <returns><inheritdoc/></returns>
-            public override async Task<string> GetURL(JObject modloaderinf)
-            {
-                string ret = "";
-                await Task.Run(() => { ret = (modloaderinf["url"] ?? "").ToString(); });
-                return ret;
-            }
+            public override Task<string> GetURL(JObject modloaderinf, CancellationToken token)
+                => Task.FromResult((modloaderinf["url"] ?? "").ToString());
+
         }
     }
 

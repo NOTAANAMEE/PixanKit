@@ -19,7 +19,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         /// </summary>
         public OptifineServer() : base("optifine")
         {
-
+            Mirrors.Add(new OfficialOptifineServer());
         }
 
         /// <summary>
@@ -29,13 +29,16 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         {
             HttpClient client = new();
 
-            private async Task<HtmlNodeCollection> GetNodes()
+            private async Task<HtmlNodeCollection> GetNodes(CancellationToken token)
             {
-                var response = await client.GetAsync("https://optifine.net/downloads");
-                var content = await response.Content.ReadAsStringAsync();
+                var response = await client.GetAsync("https://optifine.net/downloads", token);
+                if (token.IsCancellationRequested) return null;
+                var content = await response.Content.ReadAsStringAsync(token);
+                if (token.IsCancellationRequested) return null;
                 var versions = new List<string>();
-                HtmlDocument document = new HtmlDocument();
+                HtmlDocument document = new();
                 document.LoadHtml(content);
+                if (token.IsCancellationRequested) return null;
                 return document.DocumentNode.SelectNodes(
                     "/html/body/table/tbody/tr[2]/td/span/h2 | " +
                     "/html/body/table/tbody/tr[2]/td/span/div[position() != last()] | " +
@@ -64,12 +67,14 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <inheritdoc/>
             /// </summary>
             /// <param name="mcversion"><inheritdoc/></param>
+            /// <param name="token"><inheritdoc/></param>
             /// <returns><inheritdoc/></returns>
-            public override async Task<bool> CheckBuild(string mcversion)
+            public override async Task<bool> CheckBuild(string mcversion, CancellationToken token)
             {
-                HtmlNodeCollection nodes = await GetNodes();
-                for (var i = 0; i < nodes.Count; i += 2) 
+                HtmlNodeCollection nodes = await GetNodes(token);
+                for (var i = 0; i < nodes.Count; i += 2)
                 {
+                    if (token.IsCancellationRequested) return false;
                     if (nodes[i].InnerText == mcversion) return true;
                 }
                 return false;
@@ -78,14 +83,16 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <summary>
             /// <inheritdoc/>
             /// </summary>
+            /// <param name="token"><inheritdoc/></param>
             /// <param name="mcversion"><inheritdoc/></param>
             /// <returns><inheritdoc/></returns>
-            public override async Task<JArray> GetBuild(string mcversion)
+            public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
-                HtmlNodeCollection nodes = await GetNodes();
+                HtmlNodeCollection nodes = await GetNodes(token);
                 HtmlNode? node = null;
                 for (var i = 0; i < nodes.Count; i += 2)
                 {
+                    if (token.IsCancellationRequested)return new JArray();
                     if (nodes[i].InnerText == mcversion)
                     {
                         node = nodes[i + 1];
@@ -100,15 +107,21 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <inheritdoc/>
             /// </summary>
             /// <param name="modloaderinf"><inheritdoc/></param>
-            /// <returns><inheritdoc/></returns>
-            public override async Task<string> GetURL(JObject modloaderinf)
+            /// <param name="token"><inheritdoc/></param>
+            /// <returns></returns>
+            public override async Task<string> GetURL(JObject modloaderinf, CancellationToken token)
             {
-                var response = await client.GetAsync(modloaderinf["url"].ToString());
-                var content = await response.Content.ReadAsStringAsync();
-                HtmlDocument document = new HtmlDocument();
+                var response = await client.GetAsync(modloaderinf["url"].ToString(), token);
+                if (token.IsCancellationRequested) return "";
+                var content = await response.Content.ReadAsStringAsync(token);
+                if (token.IsCancellationRequested) return "";
+
+                HtmlDocument document = new();
                 document.LoadHtml(content);
+                if (token.IsCancellationRequested) return "";
                 return "https://optifine.net/" + document.DocumentNode.SelectSingleNode(
-                    "/html/body/table/tbody/tr[2]/td/table/tbody/tr/td[2]/table/tbody/tr[2]/td/span/a"
+                    "/html/body/table/tbody/tr[2]/td/table/tbody/tr/td[2]/table/tbody/tr[2]" +
+                    "/td/span/a"
                     ).Attributes["href"].Value;
             }
         }

@@ -12,14 +12,29 @@ namespace PixanKit.ModModule.Module
 {
     public partial class ModModule
     {
+        /// <summary>
+        /// Single Instance
+        /// </summary>
         public static ModModule? Instance { get; private set; }
 
+        /// <summary>
+        /// The ModInfs List
+        /// </summary>
         public Dictionary<string, ModInf> Mods { get; private set; } = new();
 
+        /// <summary>
+        /// Mod Game List
+        /// </summary>
         public Dictionary<string, ModCollection> ModGames { get; private set; } = new();
 
+        /// <summary>
+        /// Initor
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
         public ModModule() 
         {
+            if (Instance != null) 
+                throw new InvalidOperationException("Single Instance Class");
             Instance = this;
             foreach (var mod in ModInfCache) 
                 Mods.Add(mod.Key, ModInf.Load(mod.Value));

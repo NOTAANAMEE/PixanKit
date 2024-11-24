@@ -59,7 +59,7 @@ namespace PixanKit.ResourceDownloader.Download
         /// </summary>
         public override double Schedule
         {
-            get => downloadchars / (double)Size;
+            get => DownloadedChars / (double)Size;
         }
 
         int threadnum = ThreadCount;
@@ -71,8 +71,6 @@ namespace PixanKit.ResourceDownloader.Download
         List<ChunkDownload> fileChunks = new();
 
         long length;
-
-        long downloadchars;
 
         object Lock = new();
 

@@ -61,16 +61,11 @@ namespace PixanKit.ModModule.Mods
         {
             return new()
             {
-                { "name", Name
-                },
-                { "description", Description
-                },
-                { "id", ID
-                },
-                { "icon", Icon
-                },
-                { "authors", new JArray(Authors)
-                },
+                { "name", Name },
+                { "description", Description },
+                { "id", ID },
+                { "icon", Icon },
+                { "authors", new JArray(Authors) },
             };
         }
 

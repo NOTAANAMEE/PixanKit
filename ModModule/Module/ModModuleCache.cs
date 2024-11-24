@@ -23,7 +23,7 @@ namespace PixanKit.ModModule.Module
         static Dictionary<string, JObject> ModInfCache = new();
 
         static string Path
-        { get => Paths.Get("ModPath"); set => Paths.TrySet("ModPath", value); }
+        { get => Paths.Get("ModModule.ModPath"); set => Paths.TrySet("ModPath", value); }
 
         public static void LoadCache()
         {
