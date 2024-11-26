@@ -98,13 +98,13 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 string url = node.SelectSingleNode("/td[3]/ul/li[2]/a[2]").Attributes["href"].Value;
                 string release = node.SelectSingleNode("/td[2]").Attributes["title"].Value;
                 string source = "official";
-                return new JObject()
-            {
-                { "version", name },
-                { "url", url },
-                { "source", source },
-                { "release", release },
-            };
+                return new()
+                {
+                    { "version", name },
+                    { "url", url },
+                    { "source", source },
+                    { "release", release },
+                };
             }
 
             /// <summary>

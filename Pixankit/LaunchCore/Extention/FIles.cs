@@ -92,19 +92,19 @@ namespace PixanKit.LaunchCore.Extention
         /// For example:C:\Users\admin\AppData\Roaming\.minecraft\versions\1.20.4\settings.json
         /// </summary>
         public static string SettingsPath 
-        { get => Paths.Get("CacheDir"); set => Paths.TrySet("CacheDir", value); }
+        { get => Paths.Get("SettingsPath"); set => Paths.TrySet("SettingsPath", value); }
 
         /// <summary>
         /// Dir For Minecraft Version Manifest
         /// </summary>
         public static string ManifestDir
-        { get => Paths.Get("CacheDir"); set => Paths.TrySet("CacheDir", value); }
+        { get => Paths.Get("ManifestDir"); set => Paths.TrySet("ManifestDir", value); }
 
         /// <summary>
         /// Dir For Skin Cache
         /// </summary>
         public static string SkinCacheDir 
-        { get => Paths.Get("CacheDir"); set => Paths.TrySet("CacheDir", value); }
+        { get => Paths.Get("SkinCacheDir"); set => Paths.TrySet("SkinCacheDir", value); }
 
 
         private static JObject? _folderJData = null;

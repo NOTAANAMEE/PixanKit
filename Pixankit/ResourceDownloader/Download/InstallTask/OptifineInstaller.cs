@@ -67,7 +67,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             TrackFuncTask<string> funcTask = new();
             funcTask.Function += async (a, b) =>
             {
-                var tmp = await (ServerList.ModLoaderServers["optifine"] as OptifineServer)
+                var tmp = await ServerList.ModLoaderServers["optifine"]
                     .GetURL(optifineversion, b);
                 a.Sched = 10;
                 return tmp;
@@ -115,7 +115,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
             extractpath = Localize.PathLocalize(
                     Owner.LibraryDir +
-                    $"optifine/launcherwrapper-of/{content}/" +
+                    $"/optifine/launcherwrapper-of/{content}/" +
                     $"launcherwrapper-of-{content}.jar");
             Localize.CheckDir(extractpath);
 
