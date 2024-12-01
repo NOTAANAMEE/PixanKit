@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ResourceDownloader.Download.ModLoaders
+namespace PixanKit.ResourceDownloader.Download.ModLoaders
 {
     public interface ModLoaderMirrorServer
     {

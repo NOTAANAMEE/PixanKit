@@ -2,7 +2,6 @@
 using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Json;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
-using ResourceDownloader.Download.ModLoaders;
 using System;
 using System.Collections.Generic;
 using System.Linq;

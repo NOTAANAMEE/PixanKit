@@ -1,11 +1,13 @@
-﻿using PixanKit.ModModule.Mods;
-using PixanKit.LaunchCore.GameModule.Game;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Log;
+using PixanKit.ModModule.Mods;
+using PixanKit.LaunchCore.GameModule.Game;
+
 /*Redesign
  * process:
  * 1.GetList Of Mod Files
@@ -23,11 +25,11 @@ namespace PixanKit.ModModule.Module
     /// </summary>
     public class ModCollection
     {
-        public ModloaderGame Game;
+        public ModLoaderGame Game;
 
         public ModModule Owner;
 
-        public ModCollection(ModloaderGame game, ModModule owner)
+        public ModCollection(ModLoaderGame game, ModModule owner)
         {
             Game = game;
             Owner = owner;
@@ -53,13 +55,17 @@ namespace PixanKit.ModModule.Module
                 ModFileIDCache.Add(id, value.ToString());
                 if (Owner.Mods.ContainsKey(id)) ModIDCache.Add(id, Owner.Mods[id]);
             }
+            LoadMods();
         }
 
         private void LoadMods()
         {
+            if (!Directory.Exists(Localize.PathLocalize(Game.ModDir)))
+                Directory.CreateDirectory((Localize.PathLocalize(Game.ModDir)));
             var files = Directory.GetFiles(Localize.PathLocalize(Game.ModDir));
             foreach (var file in files)
             {
+                Logger.Info("PixanKit.ModModule", $"Start Initing File {file}");
                 if (!file.EndsWith(".jar") && !file.EndsWith(".jar.disabled")) continue;
                 ModFile? f = null;
                 try
@@ -136,6 +142,29 @@ namespace PixanKit.ModModule.Module
         {
             var id = (ModFileSHACache[SHA1]["id"]?? "").ToString();
             return ModIDCache[id];
+        }
+        #endregion
+
+        #region Dependencies
+        public bool CheckDependencies()
+        {
+            return LostDependencies().Count == 0;
+        }
+
+        public List<string> LostDependencies()
+        {
+            var copy = new Dictionary<string, ModFile>(Mods);
+            List<string> ret = new();
+            foreach (var key in copy.Keys)
+            {
+                var mod = copy[key];
+                if (mod == null) continue;
+                ret.AddRange(mod.LostDependenciesR(copy));
+            }
+            ret.Remove("minecraft");
+            ret.Remove("java");
+            ret.Remove(Game.ToString());
+            return ret;
         }
         #endregion
 

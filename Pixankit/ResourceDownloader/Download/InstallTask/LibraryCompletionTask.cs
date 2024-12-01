@@ -1,39 +1,35 @@
-﻿using PixanKit.LaunchCore;
+﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.GameModule.Game;
+using PixanKit.LaunchCore.GameModule.LibraryData;
+using PixanKit.ResourceDownloader.Download.DownloadTask;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PixanKit.LaunchCore.SystemInf;
-using PixanKit.ResourceDownloader.Tasks.MultiTasks;
-using PixanKit.ResourceDownloader.Download;
-using PixanKit.LaunchCore.GameModule.Game;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
-    /// <summary>
-    /// The Task That Downloads Libraries 
-    /// </summary>
-    public class LibraryCompletionTask:MultiFileDownload
+    public class LibraryCompletionTask:MultiFileDownloadTask
     {
-        /// <summary>
-        /// Init A <c>LibraryCompletionTask</c>
-        /// </summary>
-        public LibraryCompletionTask() : base() { }
-        
-        /// <summary>
-        /// Set The Minecraft Game
-        /// </summary>
-        /// <param name="game">The GameBase That Needs To Complete</param>
-        public void SetMinecraft(GameBase game)
+        public LibraryCompletionTask(GameBase game)
         {
-            var libraries = game.GetLibraries();
-            foreach (var library in libraries) 
+            Set(game);
+        }
+
+        internal LibraryCompletionTask() { }
+
+        internal void Set(GameBase game)
+        {
+            List<string> urls = new();
+            List<string> paths = new();
+            foreach (var library in game.GetLibraries())
             {
-                if (!File.Exists(library.Path))
-                    Add(library.Url, library.Path);
+                if (library.LibraryType == LibraryType.Mod) continue;
+                urls.Add(library.Url);
+                paths.Add(library.Path);
             }
+            Init();
         }
     }
 }

@@ -80,15 +80,15 @@ namespace PixanKit.LaunchCore.Server
         }
 
         /// <summary>
-        /// Replace The OriginUrl From The Server
+        /// Replace The OriginalUrl From The Server
         /// </summary>
-        /// <param name="OriginUrl">The Origin Url For The Resource</param>
+        /// <param name="OriginalUrl">The Original Url For The Resource</param>
         /// <returns>The URL Of The Resource On The Current MirrorServer</returns>
-        protected string Replace(string OriginUrl) => Current.Replace(OriginUrl);
+        protected string Replace(string OriginalUrl) => Current.Replace(OriginalUrl);
 
-        private static string GetHost(string OriginUrl)
+        private static string GetHost(string OriginalUrl)
         {
-            Uri uri = new(OriginUrl);
+            Uri uri = new(OriginalUrl);
             return uri.Host;
         }
     }

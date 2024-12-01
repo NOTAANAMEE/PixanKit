@@ -70,7 +70,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <summary>
         /// Type
         /// </summary>
-        protected LibraryType libraryType = LibraryType.Ordinary;
+        protected LibraryType libraryType = LibraryType.Original;
 
         /// <summary>
         /// Initor Init the library
@@ -140,7 +140,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         public static LibraryType GetLibraryType(JToken jData)
         {
             if (jData["natives"] != null) return LibraryType.Native;
-            if (jData["downloads"] != null) return LibraryType.Ordinary;
+            if (jData["downloads"] != null) return LibraryType.Original;
             return LibraryType.Mod;
         }
 
@@ -184,9 +184,9 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
     public enum LibraryType
     {
         /// <summary>
-        /// Ordinary Library Type. Just Download
+        /// Original Library Type. Just Download
         /// </summary>
-        Ordinary,
+        Original,
         /// <summary>
         /// Native Library Type. Need Extract
         /// </summary>

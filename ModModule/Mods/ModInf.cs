@@ -26,10 +26,11 @@ namespace PixanKit.ModModule.Mods
 
         protected ModInf(TomlTable tomldoc) 
         {
-            if (tomldoc["mods"] is not TomlTable mod) throw new Exception();
+            if (tomldoc["mods"] is not TomlTableArray array) throw new Exception();
+            var mod = array[0];
             Name = mod["displayName"] as string ?? "";
             Description = mod["description"] as string ?? "";
-            Icon = mod["logoFile"] as string ?? "";
+            if (mod.ContainsKey("logoFile")) Icon = mod["logoFile"] as string ?? "";
             ID = mod["modId"] as string ?? "";
             Authors = (mod["authors"] as string ?? "").Split(',');
         }
@@ -41,6 +42,7 @@ namespace PixanKit.ModModule.Mods
             Icon = (jsondoc["icon"] ?? "").ToString();
             ID = (jsondoc["id"] ?? "").ToString();
             Authors = (jsondoc["authors"] as JArray ?? new JArray()).Select(x => x.ToString()).ToArray();
+            
         }
 
         public ModInf() { }

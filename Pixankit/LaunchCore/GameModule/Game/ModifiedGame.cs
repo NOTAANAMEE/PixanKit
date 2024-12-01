@@ -29,15 +29,6 @@ namespace PixanKit.LaunchCore.GameModule.Game
         public ModifiedGame(string path, JObject jData) : base(path, jData)
         {
             _gameType = GameType.Optifine;
-            if (!jData.ContainsKey("inheritsFrom"))
-            {
-                useBaseGeneration = true;
-                assetsID = jData["assetIndex"]["id"].ToString();
-            }
-            else
-            {
-                _version = jData["inheritsFrom"].ToString();
-            }
             //InitJData(jData);
         }
 
@@ -48,16 +39,20 @@ namespace PixanKit.LaunchCore.GameModule.Game
         public ModifiedGame(string path):base(path, true)
         {
             _gameType = GameType.Optifine;
-            if (!tmpdata.ContainsKey("inheritsFrom"))
+            //InitJData();
+        }
+
+        protected override void LoadJSON(JObject gameJdata)
+        {
+            if (!gameJdata.ContainsKey("inheritsFrom"))
             {
                 useBaseGeneration = true;
-                assetsID = tmpdata["assetIndex"]["id"].ToString();
+                assetsID = gameJdata["assetIndex"]["id"].ToString();
             }
             else
             {
-                _version = tmpdata["inheritsFrom"].ToString();
+                _version = gameJdata["inheritsFrom"].ToString();
             }
-            InitJData();
         }
 
         /// <summary>

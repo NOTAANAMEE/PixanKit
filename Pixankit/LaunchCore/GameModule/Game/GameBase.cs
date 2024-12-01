@@ -123,7 +123,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         #endregion
 
         #region Fields
-        internal JObject tmpdata = new JObject();
+        private JObject tmpdata = new();
 
         internal Folder? folder = null;
 
@@ -179,6 +179,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             if (initFromFile)
             {
                 tmpdata = ReadJObj(path);
+
             }
             Logger.Info($"Game Base Added. Path:{_path}");
         }
@@ -199,6 +200,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         {
             tmpdata = jData;
             InitJData();
+            
         }
 
         /// <summary>
@@ -211,12 +213,12 @@ namespace PixanKit.LaunchCore.GameModule.Game
             SetLibrary(jData);
             SetGameArgument(jData);
             SetJVMArguments(jData);
-
+            
             //Set The Version. Real Version
             if (jData["inheritsfrom"] != null) _version = (jData["inheritsfrom"] ?? "").ToString();
             _version = (jData["id"] ?? "").ToString();
             releaseType = (jData["type"] ?? "release").ToString();
-
+            LoadJSON(tmpdata);
             SetSettings();
             tmpdata = new();
         }
@@ -249,13 +251,13 @@ namespace PixanKit.LaunchCore.GameModule.Game
 
                 switch (LibraryBase.GetLibraryType(token))
                 {
-                    case LibraryType.Ordinary:
-                        libraries.Add(FolderAddLibrary(new OrdinaryLibrary(token)));
+                    case LibraryType.Original:
+                        libraries.Add(FolderAddLibrary(new OriginalLibrary(token)));
                         break;
                     case LibraryType.Native:
                         libraries.Add(FolderAddLibrary(new NativeLibrary(token)));
                         if ((token["downloads"] as JObject ?? new JObject()).Count > 1) 
-                            libraries.Add(FolderAddLibrary(new OrdinaryLibrary(token)));
+                            libraries.Add(FolderAddLibrary(new OriginalLibrary(token)));
                         break;
                     case LibraryType.Mod:
                         libraries.Add(FolderAddLibrary(new LoaderLibrary(token)));
@@ -393,7 +395,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <exception cref="Exception"></exception>
         protected string SameVersionGameArguments()
         {
-            var target = Owner.FindVersion(_version, GameType.Ordinary);
+            var target = Owner.FindVersion(_version, GameType.Original);
             if (target == null)
             {
                 Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
@@ -415,7 +417,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <exception cref="Exception"></exception>
         protected string SameVersionAssetsID()
         {
-            var target = Owner.FindVersion(_version, GameType.Ordinary);
+            var target = Owner.FindVersion(_version, GameType.Original);
             if (target == null)
             {
                 Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
@@ -446,7 +448,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <exception cref="Exception"></exception>
         protected string SameVersionCPArgs()
         {
-            var target = Owner.FindVersion(_version, GameType.Ordinary);
+            var target = Owner.FindVersion(_version, GameType.Original);
             if (target == null) { 
                 Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version"); 
             }
@@ -510,12 +512,21 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <exception cref="Exception"></exception>
         protected List<LibraryBase> SameVersionLibraries()
         {
-            var target = Owner.FindVersion(_version, GameType.Ordinary);
+            var target = Owner.FindVersion(_version, GameType.Original);
             if (target == null)
             {
                 Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
             }
             return target.libraries;
+        }
+
+        /// <summary>
+        /// Convenient Subclass Initialization
+        /// </summary>
+        /// <param name="gameJdata"></param>
+        protected virtual void LoadJSON(JObject gameJdata)
+        {
+
         }
         #endregion
 
@@ -542,14 +553,14 @@ namespace PixanKit.LaunchCore.GameModule.Game
     /// Different types of Minecraft
     /// Mod:ModLoader like Fabric, Quilt, Liteloader, Forge and NeoForge
     /// Optifine:Only With Optifine
-    /// Ordinary:No modloader or Optifine.
+    /// Original:No modloader or Optifine.
     /// </summary>
     public enum GameType
     {
         /// <summary>
-        /// Ordinary Game
+        /// Original Game
         /// </summary>
-        Ordinary,
+        Original,
         /// <summary>
         /// Optifine Game
         /// </summary>

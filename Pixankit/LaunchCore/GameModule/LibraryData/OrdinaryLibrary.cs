@@ -11,18 +11,18 @@ using Newtonsoft.Json.Linq;
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
     /// <summary>
-    /// Ordinary Kind Of Library
+    /// Original Kind Of Library
     /// </summary>
-    public class OrdinaryLibrary: LibraryBase
+    public class OriginalLibrary: LibraryBase
     {
         /// <summary>
-        /// Initor Of Ordinary Library
+        /// Initor Of Original Library
         /// </summary>
         /// <param name="folder">The Library Directory</param>
         /// <param name="libraryJData">The JSON Data Of Library</param>
-        public OrdinaryLibrary(string folder, JToken libraryJData):base(libraryJData, folder) 
+        public OriginalLibrary(string folder, JToken libraryJData):base(libraryJData, folder) 
         {
-            libraryType = LibraryType.Ordinary;
+            libraryType = LibraryType.Original;
             _url = libraryJData["downloads"]["artifact"]["url"].ToString();
             _sha1 = libraryJData["downloads"]["artifact"]["sha1"].ToString();
         }
@@ -31,14 +31,14 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// Initor
         /// </summary>
         /// <param name="libraryJData"></param>
-        public OrdinaryLibrary(JToken libraryJData):this("", libraryJData) { }
+        public OriginalLibrary(JToken libraryJData):this("", libraryJData) { }
 
         /// <summary>
         /// Initor For Copy
         /// </summary>
-        protected OrdinaryLibrary():base()
+        protected OriginalLibrary():base()
         {
-            libraryType = LibraryType.Ordinary;
+            libraryType = LibraryType.Original;
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <returns><inheritdoc/></returns>
         public override LibraryBase Copy()
         {
-            return new OrdinaryLibrary()
+            return new OriginalLibrary()
             {
                 _name = _name,
                 _url = _url,

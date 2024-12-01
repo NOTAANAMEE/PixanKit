@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.ResourceDownloader.Tasks;
-using PixanKit.ResourceDownloader.Tasks.MultiTasks;
 using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Server;
 using PixanKit.ResourceDownloader.Download.ModLoaders;
@@ -16,13 +15,15 @@ using PixanKit.LaunchCore.Extention;
 using PixanKit.LaunchCore.Core;
 using PixanKit.LaunchCore.JavaModule;
 using System.IO.Compression;
+using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
+using PixanKit.ResourceDownloader.Download.DownloadTask;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
     /// <summary>
     /// Optifine Install Task
     /// </summary>
-    public class OptifineInstaller: MultiSequenceTask
+    public class OptifineInstaller: SequenceProgressTask
     {
         string MCVersion = "";
 
@@ -57,27 +58,27 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// <param name="folder"></param>
         private void Init_CheckExists(Folder folder) 
         {
-            if (folder.FindVersion(MCVersion, GameType.Ordinary) != null) return;
-            Add(new OrdinaryInstallTask(folder, MCVersion, MCVersion));
+            if (folder.FindVersion(MCVersion, GameType.Original) != null) return;
+            Add(new OriginalInstallTask(folder, MCVersion, MCVersion));
         }
 
         private void InitDownload(JObject optifineversion)
         {
             string file = Localize.PathLocalize($"{Files.CacheDir}/Installer/optifine.jar");
-            TrackFuncTask<string> funcTask = new();
+            FuncProgressTask<string> funcTask = new();
             funcTask.Function += async (a, b) =>
             {
                 var tmp = await ServerList.ModLoaderServers["optifine"]
                     .GetURL(optifineversion, b);
-                a.Sched = 10;
+                a(1.0);
                 return tmp;
             };
-            MultiThreadDownload download = new(file);
-            funcTask.OnFinish += () =>
+            FileDownloadTask download = new("", file);
+            funcTask.OnFinish += (a) =>
             {
                 download.SetURL(funcTask.Return);
             };
-            download.OnFinish += UnpressWrapperFile;
+            download.OnFinish += (a) => { UnpressWrapperFile(); };
         }
 
         private void ArgGenerator()
@@ -90,13 +91,13 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             Localize.CheckDir(mcpath);
             Localize.CheckDir(librarypath);
 
-            CLIRunningTask task = new(java.JavaEXE,
+            CLITask task = new(java.JavaEXE,
                 "-cp " +
                $"\"{Localize.PathLocalize(installerpath)}\" " +
                 "optifine.Patcher " +
                $"\"{mcpath}\" " +
                $"\"{Localize.PathLocalize(librarypath)}\"");
-            task.OnFinish += () =>
+            task.OnFinish += (a) =>
             {
                 Owner.AddGame(new ModifiedGame(mcpath));
             };

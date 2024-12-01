@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Core;
 using PixanKit.LaunchCore.Extention;
+using PixanKit.LaunchCore.Log;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +13,18 @@ namespace PixanKit.ModModule.Module
 {
     public partial class ModModule
     {
+        public static void Init()
+        {
+            Logger.Info("PixanKit.ModModule", "InitModule");
+
+            
+        }
+
         static ModModule()
         {
-            Path = $"{Files.ConfigDir}/ModSettings.json";
+            _ = new ModModule();
+            Launcher.LauncherInit += Instance.Init;
+            Path = "${Files.ConfigDir}/ModSettings.json";
         }
 
         static JObject Cache = new();

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Extention;
+using PixanKit.LaunchCore.Log;
 using PixanKit.ModModule.Module;
 using System;
 using System.Collections.Generic;
@@ -51,6 +52,8 @@ namespace PixanKit.ModModule.Mods
         public string SHA1 {  get; private set; }
 
         private bool Valid { get=> Information != null; }
+
+        public bool IsEnabled { get => FilePath.EndsWith(".jar"); }
         #endregion
 
         ModCollection Owner;
@@ -86,10 +89,11 @@ namespace PixanKit.ModModule.Mods
 
         internal void LoadDependencies(TomlTable tomldoc)
         {
-            foreach (TomlTable item in (tomldoc["dependencies"] as TomlTable) 
-                ["yes_steve_model"] as TomlArray)
+            var array = (tomldoc["dependencies"] as TomlTable).First().Value as TomlTableArray;
+            foreach (TomlTable item in array)
             {
                 if (item == null) continue;
+                if (item.ContainsKey("mandatory") && (bool)item["mandatory"] == false) continue;
                 Dependencies.Add(item["modId"] as string, item["versionRange"] as string);
             }
         }
@@ -99,12 +103,12 @@ namespace PixanKit.ModModule.Mods
             List<string> list = new ();
             foreach (var dependency in Dependencies)
             {
-                string depid = dependency.Value;
-                if (mods.ContainsKey(dependency.Value)) {
+                string depid = dependency.Key;
+                if (mods.ContainsKey(depid)) {
                     if (mods[depid] != null) list.AddRange(mods[depid].LostDependenciesR(mods)); }
                 else list.Add(depid);
             }
-            mods[Information.ID] = null;
+            mods[ID] = null;
             return list;
         }
 
@@ -142,12 +146,13 @@ namespace PixanKit.ModModule.Mods
             //Try Load From IDCache
             if (config.Config == ConfigType.json) Jconf = LoadIDJ(config);
             else toml = LoadIDT(config);
+            RemoveConfigFile(config);
             if (Owner.LoadFromID(this)) return;
             //Directly Load From Config
             if (Owner.TryLoadInfFromOwnerCache(this)) 
                 ValidLoadConf(Jconf, toml, config.Config == ConfigType.json);
             else InvalidLoadConf(Jconf, toml, config.Config == ConfigType.json);
-
+            Logger.Info("ModModule", "null");
         }
 
         private void ValidLoadConf(JObject Jconf, TomlTable toml, bool json)
@@ -161,9 +166,10 @@ namespace PixanKit.ModModule.Mods
         {
             ModInf inf;
             if (json)
-            { inf = ModInf.Load(Jconf); LoadDependencies(Jconf["dependencies"] as JObject); }
+            { inf = ModInf.Load(Jconf); LoadDependencies(Jconf["depends"] as JObject); Version = new(Jconf["version"].ToString()); }
             else { inf = ModInf.Load(toml); LoadDependencies(toml); }
             Information = inf;
+           
         }
 
         private JObject LoadIDJ(ConfigFile config)
@@ -177,7 +183,7 @@ namespace PixanKit.ModModule.Mods
 
         private TomlTable LoadIDT(ConfigFile config)
         {
-            var table = Toml.Parse(config.FilePath).ToModel();
+            var table = Toml.Parse(File.ReadAllText(config.FilePath)).ToModel();
 
             ID = (table["mods"] as TomlTableArray)[0]["modId"] as string;
             return table;
@@ -213,13 +219,15 @@ namespace PixanKit.ModModule.Mods
         {
             ZipArchiveEntry? entry;
             string name;
-            bool type = (entry = zip.Archive.GetEntry(name = "mod.fabric.json")) != null;
+            bool type = (entry = zip.Archive.GetEntry(name = "fabric.mod.json")) != null;
             if (!type) entry = zip.Archive.GetEntry(name = "META-INF/mods.toml");
 
             if (entry == null) throw new FileNotFoundException("FileNotFound");
 
-            string configpath = $"{Files.CacheDir}/mods/{Owner.Game.Name}-{FileName}-{name}";
-            entry.ExtractToFile(Localize.PathLocalize(configpath));
+            string configpath = Localize.PathLocalize($"{Files.CacheDir}/mods/{SHA1}-conf");
+            Directory.CreateDirectory(Path.GetDirectoryName(configpath));
+            if (!File.Exists(configpath))
+            entry.ExtractToFile(configpath);
 
             return new(configpath, type? ConfigType.json : ConfigType.tmol);
         }
@@ -228,6 +236,20 @@ namespace PixanKit.ModModule.Mods
         {
             File.Delete(file.FilePath);
         }
+        #endregion
+
+        #region Disable
+        public void Disable()
+        {
+            File.Move(FilePath, FilePath += ".disabled");
+        }
+
+        public void Enable()
+        {
+            File.Move(FilePath, FilePath = FilePath[0..(FilePath.Length - 9)]);
+            if (!IsEnabled) throw new Exception("");
+        }
+
         #endregion
 
         public JObject ToJSON()

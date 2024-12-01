@@ -26,7 +26,7 @@ namespace PixanKit.LaunchCore.Core
         /// <summary>
         /// When a new launcher instance is inited, this action will be called
         /// </summary>
-        public static Action<Launcher?>? LauncherInit;
+        public static Action<Launcher>? LauncherInit;
 
         /// <summary>
         /// Constructs a Launcher instance. Init JObjects in Files before calling this constructor.

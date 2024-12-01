@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Core;
 using PixanKit.LaunchCore.GameModule.Game;
+using PixanKit.LaunchCore.Log;
 using PixanKit.ModModule.Mods;
+using PixanKit.ModModule.Module;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +14,7 @@ namespace PixanKit.ModModule.Module
 {
     public partial class ModModule
     {
+
         /// <summary>
         /// Single Instance
         /// </summary>
@@ -48,21 +51,49 @@ namespace PixanKit.ModModule.Module
             }
         }
 
+        public async Task Init(Launcher launcher, bool parallel)
+        {
+            List<Task> tasks = new();
+            foreach (var folder in launcher.Folders)
+            {
+                foreach (var game in folder.Games)
+                {
+                    if (game.GameType != GameType.Mod) continue;
+                    var collection = AddGame(game as ModLoaderGame, false);
+                    tasks.Add(Task.Run(() =>
+                    {
+                        if (gameCache.ContainsKey(game.Path))
+                            collection.SetCache(gameCache[game.Path]);
+                        else collection.SetCache(new JObject());
+                    }));
+                }
+            }
+            await Task.WhenAll(tasks);
+        }
+
         private void AddGame(GameBase game)
         {
-            if (game.GameType == GameType.Mod) AddGame(game as ModloaderGame);
+            if (game.GameType == GameType.Mod) AddGame(game as ModLoaderGame);
         }
 
-        private void AddGame(ModloaderGame game)
+        private void AddGame(ModLoaderGame game)
         {
+            AddGame(game, true);
+        }
+
+        private ModCollection AddGame(ModLoaderGame game, bool init)
+        {
+            Logger.Info("PixanKit.ModModule", "Start Initing Games");
             ModCollection modcollection;
             ModGames.Add(game.Path, modcollection = new ModCollection(game, this));
-
-            if (gameCache.ContainsKey(game.Path)) modcollection.SetCache(gameCache[game.Path]);
+            if (!init) return modcollection;
+            if (gameCache.ContainsKey(game.Path)) 
+                modcollection.SetCache(gameCache[game.Path]);
             else modcollection.SetCache(new JObject());
+            return modcollection;
         }
 
-        private void RemoveGame(ModloaderGame game) 
+        private void RemoveGame(ModLoaderGame game) 
         {
             ModGames.Remove(game.Path);
         }

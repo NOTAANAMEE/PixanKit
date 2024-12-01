@@ -36,7 +36,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             public OfficialFabricMirror()
             {
                 BaseURL = "";
-                OriginURL = "";
+                OriginalURL = "";
             }
 
             /// <summary>

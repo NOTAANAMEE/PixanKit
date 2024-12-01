@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,7 +12,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// <summary>
     /// Command Language Running Task
     /// </summary>
-    public class CLIRunningTask: ProcessTask
+    public class CLITask : ProgressTask
     {
 
         ProcessStartInfo StartInfo;
@@ -23,7 +24,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// </summary>
         /// <param name="file">file path</param>
         /// <param name="args">arguments</param>
-        public CLIRunningTask(string file, string args)
+        public CLITask(string file, string args)
         {
             StartInfo = new ProcessStartInfo()
             {
@@ -50,11 +51,11 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// <inheritdoc/>
         /// </summary>
         /// <exception cref="InvalidOperationException"><inheritdoc/></exception>
-        public override async Task Cancel()
+        public override void Cancel()
         {
-            if (_status >= ProcessStatus.Canceling) throw new InvalidOperationException();
+            if (_status >= ProgressStatus.Canceled) throw new InvalidOperationException();
             Process.Kill();
-            await base.Cancel();
+            base.Cancel();
         }
     }
 }

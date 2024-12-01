@@ -11,32 +11,32 @@ namespace PixanKit.LaunchCore.Server
     /// </summary>
     public class MirrorServer
     {
-        protected string OriginURL;
+        protected string OriginalURL;
 
         public string BaseURL;
 
         /// <summary>
         /// Initor But Do Nothing. Do Not Use That
         /// </summary>
-        public MirrorServer() { OriginURL = ""; BaseURL = ""; }
+        public MirrorServer() { OriginalURL = ""; BaseURL = ""; }
 
         ///<summary>Initor</summary>
-        /// <param name="OriginURL">The Url Part That Needs To Replace(If No, Make It "")</param>
+        /// <param name="OriginalURL">The Url Part That Needs To Replace(If No, Make It "")</param>
         /// <param name="ReplacedURL">The Url That Replacing(Include https://)</param>
-        public MirrorServer(string OriginURL, string ReplacedURL)
+        public MirrorServer(string OriginalURL, string ReplacedURL)
         {
-            this.OriginURL = OriginURL;
+            this.OriginalURL = OriginalURL;
             this.BaseURL = ReplacedURL;
         }
 
         /// <summary>
         /// Replace The URL
         /// </summary>
-        /// <param name="url">The Origin URL</param>
+        /// <param name="url">The Original URL</param>
         /// <returns>The Replaced URL</returns>
         public virtual string Replace(string url)
         {
-            return OriginURL == "" ? url : url.Replace(OriginURL, BaseURL);
+            return OriginalURL == "" ? url : url.Replace(OriginalURL, BaseURL);
         }
     }
 }

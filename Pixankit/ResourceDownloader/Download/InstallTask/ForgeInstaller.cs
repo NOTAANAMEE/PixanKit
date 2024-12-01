@@ -5,9 +5,10 @@ using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.JavaModule;
 using PixanKit.LaunchCore.Server;
+using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.ResourceDownloader.Download.ModLoaders;
 using PixanKit.ResourceDownloader.Tasks.FuncTask;
-using PixanKit.ResourceDownloader.Tasks.MultiTasks;
+using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,7 +21,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// <summary>
     /// Forge Installer
     /// </summary>
-    public class ForgeInstaller:MultiSequenceTask
+    public class ForgeInstaller:SequenceProgressTask
     {
         string MCVersion = "";
 
@@ -54,8 +55,8 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void Init()
         {
-            TrackActionTask trackFuncTask = new();
-            trackFuncTask.Action += InitTask;
+            FuncProgressTask<int> trackFuncTask = new();
+            trackFuncTask.Function += InitTask;
             AddMinecraftInstallTask();
             AddDownloadTask();
             AddCommandTask();
@@ -63,15 +64,15 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void AddMinecraftInstallTask()
         {
-            if (Owner.FindVersion(MCVersion, LaunchCore.GameModule.Game.GameType.Ordinary) == null)
-            Add(new OrdinaryInstallTask(Owner, MCVersion, MCVersion));
+            if (Owner.FindVersion(MCVersion, LaunchCore.GameModule.Game.GameType.Original) == null)
+            Add(new OriginalInstallTask(Owner, MCVersion, MCVersion));
         }
 
         private void AddDownloadTask()
         {
-            MultiThreadDownload download = new(installerpath);
-            var process = processes[0] as TrackFuncTask<string>;
-            process.OnFinish += () =>
+            FileDownloadTask download = new("", installerpath);
+            var process = ProgressTasks[0] as FuncProgressTask<string>;
+            process.OnFinish += (a) =>
             {
                 download.SetURL(process.Return);
             };
@@ -81,21 +82,22 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         private void AddCommandTask()
         {
             var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes);
-            CLIRunningTask task = new(java.JavaEXE, $"-jar {installerpath} --installClient " +
+            CLITask task = new(java.JavaEXE, $"-jar {installerpath} --installClient " +
                 $"{Owner.Path}");
-            processes.Add(task);
-            task.OnFinish += () =>
+            ProgressTasks.Add(task);
+            task.OnFinish += (a) =>
             {
-                Owner.AddGame(new ModloaderGame($"{Owner.VersionDir}/{Name}"));
+                Owner.AddGame(new ModLoaderGame($"{Owner.VersionDir}/{Name}"));
             };
         }
 
-        private async Task InitTask(TrackActionTask task, CancellationToken token)
+        private async Task<int> InitTask(Action<double> progress, CancellationToken token)
         {
             url = await ServerList.ModLoaderServers["forge"]
                     .GetURL(forgeversion, token);
-            if (token.IsCancellationRequested) return;
-            task.Sched = 10;
+            if (token.IsCancellationRequested) return 1;
+            progress(1.0);
+            return 0;
         }
     }
 }

@@ -8,17 +8,18 @@ using PixanKit.LaunchCore.Server;
 using PixanKit.ResourceDownloader.Download.InstallTask;
 using PixanKit.ResourceDownloader.Download;
 using PixanKit.ResourceDownloader.Tasks.FuncTask;
-using PixanKit.ResourceDownloader.Tasks.MultiTasks;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
+using PixanKit.ResourceDownloader.Download.DownloadTask;
 
-namespace ResourceDownloader.Download.InstallTask
+namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
-    public class QuiltInstaller : MultiSequenceTask
+    public class QuiltInstaller : SequenceProgressTask
     {
 
         string MCVersion = "";
@@ -53,8 +54,8 @@ namespace ResourceDownloader.Download.InstallTask
 
         private void Init()
         {
-            TrackActionTask trackFuncTask = new();
-            trackFuncTask.Action += InitTask;
+            FuncProgressTask<int> trackFuncTask = new();
+            trackFuncTask.Function += InitTask;
             AddMinecraftInstallTask();
             AddDownloadTask();
             AddCommandTask();
@@ -62,15 +63,15 @@ namespace ResourceDownloader.Download.InstallTask
 
         private void AddMinecraftInstallTask()
         {
-            if (Owner.FindVersion(MCVersion, GameType.Ordinary) == null)
-                Add(new OrdinaryInstallTask(Owner, MCVersion, MCVersion));
+            if (Owner.FindVersion(MCVersion, GameType.Original) == null)
+                Add(new OriginalInstallTask(Owner, MCVersion, MCVersion));
         }
 
         private void AddDownloadTask()
         {
-            MultiThreadDownload download = new(installerpath);
-            var process = processes[0] as TrackFuncTask<string>;
-            process.OnFinish += () =>
+            FileDownloadTask download = new("", installerpath);
+            var process = ProgressTasks[0] as FuncProgressTask<string>;
+            process.OnFinish += (a) =>
             {
                 download.SetURL(process.Return);
             };
@@ -80,21 +81,22 @@ namespace ResourceDownloader.Download.InstallTask
         private void AddCommandTask()
         {
             var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes);
-            CLIRunningTask task = new(java.JavaEXE, $"-jar {installerpath} install client " +
+            CLITask task = new(java.JavaEXE, $"-jar {installerpath} install client " +
                 $"{MCVersion} {quiltversion["version"]} --install-dir {Owner.Path}");
-            processes.Add(task);
-            task.OnFinish += () =>
+            ProgressTasks.Add(task);
+            task.OnFinish += (a) =>
             {
-                Owner.AddGame(new ModloaderGame($"{Owner.VersionDir}/{Name}"));
+                Owner.AddGame(new ModLoaderGame($"{Owner.VersionDir}/{Name}"));
             };
         }
 
-        private async Task InitTask(TrackActionTask task, CancellationToken token)
+        private async Task<int> InitTask(Action<double> progress, CancellationToken token)
         {
             url = await ServerList.ModLoaderServers["fabric"]
                     .GetURL(quiltversion, token);
-            if (token.IsCancellationRequested) return;
-            task.Sched = 10;
+            if (token.IsCancellationRequested) return 1;
+            progress(1.0);
+            return 0;
         }
     }
 }

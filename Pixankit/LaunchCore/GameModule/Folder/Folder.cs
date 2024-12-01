@@ -232,13 +232,24 @@ namespace PixanKit.LaunchCore.GameModule
             string[] dirs = Directory.GetDirectories(Localize.PathLocalize(VersionDir));
             foreach (string dir in dirs) 
             {
-                var tmp = Initors.GameInitor(dir);
-                if (tmp != null)
+                GameBase game;
+                try {
+                    game = Initors.GameInitor(dir);
+                }
+                catch(Exception ex)
                 {
-                    _games.Add(tmp);
-                    tmp.SetOwner(this);
-                    Logger.Info($"Folder {Path} Add Game {tmp.Path}");
-                    Launcher.GameLoad?.Invoke(tmp);
+                    Logger.Error(ex.Message);
+                    Logger.Error("\n" + ex.StackTrace);
+                    Logger.Error($"{dir} Is Not A Minecraft Game");
+                    continue;
+                }
+                 
+                if (game != null)
+                {
+                    _games.Add(game);
+                    game.SetOwner(this);
+                    Logger.Info($"Folder {Path} Add Game {game.Path}");
+                    Launcher.GameLoad?.Invoke(game);
                 }
             }
             Logger.Info($"Folder {Path} Added");
@@ -290,7 +301,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// Find The Specific Version And Type Of A Game In The Folder
         /// </summary>
         /// <param name="version">The Version. Like <c>"1.14"</c></param>
-        /// <param name="type">Type Of The Game. Like <c>GameType.Ordinary</c></param>
+        /// <param name="type">Type Of The Game. Like <c>GameType.Original</c></param>
         /// <returns>Return The GameBase If Exists</returns>
         public GameBase? FindVersion(string version, GameType type) 
         {
