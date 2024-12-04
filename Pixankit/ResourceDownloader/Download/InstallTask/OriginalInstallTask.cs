@@ -34,7 +34,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         GameBase? _game;
 
-        Folder folder;
+        Folder Owner;
 
         string name;
 
@@ -52,10 +52,11 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// <exception cref="Exception"></exception>
         public OriginalInstallTask(Folder folder, string name, string version)
         {
-            this.folder = folder;
+            this.Owner = folder;
             this.name = name;
             this.version = version;
             path = folder.VersionDir + '/' + name;
+            Init();
         }
 
         private void Init()
@@ -90,6 +91,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             JObject mcjData = JObject.Parse(
                 File.ReadAllText(Localize.PathLocalize($"{path}/{name}.json")));
             _game = new OriginalGame(path, mcjData);
+            Owner.AddGame(_game);
             if (_game == null) throw new Exception();
             dt.SetURL(mcjData["downloads"]["client"]["url"].ToString());
             lct.Set(_game);

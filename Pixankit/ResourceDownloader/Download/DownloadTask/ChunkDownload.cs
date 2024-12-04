@@ -7,16 +7,35 @@ using System.Threading.Tasks;
 
 namespace PixanKit.ResourceDownloader.Download.DownloadTask
 {
+    /// <summary>
+    /// Represents a task for downloading a specific chunk of a file from a given URL.
+    /// </summary>
     public class FileChunkDownloadTask : FuncProgressTask<Stream>
     {
+        /// <summary>
+        /// The default size of a file chunk in bytes.
+        /// </summary>
         public static readonly long ChunkSize = 1024 * 1024;
 
         private readonly string _url;
 
+        /// <summary>
+        /// The starting byte position of the file chunk to download.
+        /// </summary>
         public readonly long _start;
 
+        /// <summary>
+        /// The ending byte position of the file chunk to download.
+        /// </summary>
         public readonly long _end;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileChunkDownloadTask"/> class 
+        /// with a specified URL, starting byte position, and ending byte position.
+        /// </summary>
+        /// <param name="url">The URL of the file to download.</param>
+        /// <param name="start">The starting byte position of the chunk.</param>
+        /// <param name="end">The ending byte position of the chunk.</param>
         public FileChunkDownloadTask(string url, long start, long end): base()
         {
             _url = url;
@@ -25,6 +44,12 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             Function += DownloadAsync;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileChunkDownloadTask"/> class 
+        /// with a specified URL and starting byte position. The chunk size is set to the default value.
+        /// </summary>
+        /// <param name="url">The URL of the file to download.</param>
+        /// <param name="start">The starting byte position of the chunk.</param>
         public FileChunkDownloadTask(string url, long start): base()
         {
             _url = url;

@@ -9,19 +9,53 @@ using System.Threading.Tasks;
 
 namespace PixanKit.ResourceDownloader.Download.DownloadTask
 {
+    /// <summary>
+    /// Represents a task for downloading multiple files concurrently using multiple threads.
+    /// </summary>
     public class MultiFileDownloadTask: AsyncProgressTask
     {
+        /// <summary>
+        /// The default number of threads to use for downloading.
+        /// </summary>
         public static int ThreadNum = 64;
 
+        /// <summary>
+        /// The URLs of the files to download.
+        /// </summary>
         protected string[] _url;
 
+        /// <summary>
+        /// The file paths where the downloaded files will be saved.
+        /// </summary>
         protected string[] _fileName;
 
+        /// <summary>
+        /// The number of threads to use for downloading.
+        /// </summary>
         protected int threadnum = 1;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MultiFileDownloadTask"/> class 
+        /// with specified URLs and file paths, using the default number of threads.
+        /// </summary>
+        /// <param name="url">An array of file URLs to download.</param>
+        /// <param name="path">An array of file paths where the files will be saved.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the length of <paramref name="url"/> and <paramref name="path"/> are not equal.
+        /// </exception>
         public MultiFileDownloadTask(string[] url, string[] path) : this(url, path, ThreadNum)
         { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MultiFileDownloadTask"/> class 
+        /// with specified URLs, file paths, and the number of threads to use.
+        /// </summary>
+        /// <param name="url">An array of file URLs to download.</param>
+        /// <param name="path">An array of file paths where the files will be saved.</param>
+        /// <param name="threanum">The number of threads to use for downloading.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the length of <paramref name="url"/> and <paramref name="path"/> are not equal.
+        /// </exception>
         public MultiFileDownloadTask(string[] url, string[] path, int threanum)
         {
             if (url.Length != path.Length) 
@@ -41,6 +75,16 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             Init();
         }
 
+        /// <summary>
+        /// Initializes the download tasks by dividing the files across multiple threads.
+        /// </summary>
+        /// <remarks>
+        /// Each file is assigned to a sequence task, ensuring that downloads are grouped based on the available threads.
+        /// If more files are present than threads, files are distributed cyclically.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if there is a mismatch between the number of URLs and paths.
+        /// </exception>
         protected void Init()
         {
             int count = 0;

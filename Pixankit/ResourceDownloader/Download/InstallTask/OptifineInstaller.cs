@@ -21,7 +21,7 @@ using PixanKit.ResourceDownloader.Download.DownloadTask;
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
     /// <summary>
-    /// Optifine Install Task
+    /// Represents a task for installing Optifine, a Minecraft optimization mod.
     /// </summary>
     public class OptifineInstaller: SequenceProgressTask
     {
@@ -33,15 +33,15 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         string version;
 
-        string installerpath = "";
+        string installerpath = $"{Files.CacheDir}/Installer/optifine.jar";
 
         /// <summary>
-        /// Init an Optifine installer
+        /// Initializes a new instance of the <see cref="OptifineInstaller"/> class.
         /// </summary>
-        /// <param name="folder">The Target Minecraft Folder</param>
-        /// <param name="name">The Actual Minecraft Name. The path will be folder\name\name.jar</param>
-        /// <param name="optifineversion">The Optifine Version</param>
-        /// <param name="mcversion">Minecraft Version</param>
+        /// <param name="folder">The target folder where Minecraft is located.</param>
+        /// <param name="name">The name of the Minecraft instance. The JAR file will be located at <c>folder\name\name.jar</c>.</param>
+        /// <param name="mcversion">The Minecraft version for which Optifine is being installed.</param>
+        /// <param name="optifineversion">A JSON object containing the Optifine version details.</param>
         public OptifineInstaller(Folder folder, string name, string mcversion, JObject optifineversion) 
         {
             Name = name;
@@ -49,6 +49,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             MCVersion = mcversion;
             Init_CheckExists(folder);
             version = optifineversion["version"].ToString();
+            Init(optifineversion);
         }
 
         /// <summary>
@@ -62,7 +63,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             Add(new OriginalInstallTask(folder, MCVersion, MCVersion));
         }
 
-        private void InitDownload(JObject optifineversion)
+        private void Init(JObject optifineversion)
         {
             string file = Localize.PathLocalize($"{Files.CacheDir}/Installer/optifine.jar");
             FuncProgressTask<string> funcTask = new();
@@ -84,10 +85,10 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         private void ArgGenerator()
         {
             var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes);
-            var id = version[(version.LastIndexOf('_') + 1)..];
+            var id = version[(version.LastIndexOf('-') + 1)..];
             var mcpath = Localize.PathLocalize(Owner.VersionDir + $"/{Name}");
             var librarypath = Localize.PathLocalize(
-                $"{Owner.LibraryDir}/optifine/Optifine/{id}/{installerpath}");
+                $"{Owner.LibraryDir}/optifine/Optifine/{id}/{version}.jar");
             Localize.CheckDir(mcpath);
             Localize.CheckDir(librarypath);
 
@@ -121,7 +122,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             Localize.CheckDir(extractpath);
 
             var extractfile = archive.GetEntry($"launcherwrapper-of-{content}.jar");
-            if (!File.Exists(extractpath))
+            if (extractfile != null)
                 extractfile.ExtractToFile(extractpath);
             File.Delete(config);
 

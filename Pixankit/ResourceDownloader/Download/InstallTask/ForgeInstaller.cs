@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
     /// <summary>
-    /// Forge Installer
+    /// Represents a task for installing the Forge mod loader for Minecraft.
     /// </summary>
     public class ForgeInstaller:SequenceProgressTask
     {
@@ -38,19 +38,19 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         string url = "";
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="ForgeInstaller"/> class.
         /// </summary>
-        /// <param name="folder"></param>
-        /// <param name="name"></param>
-        /// <param name="mcversion"></param>
-        /// <param name="forgeversion"></param>
+        /// <param name="folder">The folder where Forge will be installed.</param>
+        /// <param name="name">The name of the Forge installation.</param>
+        /// <param name="mcversion">The Minecraft version for which Forge is being installed.</param>
+        /// <param name="forgeversion">The JSON object containing the Forge version details.</param>
         public ForgeInstaller(Folder folder, string name, string mcversion, JObject forgeversion)
         {
             Owner = folder;
             Name = name;
             version = mcversion;
             this.forgeversion = forgeversion;
-            
+            Init();
         }
 
         private void Init()

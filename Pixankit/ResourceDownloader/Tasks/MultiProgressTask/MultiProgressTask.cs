@@ -6,54 +6,69 @@ using System.Threading.Tasks;
 
 namespace PixanKit.ResourceDownloader.Tasks.MultiProgressTask
 {
-    public class MultiProgressTask:ProgressTask
+    /// <summary>
+    /// Represents a task that combines and tracks multiple progress tasks.
+    /// </summary>
+    public class MultiProgressTask : ProgressTask
     {
-        public List<ProgressTask> ProgressTasks = new();        
+        /// <summary>
+        /// Gets the list of progress tasks managed by this multi-progress task.
+        /// </summary>
+        public List<ProgressTask> ProgressTasks = new();
 
+        /// <summary>
+        /// Adds a progress task to the multi-progress task.
+        /// </summary>
+        /// <param name="task">The progress task to add.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the multi-progress task has already started.
+        /// </exception>
         public void Add(ProgressTask task)
         {
-            if (_status > ProgressStatus.Inited) 
+            if (_status > ProgressStatus.Inited)
                 throw new InvalidOperationException("Add A Process Before The Task Starts");
             ProgressTasks.Add(task);
             _tasks.Add(task.MainTask);
-            task.OnException += this.OnException;
-            task.OnReport += Report;
+            task.OnException += ReportException;
+            task.OnReport += ReportProgress;
         }
 
-        /*public override void Start()
-        {
-            foreach (var progressTask in ProgressTasks)
-            {
-                progressTask.Start();
-            }
-            base.Start();
-        }*/
-
+        /// <summary>
+        /// Cancels all tasks within the multi-progress task.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if a task has already been canceled.
+        /// </exception>
         public override void Cancel()
         {
             foreach (var progressTask in ProgressTasks)
             {
-                progressTask.Cancel();
+                if (progressTask.Status < ProgressStatus.Canceled) progressTask.Cancel();
             }
-            //Remove();
             base.Cancel();
         }
 
+        /// <summary>
+        /// Marks the multi-progress task and its sub-tasks as finished.
+        /// </summary>
         protected override void Finish()
         {
-            //Remove();
             base.Finish();
         }
 
-        protected override void Report(double progress)
+        /// <summary>
+        /// Reports the combined progress of all tasks managed by this multi-progress task.
+        /// </summary>
+        /// <param name="progress">The combined progress of all sub-tasks.</param>
+        protected override void ReportProgress(double progress)
         {
             progress = 0;
-            foreach (var task in ProgressTasks) 
+            foreach (var task in ProgressTasks)
             {
                 progress += task.Progress;
             }
-            progress /=  ProgressTasks.Count;
-            base.Report(progress);
+            progress /= ProgressTasks.Count;
+            base.ReportProgress(progress);
         }
     }
 }

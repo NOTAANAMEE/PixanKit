@@ -19,9 +19,11 @@ using PixanKit.ResourceDownloader.Download.DownloadTask;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
+    /// <summary>
+    /// Represents a task for installing the Quilt mod loader for Minecraft.
+    /// </summary>
     public class QuiltInstaller : SequenceProgressTask
     {
-
         string MCVersion = "";
 
         Folder Owner;
@@ -37,19 +39,19 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         string url = "";
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="QuiltInstaller"/> class.
         /// </summary>
-        /// <param name="folder"></param>
-        /// <param name="name"></param>
-        /// <param name="mcversion"></param>
-        /// <param name="quiltversion"></param>
+        /// <param name="folder">The target folder where Minecraft is located.</param>
+        /// <param name="name">The name of the Minecraft instance for which Quilt is being installed.</param>
+        /// <param name="mcversion">The Minecraft version for which Quilt is being installed.</param>
+        /// <param name="quiltversion">A JSON object containing the Quilt version details.</param>
         public QuiltInstaller(Folder folder, string name, string mcversion, JObject quiltversion)
         {
             Owner = folder;
             Name = name;
             version = mcversion;
             this.quiltversion = quiltversion;
-
+            Init();
         }
 
         private void Init()

@@ -18,6 +18,9 @@ using PixanKit.ResourceDownloader.Download.DownloadTask;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
+    /// <summary>
+    /// Represents a task for installing the Fabric mod loader for Minecraft.
+    /// </summary>
     public class FabricInstaller : SequenceProgressTask
     {
 
@@ -36,19 +39,19 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         string url = "";
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="FabricInstaller"/> class.
         /// </summary>
-        /// <param name="folder"></param>
-        /// <param name="name"></param>
-        /// <param name="mcversion"></param>
-        /// <param name="fabricversion"></param>
+        /// <param name="folder">The target folder where Minecraft is located.</param>
+        /// <param name="name">The name of the Minecraft instance for which Fabric is being installed.</param>
+        /// <param name="mcversion">The Minecraft version for which Fabric is being installed.</param>
+        /// <param name="fabricversion">A JSON object containing the Fabric version details.</param>
         public FabricInstaller(Folder folder, string name, string mcversion, JObject fabricversion)
         {
             Owner = folder;
             Name = name;
             version = mcversion;
             this.fabricversion = fabricversion;
-
+            Init();
         }
 
         private void Init()

@@ -6,22 +6,52 @@ using System.Threading.Tasks;
 
 namespace PixanKit.ResourceDownloader.Tasks
 {
+    /// <summary>
+    /// This class defines a task base class for tracking progress, 
+    /// supporting callback mechanisms for progress updates, task start, 
+    /// cancellation, and completion
+    /// </summary>
     public abstract class ProgressTask
     {
-        public Action<double> OnReport;
+        /// <summary>
+        /// Progress Make Event, Call When Progress Is Updated
+        /// </summary>
+        public Action<double>? OnReport;
 
-        public Action<ProgressTask> OnStart;
+        /// <summary>
+        /// Start Event, Call When Task Starts
+        /// </summary>
+        public Action<ProgressTask>? OnStart;
 
-        public Action<ProgressTask> OnCancel;
+        /// <summary>
+        /// Cancel Event, Call When Task Is Cancelled
+        /// </summary>
+        public Action<ProgressTask>? OnCancel;
 
-        public Action<ProgressTask> OnFinish;
+        /// <summary>
+        /// Finish Event, Call When Task Is Finished
+        /// </summary>
+        public Action<ProgressTask>? OnFinish;
 
-        public Action<Exception> OnException;
+        /// <summary>
+        /// Exception Event, Not Using...
+        /// </summary>
+        public Action<Exception>? OnException;
 
+        /// <summary>
+        /// Store Current Progress
+        /// </summary>
         public double Progress { get => _progress; }
 
+        /// <summary>
+        /// The Task corresponding to the current task,
+        /// will wait for the task to be completed or cancelled
+        /// </summary>
         public Task MainTask { get => TaskStopped.Task;}
 
+        /// <summary>
+        /// The status of the current task
+        /// </summary>
         public ProgressStatus Status { get => _status; }
 
         protected CancellationTokenSource CancellationToken = new();
@@ -34,10 +64,20 @@ namespace PixanKit.ResourceDownloader.Tasks
 
         protected ProgressStatus _status;
 
-        protected object _lock = new();
+        protected object _progresslock = new();
 
+        /// <summary>
+        /// Constructor, initialize the task status to ProgressStatus.Inited
+        /// </summary>
         public ProgressTask() { _status = ProgressStatus.Inited; }
 
+        /// <summary>
+        /// Starts the task
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// When the status of the task is not <c>ProgressStatus.Inited</c>
+        /// the exception will be thrown
+        /// </exception>
         public virtual void Start()
         {
             if (_status != ProgressStatus.Inited) 
@@ -46,6 +86,11 @@ namespace PixanKit.ResourceDownloader.Tasks
             _ = Running();
         }
 
+        /// <summary>
+        /// Cancel the task
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// If the task has been canceled, an InvalidOperationException will be thrown</exception>
         public virtual void Cancel() 
         {
             if (CancellationToken.IsCancellationRequested) 
@@ -55,6 +100,26 @@ namespace PixanKit.ResourceDownloader.Tasks
             _status = ProgressStatus.Canceled;
         }
 
+        /// <summary>
+        /// Reports an exception that occurs during the task's execution.
+        /// </summary>
+        /// <param name="ex">The exception to report.</param>
+        /// <remarks>
+        /// This method cancels the task and triggers the <see cref="OnException"/> event 
+        /// to notify listeners about the exception.
+        /// </remarks>
+        public virtual void ReportException(Exception ex)
+        {
+            Cancel();
+            OnException?.Invoke(ex);
+        }
+
+        /// <summary>
+        /// Execute the main logic of the task.<br/>
+        /// Wait for all subtasks to complete. If the task is not cancelled, 
+        /// call the Finish() method. Finally, set the task completion mark.
+        /// </summary>
+        /// 
         protected virtual async Task Running()
         {
             await Task.WhenAll(_tasks);
@@ -63,15 +128,23 @@ namespace PixanKit.ResourceDownloader.Tasks
             TaskStopped.SetResult();
         }
 
+        /// <summary>
+        /// The callback logic when the task is completed triggers 
+        /// the OnFinish event and updates the status to ProgressStatus.Finished
+        /// </summary>
         protected virtual void Finish()
         {
             OnFinish?.Invoke(this);
             _status = ProgressStatus.Finished;
         }
 
-        protected virtual void Report(double progress) 
+        /// <summary>
+        /// Reports the progress of the current task.
+        /// </summary>
+        /// <param name="progress">current progress value (double)</param>
+        protected virtual void ReportProgress(double progress) 
         {
-            lock (_lock)
+            lock (_progresslock)
             {
                 _progress = progress;
                 OnReport?.Invoke(progress);
@@ -79,12 +152,30 @@ namespace PixanKit.ResourceDownloader.Tasks
         }
     }
 
+    /// <summary>
+    /// Task status enumeration.
+    /// </summary>
     public enum ProgressStatus
     {
+        /// <summary>
+        /// Initializing
+        /// </summary>
         Initing,
+        /// <summary>
+        /// Initialization completed, task not started
+        /// </summary>
         Inited,
+        /// <summary>
+        /// Task running
+        /// </summary>
         Running,
+        /// <summary>
+        /// Task canceled
+        /// </summary>
         Canceled,
+        /// <summary>
+        /// Task completed
+        /// </summary>
         Finished
     }
 }

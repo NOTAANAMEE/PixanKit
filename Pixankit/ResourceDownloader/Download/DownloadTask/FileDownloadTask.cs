@@ -3,13 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PixanKit.ResourceDownloader.SystemInf;
 using PixanKit.ResourceDownloader.Tasks;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 
 namespace PixanKit.ResourceDownloader.Download.DownloadTask
 {
+    /// <summary>
+    /// Represents a task for downloading a file from a given URL using multiple threads.
+    /// </summary>
     public class FileDownloadTask:AsyncProgressTask
     {
+        /// <summary>
+        /// The default number of threads to use for downloading.
+        /// </summary>
         public static int ThreadNum = 64;
 
         private string _url;
@@ -18,24 +25,49 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
 
         private FileStream _stream;
 
-        private object _lock = new();
+        private object _filelock = new();
 
         private int threadnum = 1;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileDownloadTask"/> class 
+        /// with a specified URL, file path, and the default number of threads.
+        /// </summary>
+        /// <param name="url">The URL of the file to download.</param>
+        /// <param name="path">The path where the file will be saved.</param>
         public FileDownloadTask(string url, string path):this(url, path, ThreadNum)
         {    }
 
-        public FileDownloadTask(string url, string path, int threanum)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileDownloadTask"/> class 
+        /// with a specified URL, file path, and the number of threads to use.
+        /// </summary>
+        /// <param name="url">The URL of the file to download.</param>
+        /// <param name="path">The path where the file will be saved.</param>
+        /// <param name="threadnum">The number of threads to use for downloading.</param>
+        public FileDownloadTask(string url, string path, int threadnum)
         {
-            this.threadnum = threanum;
+            this.threadnum = threadnum;
             _url = url;
             _fileName = path;
             _stream = new FileStream(path, FileMode.Create);
+            OnCancel += ChunkReturn;
             OnFinish += (a) =>
             {
                 _stream.Close();
             };
             Init();
+        }
+
+        /// <summary>
+        /// Start The Task<br/>
+        /// It will first check whether the url is not blank, then start the task.
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
+        public override void Start()
+        {
+            if (_url == "") throw new InvalidOperationException("Set A URL");
+            base.Start();
         }
 
         internal void SetURL(string url)
@@ -81,18 +113,24 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             response.Dispose();
         }
 
-        private void ChunkReturn(ProgressTask task)
+        private async void ChunkReturn(ProgressTask task)
         {
             FileChunkDownloadTask downloadTask = (FileChunkDownloadTask)task;
 
-            lock (_lock) 
+            lock (_filelock) 
             {
                 _stream.Position = downloadTask._start;
                 downloadTask.Return.CopyTo(_stream);
                 _stream.Flush();
             }
 
-            downloadTask.Return.DisposeAsync();
+            await downloadTask.Return.DisposeAsync().AsTask();
+        }
+
+        private void CancelRun(ProgressTask t)
+        {
+            _stream.Dispose();
+            File.Delete(_fileName);
         }
     }
 }

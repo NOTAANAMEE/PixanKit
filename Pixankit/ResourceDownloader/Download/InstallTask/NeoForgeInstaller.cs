@@ -16,6 +16,9 @@ using PixanKit.ResourceDownloader.Download.DownloadTask;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
+    /// <summary>
+    /// Represents a task for installing the NeoForge mod loader for Minecraft.
+    /// </summary>
     public class NeoForgeInstaller : SequenceProgressTask
     {
         string MCVersion = "";
@@ -33,19 +36,19 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         string url = "";
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="NeoForgeInstaller"/> class.
         /// </summary>
-        /// <param name="folder"></param>
-        /// <param name="name"></param>
-        /// <param name="mcversion"></param>
-        /// <param name="neoforgeversion"></param>
+        /// <param name="folder">The folder where NeoForge will be installed.</param>
+        /// <param name="name">The name of the NeoForge installation.</param>
+        /// <param name="mcversion">The Minecraft version for which NeoForge is being installed.</param>
+        /// <param name="neoforgeversion">The JSON object containing the NeoForge version details.</param>
         public NeoForgeInstaller(Folder folder, string name, string mcversion, JObject neoforgeversion)
         {
             Owner = folder;
             Name = name;
             version = mcversion;
             this.neoforgeversion = neoforgeversion;
-
+            Init();
         }
 
         private void Init()
