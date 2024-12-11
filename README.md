@@ -49,7 +49,7 @@ Whether you're creating a custom launcher or automating tasks related to Minecra
 2. Install Node.js
 3. Set up a special directory for the server and run `docfx init` under the directory
 4. Change the docfx.json file and add keys under /metadata/src
- - **ResourceDownloader**
+- **ResourceDownloader**
   - src：`<git pull directory>/PixanKit/ResourceDownloader`
   - files：`**/*.csproj`
 - **ModModule**
