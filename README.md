@@ -58,7 +58,7 @@ Whether you're creating a custom launcher or automating tasks related to Minecra
 - **LaunchCore**
   - src：`<git pull directory>/Pixankit/LaunchCore`
   - files：`**/*.csproj`
-
+5.  Run `docfx docfx.json --serve` and visit `localhost:8080` in your web browser
 
 ## Something else?
 
