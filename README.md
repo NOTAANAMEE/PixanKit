@@ -41,7 +41,24 @@ Whether you're creating a custom launcher or automating tasks related to Minecra
 ### Option 2: Build and Reference DLLs
 
 1.  Clone the repository:
-2. 
+2.
+
+# Documentation?
+### DocFX instruction
+1. Go to bash or cmd and run `dotnet tool install -g docfx`
+2. Install Node.js
+3. Set up a special directory for the server and run `docfx init` under the directory
+4. Change the docfx.json file and add keys under /metadata/src
+ - **ResourceDownloader**
+  - src：`<git pull directory>/PixanKit/ResourceDownloader`
+  - files：`**/*.csproj`
+- **ModModule**
+  - src：`<git pull directory>/ModModule`
+  - files：`**/*.csproj`
+- **LaunchCore**
+  - src：`<git pull directory>/Pixankit/LaunchCore`
+  - files：`**/*.csproj`
+
 
 ## Something else?
 
