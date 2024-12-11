@@ -25,6 +25,11 @@ namespace PixanKit.LaunchCore.GameModule.Game
         }
 
         /// <summary>
+        /// Stores the name of the mod loader
+        /// </summary>
+        public string ModLoader = "quilt";
+
+        /// <summary>
         /// Initor
         /// </summary>
         /// <param name="path"><inheritdoc/></param>
@@ -38,7 +43,9 @@ namespace PixanKit.LaunchCore.GameModule.Game
 
         protected override void LoadJSON(JObject gameJdata)
         {
-            
+            if (javaArguments.Contains("fabric")) ModLoader = "fabric";
+            else if (gameArguments.Contains("neoForge")) ModLoader = "neoforge";
+            else if (gameArguments.Contains("forge")) ModLoader = "forge";
         }
     }
 }

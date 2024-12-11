@@ -13,8 +13,14 @@ using System.Reflection;
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
     /// <summary>
-    /// This is the base class of Library Class.
+    /// Represents the base class for managing libraries in a Minecraft environment.
     /// </summary>
+    /// <remarks>
+    /// This abstract class defines the structure and behavior of various library types, 
+    /// such as original libraries, native libraries, and mod libraries. 
+    /// It includes functionality for initializing libraries from JSON data, 
+    /// determining their type and compatibility, and managing their paths and URLs.
+    /// </remarks>
     public abstract class LibraryBase
     {
         /// <summary>
@@ -25,7 +31,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <summary>
         /// The Absolute Path Of The Library
         /// </summary>
-        public string Path { get => libraryPath + GetPath(_name); }
+        public string Path { get => "${library_directory}/" + GetPath(_name); }
 
         /// <summary>
         /// Download URL Of The Library

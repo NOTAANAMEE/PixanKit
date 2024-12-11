@@ -13,7 +13,7 @@ namespace PixanKit.LaunchCore.Core
     public partial class Launcher
     {
         /// <summary>
-        /// 
+        /// Gets the collection of Java runtimes added to the launcher.
         /// </summary>
         public JavaRuntime[] JavaRuntimes
         {
@@ -23,39 +23,38 @@ namespace PixanKit.LaunchCore.Core
         List<JavaRuntime> _javaRuntimes = new List<JavaRuntime>();
 
         /// <summary>
-        /// Add A Java Runtime To The Launcher
+        /// Adds a Java runtime to the launcher.
         /// </summary>
-        /// <param name="runtime">A Valid JavaRuntime</param>
+        /// <param name="runtime">A valid <see cref="JavaRuntime"/> instance.</param>
         public void AddJavaRuntime(JavaRuntime runtime)
         {
             _javaRuntimes.Add(runtime);
         }
 
         /// <summary>
-        /// Add A Java Runtime To The Launcher
+        /// Adds a Java runtime to the launcher by specifying its installation path.
         /// </summary>
-        /// <param name="path">The Folder Of Java<br/>
-        /// For Example: "C:\\Program Files\\Java\\jdk-21"
-        /// </param>
+        /// <param name="path">The folder path of the Java runtime installation.
+        /// For example: "C:\\Program Files\\Java\\jdk-21"</param>
         public void AddJavaRuntime(string path)
         {
             AddJavaRuntime(new JavaRuntime(path));
         }
 
         /// <summary>
-        /// Remove A Java Runtime From The Launcher
+        /// Removes a Java runtime from the launcher.
         /// </summary>
-        /// <param name="runtime">A Valid Runtime Which Is In The Launcher</param>
+        /// <param name="runtime">A valid <see cref="JavaRuntime"/> instance that is already added to the launcher.</param>
         public void RemoveJavaRuntime(JavaRuntime runtime) 
         {
             _javaRuntimes.Remove(runtime);
         }
 
         /// <summary>
-        /// Choose A Java Runtime For A Minecraft Game
+        /// Chooses an appropriate Java runtime for a specified Minecraft game.
         /// </summary>
-        /// <param name="game"></param>
-        /// <returns></returns>
+        /// <param name="game">The <see cref="GameBase"/> instance representing the Minecraft game.</param>
+        /// <returns>A <see cref="JavaRuntime"/> instance that is selected based on the game's settings, or <c>null</c> if no runtime matches.</returns>
         public JavaRuntime? ChooseRuntime(GameBase game)
         {
             JavaRuntime? runtime;

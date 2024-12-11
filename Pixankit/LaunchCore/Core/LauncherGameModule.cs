@@ -13,13 +13,14 @@ using PixanKit.LaunchCore.SystemInf;
 using PixanKit.LaunchCore.Extention;
 using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Log;
+using System.Buffers;
 
 namespace PixanKit.LaunchCore.Core
 {
     public partial class Launcher
     {
         /// <summary>
-        /// The folders
+        /// Gets the collection of folders managed by the launcher.
         /// </summary>
         public Folder[] Folders
         {
@@ -27,7 +28,7 @@ namespace PixanKit.LaunchCore.Core
         }
 
         /// <summary>
-        /// The default game to be launched
+        /// Gets or sets the default game to be launched.
         /// </summary>
         public GameBase? TargetGame { get; set; }
 
@@ -44,7 +45,7 @@ namespace PixanKit.LaunchCore.Core
         /// <exception cref="DependencyException"></exception>
         public ProcessResult Launch(GameBase game)
         {
-            string cmd = CMD(game);
+            string cmd = InlineCommand(game);
 
 
             JavaRuntime? java = ChooseRuntime(game);
@@ -106,11 +107,22 @@ namespace PixanKit.LaunchCore.Core
             };
         }
 
-        private string CMD(GameBase game)
+        /// <summary>
+        /// Launch the default game
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NullReferenceException"></exception>
+        public ProcessResult Launch()
+        {
+            if (TargetGame == null) throw new NullReferenceException();
+            return Launch(TargetGame);
+        }
+
+        private string InlineCommand(GameBase game)
         {
             game.LaunchCheck();
             long timeStamp = DateTime.Now.Ticks;
-            string cmd = GenerateLaunchCmd(game);
+            string cmd = GenerateCommand(game);
 
             cmd = PlayerInLine(cmd);
             cmd = Localize.PathLocalize(cmd);
@@ -121,15 +133,16 @@ namespace PixanKit.LaunchCore.Core
             return cmd;
         }
 
-        /// <summary>
-        /// Launch the default game
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NullReferenceException"></exception>
-        public ProcessResult Launch()
+        public bool Contains(GameBase? game)
         {
-            if (TargetGame == null) throw new NullReferenceException();
-            return Launch(TargetGame);
+            if (game == null) return false;
+            return Contains(game.Owner) && game.Owner.Contains(game);
+        }
+
+        public bool Contains(Folder? folder)
+        {
+            if(folder == null) return false;
+            return _folders.Contains(folder);
         }
 
         /// <summary>
@@ -145,9 +158,8 @@ namespace PixanKit.LaunchCore.Core
             }
             _folders.Add(folder);
             folder.SetOwner(this);
-            if (_folders.Count > 0) nogame = false;            
-            ResetTargetGame();
             FolderAdd?.Invoke(folder);
+            UpdateTargetGame();
             Logger.Info($"Folder {folder.Path} Added");
         }
 
@@ -160,9 +172,7 @@ namespace PixanKit.LaunchCore.Core
             if (!_folders.Contains(folder)) return;
             _folders.Remove(folder);
             FolderRemove?.Invoke(folder);
-            if (TargetGame == null || !folder.HasGame(TargetGame)) return;
-            TargetGame = null;
-            ResetTargetGame();
+            UpdateTargetGame();
         }
 
         /// <summary>
@@ -201,8 +211,8 @@ namespace PixanKit.LaunchCore.Core
                 if (game.GameFolder.StartsWith(f.Path))
                 {
                     f.InternalAddGame(game);
-                    nogame = false;
-                    ResetTargetGame();
+                    GameAdd?.Invoke(game);
+                    UpdateTargetGame();
                     return;
                 }
             }
@@ -217,7 +227,8 @@ namespace PixanKit.LaunchCore.Core
         {
             if (game.Owner == null) return;
             game.Owner.InternalRemoveGame(game);
-            if (TargetGame == game) ResetTargetGame();
+
+            UpdateTargetGame();
         }
 
         /// <summary>
@@ -236,25 +247,11 @@ namespace PixanKit.LaunchCore.Core
         }
 
         /// <summary>
-        /// Move game to another folder. Not implemented yet
-        /// </summary>
-        /// <param name="game"></param>
-        /// <param name="folder"></param>
-        public static void MoveGame(GameBase game, Folder folder)
-        {
-            if (game.folder == null) return;
-            if (folder.HasGame(game)) return;
-            game.folder.RemoveGame(game);
-            folder.AddGame(game);
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// Generate The Launch Command
         /// </summary>
         /// <param name="game">target gae</param>
         /// <returns>command</returns>
-        public string GenerateLaunchCmd(GameBase game)
+        public string GenerateCommand(GameBase game)
         {
             string cmd = game.GetLaunchArgument();
             cmd = cmd.Replace("${arguments}", (Settings["arguments"] ?? new JObject()).ToString());
@@ -262,21 +259,23 @@ namespace PixanKit.LaunchCore.Core
             return cmd;
         }
 
-        private void ResetTargetGame()
+        private void UpdateTargetGame()
         {
-            if (TargetGame != null || nogame) return;
-            if (_folders.Count > 0 )
+            if (TargetGame is null) FirstGame();
+            else if (!_folders.Contains(TargetGame.Owner)) FirstGame();
+            else if (TargetGame.Owner.Contains(TargetGame)) return;
+            else if (TargetGame.Owner.Count > 0) TargetGame = TargetGame.Owner.First;
+            else FirstGame();
+            TargetGameChange?.Invoke(TargetGame);
+        }
+
+        private void FirstGame()
+        {
+            foreach (var folder in _folders) if(folder.Count > 0)
             {
-                foreach (Folder folder in _folders) 
-                {
-                    if (folder.Count > 0)
-                    {
-                        TargetGame = folder.First;
-                        return;
-                    }
-                }
+                TargetGame = folder.First;
+                return;
             }
-            nogame = true;
         }
 
         private static Dictionary<long, string> GetTimestampAndFilePath(string dir)

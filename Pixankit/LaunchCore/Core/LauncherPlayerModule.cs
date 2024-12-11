@@ -11,7 +11,7 @@ namespace PixanKit.LaunchCore.Core
     public partial class Launcher
     {
         /// <summary>
-        /// Player Collection
+        /// Gets the collection of players added to the launcher.
         /// </summary>
         public PlayerBase[] Players
         {
@@ -21,17 +21,17 @@ namespace PixanKit.LaunchCore.Core
         private List<PlayerBase> _players = new();
 
         /// <summary>
-        /// Default Launch Player
+        /// Gets or sets the default player used for launching.
         /// </summary>
         public PlayerBase? TargetPlayer { get; set; }
 
         /// <summary>
-        /// Inline Player Information To Command
+        /// Inlines player information into a command string.
         /// </summary>
-        /// <param name="arg">The Command</param>
-        /// <param name="player">Player Used To Launch</param>
-        /// <returns>Command Line After Inline</returns>
-        /// <exception cref="ArgumentNullException">Player Should Not Be Null</exception>
+        /// <param name="arg">The base command string.</param>
+        /// <param name="player">The player whose information is to be inlined.</param>
+        /// <returns>The command string with the player's information inlined.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the provided player is null.</exception>
         public string PlayerInLine(string arg, PlayerBase? player)
         {
             if (player == null) throw new ArgumentNullException("");
@@ -39,18 +39,18 @@ namespace PixanKit.LaunchCore.Core
         }
 
         /// <summary>
-        /// Inline Default Player Information To Command
+        /// Inlines the default player's information into a command string.
         /// </summary>
-        /// <param name="arg">The Command</param>
-        /// <returns>The Command After Inline</returns>
+        /// <param name="arg">The base command string.</param>
+        /// <returns>The command string with the default player's information inlined.</returns>
         public string PlayerInLine(string arg)
             =>PlayerInLine(arg, TargetPlayer);
 
         /// <summary>
-        /// Add A New Player To The Launcher
+        /// Adds a new player to the launcher.
         /// </summary>
-        /// <param name="player">Player Needed To Add</param>
-        /// <exception cref="ArgumentException">If Player UID Exists, The Exception Is Raised</exception>
+        /// <param name="player">The player to add.</param>
+        /// <exception cref="ArgumentException">Thrown if a player with the same UID already exists.</exception>
         public void AddPlayer(PlayerBase player)
         {
             foreach (var p in Players) 
@@ -64,17 +64,17 @@ namespace PixanKit.LaunchCore.Core
         }
 
         /// <summary>
-        /// Remove Player
+        /// Removes a player from the launcher.
         /// </summary>
-        /// <param name="player">Player Needed To Be Removed</param>
+        /// <param name="player">The player to remove.</param>
         public void RemovePlayer(PlayerBase player)
             => _players.Remove(player);
 
         /// <summary>
-        /// Get The Player From UID
+        /// Finds a player by their unique identifier (UID).
         /// </summary>
-        /// <param name="uid">Player UID</param>
-        /// <returns>If Exists, Return The Player. Else Return null</returns>
+        /// <param name="uid">The unique identifier of the player.</param>
+        /// <returns>The player if found; otherwise, <c>null</c>.</returns>
         public PlayerBase? FindPlayer(string uid)
         {
             foreach (PlayerBase player in _players)

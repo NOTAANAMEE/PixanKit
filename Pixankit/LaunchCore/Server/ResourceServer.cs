@@ -8,12 +8,13 @@ using System.Threading.Tasks;
 namespace PixanKit.LaunchCore.Server
 {
     /// <summary>
-    /// Resource Server Base
+    /// Represents an abstract resource server that manages mirror servers
+    /// and handles server selection based on ping times.
     /// </summary>
     public abstract class ResourceServer
     {
         /// <summary>
-        /// The Mirror Servers That Available
+        /// The list of available mirror servers.
         /// </summary>
         public List<MirrorServer> Mirrors = new();
 
@@ -23,7 +24,7 @@ namespace PixanKit.LaunchCore.Server
         public MirrorServer Current;
 
         /// <summary>
-        /// Choose The Best MirrorServer From The List
+        /// Selects the best mirror server from the list based on ping times.
         /// </summary>
         public void UpdateIndex()
         {
@@ -39,29 +40,28 @@ namespace PixanKit.LaunchCore.Server
         }
 
         /// <summary>
-        /// Specify A Current Server From The List
+        /// Selects a specific mirror server from the list based on its index.
         /// </summary>
-        /// <param name="index">The index Of The Server In The List</param>
+        /// <param name="index">The index of the server in the <see cref="Mirrors"/> list.</param>
         public void UpdateIndex(int index)
         {
             Current = Mirrors[index];
         }
 
         /// <summary>
-        /// Get The Time That Used To Ping The Current Server
+        /// Gets the ping time for the current mirror server.
         /// </summary>
-        /// <returns>The Time Needs To Ping</returns>
+        /// <returns>The round-trip time in milliseconds to ping the current server, or -1 if the ping fails.</returns>
         public long Ping()
         {
             return GetPing(Current.BaseURL);
         }
 
         /// <summary>
-        /// Get The Time That Used To Ping The Server
+        /// Gets the ping time for a specific server URL.
         /// </summary>
-        /// <param name="url">The URL  The Method Will Automatically 
-        /// Recognize The Server</param>
-        /// <returns>The Time Needs To Ping</returns>
+        /// <param name="url">The URL of the server to ping. The method will automatically extract the host from the URL.</param>
+        /// <returns>The round-trip time in milliseconds to ping the server, or -1 if the ping fails.</returns>
         public static long GetPing(string url)
         {
             Ping ping = new();
@@ -71,19 +71,19 @@ namespace PixanKit.LaunchCore.Server
         }
 
         /// <summary>
-        /// Add A Mirror Server
+        /// Adds a new mirror server to the list of available servers.
         /// </summary>
-        /// <param name="server">The Mirror Server</param>
+        /// <param name="server">The <see cref="MirrorServer"/> to add.</param>
         public void Add(MirrorServer server)
         {
             Mirrors.Add(server);
         }
 
         /// <summary>
-        /// Replace The OriginalUrl From The Server
+        /// Replaces the original URL of a resource with the corresponding URL from the current mirror server.
         /// </summary>
-        /// <param name="OriginalUrl">The Original Url For The Resource</param>
-        /// <returns>The URL Of The Resource On The Current MirrorServer</returns>
+        /// <param name="OriginalUrl">The original URL of the resource.</param>
+        /// <returns>The URL of the resource on the current mirror server.</returns>
         protected string Replace(string OriginalUrl) => Current.Replace(OriginalUrl);
 
         private static string GetHost(string OriginalUrl)

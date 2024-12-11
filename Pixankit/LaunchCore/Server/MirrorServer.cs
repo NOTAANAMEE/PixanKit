@@ -11,8 +11,14 @@ namespace PixanKit.LaunchCore.Server
     /// </summary>
     public class MirrorServer
     {
+        /// <summary>
+        /// The original base url of the network assets
+        /// </summary>
         protected string OriginalURL;
 
+        /// <summary>
+        /// The base url of the network assets. It will replace the base url
+        /// </summary>
         public string BaseURL;
 
         /// <summary>

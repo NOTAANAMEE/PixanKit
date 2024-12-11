@@ -9,33 +9,33 @@ using System.Threading.Tasks;
 namespace PixanKit.LaunchCore.Server.Servers.ModLoader
 {
     /// <summary>
-    /// ModLoader Mirror Server
+    /// Represents an abstract base class for a mod loader mirror server.
     /// </summary>
     public abstract class ModLoaderMirror:MirrorServer
     {
         #region CancellableMethod
         /// <summary>
-        /// Check whether the builds exist
+        /// Checks whether the builds exist for a specific Minecraft version.
         /// </summary>
-        /// <param name="mcversion">Minecraft Version</param>
-        /// <param name="token">Cancel Token</param>
-        /// <returns></returns>
+        /// <param name="mcversion">The Minecraft version to check builds for.</param>
+        /// <param name="token">A cancellation token to cancel the operation.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the builds exist.</returns>
         public abstract Task<bool> CheckBuild(string mcversion, CancellationToken token);
 
         /// <summary>
-        /// Get The Build List
+        /// Retrieves the build list for a specific Minecraft version.
         /// </summary>
-        /// <param name="mcversion">Minecraft Version</param>
-        /// <param name="token">Cancel Token</param>
-        /// <returns>Mod Loader Version List</returns>
+        /// <param name="mcversion">The Minecraft version to retrieve builds for.</param>
+        /// <param name="token">A cancellation token to cancel the operation.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a JSON array of mod loader versions.</returns>
         public abstract Task<JArray> GetBuild(string mcversion, CancellationToken token);
 
         /// <summary>
-        /// Get The URL Of The Mod Loader Installer
+        /// Retrieves the URL of the mod loader installer.
         /// </summary>
-        /// <param name="token">Token</param>
-        /// <param name="modloaderinf"></param>
-        /// <returns></returns>
+        /// <param name="modloaderinf">A JSON object containing mod loader information.</param>
+        /// <param name="token">A cancellation token to cancel the operation.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the URL of the mod loader installer.</returns>
         public abstract Task<string> GetURL(JObject modloaderinf, CancellationToken token);
         #endregion
     }

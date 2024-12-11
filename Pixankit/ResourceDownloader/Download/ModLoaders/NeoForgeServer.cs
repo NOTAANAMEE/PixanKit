@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace PixanKit.ResourceDownloader.Download.ModLoaders
 {
     /// <summary>
-    /// NeoForge Server
+    /// Represents a NeoForge mod loader server.
     /// </summary>
     public class NeoForgeServer: ModLoaderServer
     {
@@ -24,7 +24,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         }
 
         /// <summary>
-        /// Neoforge Official Server
+        /// Represents the official NeoForge mirror server.
         /// </summary>
         public class OfficialNeoforgeServer : ModLoaderMirror
         {
@@ -73,12 +73,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
 
             }
 
-            /// <summary>
-            /// Check Build Version
-            /// </summary>
-            /// <param name="mcversion"><inheritdoc/></param>
-            /// <param name="token"><inheritdoc/></param>
-            /// <returns></returns>
+            /// <inheritdoc/>
             public override async Task<bool> CheckBuild(string mcversion, CancellationToken token)
             {
                 if (mcversion == "1.20.1") return true;//The First Supported Minecraft Of NeoForge
@@ -101,12 +96,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 return false;
             }
 
-            /// <summary>
             /// <inheritdoc/>
-            /// </summary>
-            /// <param name="mcversion"><inheritdoc/></param>
-            /// /// <param name="token"><inheritdoc/></param>
-            /// <returns><inheritdoc/></returns>
             public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
                 var version = mcversion.Split('.');
@@ -130,12 +120,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 return ret;
             }
 
-            /// <summary>
             /// <inheritdoc/>
-            /// </summary>
-            /// <param name="modloaderinf"><inheritdoc/></param>
-            /// <param name="token"><inheritdoc/></param>
-            /// <returns><inheritdoc/></returns>
             public override Task<string> GetURL(JObject modloaderinf, CancellationToken token)
                 => Task.FromResult((modloaderinf["url"] ?? "").ToString());
 

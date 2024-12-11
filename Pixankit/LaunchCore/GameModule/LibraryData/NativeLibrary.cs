@@ -11,29 +11,21 @@ using Newtonsoft.Json.Linq;
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
     /// <summary>
-    /// Native Library Type. This Kind Of Library Need To Extract The Files In Jar
+    /// Represents a native library used in the Minecraft environment.
     /// </summary>
-    public class NativeLibrary:LibraryBase
+    public class NativeLibrary : LibraryBase
     {
         private string[] Exclude = Array.Empty<string>();
 
-        bool NotExtract = false;
+        private bool NotExtract = false;
 
         /// <summary>
-        /// Initor
+        /// Initializes a new instance of the <see cref="NativeLibrary"/> class with the specified JSON data.
         /// </summary>
-        /// <param name="libraryJData"></param>
+        /// <param name="libraryJData">The JSON data representing the native library.</param>
         public NativeLibrary(JToken libraryJData) : base()
         {
             libraryType = LibraryType.Native;
-            /*if (libraryJData["natives"] == null)
-            {
-                _name = libraryJData["name"].ToString();
-                _sha1 = libraryJData["downloads"]["artifact"]["sha1"].ToString();
-                _url = libraryJData["downloads"]["artifact"]["url"].ToString();
-                Console.WriteLine(Path);
-                return;
-            }*/
             JToken? current = libraryJData["downloads"]["classifiers"][libraryJData["natives"][SystemInformation.OSName].ToString()];
             _name = current["path"].ToString();
             _sha1 = current["sha1"].ToString();
@@ -48,24 +40,27 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         }
 
         /// <summary>
-        /// Nothing. Just For Fun
+        /// Initializes a new instance of the <see cref="NativeLibrary"/> class for internal use without extraction.
         /// </summary>
-        protected internal NativeLibrary():base(){ libraryType = LibraryType.Native; NotExtract = true; }
+        protected internal NativeLibrary() : base()
+        {
+            libraryType = LibraryType.Native;
+            NotExtract = true;
+        }
 
         /// <summary>
-        /// Extract The Files In The Jar File
+        /// Extracts the files in the native library's JAR file to the specified directory.
         /// </summary>
-        /// <param name="nativesPath">Directory That Files Needed To Be Extracted To</param>
+        /// <param name="nativesPath">The directory to extract files to.</param>
         public void Extract(string nativesPath)
         {
             if (NotExtract) return;
-            FileStream fs = new(libraryPath + "/" +  Path, FileMode.Open);
+            FileStream fs = new(libraryPath + "/" + Path, FileMode.Open);
             ZipArchive archive = new(fs);
-            foreach (ZipArchiveEntry entry in archive.Entries) 
+            foreach (ZipArchiveEntry entry in archive.Entries)
             {
                 string fullPath = $"{nativesPath}/{entry.FullName}";
-                
-                
+
                 if (!Judge(entry.FullName))
                     continue;
                 Console.WriteLine($"Decompressing {fullPath}");
@@ -81,26 +76,31 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
                     Directory.CreateDirectory(fullDir);
                 if (File.Exists(fullPath))
                     Console.WriteLine($"{fullPath} Already exists, canceled");
-                
-                else entry.ExtractToFile($"{fullPath}");
-                Console.WriteLine($"Finish compressing {fullPath}");
+                else
+                    entry.ExtractToFile(fullPath);
+                Console.WriteLine($"Finish decompressing {fullPath}");
             }
             fs.Close();
         }
 
+        /// <summary>
+        /// Determines whether the specified file path should be excluded from extraction.
+        /// </summary>
+        /// <param name="fullPath">The full path of the file.</param>
+        /// <returns><c>true</c> if the file should be included; otherwise, <c>false</c>.</returns>
         private bool Judge(string fullPath)
         {
             foreach (string path in Exclude)
             {
                 if (fullPath.StartsWith(path)) return false;
             }
-            return true; 
+            return true;
         }
 
         /// <summary>
-        /// <inheritdoc/>
+        /// Creates a copy of the current <see cref="NativeLibrary"/> instance.
         /// </summary>
-        /// <returns><inheritdoc/></returns>
+        /// <returns>A new instance of <see cref="NativeLibrary"/> with the same properties.</returns>
         public override NativeLibrary Copy()
         {
             return new NativeLibrary()

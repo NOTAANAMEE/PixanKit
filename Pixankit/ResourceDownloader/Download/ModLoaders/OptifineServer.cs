@@ -20,6 +20,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         public OptifineServer() : base("optifine")
         {
             Mirrors.Add(new OfficialOptifineServer());
+            UpdateIndex();
         }
 
         /// <summary>

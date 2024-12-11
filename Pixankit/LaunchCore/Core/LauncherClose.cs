@@ -13,7 +13,8 @@ namespace PixanKit.LaunchCore.Core
     public partial class Launcher
     {
         /// <summary>
-        /// Close the launcher instance. It will also close the GameBase and Folders instances.
+        /// Closes the launcher and saves the current state of folders, Java runtimes, and players into the respective data structures.
+        /// Note: The actual saving to disk must be handled separately by calling <see cref="Files.Save"/> or other appropriate methods.
         /// </summary>
         public void Close()
         {

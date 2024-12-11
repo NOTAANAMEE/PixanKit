@@ -10,13 +10,12 @@ using PixanKit.LaunchCore.Log;
 namespace PixanKit.LaunchCore.PlayerModule.Player
 {
     /// <summary>
-    /// Player Base. Base Class For Players
+    /// Represents a base class for a player in the Minecraft environment.
     /// </summary>
     public class PlayerBase:IToJSON
     {
         /// <summary>
-        /// Player Name
-        /// Necessary For Launch
+        /// Gets the player's name. Necessary for launch.
         /// </summary>
         public string Name
         {
@@ -24,8 +23,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         }
 
         /// <summary>
-        /// Player UID
-        /// Necessary For Launch
+        /// Gets the player's unique identifier (UID). Necessary for launch.
         /// </summary>
         public virtual string UID
         {
@@ -33,16 +31,15 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         }
 
         /// <summary>
-        /// Player Access Token To Verification
-        /// Necessary For Launch
+        /// Gets the player's access token for verification. Necessary for launch.
         /// </summary>
-        public virtual string AccessToken 
+        public virtual string AccessToken
         {
             get => _accesstoken;
         }
 
         /// <summary>
-        /// Login Type
+        /// Gets the player's login type.
         /// </summary>
         public PlayerType LoginType
         {
@@ -50,39 +47,39 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         }
 
         /// <summary>
-        /// Player ID
+        /// The player's unique identifier.
         /// </summary>
         protected string _uid = "";
 
         /// <summary>
-        /// Player Name
+        /// The player's name.
         /// </summary>
         protected string _name = "";
 
         /// <summary>
-        /// Player Login Type
+        /// The player's login type.
         /// </summary>
         protected PlayerType _type;
 
         /// <summary>
-        /// Player Mojang AccessToken
+        /// The player's Mojang access token.
         /// </summary>
         protected string _accesstoken = "";
 
         /// <summary>
-        /// Player Microsoft Refresh Token
+        /// The player's Microsoft refresh token.
         /// </summary>
         protected string refreshToken = "";
 
         /// <summary>
-        /// Last Login Time
+        /// The last login time of the player.
         /// </summary>
         protected DateTime lastLogin;
 
         /// <summary>
-        /// Initor
+        /// Initializes a new instance of the <see cref="PlayerBase"/> class with the specified JSON data.
         /// </summary>
-        /// <param name="jData">jData Of A Player</param>
+        /// <param name="jData">The JSON data of a player.</param>
         public PlayerBase(JObject? jData)
         {
             if (jData == null) return;
@@ -93,15 +90,15 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         }
 
         /// <summary>
-        /// Initor
+        /// Initializes a new instance of the <see cref="PlayerBase"/> class.
         /// </summary>
         protected PlayerBase() { }
 
         /// <summary>
-        /// Inline Player Data
+        /// Inlines the player's data into a command string.
         /// </summary>
-        /// <param name="arg"></param>
-        /// <returns></returns>
+        /// <param name="arg">The command string.</param>
+        /// <returns>The command string with the player's data inlined.</returns>
         public string InlinePlayer(string arg)
         {
             arg = arg.Replace("${auth_player_name}", Name);
@@ -112,22 +109,22 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         }
 
         /// <summary>
-        /// Test Whether The Players Are The Same
+        /// Determines whether two players are the same.
         /// </summary>
-        /// <param name="player1">Player1</param>
-        /// <param name="player2">Player2</param>
-        /// <returns>bool</returns>
+        /// <param name="player1">The first player.</param>
+        /// <param name="player2">The second player.</param>
+        /// <returns><c>true</c> if the players are the same; otherwise, <c>false</c>.</returns>
         protected static bool SamePlayer(PlayerBase player1, PlayerBase player2)
         {
             return player1._uid == player2._uid;
         }
 
         /// <summary>
-        /// <inheritdoc/>
+        /// Determines whether two <see cref="PlayerBase"/> objects are equal.
         /// </summary>
-        /// <param name="player1"><inheritdoc/></param>
-        /// <param name="player2"><inheritdoc/></param>
-        /// <returns><inheritdoc/></returns>
+        /// <param name="player1">The first player.</param>
+        /// <param name="player2">The second player.</param>
+        /// <returns><c>true</c> if the players are equal; otherwise, <c>false</c>.</returns>
         public static bool operator ==(PlayerBase? player1, PlayerBase? player2)
         {
             if (player1 is null)return player2 is null;
@@ -136,20 +133,20 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         }
 
         /// <summary>
-        /// <inheritdoc/>
+        /// Determines whether two <see cref="PlayerBase"/> objects are not equal.
         /// </summary>
-        /// <param name="player1"><inheritdoc/></param>
-        /// <param name="player2"><inheritdoc/></param>
-        /// <returns><inheritdoc/></returns>
+        /// <param name="player1">The first player.</param>
+        /// <param name="player2">The second player.</param>
+        /// <returns><c>true</c> if the players are not equal; otherwise, <c>false</c>.</returns>
         public static bool operator !=(PlayerBase? player1, PlayerBase? player2)
         {
             return !(player1 == player2);
         }
 
         /// <summary>
-        /// <inheritdoc/>
+        /// Converts the player's data to a JSON object.
         /// </summary>
-        /// <returns><inheritdoc/></returns>
+        /// <returns>A <see cref="JObject"/> representing the player's data.</returns>
         public virtual JObject ToJSON()
         {
             JObject jobj = new()
@@ -163,19 +160,19 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         }
 
         /// <summary>
-        /// I hate Warnings so I wrote this
+        /// Gets a hash code for the player.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A hash code for the player.</returns>
         public override int GetHashCode()
         {
             return _uid.GetHashCode();
         }
 
         /// <summary>
-        /// I hate Warnings so I wrote this
+        /// Determines whether the specified object is equal to the current player.
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+        /// <param name="obj">The object to compare with the current player.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current player; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
             if (obj is null) return false;

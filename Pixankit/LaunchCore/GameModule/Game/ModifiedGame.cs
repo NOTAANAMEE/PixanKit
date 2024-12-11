@@ -29,7 +29,6 @@ namespace PixanKit.LaunchCore.GameModule.Game
         public ModifiedGame(string path, JObject jData) : base(path, jData)
         {
             _gameType = GameType.Optifine;
-            //InitJData(jData);
         }
 
         /// <summary>
@@ -39,9 +38,9 @@ namespace PixanKit.LaunchCore.GameModule.Game
         public ModifiedGame(string path):base(path, true)
         {
             _gameType = GameType.Optifine;
-            //InitJData();
         }
 
+        /// <inheritdoc/>
         protected override void LoadJSON(JObject gameJdata)
         {
             if (!gameJdata.ContainsKey("inheritsFrom"))
@@ -81,7 +80,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <returns><inheritdoc/></returns>
         protected override string GetGameArguments()
         {
-            if (useBaseGeneration) return PCLGameArgProcess(base.GetGameArguments());
+            if (useBaseGeneration) return ProcessedGameArgProcess(base.GetGameArguments());
             return base.SameVersionGameArguments() + " " + base.GetGameArguments();
         }
 
@@ -105,7 +104,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             return base.SameVersionAssetsID();
         }
 
-        internal string PCLGameArgProcess(string args)
+        internal string ProcessedGameArgProcess(string args)
         {
             if (args.Contains(" --tweakClass optifine.OptiFineForgeTweaker"))
             {

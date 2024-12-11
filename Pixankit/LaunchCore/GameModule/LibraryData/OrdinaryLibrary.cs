@@ -11,16 +11,16 @@ using Newtonsoft.Json.Linq;
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
     /// <summary>
-    /// Original Kind Of Library
+    /// Represents an original library in the Minecraft environment.
     /// </summary>
-    public class OriginalLibrary: LibraryBase
+    public class OriginalLibrary : LibraryBase
     {
         /// <summary>
-        /// Initor Of Original Library
+        /// Initializes a new instance of the <see cref="OriginalLibrary"/> class with a specified directory and library JSON data.
         /// </summary>
-        /// <param name="folder">The Library Directory</param>
-        /// <param name="libraryJData">The JSON Data Of Library</param>
-        public OriginalLibrary(string folder, JToken libraryJData):base(libraryJData, folder) 
+        /// <param name="folder">The directory where the library is located.</param>
+        /// <param name="libraryJData">The JSON data representing the library.</param>
+        public OriginalLibrary(string folder, JToken libraryJData) : base(libraryJData, folder)
         {
             libraryType = LibraryType.Original;
             _url = libraryJData["downloads"]["artifact"]["url"].ToString();
@@ -28,23 +28,23 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         }
 
         /// <summary>
-        /// Initor
+        /// Initializes a new instance of the <see cref="OriginalLibrary"/> class with library JSON data.
         /// </summary>
-        /// <param name="libraryJData"></param>
-        public OriginalLibrary(JToken libraryJData):this("", libraryJData) { }
+        /// <param name="libraryJData">The JSON data representing the library.</param>
+        public OriginalLibrary(JToken libraryJData) : this("", libraryJData) { }
 
         /// <summary>
-        /// Initor For Copy
+        /// Initializes a new instance of the <see cref="OriginalLibrary"/> class for internal use.
         /// </summary>
-        protected OriginalLibrary():base()
+        protected OriginalLibrary() : base()
         {
             libraryType = LibraryType.Original;
         }
 
         /// <summary>
-        /// <inheritdoc/>
+        /// Creates a copy of the current <see cref="OriginalLibrary"/> instance.
         /// </summary>
-        /// <returns><inheritdoc/></returns>
+        /// <returns>A new instance of <see cref="OriginalLibrary"/> with the same properties.</returns>
         public override LibraryBase Copy()
         {
             return new OriginalLibrary()

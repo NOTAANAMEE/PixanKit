@@ -10,7 +10,7 @@ using PixanKit.LaunchCore.Server;
 using PixanKit.LaunchCore.Server.Servers.Microsoft;
 using PixanKit.LaunchCore.Server.Servers.Mojang;
 
-namespace PixanKit.LaunchCore.PlayerModule.MojangAPI.Login
+namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
 {
     /// <summary>
     /// Standard Mojang Login Process

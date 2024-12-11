@@ -14,23 +14,26 @@ using System.Threading.Tasks;
 namespace PixanKit.LaunchCore.Core
 {
     /// <summary>
-    /// The Launcher Class
+    /// Represents the main launcher class for managing games, players, Java runtimes, and settings.
+    /// Provides a variety of events for interaction and lifecycle management.    
     /// </summary>
     public partial class Launcher
     {
         /// <summary>
-        /// Single Instance
+        /// Gets the single instance of the <see cref="Launcher"/> class.
         /// </summary>
         public static Launcher? Instance = null;
 
         /// <summary>
-        /// When a new launcher instance is inited, this action will be called
+        /// Occurs when a new launcher instance is initialized.
         /// </summary>
         public static Action<Launcher>? LauncherInit;
 
         /// <summary>
-        /// Constructs a Launcher instance. Init JObjects in Files before calling this constructor.
+        /// Initializes a new instance of the <see cref="Launcher"/> class.
+        /// This constructor initializes game, player, and Java modules, and loads settings.
         /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if an instance of the launcher already exists.</exception>        
         public Launcher()
         {
             if (Instance != null) throw new InvalidOperationException("Launcher is a single instance class");
@@ -58,7 +61,7 @@ namespace PixanKit.LaunchCore.Core
             _folders = folders;
             string tmpstr = Files.FolderJData["target"].ToString();
             if (tmpstr != "") TargetGame = FindGame(tmpstr);
-            ResetTargetGame();
+            UpdateTargetGame();
         }
 
         private void InitPlayerModule()
@@ -92,7 +95,7 @@ namespace PixanKit.LaunchCore.Core
         }
 
         /// <summary>
-        /// The setting of the launcher instance
+        /// Gets or sets the settings of the launcher instance.
         /// </summary>
         public JObject Settings = new()
         {
@@ -102,12 +105,12 @@ namespace PixanKit.LaunchCore.Core
         };
 
         /// <summary>
-        /// The name of the launcher
+        /// The name of the launcher.
         /// </summary>
         public static string LauncherName = "MyLauncher";
 
         /// <summary>
-        /// The version of the launcher
+        /// The version of the launcher.
         /// </summary>
         public static string VersionName = "1000";
     }

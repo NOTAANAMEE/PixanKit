@@ -9,15 +9,15 @@ using Newtonsoft.Json.Linq;
 namespace PixanKit.LaunchCore.GameModule.Game
 {
     /// <summary>
-    /// Original Game. Minecraft Game Without Optifine Or Mod Loaders
+    /// Represents the original Minecraft game without Optifine or mod loaders.
     /// </summary>
     public class OriginalGame: GameBase
     {
         /// <summary>
-        /// Initor
+        /// Initializes a new instance of the <see cref="OriginalGame"/> class.
         /// </summary>
-        /// <param name="path"><inheritdoc/></param>
-        /// <param name="jData"><inheritdoc/></param>
+        /// <param name="path">The file path to the game directory.</param>
+        /// <param name="jData">The JSON data containing game information.</param>
         public OriginalGame(string path, JObject jData): base(path, jData)
         {
             _gameType = GameType.Original;

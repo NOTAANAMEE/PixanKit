@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 using System.Buffers.Text;
 using System.ComponentModel;
 
-namespace PixanKit.LaunchCore.PlayerModule.MojangAPI.Skin
+namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
 {
     /// <summary>
     /// Skin Class For Launchers To Change The Skin

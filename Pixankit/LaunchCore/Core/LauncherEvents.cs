@@ -13,69 +13,76 @@ namespace PixanKit.LaunchCore.Core
     {
         #region GameEvents
         /// <summary>
-        /// Game Load From File Event
+        /// Occurs when a game is loaded from a file.
         /// </summary>
         public static Action<GameBase>? GameLoad;
 
         /// <summary>
-        /// Default Game Change Event
+        /// Occurs when the default game is changed.
         /// </summary>
-        public static Action<GameBase>? DefaultGameChange;
+        public static Action<GameBase?>? TargetGameChange;
 
         /// <summary>
-        /// Game Add Event
+        /// Occurs when a new game is added.
         /// </summary>
         public static Action<GameBase>? GameAdd;
 
         /// <summary>
-        /// Folder Remove Event
+        /// Occurs when a game is removed.
         /// </summary>
         public static Action<GameBase>? GameRemove;
 
         /// <summary>
-        /// Folder Add Event
+        /// Occurs when a new folder is added.
         /// </summary>
         public static Action<Folder>? FolderAdd;
 
         /// <summary>
-        /// Folder Remove Event
+        /// Occurs when a folder is removed.
         /// </summary>
         public static Action<Folder>? FolderRemove;
 
         /// <summary>
-        /// Pre-launch Event
+        /// Occurs before launching a game. Allows modification of the launch parameters.
         /// </summary>
+        /// <remarks>
+        /// The first parameter is the game being launched, and the second is the original launch arguments.
+        /// The method should return the modified launch arguments.
+        /// </remarks>
         public static Func<GameBase, string, string>? GamePreLaunch;
 
         /// <summary>
-        /// Post-launch Event
+        /// Occurs after a game is launched.
         /// </summary>
         public static Action<GameBase>? GamePostLaunch;
 
         /// <summary>
-        /// Game Exit Event
+        /// Occurs when a game exits.
         /// </summary>
+        /// <remarks>
+        /// The first parameter is the game that exited, and the second is the process result.
+        /// </remarks>
         public static Action<GameBase, ProcessResult>? GameExit;
         #endregion
 
         #region PlayerEvents
         /// <summary>
-        /// Player Load From JSON Event
+        /// Occurs when a player profile is loaded from a JSON file.
         /// </summary>
         public static Action<PlayerBase>? PlayerLoad;
 
         /// <summary>
-        /// Player Add Event
+        /// Occurs when a new player is added.
         /// </summary>
         public static Action<PlayerBase>? PlayerAdd;
 
         /// <summary>
-        /// Player Remove Event
+        /// Occurs when a player is removed.
         /// </summary>
         public static Action<PlayerBase>? PlayerRemove;
 
         /// <summary>
-        /// Player Profile Change Event
+        /// Occurs when a player's profile is changed.
         /// </summary>
         public static Action<PlayerBase>? ProfileChange;
         #endregion

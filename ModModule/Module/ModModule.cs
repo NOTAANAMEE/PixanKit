@@ -12,28 +12,31 @@ using System.Threading.Tasks;
 
 namespace PixanKit.ModModule.Module
 {
+    /// <summary>
+    /// Represents the module responsible for managing mods and their collections.
+    /// </summary>
     public partial class ModModule
     {
-
         /// <summary>
-        /// Single Instance
+        /// Gets the single instance of the <see cref="ModModule"/> class.
         /// </summary>
         public static ModModule? Instance { get; private set; }
 
         /// <summary>
-        /// The ModInfs List
+        /// Gets the dictionary of mod information, where the key is the mod ID and the value is the <see cref="ModInf"/> object.
         /// </summary>
-        public Dictionary<string, ModInf> Mods { get; private set; } = new();
+        public Dictionary<string, ModInf> Mods { get; private set; } = [];
 
         /// <summary>
-        /// Mod Game List
+        /// Gets the dictionary of mod collections, where the key is the game ID and the value is the <see cref="ModCollection"/> object.
         /// </summary>
-        public Dictionary<string, ModCollection> ModGames { get; private set; } = new();
+        public Dictionary<string, ModCollection> ModGames { get; private set; } = [];
 
         /// <summary>
-        /// Initor
+        /// Initializes a new instance of the <see cref="ModModule"/> class.
+        /// Ensures that only one instance of the class can exist.
         /// </summary>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="InvalidOperationException">Thrown if an instance of the class already exists.</exception>
         public ModModule() 
         {
             if (Instance != null) 
@@ -43,6 +46,11 @@ namespace PixanKit.ModModule.Module
                 Mods.Add(mod.Key, ModInf.Load(mod.Value));
         }
 
+        /// <summary>
+        /// Initializes the mod module with a specified launcher.
+        /// This method processes all games in the launcher's folders and adds them to the module.
+        /// </summary>
+        /// <param name="launcher">The launcher containing the folders and games to initialize.</param>
         public void Init(Launcher launcher)
         {
             foreach (var folder in launcher.Folders) 
@@ -51,9 +59,16 @@ namespace PixanKit.ModModule.Module
             }
         }
 
+        /// <summary>
+        /// Initializes the mod module with a specified launcher using asynchronous tasks.
+        /// Allows parallel initialization if specified.
+        /// </summary>
+        /// <param name="launcher">The launcher containing the folders and games to initialize.</param>
+        /// <param name="parallel">Determines whether to initialize the games in parallel.</param>
+        /// <returns>A task that represents the asynchronous initialization operation.</returns>
         public async Task Init(Launcher launcher, bool parallel)
         {
-            List<Task> tasks = new();
+            List<Task> tasks = [];
             foreach (var folder in launcher.Folders)
             {
                 foreach (var game in folder.Games)
@@ -62,9 +77,10 @@ namespace PixanKit.ModModule.Module
                     var collection = AddGame(game as ModLoaderGame, false);
                     tasks.Add(Task.Run(() =>
                     {
-                        if (gameCache.ContainsKey(game.Path))
-                            collection.SetCache(gameCache[game.Path]);
-                        else collection.SetCache(new JObject());
+                        JObject cache = [];
+                        if (gameCache.TryGetValue(game.Path, out cache))
+                            collection.SetCache(cache);
+                        else collection.SetCache([]);
                     }));
                 }
             }
@@ -87,9 +103,9 @@ namespace PixanKit.ModModule.Module
             ModCollection modcollection;
             ModGames.Add(game.Path, modcollection = new ModCollection(game, this));
             if (!init) return modcollection;
-            if (gameCache.ContainsKey(game.Path)) 
-                modcollection.SetCache(gameCache[game.Path]);
-            else modcollection.SetCache(new JObject());
+            if (gameCache.TryGetValue(game.Path, out JObject cache)) 
+                modcollection.SetCache(cache);
+            else modcollection.SetCache([]);
             return modcollection;
         }
 
@@ -98,14 +114,17 @@ namespace PixanKit.ModModule.Module
             ModGames.Remove(game.Path);
         }
 
+        /// <summary>
+        /// Close the mod module
+        /// </summary>
         public void Close()
         {
-            JObject array1 = new();
+            JObject array1 = [];
             foreach (var mod in Mods)
             {
                 array1.Add(mod.Key, mod.Value.ToJSON());
             }
-            JObject array2 = new();
+            JObject array2 = [];
             foreach(var game in ModGames)
             {
                 array2.Add(game.Key, game.Value.ToJSON());

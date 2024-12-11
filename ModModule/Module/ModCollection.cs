@@ -21,14 +21,25 @@ using PixanKit.LaunchCore.GameModule.Game;
 namespace PixanKit.ModModule.Module
 {
     /// <summary>
-    /// 
+    /// Represents a collection of mods managed by a specific mod loader and owner.
     /// </summary>
     public class ModCollection
     {
+        /// <summary>
+        /// The game associated with this mod collection.
+        /// </summary>
         public ModLoaderGame Game;
 
+        /// <summary>
+        /// The owner module of this mod collection.
+        /// </summary>
         public ModModule Owner;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ModCollection"/> class.
+        /// </summary>
+        /// <param name="game">The game instance associated with the mod loader.</param>
+        /// <param name="owner">The owner module managing this mod collection.</param>
         public ModCollection(ModLoaderGame game, ModModule owner)
         {
             Game = game;
@@ -37,14 +48,16 @@ namespace PixanKit.ModModule.Module
 
         #region Init
         /// <summary>
-        /// 
+        /// Sets the cache for mod files based on the given JSON object.
         /// </summary>
         /// <param name="jobj">
+        /// A JSON object in the format:
         /// <code>
         /// {
-        ///  "files":{}
+        ///  "files": {}
         /// }
-        /// </code></param>
+        /// </code>
+        /// </param>
         public void SetCache(JObject jobj)
         {
             foreach (var item in jobj["files"] as JObject ?? new JObject()) 
@@ -91,14 +104,17 @@ namespace PixanKit.ModModule.Module
 
         private Dictionary<string, ModInf> ModIDCache = new();
 
+        /// <summary>
+        /// Dictionary of mods loaded in this collection.
+        /// </summary>
         public Dictionary<string, ModFile> Mods = new();
         #endregion
 
         #region Cache
         internal void AddCache(ModInf inf)
         {
+            if (ModFileIDCache.ContainsKey(inf.ID)) return;
             ModIDCache.Add(inf.ID, inf);
-
         }
 
         internal void RemoveCache(ModInf inf) 
@@ -146,15 +162,24 @@ namespace PixanKit.ModModule.Module
         #endregion
 
         #region Dependencies
+        /// <summary>
+        /// Checks whether all dependencies for loaded mods are satisfied.
+        /// </summary>
+        /// <returns>True if all dependencies are satisfied, otherwise false.</returns>
         public bool CheckDependencies()
         {
             return LostDependencies().Count == 0;
         }
 
+        /// <summary>
+        /// Retrieves a list of missing dependencies for the loaded mods.
+        /// </summary>
+        /// <returns>A list of missing dependency identifiers.</returns>
         public List<string> LostDependencies()
         {
             var copy = new Dictionary<string, ModFile>(Mods);
-            List<string> ret = new();
+            if (copy == null) return [];
+            List<string> ret = [];
             foreach (var key in copy.Keys)
             {
                 var mod = copy[key];
@@ -163,11 +188,18 @@ namespace PixanKit.ModModule.Module
             }
             ret.Remove("minecraft");
             ret.Remove("java");
-            ret.Remove(Game.ToString());
+            ret.Remove(Game.ModLoader);
             return ret;
         }
         #endregion
 
+        /// <summary>
+        /// Converts the current collection of mods to a JSON object.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="JObject"/> where each key is a mod's SHA1 hash 
+        /// and the value is the mod's JSON representation.
+        /// </returns>
         public JObject ToJSON()
         {
             JObject JOb = new();

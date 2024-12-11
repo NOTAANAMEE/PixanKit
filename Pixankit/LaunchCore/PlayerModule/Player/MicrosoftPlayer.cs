@@ -1,6 +1,5 @@
 ﻿using PixanKit.LaunchCore.Extention;
-using PixanKit.LaunchCore.PlayerModule.MojangAPI.Login;
-using PixanKit.LaunchCore.PlayerModule.MojangAPI.Skin;
+using PixanKit.LaunchCore.PlayerModule.MojangAPI;
 using PixanKit.LaunchCore.SystemInf;
 using Newtonsoft.Json.Linq;
 using System;
@@ -13,27 +12,27 @@ using System.Threading.Tasks;
 namespace PixanKit.LaunchCore.PlayerModule.Player
 {
     /// <summary>
-    /// Microsoft Login Player
+    /// Represents a Microsoft account player in the Minecraft environment.
     /// </summary>
     public class MicrosoftPlayer:PlayerBase
     {
         /// <summary>
-        /// The Login Time. Need To Relogin After 1 Day 
+        /// Gets the latest login time. Re-login is required after 1 day.
         /// </summary>
         public DateTime LatestLoginTime { get => _latestLoginTime; }
 
         /// <summary>
-        /// The URL Of The Skin. Different Images Will Be Different URLs
+        /// Gets the URL of the player's skin. Different images correspond to different URLs.
         /// </summary>
         public string SkinURL { get => _skinURL; }
 
         /// <summary>
-        /// The URL Of The Cape.
+        /// Gets the URL of the player's cape.
         /// </summary>
         public string CapeURL { get => _capeURL; }
 
         /// <summary>
-        /// Local Cache Of The Skin. It Will Automatically Change If The <see cref="SkinURL"/> Changes
+        /// Gets the local cache path of the skin. It automatically updates if the <see cref="SkinURL"/> changes.
         /// </summary>
         public string SkinCachePath
         {
@@ -49,16 +48,9 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         private string refreshtoken = "";
 
         /// <summary>
-        /// Init A Microsoft Player According To jData
+        /// Initializes a new instance of the <see cref="MicrosoftPlayer"/> class using JSON data.
         /// </summary>
-        /// <param name="jData">
-        /// {
-        ///     "uid":${uid},
-        ///     "accesstoken":${accesstoken},
-        ///     "name":${name},
-        ///     "logintime":${logintime}
-        /// }
-        /// </param>
+        /// <param name="jData">The JSON data representing the player.</param>
         public MicrosoftPlayer(JObject jData):base(jData)
         {
             _latestLoginTime = DateTime.Parse(jData["logintime"].ToString());
@@ -74,15 +66,15 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         }
 
         /// <summary>
-        /// Init
+        /// Initializes a new instance of the <see cref="MicrosoftPlayer"/> class for internal use.
         /// </summary>
         protected MicrosoftPlayer() { }
 
         /// <summary>
-        /// Init a player by giving the login code
+        /// Logs in a player using a login code.
         /// </summary>
-        /// <param name="loginCode"></param>
-        /// <returns></returns>
+        /// <param name="loginCode">The login code for Microsoft authentication.</param>
+        /// <returns>A task representing the asynchronous operation, with a <see cref="MicrosoftPlayer"/> as the result.</returns>
         public static async Task<MicrosoftPlayer> Login(string loginCode)
         {
             var ret1 = await MojangLogin.GetMSToken(loginCode);
@@ -105,9 +97,9 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         }
 
         /// <summary>
-        /// Relogin the player by refreshtoken
+        /// Re-logs in the player using the refresh token.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task ReLogin() 
         {
             TimeSpan span = DateTime.Now - LatestLoginTime;
@@ -128,8 +120,9 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         }
 
         /// <summary>
-        /// This method refresh the local skin cache
+        /// Refreshes the local skin cache.
         /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task RefreshSkinCache()
         {
             HttpClient client = new();
@@ -142,9 +135,9 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         }
 
         /// <summary>
-        /// To JSON Object
+        /// Converts the player's data to a JSON object.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A <see cref="JObject"/> representing the player's data.</returns>
         public override JObject ToJSON()
         {
             JObject jobj = base.ToJSON();

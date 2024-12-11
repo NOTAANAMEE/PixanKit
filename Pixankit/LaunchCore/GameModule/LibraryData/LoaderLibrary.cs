@@ -8,36 +8,39 @@ using System.Threading.Tasks;
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
     /// <summary>
-    /// Library That ModLoader Installer Generated
+    /// Represents a library specific to mod loaders.
     /// </summary>
-    public class LoaderLibrary: LibraryBase
+    public class LoaderLibrary : LibraryBase
     {
         /// <summary>
-        /// Initor
+        /// Initializes a new instance of the <see cref="LoaderLibrary"/> class with a specified folder and library JSON data.
         /// </summary>
-        /// <param name="folder">The Library Dir</param>
-        /// <param name="libraryJData">The JSON Data Of A Library</param>
-        public LoaderLibrary(string folder, JToken libraryJData):base(libraryJData, folder) 
-        { 
+        /// <param name="folder">The directory where the library is located.</param>
+        /// <param name="libraryJData">The JSON data representing the library.</param>
+        public LoaderLibrary(string folder, JToken libraryJData) : base(libraryJData, folder)
+        {
             libraryType = LibraryType.Mod;
             if (libraryJData["url"] != null) _url = libraryJData["url"].ToString();
         }
 
         /// <summary>
-        /// Initor. Please Set The Folder
+        /// Initializes a new instance of the <see cref="LoaderLibrary"/> class with library JSON data.
         /// </summary>
-        /// <param name="libraryJData"></param>
-        public LoaderLibrary(JToken libraryJData):this("", libraryJData) { }
+        /// <param name="libraryJData">The JSON data representing the library.</param>
+        public LoaderLibrary(JToken libraryJData) : this("", libraryJData) { }
 
         /// <summary>
-        /// For Copy
+        /// Initializes a new instance of the <see cref="LoaderLibrary"/> class for internal use.
         /// </summary>
-        protected LoaderLibrary():base() { libraryType = LibraryType.Mod; }
+        protected LoaderLibrary() : base()
+        {
+            libraryType = LibraryType.Mod;
+        }
 
         /// <summary>
-        /// <inheritdoc/>
+        /// Creates a copy of the current <see cref="LoaderLibrary"/> instance.
         /// </summary>
-        /// <returns><inheritdoc/></returns>
+        /// <returns>A new instance of <see cref="LoaderLibrary"/> with the same properties.</returns>
         public override LoaderLibrary Copy()
         {
             return new LoaderLibrary()
@@ -46,7 +49,6 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
                 _url = _url,
                 _sha1 = _sha1,
             };
-
         }
     }
 }

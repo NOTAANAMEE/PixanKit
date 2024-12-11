@@ -9,21 +9,20 @@ using System.Xml;
 namespace PixanKit.LaunchCore.PlayerModule.Player
 {
     /// <summary>
-    /// Offline Player. Player Might Not Purchase Minecraft :(<br/>
-    /// Please Decide Whether To Open Offline Channels To Players According To Local Laws.
+    /// Represents an offline player in the Minecraft environment.
     /// </summary>
-    public class OfflinePlayer:PlayerBase
+    public class OfflinePlayer : PlayerBase
     {
         /// <summary>
-        /// <inheritdoc/>
+        /// Gets the unique identifier (UID) for the offline player.
         /// </summary>
-        public override string UID 
-        { 
-            get => "00000FFFFFFFFFFFFFFFFFFFFFF1FF43"; 
+        public override string UID
+        {
+            get => "00000FFFFFFFFFFFFFFFFFFFFFF1FF43";
         }
-        
+
         /// <summary>
-        /// <inheritdoc/>
+        /// Gets the access token for the offline player, which is the same as the UID.
         /// </summary>
         public override string AccessToken
         {
@@ -31,10 +30,10 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         }
 
         /// <summary>
-        /// Initor With Name
+        /// Initializes a new instance of the <see cref="OfflinePlayer"/> class with a specified name.
         /// </summary>
-        /// <param name="name">Player Name</param>
-        public OfflinePlayer(string name): base(null)
+        /// <param name="name">The name of the player.</param>
+        public OfflinePlayer(string name) : base(null)
         {
             _name = name;
             _uid = $"uid{name}offline";
@@ -43,9 +42,9 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         }
 
         /// <summary>
-        /// Initor With JSON Data
+        /// Initializes a new instance of the <see cref="OfflinePlayer"/> class with JSON data.
         /// </summary>
-        /// <param name="jData"></param>
+        /// <param name="jData">The JSON data representing the player.</param>
         public OfflinePlayer(JObject jData) : base(jData)
         {
             _type = PlayerType.offline;

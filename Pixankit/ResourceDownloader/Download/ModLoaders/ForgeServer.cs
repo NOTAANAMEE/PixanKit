@@ -12,12 +12,12 @@ using System.Threading.Tasks;
 namespace PixanKit.ResourceDownloader.Download.ModLoaders
 {
     /// <summary>
-    /// Forge Install Server
+    /// Represents a Forge mod loader server.
     /// </summary>
     public class ForgeServer: ModLoaderServer
     {
         /// <summary>
-        /// Initor
+        /// Initializes a new instance of the <see cref="ForgeServer"/> class.
         /// </summary>
         public ForgeServer() : base("forge")
         {
@@ -26,26 +26,24 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         }
 
         /// <summary>
-        /// Official forge Mirror Server
+        /// Represents the official Forge mirror server.
         /// </summary>
         public class OfficialForgeMirror : ModLoaderMirror
         {
             HttpClient client = new();
 
             /// <summary>
-            /// Initor
+            /// Initializes a new instance of the <see cref="OfficialForgeMirror"/> class.
             /// </summary>
             public OfficialForgeMirror()
             {
                 BaseURL = "https://files.minecraftforge.net";
             }
 
-            /// <summary>
-            ///  <inheritdoc/>
-            /// </summary>
-            /// <param name="mcversion"> <inheritdoc/></param>
-            /// <param name="token"><inheritdoc/></param>
-            /// <returns> <inheritdoc/></returns>
+            /// <inheritdoc/>
+            /// <param name="mcversion">The Minecraft version to check builds for.</param>
+            /// <param name="token">A cancellation token to cancel the operation.</param>
+            /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the builds exist.</returns>
             public override async Task<bool> CheckBuild(string mcversion, CancellationToken token)
             {
                 var response = await client.GetAsync(
@@ -65,12 +63,12 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 return false;
             }
 
-            /// <summary>
             /// <inheritdoc/>
-            /// </summary>
-            /// <param name="mcversion"> <inheritdoc/></param>
-            /// <param name="token"><inheritdoc/></param>
-            /// <returns> <inheritdoc/></returns>
+            /// <param name="mcversion">The Minecraft version to retrieve builds for.</param>
+            /// <param name="token">A cancellation token to cancel the operation.</param>
+            /// <returns>
+            /// A task that represents the asynchronous operation. The task result contains a JSON array of mod loader versions.
+            /// </returns>
             public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
                 var response = await client.GetAsync(
@@ -106,12 +104,12 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 };
             }
 
-            /// <summary>
-            ///  <inheritdoc/>
-            /// </summary>
-            /// <param name="modloaderinf"><inheritdoc/></param>
-            /// <param name="token"><inheritdoc/></param>
-            /// <returns><inheritdoc/></returns>
+            /// <inheritdoc/>
+            /// <param name="modloaderinf">A JSON object containing mod loader information.</param>
+            /// <param name="token">A cancellation token to cancel the operation.</param>
+            /// <returns>
+            /// A task that represents the asynchronous operation. The task result contains the URL of the mod loader installer.
+            /// </returns>
             public override Task<string> GetURL(JObject modloaderinf, CancellationToken token)
                 => Task.FromResult(Replace(modloaderinf["url"].ToString()));
 

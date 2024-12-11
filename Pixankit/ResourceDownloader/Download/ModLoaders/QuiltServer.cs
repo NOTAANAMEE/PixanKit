@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 namespace PixanKit.ResourceDownloader.Download.ModLoaders
 {
     /// <summary>
-    /// Quilt Mod Loader
+    /// Represents a Quilt mod loader server.
     /// </summary>
     public class QuiltServer: ModLoaderServer
     {
         /// <summary>
-        /// Initor
+        /// Initializes a new instance of the <see cref="QuiltServer"/> class.
         /// </summary>
         public QuiltServer() : base("quilt") 
         {
@@ -23,18 +23,13 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         }
 
         /// <summary>
-        /// Official Quilt Server
+        /// Represents the official Quilt mirror server.
         /// </summary>
         public class OfficialQuiltMirror : ModLoaderMirror
         {
             HttpClient client = new();
 
-            /// <summary>
             /// <inheritdoc/>
-            /// </summary>
-            /// <param name="mcversion"><inheritdoc/></param>
-            /// <param name="token"><inheritdoc/></param>
-            /// <returns><inheritdoc/></returns>
             public override async Task<bool> CheckBuild(string mcversion, CancellationToken token)
             {
                 var response = await client.GetAsync("https://meta.quiltmc.org/v3/versions/game", token);
@@ -51,12 +46,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 return false;
             }
 
-            /// <summary>
             /// <inheritdoc/>
-            /// </summary>
-            /// <param name="mcversion"><inheritdoc/></param>
-            /// <param name="token"><inheritdoc/></param>
-            /// <returns><inheritdoc/></returns>
             public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
                 var response = await client.GetAsync("https://meta.quiltmc.org/v3/versions/loader", token);
@@ -66,12 +56,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 return JArray.Parse(content);
             }
 
-            /// <summary>
             /// <inheritdoc/>
-            /// </summary>
-            /// <param name="modloaderinf"><inheritdoc/></param>
-            /// <param name="token"><inheritdoc/></param>
-            /// <returns><inheritdoc/></returns>
             public override async Task<string> GetURL(JObject modloaderinf, CancellationToken token)
             {
                 var response = await client.GetAsync("https://meta.quiltmc.org/v3/versions/loader", token);

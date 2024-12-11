@@ -14,19 +14,40 @@ using System.Threading.Tasks;
 namespace PixanKit.LaunchCore.GameModule.Game
 {
     /// <summary>
-    /// The Base Of The Game
+    /// Represents the base class for managing Minecraft game instances.
     /// </summary>
+    /// <remarks>
+    /// This abstract class provides core functionality for handling Minecraft game instances, 
+    /// including managing game files, libraries, settings, and runtime arguments. 
+    /// It serves as a foundation for derived classes that implement specific game types, 
+    /// such as modded or vanilla versions.
+    /// 
+    /// Key features of this class include:
+    /// - Managing paths for game resources (e.g., JAR files, libraries, and assets).
+    /// - Generating launch arguments for starting the game.
+    /// - Supporting runtime settings and configuration management.
+    /// - Handling native library extraction and version-specific operations.
+    /// 
+    /// Derived classes are expected to implement additional functionality as needed, 
+    /// while reusing the core capabilities provided by this base class.
+    /// </remarks>
     public abstract class GameBase
     {
         #region Properties
         /// <summary>
-        /// Minecraft Game Name
+        /// Gets the name of the Minecraft game.
         /// </summary>
+        /// <remarks>
+        /// This is derived from the folder name containing the game files.
+        /// </remarks>
         public string Name { get => System.IO.Path.GetFileName(_path) ?? ""; }
 
         /// <summary>
-        /// Minecraft Game Description
+        /// Gets or sets the description of the Minecraft game.
         /// </summary>
+        /// <remarks>
+        /// Default value is "Minecraft" if not specified.
+        /// </remarks>
         public string Description 
         { 
             get => (Settings["description"]?? "Minecraft").ToString();
@@ -34,29 +55,40 @@ namespace PixanKit.LaunchCore.GameModule.Game
         }
 
         /// <summary>
-        /// Minecraft Game Folder. Where game.jar is at.
+        /// Gets the folder where the main game files (e.g., game.jar) are located.
         /// </summary>
         public string GameFolder { get =>_path; }
 
         /// <summary>
-        /// The Owner Folder
+        /// Gets the owner folder of the Minecraft game.
         /// </summary>
+        /// <remarks>
+        /// This represents the parent directory of the game folder.
+        /// </remarks>
         public Folder? Owner { get => folder; }
 
         /// <summary>
-        /// The actual path of jar file
+        /// Gets the full path to the game JAR file.
         /// </summary>
+        /// <remarks>
+        /// Combines the <see cref="GameFolder"/> and the <see cref="Name"/> to locate the JAR file.
+        /// </remarks>
         public string Path { get => _path + $"/{Name}.jar"; }
 
         /// <summary>
-        /// The path of JSON file
+        /// Gets the full path to the game's JSON configuration file.
         /// </summary>
-        public string JsonPath { get => folder + $"/{Name}.json"; }
+        /// <remarks>
+        /// This file stores metadata about the game instance.
+        /// </remarks>
+        public string JsonPath { get => _path + $"/{Name}.json"; }
 
         /// <summary>
-        /// The place to store world data and mods
-        /// gamedir
+        /// Gets or sets the folder used to store world data, mods, and other runtime files.
         /// </summary>
+        /// <remarks>
+        /// Also known as the "game directory".
+        /// </remarks>
         public string RunningDir
         {
             get => GetRunningFolder();
@@ -64,16 +96,22 @@ namespace PixanKit.LaunchCore.GameModule.Game
         }
 
         /// <summary>
-        /// The place to store library folder
+        /// Gets the folder where library files are stored.
         /// </summary>
+        /// <remarks>
+        /// Defaults to the global libraries folder if no specific owner folder is defined.
+        /// </remarks>
         public string LibraryDir
         {
             get => (folder == null)? RootDir + "/libraries":folder.LibraryDir;
         }
 
         /// <summary>
-        /// The place to store Textrue Text and Assets
+        /// Gets the folder where texture packs and assets are stored.
         /// </summary>
+        /// <remarks>
+        /// Defaults to the global assets folder derived from the Minecraft directory structure.
+        /// </remarks>
         public string AssetsDir 
         { 
             get => (folder == null)? _path.Remove(_path.LastIndexOf("/versions/")) + "/assets"
@@ -81,38 +119,56 @@ namespace PixanKit.LaunchCore.GameModule.Game
         }
 
         /// <summary>
-        /// The root folder
+        /// Gets the root folder of the Minecraft installation.
         /// </summary>
+        /// <remarks>
+        /// This is the base directory containing all versions and global assets.
+        /// </remarks>
         public string RootDir{ get => _path.Remove(_path.LastIndexOf("/versions/")); }
 
         /// <summary>
-        /// The place to get Minecraft Version
+        /// Gets the Minecraft version for this game instance.
         /// </summary>
-        public string Version { get => _version; }        
+        public string Version { get => _version; }
 
         /// <summary>
-        /// The place to store native binary libraries
+        /// Gets the folder where native binary libraries are stored.
         /// </summary>
+        /// <remarks>
+        /// These binaries are required for platform-specific functionality.
+        /// </remarks>
         public string NativeDir { get => _path + $"/{Name}-natives"; }
 
         /// <summary>
-        /// The Settings Config Path
+        /// Gets the path to the settings configuration file.
         /// </summary>
+        /// <remarks>
+        /// The settings file contains user and game-specific configurations.
+        /// </remarks>
         public string SettingsPath { get => _path + Files.SettingsPath; }
 
         /// <summary>
-        /// The Actual path of crash report. tar.gz file
+        /// Gets the folder where crash reports are stored.
         /// </summary>
+        /// <remarks>
+        /// Crash reports are saved as compressed tar.gz files in this directory.
+        /// </remarks>
         public string CrashReportDir { get => RunningDir + "/crash-reports"; }
 
         /// <summary>
-        /// Get The Type Of Game
+        /// Gets the type of the game instance.
         /// </summary>
+        /// <remarks>
+        /// The game type defines whether the instance is a vanilla, modded, or other variant.
+        /// </remarks>
         public GameType GameType { get => _gameType; }
 
         /// <summary>
-        /// Settings
+        /// Gets the settings for this game instance.
         /// </summary>
+        /// <remarks>
+        /// The settings define Java version preferences, runtime folder behavior, and custom descriptions.
+        /// </remarks>
         public JObject Settings = new()
         {
             { "java", "overall"},//"overall": the same as the overall settings, "specified": Should be the same version, "closest": The closest version(Bigger / equal), "newest": The largest version, default: user specified
@@ -150,29 +206,48 @@ namespace PixanKit.LaunchCore.GameModule.Game
 
         #region Initors
         /// <summary>
-        /// Initor
+        /// Initializes a new instance of the <see cref="GameBase"/> class.
         /// </summary>
-        /// <param name="path">Path Of The Initor</param>
+        /// <param name="path">The path to the game folder.</param>
+        /// <remarks>
+        /// This constructor initializes the game instance from the specified path, 
+        /// reading additional configuration if needed.
+        /// </remarks>
         protected GameBase(string path):this(path, true)
         {
 
         }
 
         /// <summary>
-        /// Initor
+        /// Initializes a new instance of the <see cref="GameBase"/> class with a JSON configuration file.
         /// </summary>
-        /// <param name="path">The version path. Like "C:/Users/Admin/AppData/Roaming/.minecraft/versions/1.20.1"</param>
-        /// <param name="jData">The JSON file.</param>
+        /// <param name="path">
+        /// The path to the game folder. For example: 
+        /// <c>"C:/Users/Admin/AppData/Roaming/.minecraft/versions/1.20.1"</c>.
+        /// </param>
+        /// <param name="jData">A JSON object containing game-specific configuration details.</param>
+        /// <remarks>
+        /// Use this constructor when you already have a JSON object to initialize the game instance.
+        /// </remarks>
         public GameBase(string path, JObject jData):this(path, false)
         {
             tmpdata = jData;
         }
 
         /// <summary>
-        /// Initor
+        /// Initializes a new instance of the <see cref="GameBase"/> class with optional file-based initialization.
         /// </summary>
-        /// <param name="path">The Path like:<c>"C:\\Users\\Admin\\AppData\\Roaming\\.minecraft\\versions\\1.14"</c></param>
-        /// <param name="initFromFile">If True, Read The File And Init</param>
+        /// <param name="path">
+        /// The path to the game folder. For example:
+        /// <c>"C:/Users/Admin/AppData/Roaming/.minecraft/versions/1.14"</c>.
+        /// </param>
+        /// <param name="initFromFile">
+        /// If <c>true</c>, the constructor reads configuration data from a file in the specified path. 
+        /// Otherwise, no file is read.
+        /// </param>
+        /// <remarks>
+        /// This constructor is typically used to create a game instance with an optional initialization step based on existing files.
+        /// </remarks>
         protected GameBase(string path, bool initFromFile) 
         {
             _path = path;
@@ -185,9 +260,13 @@ namespace PixanKit.LaunchCore.GameModule.Game
         }
 
         /// <summary>
-        /// Initor
+        /// Initializes a new instance of the <see cref="GameBase"/> class with only JSON data.
         /// </summary>
-        /// <param name="jData">JSON Data Of The Game</param>
+        /// <param name="jData">A JSON object containing game-specific configuration details.</param>
+        /// <remarks>
+        /// This constructor is useful for creating a game instance based solely on JSON data, 
+        /// without specifying a path.
+        /// </remarks>
         protected GameBase(JObject jData):this("", jData) { }
         #endregion
 
@@ -340,10 +419,13 @@ namespace PixanKit.LaunchCore.GameModule.Game
 
         #region LaunchMethods
         /// <summary>
-        /// This will generate the launch argument of Minecraft.
+        /// Generates the launch arguments for the game.
         /// </summary>
-        /// <returns>The argument. You still need to specify Java, and player arguments
-        /// </returns>
+        /// <returns>A formatted string containing the full launch arguments.</returns>
+        /// <remarks>
+        /// This method replaces placeholders like <c>${natives_directory}</c> with actual paths
+        /// and applies localization. It also incorporates JVM and game-specific arguments.
+        /// </remarks>
         public virtual string GetLaunchArgument()
         {
             string arg = GetJVMArguments() + $" {className} " + GetGameArguments();
@@ -354,6 +436,8 @@ namespace PixanKit.LaunchCore.GameModule.Game
             arg = arg.Replace("${classpath}", "\"" + GetCPArgs() + "\"");
             arg = arg.Replace("${version_name}", Version);
             arg = arg.Replace("${version_type}", releaseType);
+            arg = arg.Replace("${library_directory}", LibraryDir);
+            arg = Localize.CPLocalize(arg);
             Logger.Info($"Arguments Generated. Targeted Game:{_path}");
             if (Settings == null) return arg;
             switch ((Settings["argument"] ?? 1).ToString())
@@ -369,30 +453,30 @@ namespace PixanKit.LaunchCore.GameModule.Game
         }
 
         /// <summary>
-        /// Check whether it could launch
+        /// Checks whether the game is ready to launch.
         /// </summary>
-        /// <returns>if could return true</returns>
+        /// <returns><c>true</c> if the game can launch; otherwise, <c>false</c>.</returns>
         public virtual bool LaunchCheck() => true;
 
         /// <summary>
-        /// Get The Java VM Arguments
+        /// Retrieves the Java Virtual Machine (JVM) arguments.
         /// </summary>
-        /// <returns>The Java VM Arguments String</returns>
+        /// <returns>A string containing the JVM arguments.</returns>
         protected virtual string GetJVMArguments()
             => javaArguments;
 
         /// <summary>
-        /// Get The Game Arguments
+        /// Retrieves the game-specific arguments.
         /// </summary>
-        /// <returns>Game Arguments String</returns>
+        /// <returns>A string containing the game arguments.</returns>
         protected virtual string GetGameArguments()
             => gameArguments;
 
         /// <summary>
-        /// Run <c>GetGameArguments()</c> For The Same Version Game Inside The Folder
+        /// Retrieves game arguments for the same version game within the folder.
         /// </summary>
-        /// <returns>Game Arguments String</returns>
-        /// <exception cref="Exception"></exception>
+        /// <returns>A string containing the game arguments.</returns>
+        /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
         protected string SameVersionGameArguments()
         {
             var target = Owner.FindVersion(_version, GameType.Original);
@@ -404,17 +488,17 @@ namespace PixanKit.LaunchCore.GameModule.Game
         }
 
         /// <summary>
-        /// Get The Assets ID
+        /// Retrieves the assets ID for the game.
         /// </summary>
-        /// <returns>The Assets ID String</returns>
+        /// <returns>A string containing the assets ID.</returns>
         protected virtual string GetAssetsID()
             => assetsID;
 
         /// <summary>
-        /// Run <c>GetAssetsID()</c> For The Same Version Game Inside The Folder
+        /// Retrieves the assets ID for the same version game within the folder.
         /// </summary>
-        /// <returns>The Assets ID String</returns>
-        /// <exception cref="Exception"></exception>
+        /// <returns>A string containing the assets ID.</returns>
+        /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
         protected string SameVersionAssetsID()
         {
             var target = Owner.FindVersion(_version, GameType.Original);
@@ -427,9 +511,14 @@ namespace PixanKit.LaunchCore.GameModule.Game
         }
 
         /// <summary>
-        /// Get The Class Path Args
+        /// Retrieves the classpath arguments for the game.
         /// </summary>
-        /// <returns>The Class Path String Which Does Not Contains The Jar File Of The Game</returns>
+        /// <returns>
+        /// A string containing the classpath arguments, excluding the game JAR file.
+        /// </returns>
+        /// <remarks>
+        /// The classpath includes library paths and the main game JAR path.
+        /// </remarks>
         protected virtual string GetCPArgs()
         {
             string classpath = "";
@@ -442,10 +531,10 @@ namespace PixanKit.LaunchCore.GameModule.Game
         }
 
         /// <summary>
-        /// Run <c>GetCPArgs()</c> For The Same Version Game Inside The Folder
+        /// Retrieves the classpath arguments for the same version game within the folder.
         /// </summary>
-        /// <returns>Class Path Args</returns>
-        /// <exception cref="Exception"></exception>
+        /// <returns>A string containing the classpath arguments.</returns>
+        /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
         protected string SameVersionCPArgs()
         {
             var target = Owner.FindVersion(_version, GameType.Original);
@@ -456,8 +545,13 @@ namespace PixanKit.LaunchCore.GameModule.Game
         }
 
         /// <summary>
-        /// Decompress The Native Libraries
+        /// Decompresses native libraries required for the game.
         /// </summary>
+        /// <remarks>
+        /// This method extracts all native libraries to the <c>NativeDir</c> folder.
+        /// It skips non-native libraries.
+        /// </remarks>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public virtual async Task Decompress()
         {
             foreach(LibraryBase library in libraries)
@@ -497,19 +591,28 @@ namespace PixanKit.LaunchCore.GameModule.Game
 
         #region Others
         /// <summary>
-        /// Get The Libraries Array
+        /// Retrieves all libraries associated with this game instance.
         /// </summary>
-        /// <returns>Array</returns>
+        /// <returns>An array of <see cref="LibraryBase"/> objects representing the libraries.</returns>
+        /// <remarks>
+        /// This method returns the complete list of libraries required for the game, including runtime and mod libraries.
+        /// </remarks>
         public virtual LibraryBase[] GetLibraries()
         {
             return libraries.ToArray();
         }
 
         /// <summary>
-        /// /// Run <c>GetLibraries()</c> For The Same Version Game Inside The Folder
+        /// Retrieves libraries for the same version game within the folder.
         /// </summary>
-        /// <returns>The Array</returns>
-        /// <exception cref="Exception"></exception>
+        /// <returns>A list of <see cref="LibraryBase"/> objects representing the libraries.</returns>
+        /// <exception cref="Exception">
+        /// Thrown when the same version game cannot be found in the folder.
+        /// </exception>
+        /// <remarks>
+        /// Use this method when you need to retrieve the libraries from a game version
+        /// that matches the current version but exists in the same folder.
+        /// </remarks>
         protected List<LibraryBase> SameVersionLibraries()
         {
             var target = Owner.FindVersion(_version, GameType.Original);
@@ -521,9 +624,13 @@ namespace PixanKit.LaunchCore.GameModule.Game
         }
 
         /// <summary>
-        /// Convenient Subclass Initialization
+        /// Initializes the game instance with the provided JSON configuration.
         /// </summary>
-        /// <param name="gameJdata"></param>
+        /// <param name="gameJdata">A JSON object containing the game configuration.</param>
+        /// <remarks>
+        /// This method allows convenient subclass initialization by loading configuration details 
+        /// such as assets, libraries, and runtime settings from a JSON file.
+        /// </remarks>
         protected virtual void LoadJSON(JObject gameJdata)
         {
 
@@ -531,8 +638,19 @@ namespace PixanKit.LaunchCore.GameModule.Game
         #endregion
 
         /// <summary>
-        /// Close the game
+        /// Saves the current settings to a file and closes the game instance.
         /// </summary>
+        /// <remarks>
+        /// This method writes the <see cref="Settings"/> object to the settings file specified by <see cref="SettingsPath"/>.
+        /// If the settings directory does not exist, it will be created. 
+        /// Proper logging is performed before and after saving the file.
+        /// </remarks>
+        /// <exception cref="IOException">
+        /// Thrown if an error occurs while writing to the file.
+        /// </exception>
+        /// <exception cref="UnauthorizedAccessException">
+        /// Thrown if the application does not have permission to write to the specified path.
+        /// </exception>
         public virtual void Close()
         {
             FileStream fs;

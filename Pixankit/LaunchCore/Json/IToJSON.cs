@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 namespace PixanKit.LaunchCore.Json
 {
     /// <summary>
-    /// An interface to store the data
+    /// Defines a method to convert an object to a JSON representation.
     /// </summary>
     public interface IToJSON
     {
         /// <summary>
-        /// Store The Data By JSON
+        /// Converts the implementing object to a JSON object.
         /// </summary>
-        /// <returns>The JSON Object</returns>
-        public JObject ToJSON(); 
+        /// <returns>A <see cref="JObject"/> representing the object's data.</returns>
+        public JObject ToJSON();
     }
 }

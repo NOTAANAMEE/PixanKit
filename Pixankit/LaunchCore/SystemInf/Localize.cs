@@ -34,20 +34,13 @@ namespace PixanKit.LaunchCore.SystemInf
             switch (SystemInformation.OSName) 
             {
                 case "windows":
-                    return PathLocalize(cparg).Replace(":", ";");
+                    return PathLocalize(cparg).Replace("${classpath_separator}", ";");
                 default:
                     return cparg;
             }
         }
 
-        public static string LocalParser
-        {
-            get
-            {
-                if (SystemInformation.OSName == "windows") return ";";
-                else return ":";
-            }
-        }
+        public static string LocalParser = "${classpath_separator}";
 
         public static string DeLocalize(string path)
         {

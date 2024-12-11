@@ -10,13 +10,20 @@ using System.Threading.Tasks;
 namespace PixanKit.ResourceDownloader.Download.ModLoaders
 {
     /// <summary>
-    /// Fabric Server For Installation
+    /// Represents a Fabric mod loader server for managing Fabric installations.
     /// </summary>
+    /// <remarks>
+    /// This class handles the initialization and management of Fabric mod loader mirrors
+    /// and provides functionality to fetch build information and URLs for Fabric installations.
+    /// </remarks>
     public class FabricServer : ModLoaderServer
     {
         /// <summary>
-        /// Initor
+        /// Initializes a new instance of the <see cref="FabricServer"/> class.
         /// </summary>
+        /// <remarks>
+        /// By default, this class uses the official Fabric mirror and updates the index on initialization.
+        /// </remarks>
         public FabricServer() : base("fabric")
         {
             Mirrors.Add(new OfficialFabricMirror());
@@ -24,15 +31,18 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         }
 
         /// <summary>
-        /// The Official Fabric Server
+        /// Represents the official Fabric mirror used for fetching build and installer information.
         /// </summary>
         public class OfficialFabricMirror : ModLoaderMirror
         {
             HttpClient client = new();
 
             /// <summary>
-            /// Initor
+            /// Initializes a new instance of the <see cref="OfficialFabricMirror"/> class.
             /// </summary>
+            /// <remarks>
+            /// The base URL and original URL properties are initialized as empty by default.
+            /// </remarks>
             public OfficialFabricMirror()
             {
                 BaseURL = "";
@@ -40,21 +50,44 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             }
 
             /// <summary>
-            /// <inheritdoc/>
+            /// Checks if a build is available for the specified Minecraft version.
             /// </summary>
-            /// <param name="mcversion"><inheritdoc/></param>
-            /// <param name="token"><inheritdoc/></param>
-            /// <returns><inheritdoc/></returns>
+            /// <param name="mcversion">The Minecraft version to check.</param>
+            /// <param name="token">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+            /// <returns>
+            /// A task that represents the asynchronous operation. 
+            /// The task result contains <c>true</c> if a build is available; otherwise, <c>false</c>.
+            /// </returns>
             public override Task<bool> CheckBuild(string mcversion, CancellationToken token)
-                => Task.FromResult(true);
+            {
+                if (mcversion.Contains('.')) return CheckReleaseBuild(mcversion);
+                return CheckSnapBuild(mcversion);
+            }
 
+
+            private Task<bool> CheckReleaseBuild(string mcversion)
+            {
+                string[] version = mcversion.Split('.');
+                return Task.FromResult(int.Parse(version[1]) >= 14);
+            }
+
+            private Task<bool> CheckSnapBuild(string mcversion)
+            {
+                return Task.FromResult(mcversion.CompareTo("18w43b") >= 0);
+            }
 
             /// <summary>
-            /// <inheritdoc/>
+            /// Retrieves the build information for the specified Minecraft version.
             /// </summary>
-            /// <param name="mcversion"><inheritdoc/></param>
-            /// <param name="token"><inheritdoc/></param>
-            /// <returns><inheritdoc/></returns>
+            /// <param name="mcversion">The Minecraft version to fetch builds for.</param>
+            /// <param name="token">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+            /// <returns>
+            /// A task that represents the asynchronous operation. 
+            /// The task result contains a <see cref="JArray"/> of build information.
+            /// </returns>
+            /// <exception cref="HttpRequestException">
+            /// Thrown if there is an error during the HTTP request.
+            /// </exception>
             public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
                 var response = await client.GetAsync("https://meta.fabricmc.net/v2/versions", token);
@@ -66,11 +99,17 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             }
 
             /// <summary>
-            /// <inheritdoc/>
+            /// Retrieves the download URL for the specified Fabric loader information.
             /// </summary>
-            /// <param name="loaderInf"><inheritdoc/></param>
-            /// <param name="token"><inheritdoc/></param>
-            /// <returns><inheritdoc/></returns>
+            /// <param name="loaderInf">The JSON object containing loader information.</param>
+            /// <param name="token">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+            /// <returns>
+            /// A task that represents the asynchronous operation. 
+            /// The task result contains the download URL as a string.
+            /// </returns>
+            /// <exception cref="HttpRequestException">
+            /// Thrown if there is an error during the HTTP request.
+            /// </exception>
             public override async Task<string> GetURL(JObject loaderInf, CancellationToken token)
             {
                 var response = await client.GetAsync("https://meta.fabricmc.net/v2/versions", token);

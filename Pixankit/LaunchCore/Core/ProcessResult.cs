@@ -7,37 +7,37 @@ using System.Threading.Tasks;
 namespace PixanKit.LaunchCore.Core
 {
     /// <summary>
-    /// The result of Minecraft Process
+    /// Represents the result of a Minecraft process.
     /// </summary>
     public struct ProcessResult
     {
         /// <summary>
-        /// The Return Code
+        /// Gets or sets the return code of the Minecraft process.
         /// </summary>
         public int ReturnCode;
 
         /// <summary>
-        /// Normal Exit?
+        /// Gets a value indicating whether the process exited successfully.
         /// </summary>
-        public bool Successful { get => ReturnCode == 1; }
+        public readonly bool Successful => ReturnCode == 0;
 
         /// <summary>
-        /// Log File Path. .tar.gz file
+        /// Gets or sets the path to the log file, which is a .tar.gz archive.
         /// </summary>
         public string LogGZPath;
 
         /// <summary>
-        /// The Crash File Path
+        /// Gets or sets the path to the crash file, if applicable.
         /// </summary>
         public string? CrashFilePath;
 
         /// <summary>
-        /// The Output Stream
+        /// Gets or sets the output stream of the Minecraft process.
         /// </summary>
         public Stream OutputStream;
 
         /// <summary>
-        /// Close the OutputStream
+        /// Closes the output stream associated with the Minecraft process.
         /// </summary>
         public void Close()
         {

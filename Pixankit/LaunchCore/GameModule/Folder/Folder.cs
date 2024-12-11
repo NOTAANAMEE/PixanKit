@@ -16,8 +16,6 @@ using PixanKit.LaunchCore.Log;
 
 namespace PixanKit.LaunchCore.GameModule
 {
-    internal delegate void FinishInited();
-
     /// <summary>
     /// Folder Class<br/> An Abstraction For A .minecraft Folder
     /// </summary>
@@ -102,8 +100,6 @@ namespace PixanKit.LaunchCore.GameModule
         {
             get => _owner;
         }
-
-        internal FinishInited GamesInited = new(() => { });
 
         private List<GameBase> _games = new();
 
@@ -280,7 +276,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// </summary>
         /// <param name="game">The <c>GameBase</c> You Want To Check</param>
         /// <returns></returns>
-        public bool HasGame(GameBase game) 
+        public bool Contains(GameBase game) 
             => _games.Contains(game);
 
         /// <summary>
@@ -354,7 +350,7 @@ namespace PixanKit.LaunchCore.GameModule
 
         internal void InternalAddGame(GameBase game)
         {
-            if (HasGame(game)) return;
+            if (Contains(game)) return;
             _games.Add(game);
             game.SetOwner(this);
             Launcher.GameAdd?.Invoke(game);

@@ -34,6 +34,7 @@ namespace PixanKit.LaunchCore.Server.Servers.ModLoader
         public ModLoaderServer(string name)
         {
             Name = name;
+            ServerList.ModLoaderServers.Add(name, this);
         }
 
         /// <summary>
