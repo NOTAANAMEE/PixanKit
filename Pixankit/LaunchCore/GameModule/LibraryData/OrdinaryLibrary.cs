@@ -40,19 +40,5 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         {
             libraryType = LibraryType.Original;
         }
-
-        /// <summary>
-        /// Creates a copy of the current <see cref="OriginalLibrary"/> instance.
-        /// </summary>
-        /// <returns>A new instance of <see cref="OriginalLibrary"/> with the same properties.</returns>
-        public override LibraryBase Copy()
-        {
-            return new OriginalLibrary()
-            {
-                _name = _name,
-                _url = _url,
-                _sha1 = _sha1,
-            };
-        }
     }
 }

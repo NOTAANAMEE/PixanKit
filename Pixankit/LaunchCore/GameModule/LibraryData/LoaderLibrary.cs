@@ -36,19 +36,5 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         {
             libraryType = LibraryType.Mod;
         }
-
-        /// <summary>
-        /// Creates a copy of the current <see cref="LoaderLibrary"/> instance.
-        /// </summary>
-        /// <returns>A new instance of <see cref="LoaderLibrary"/> with the same properties.</returns>
-        public override LoaderLibrary Copy()
-        {
-            return new LoaderLibrary()
-            {
-                _name = _name,
-                _url = _url,
-                _sha1 = _sha1,
-            };
-        }
     }
 }
