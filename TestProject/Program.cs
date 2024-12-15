@@ -23,11 +23,12 @@ namespace TestProject
 
         static void TestFileDownload()
         {
-            //Files.Load();
-            _ = new Launcher();
+            Files.Load();
+            var tmp = new Launcher();
             //MultiThreadDownload task = new MultiThreadDownload("https://piston-meta.mojang.com/mc/game/version_manifest.json", "./a.json");
             //task.Start();
             //task.MainTask.Wait();
+            tmp.Launch();
             
         }
     }

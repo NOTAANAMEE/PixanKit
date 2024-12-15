@@ -101,7 +101,7 @@ namespace PixanKit.LaunchCore.Core
             return new ProcessResult()
             {
                 ReturnCode = p.ExitCode,
-                LogGZPath = GetTimestampAndFilePath(runningdir + "/logs").Last().Value,
+                LogGZPath = "",//GetTimestampAndFilePath(runningdir + "/logs").Last().Value,
                 OutputStream = ms,
                 CrashFilePath = "",
             };

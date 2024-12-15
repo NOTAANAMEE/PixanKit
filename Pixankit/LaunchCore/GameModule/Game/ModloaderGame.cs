@@ -43,6 +43,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
 
         protected override void LoadJSON(JObject gameJdata)
         {
+            base.LoadJSON(gameJdata);
             if (javaArguments.Contains("fabric")) ModLoader = "fabric";
             else if (gameArguments.Contains("neoForge")) ModLoader = "neoforge";
             else if (gameArguments.Contains("forge")) ModLoader = "forge";

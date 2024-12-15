@@ -47,6 +47,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             {
                 useBaseGeneration = true;
                 assetsID = gameJdata["assetIndex"]["id"].ToString();
+                _version = gameJdata["clientVersion"].ToString();
             }
             else
             {

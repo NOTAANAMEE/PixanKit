@@ -86,7 +86,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             }
 
             private static bool Allow(JObject jData)
-                => jData["actiton"].ToString() == "allow";
+                => jData["action"].ToString() == "allow";
 
         }
 
@@ -274,7 +274,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </remarks>
         protected GameBase(string path):this(path, true)
         {
-
+            Init();
         }
 
         /// <summary>
@@ -291,6 +291,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         public GameBase(string path, JObject jData):this(path, false)
         {
             gameJSONData = jData;
+            Init();
         }
 
         /// <summary>
@@ -314,7 +315,6 @@ namespace PixanKit.LaunchCore.GameModule.Game
             {
                 gameJSONData = ReadJObj(path);
             }
-            Init();
             Logger.Info($"Game Base Added. Path:{_path}");
         }
 
@@ -339,6 +339,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             SetJVMArgs();
             SetGameArgs();
             SetVersion();
+            SetLibrary();
             releaseType = (gameJSONData["type"] ?? "release").ToString();
             LoadJSON(gameJSONData);
             SetSettings();
@@ -363,9 +364,9 @@ namespace PixanKit.LaunchCore.GameModule.Game
                     File.ReadAllText(path));
         }
 
-        private void SetLibrary(JObject jData)
+        private void SetLibrary()
         {
-            foreach (JToken token in (jData["libraries"] ?? new JObject()))
+            foreach (JToken token in (gameJSONData["libraries"] ?? new JObject()))
             {
                 LibraryBase.Parse(token as JObject, libraries);
             }
@@ -386,7 +387,10 @@ namespace PixanKit.LaunchCore.GameModule.Game
         {
             if (gameJSONData["inheritsfrom"] != null) 
                 _version = (gameJSONData["inheritsfrom"] ?? "").ToString();
-            _version = (gameJSONData["id"] ?? "").ToString();
+            else if (gameJSONData["clientVersion"] != null)
+                _version = (gameJSONData["clientVersion"] ?? "").ToString();
+            else
+                _version = (gameJSONData["id"] ?? "").ToString();
             releaseType = (gameJSONData["type"] ?? "release").ToString();
         }
 
@@ -401,8 +405,10 @@ namespace PixanKit.LaunchCore.GameModule.Game
             {
                 foreach (JToken token in gameJSONData["arguments"]["game"])
                 {
-                    if (token.Type != JTokenType.String) 
-                        optionalArgs.Add(OptionalArgs.Parse(token as JObject));
+                    if (token.Type != JTokenType.String)
+                    {
+                        optionalArgs.Add(OptionalArgs.Parse(token as JObject)); continue;
+                    }
                     gameArguments += token.ToString() + " ";
                 }
             }
