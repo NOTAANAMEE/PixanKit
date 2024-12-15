@@ -103,8 +103,6 @@ namespace PixanKit.LaunchCore.GameModule
 
         private List<GameBase> _games = new();
 
-        private Dictionary<string, LibraryBase> _libraries = new();
-
         private string _path = "";
 
         private Launcher? _owner;
@@ -146,56 +144,6 @@ namespace PixanKit.LaunchCore.GameModule
         public void SetOwner(Launcher launcher)
         {
             _owner = launcher;
-        }
-
-        /// <summary>
-        /// Get The Library In The Folder With The Name
-        /// </summary>
-        /// <param name="name">The Name Of A Library From The Minecraft JSON File, For Example:
-        /// <br/><c>"org.lwjgl:lwjgl-freetype:3.3.3"</c></param>
-        /// <returns>If Exists, Return The Library. Else, Return <c>null</c></returns>
-        public LibraryBase? FindLibrary(string name)
-        {
-            return (_libraries.ContainsKey(name))? _libraries[name] : null;
-        }
-
-        /// <summary>
-        /// Remove A Library Reference.<br/>
-        /// It Will Make The <c>LibraryBase.ReferenceCount</c> Decrement By 1
-        /// </summary>
-        /// <param name="library">The <c>LibraryBase</c> Reference That You Want To Remove</param>
-        public void RemoveLibrary(LibraryBase library)
-        {
-            if (!_libraries.ContainsValue(library)) throw new ArgumentException();
-            library.ReferenceCount--;
-            if (library.ReferenceCount == 0) _libraries.Remove(library.Name);
-        }
-
-        /// <summary>
-        /// If the library exists, add the reference.<br/>
-        /// Else, add the library to <c>_libraries</c> and set the reference to 1<br/>
-        /// As The Program Cannot Decide Which Library the <c>LibraryBase</c> Is, You Need To Init It 
-        /// On Your Own
-        /// </summary>
-        /// <param name="library"><c>LibraryBase</c> You Want To Add Reference</param>
-        public LibraryBase AddLibrary(LibraryBase library)
-        {
-            if (_libraries.ContainsKey(library.Name))
-            {
-                _libraries[library.Name].ReferenceCount++;
-                return library;
-            }
-            else
-            {
-                if (!library.Path.StartsWith(this.LibraryDir)) 
-                { 
-                    library = library.Copy();
-                    library.SetFolder(this);
-                }
-                _libraries.Add(library.Name, library);
-                library.ReferenceCount = 1;
-                return library;
-            }
         }
 
         /// <summary>
@@ -360,10 +308,6 @@ namespace PixanKit.LaunchCore.GameModule
         {
             game.folder = null;
             _games.Remove(game);
-            foreach (var library in game.libraries)
-            {
-                RemoveLibrary(library);//Why did I do this?
-            }
             Directory.Delete(game.GameFolder);
             Launcher.GameRemove?.Invoke(game);
         }

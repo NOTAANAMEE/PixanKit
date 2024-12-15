@@ -9,6 +9,7 @@ using PixanKit.LaunchCore.SystemInf;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Reflection;
+using PixanKit.LaunchCore.GameModule.Game;
 
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
@@ -23,6 +24,32 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
     /// </remarks>
     public abstract class LibraryBase
     {
+        #region StaticFields
+        static Dictionary<string, LibraryBase> libraries = new();
+
+        public static void Parse(JObject jData, List<LibraryBase> gamelibraries)
+        {
+            if (!SystemSupport(jData)) return;
+            if (libraries.TryGetValue(GetName(jData), out LibraryBase ret)) 
+                gamelibraries.Add(ret);
+            switch (GetLibraryType(jData))
+            {
+                case LibraryType.Original:
+                    gamelibraries.Add(new OriginalLibrary(jData));
+                    break;
+                case LibraryType.Native:
+                    gamelibraries.Add(new NativeLibrary(jData));
+                    if ((jData["downloads"] as JObject ?? new JObject()).Count > 1)
+                        gamelibraries.Add(new OriginalLibrary(jData));
+                    break;
+                case LibraryType.Mod:
+                    gamelibraries.Add(new LoaderLibrary(jData));
+                    break;
+            }
+        }
+        #endregion
+
+        #region Properties
         /// <summary>
         /// Library Name Like <c>com.ibm.icu:icu4j:73.2</c>
         /// </summary>
@@ -47,16 +74,13 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// SHA1 Of The Folder
         /// </summary>
         public string SHA1 { get => _sha1; }
+        #endregion
 
+        #region Fields
         /// <summary>
         /// The Reference Count
         /// </summary>
         public int ReferenceCount = 0;
-
-        /// <summary>
-        /// Library Directory
-        /// </summary>
-        protected string libraryPath = "";
 
         /// <summary>
         /// Name
@@ -77,7 +101,9 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// Type
         /// </summary>
         protected LibraryType libraryType = LibraryType.Original;
+        #endregion
 
+        #region Initors
         /// <summary>
         /// Initor Init the library
         /// </summary>
@@ -91,13 +117,17 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
             //Output Error
             if (!os.Contains(SystemInformation.OSName)) throw new SystemNotSupportedException(string.Join(',', os), SystemInformation.OSName);
             _name = (jData["name"]?? "").ToString();
-            this.libraryPath = libraryPath;
         }
 
         /// <summary>
         /// Initor
         /// </summary>
         protected LibraryBase() { }
+        #endregion
+
+        #region Methods
+        public static bool SystemSupport(JToken libraryToken)
+            => GetAllowedSystem(libraryToken).Contains(SystemInformation.OSName);
 
         /// <summary>
         /// This is for judging which system is suitable for this library
@@ -151,15 +181,6 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         }
 
         /// <summary>
-        /// Set The Library Directory Of A Library
-        /// </summary>
-        /// <param name="folder">The Target Folder</param>
-        public void SetFolder(Folder folder)
-        {
-            libraryPath = folder.LibraryDir;
-        }
-
-        /// <summary>
         /// Get The Path Of The Library
         /// </summary>
         /// <param name="name">Name Like <c>"com.mojang:logging:1.4.9"</c></param>
@@ -177,11 +198,9 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
             return path;
         }
 
-        /// <summary>
-        /// Copy A New LibraryBase Instance
-        /// </summary>
-        /// <returns>The Copied Instance</returns>
-        public abstract LibraryBase Copy();
+        private static string GetName(JObject jData)
+            => (jData["name"]?? "").ToString();
+        #endregion
     }
 
     /// <summary>

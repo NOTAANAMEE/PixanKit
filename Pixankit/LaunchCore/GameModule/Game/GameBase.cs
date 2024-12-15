@@ -1,8 +1,8 @@
-﻿using PixanKit.LaunchCore.Core;
-using PixanKit.LaunchCore.Extention;
+﻿using PixanKit.LaunchCore.Extention;
 using PixanKit.LaunchCore.GameModule.LibraryData;
 using PixanKit.LaunchCore.Log;
 using PixanKit.LaunchCore.SystemInf;
+using PixanKit.LaunchCore.Core;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -31,8 +31,65 @@ namespace PixanKit.LaunchCore.GameModule.Game
     /// Derived classes are expected to implement additional functionality as needed, 
     /// while reusing the core capabilities provided by this base class.
     /// </remarks>
-    public abstract class GameBase
+    public abstract partial class GameBase
     {
+        /// <summary>
+        /// Represents the game argument that needs conditions to activate. 
+        /// It is optional as these parameters will not affect the normal 
+        /// operation of the program
+        /// </summary>
+        /// <param name="arg">The argument itself</param>
+        /// <param name="rules">
+        /// The rules that activate the argument<br/>
+        /// The rule string matches the format<br/>
+        /// <c>arch=x86</c><br/>
+        /// <c>os=!osx</c>
+        /// </param>
+        protected record class OptionalArgs(string arg, string[] rules)
+        {
+            /// <summary>
+            /// Parses the JObject to an OptionalArgs instance
+            /// </summary>
+            /// <param name="jData"></param>
+            /// <returns>the argument instance</returns>
+            public static OptionalArgs Parse(JObject jData)
+            {
+                List<string> rules = [];
+                foreach (var rule in jData["rules"])
+                {
+                    rules.Add(ParseRule(rule as JObject));
+                }
+                return new OptionalArgs(ParseArg(jData), rules.ToArray());
+            }
+
+            private static string ParseArg(JObject jData)
+            {
+                string ret = "";
+                if (jData["value"].Type == JTokenType.String) return (string)jData["value"];
+                foreach (var token in jData["value"])
+                {
+                    ret += $"{token.ToString()} ";
+                }
+                return ret;
+            }
+
+            private static string ParseRule(JObject jData)
+            {
+                string sign = Allow(jData) ? "" : "!";
+                foreach (var rule in (jData["features"] as JObject))
+                {
+                    return $"{rule.Key}=" +
+                           $"{sign}" +
+                           $"{rule.Value.ToString()}";
+                }
+                return "";
+            }
+
+            private static bool Allow(JObject jData)
+                => jData["actiton"].ToString() == "allow";
+
+        }
+
         #region Properties
         /// <summary>
         /// Gets the name of the Minecraft game.
@@ -124,7 +181,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <remarks>
         /// This is the base directory containing all versions and global assets.
         /// </remarks>
-        public string RootDir{ get => _path.Remove(_path.LastIndexOf("/versions/")); }
+        public string RootDir{ get => (this.folder != null)? _path.Remove(_path.LastIndexOf("/versions/")):folder.Path; }
 
         /// <summary>
         /// Gets the Minecraft version for this game instance.
@@ -179,7 +236,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         #endregion
 
         #region Fields
-        private JObject tmpdata = new();
+        private JObject gameJSONData = new();
 
         internal Folder? folder = null;
 
@@ -202,6 +259,8 @@ namespace PixanKit.LaunchCore.GameModule.Game
         internal string assetsID = "";
 
         internal string releaseType = "";
+
+        protected List<OptionalArgs> optionalArgs = [];
         #endregion
 
         #region Initors
@@ -231,7 +290,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </remarks>
         public GameBase(string path, JObject jData):this(path, false)
         {
-            tmpdata = jData;
+            gameJSONData = jData;
         }
 
         /// <summary>
@@ -253,9 +312,9 @@ namespace PixanKit.LaunchCore.GameModule.Game
             _path = path;
             if (initFromFile)
             {
-                tmpdata = ReadJObj(path);
-
+                gameJSONData = ReadJObj(path);
             }
+            Init();
             Logger.Info($"Game Base Added. Path:{_path}");
         }
 
@@ -272,34 +331,18 @@ namespace PixanKit.LaunchCore.GameModule.Game
 
         #region InitorUsingMethods
         /// <summary>
-        /// Init JSON Data From Outside
+        /// Init the game
         /// </summary>
-        /// <param name="jData"></param>
-        public void InitJData(JObject jData)
+        public void Init()
         {
-            tmpdata = jData;
-            InitJData();
-            
-        }
-
-        /// <summary>
-        /// Init JSON Data From tmpdata
-        /// </summary>
-        protected void InitJData()
-        { 
-            var jData = tmpdata;
-            className = (jData["mainClass"] ?? "net.minecraft.client.main.Main.").ToString();
-            SetLibrary(jData);
-            SetGameArgument(jData);
-            SetJVMArguments(jData);
-            
-            //Set The Version. Real Version
-            if (jData["inheritsfrom"] != null) _version = (jData["inheritsfrom"] ?? "").ToString();
-            _version = (jData["id"] ?? "").ToString();
-            releaseType = (jData["type"] ?? "release").ToString();
-            LoadJSON(tmpdata);
+            SetMainClass();
+            SetJVMArgs();
+            SetGameArgs();
+            SetVersion();
+            releaseType = (gameJSONData["type"] ?? "release").ToString();
+            LoadJSON(gameJSONData);
             SetSettings();
-            tmpdata = new();
+            gameJSONData = [];
         }
 
         /// <summary>
@@ -310,7 +353,6 @@ namespace PixanKit.LaunchCore.GameModule.Game
         {
             if (_path.StartsWith(owner.Path))
             folder = owner;
-            InitJData();
         }
 
         private void SetSettings()
@@ -325,85 +367,9 @@ namespace PixanKit.LaunchCore.GameModule.Game
         {
             foreach (JToken token in (jData["libraries"] ?? new JObject()))
             {
-                //System Support?
-                if (!SystemSupport(token)) continue;
-
-                switch (LibraryBase.GetLibraryType(token))
-                {
-                    case LibraryType.Original:
-                        libraries.Add(FolderAddLibrary(new OriginalLibrary(token)));
-                        break;
-                    case LibraryType.Native:
-                        libraries.Add(FolderAddLibrary(new NativeLibrary(token)));
-                        if ((token["downloads"] as JObject ?? new JObject()).Count > 1) 
-                            libraries.Add(FolderAddLibrary(new OriginalLibrary(token)));
-                        break;
-                    case LibraryType.Mod:
-                        libraries.Add(FolderAddLibrary(new LoaderLibrary(token)));
-                        break;
-                }
+                LibraryBase.Parse(token as JObject, libraries);
             }
             Logger.Info($"Libraries Added. Number:{libraries.Count}");
-        }
-
-        private bool SystemSupport(JToken libraryToken)
-        {
-            return LibraryBase.GetAllowedSystem(libraryToken).Contains(SystemInformation.OSName);
-        }
-
-        private LibraryBase FolderAddLibrary(LibraryBase library)
-        {
-            if (folder == null) return library;
-            else return folder.AddLibrary(library);
-        }
-
-        internal virtual void SetGameArgument(JObject jData)
-        {
-            if (jData["minecraftArguments"] != null) 
-            {
-                gameArguments = (jData["minecraftArguments"] ?? 1).ToString();
-            }
-            else
-            {
-                foreach(JToken token in (jData["arguments"] ?? new JObject())["game"]?? new JObject())
-                {
-                    if (token.Type != JTokenType.String) continue;
-                    gameArguments += token.ToString() + " ";
-                }
-            }
-        }
-
-        internal virtual void SetJVMArguments(JObject jData)
-        {
-            string tmp = "[{\"rules\": [{\"action\": \"allow\",\"os\": {\"name\": \"osx\"}}],\"value\": [\"-XstartOnFirstThread\"]},{\"rules\": [{\"action\": \"allow\",\"os\": {\"name\": \"windows\"}}],\"value\": \"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump\"},{\"rules\": [{\"action\": \"allow\",\"os\": {\"arch\": \"x86\"}}],\"value\": \"-Xss1M\"},\"-Djava.library.path=${natives_directory}\"" +
-                ",\"-Dminecraft.launcher.brand=${launcher_name}\",\"-Dminecraft.launcher.version=${launcher_version}\",\"-cp\",\"${classpath}\"]";
-            JArray? jvmargArray;
-            if (jData["arguments"] != null && (jData["arguments"] ?? new JObject())["jvm"] != null)
-            {
-                jvmargArray = (jData["arguments"] ?? new JObject())["jvm"] as JArray;
-            }
-            else
-            {
-                jvmargArray = JArray.Parse(tmp);
-            }
-            if (jvmargArray == null) return;
-            foreach(JToken token in jvmargArray)
-            {
-                if (token.Type == JTokenType.String) 
-                {
-                    string tok = token.ToString();
-                    if (tok.Contains(' ')) tok = "\"" + tok + "\"";
-                    javaArguments += tok + " "; 
-                    continue; 
-                }
-                if (LibraryBase.GetAllowedSystem(token).Contains(SystemInformation.OSName))
-                {
-                    string tmpstr;
-                    if ((token["value"]?? 0).Type == JTokenType.String) tmpstr = (token["value"] ?? 1).ToString();
-                    else tmpstr = string.Join(' ', token["value"] as JArray?? new JArray());
-                    javaArguments += tmpstr + " ";
-                }
-            }
         }
 
         private static JObject ReadJObj(string path)
@@ -415,178 +381,80 @@ namespace PixanKit.LaunchCore.GameModule.Game
             }
             return jData;
         }
-        #endregion
 
-        #region LaunchMethods
-        /// <summary>
-        /// Generates the launch arguments for the game.
-        /// </summary>
-        /// <returns>A formatted string containing the full launch arguments.</returns>
-        /// <remarks>
-        /// This method replaces placeholders like <c>${natives_directory}</c> with actual paths
-        /// and applies localization. It also incorporates JVM and game-specific arguments.
-        /// </remarks>
-        public virtual string GetLaunchArgument()
+        private void SetVersion()
         {
-            string arg = GetJVMArguments() + $" {className} " + GetGameArguments();
-            arg = arg.Replace("${natives_directory}", $"\"{NativeDir}\"");
-            arg = arg.Replace("${game_directory}", $"\"{RunningDir}\"");
-            arg = arg.Replace("${assets_root}", $"\"{AssetsDir}\"");
-            arg = arg.Replace("${assets_index_name}", GetAssetsID());
-            arg = arg.Replace("${classpath}", "\"" + GetCPArgs() + "\"");
-            arg = arg.Replace("${version_name}", Version);
-            arg = arg.Replace("${version_type}", releaseType);
-            arg = arg.Replace("${library_directory}", LibraryDir);
-            arg = Localize.CPLocalize(arg);
-            Logger.Info($"Arguments Generated. Targeted Game:{_path}");
-            if (Settings == null) return arg;
-            switch ((Settings["argument"] ?? 1).ToString())
+            if (gameJSONData["inheritsfrom"] != null) 
+                _version = (gameJSONData["inheritsfrom"] ?? "").ToString();
+            _version = (gameJSONData["id"] ?? "").ToString();
+            releaseType = (gameJSONData["type"] ?? "release").ToString();
+        }
+
+        #region ArgsParser
+        internal virtual void SetGameArgs()
+        {
+            if (gameJSONData["minecraftArguments"] != null)
             {
-                case "overall":
-                    arg = "${arguments} " + arg;
-                    break;
-                default:
-                    arg = (Settings["arguments"] ?? 1).ToString() + " " + arg;
-                    break;
+                gameArguments = gameJSONData["minecraftArguments"].ToString();
+            }
+            else
+            {
+                foreach (JToken token in gameJSONData["arguments"]["game"])
+                {
+                    if (token.Type != JTokenType.String) 
+                        optionalArgs.Add(OptionalArgs.Parse(token as JObject));
+                    gameArguments += token.ToString() + " ";
+                }
+            }
+        }
+
+        internal virtual void SetJVMArgs()
+        {
+            var jvmargArray = GetJVMArgArray();
+            if (jvmargArray == null) return;
+            foreach (JToken token in jvmargArray)
+            {
+                string arg;
+                if ((arg = ParseArg(token)) == "") continue;
+                javaArguments += $"{arg} ";
+            }
+        }
+
+        private JArray GetJVMArgArray()
+        {
+            string tmp = "[{\"rules\": [{\"action\": \"allow\",\"os\": {\"name\": \"osx\"}}],\"value\": [\"-XstartOnFirstThread\"]},{\"rules\": [{\"action\": \"allow\",\"os\": {\"name\": \"windows\"}}],\"value\": \"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump\"},{\"rules\": [{\"action\": \"allow\",\"os\": {\"arch\": \"x86\"}}],\"value\": \"-Xss1M\"},\"-Djava.library.path=${natives_directory}\"" +
+                ",\"-Dminecraft.launcher.brand=${launcher_name}\",\"-Dminecraft.launcher.version=${launcher_version}\",\"-cp\",\"${classpath}\"]";
+            JArray? jvmargArray = new();
+            if (gameJSONData["arguments"] != null && (gameJSONData["arguments"] ?? new JObject())["jvm"] != null)
+            {
+                jvmargArray = gameJSONData["arguments"]["jvm"] as JArray;
+            }
+            else
+            {
+                jvmargArray = JArray.Parse(tmp);
+            }
+            return jvmargArray;
+        }
+
+        private static string ParseArg(JToken token)
+        {
+            var arg = "";
+            if (token.Type == JTokenType.String)
+            {
+                arg = token.ToString();
+                if (arg.Contains(' ')) arg = "\"" + arg + "\"";
+            }
+            else if (LibraryBase.SystemSupport(token))
+            {
+                if (token["value"].Type == JTokenType.String) return (token["value"] ?? "").ToString();
+                arg = string.Join(" ", (JArray)token["value"]);
             }
             return arg;
         }
+        #endregion
 
-        /// <summary>
-        /// Checks whether the game is ready to launch.
-        /// </summary>
-        /// <returns><c>true</c> if the game can launch; otherwise, <c>false</c>.</returns>
-        public virtual bool LaunchCheck() => true;
-
-        /// <summary>
-        /// Retrieves the Java Virtual Machine (JVM) arguments.
-        /// </summary>
-        /// <returns>A string containing the JVM arguments.</returns>
-        protected virtual string GetJVMArguments()
-            => javaArguments;
-
-        /// <summary>
-        /// Retrieves the game-specific arguments.
-        /// </summary>
-        /// <returns>A string containing the game arguments.</returns>
-        protected virtual string GetGameArguments()
-            => gameArguments;
-
-        /// <summary>
-        /// Retrieves game arguments for the same version game within the folder.
-        /// </summary>
-        /// <returns>A string containing the game arguments.</returns>
-        /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
-        protected string SameVersionGameArguments()
-        {
-            var target = Owner.FindVersion(_version, GameType.Original);
-            if (target == null)
-            {
-                Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
-            }
-            return target.GetGameArguments();
-        }
-
-        /// <summary>
-        /// Retrieves the assets ID for the game.
-        /// </summary>
-        /// <returns>A string containing the assets ID.</returns>
-        protected virtual string GetAssetsID()
-            => assetsID;
-
-        /// <summary>
-        /// Retrieves the assets ID for the same version game within the folder.
-        /// </summary>
-        /// <returns>A string containing the assets ID.</returns>
-        /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
-        protected string SameVersionAssetsID()
-        {
-            var target = Owner.FindVersion(_version, GameType.Original);
-            if (target == null)
-            {
-                Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
-            }
-            return target.GetAssetsID();
-
-        }
-
-        /// <summary>
-        /// Retrieves the classpath arguments for the game.
-        /// </summary>
-        /// <returns>
-        /// A string containing the classpath arguments, excluding the game JAR file.
-        /// </returns>
-        /// <remarks>
-        /// The classpath includes library paths and the main game JAR path.
-        /// </remarks>
-        protected virtual string GetCPArgs()
-        {
-            string classpath = "";
-            foreach (LibraryBase library in libraries)
-            {
-                classpath += library.Path + Localize.LocalParser;
-            }
-            classpath += Path;
-            return classpath;
-        }
-
-        /// <summary>
-        /// Retrieves the classpath arguments for the same version game within the folder.
-        /// </summary>
-        /// <returns>A string containing the classpath arguments.</returns>
-        /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
-        protected string SameVersionCPArgs()
-        {
-            var target = Owner.FindVersion(_version, GameType.Original);
-            if (target == null) { 
-                Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version"); 
-            }
-            return target.GetCPArgs();
-        }
-
-        /// <summary>
-        /// Decompresses native libraries required for the game.
-        /// </summary>
-        /// <remarks>
-        /// This method extracts all native libraries to the <c>NativeDir</c> folder.
-        /// It skips non-native libraries.
-        /// </remarks>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public virtual async Task Decompress()
-        {
-            foreach(LibraryBase library in libraries)
-            {
-                if (library.LibraryType != LibraryType.Native) continue;
-                await Task.Run(
-                    () => { 
-                        (library as NativeLibrary??new NativeLibrary()).Extract( NativeDir); 
-                    }
-                );
-            }
-        }
-
-        private string GetRunningFolder()
-        {
-            if (Settings == null) return "";
-            string runningfolder = (Settings["runningfolder"] ?? 1).ToString();
-            string ret;
-            switch (runningfolder)
-            {
-                case "overall":
-                    if (Owner == null || Owner.Owner == null) throw new Exception("Can't use overall");
-                    Settings["runningfolder"] = Owner.Owner.Settings["runningfolder"];
-                    ret = GetRunningFolder();
-                    Settings["runningfolder"] = JToken.FromObject("overall");
-                    break;
-                case "self":
-                    ret = _path;
-                    break;
-                default:
-                    ret = runningfolder;
-                    break;
-            }
-            return ret;
-        }
+        private void SetMainClass()
+            => className = (gameJSONData["mainClass"] ?? "net.minecraft.client.main.Main.").ToString();
         #endregion
 
         #region Others

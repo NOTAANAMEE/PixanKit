@@ -17,8 +17,6 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
     {
         private string[] Exclude = Array.Empty<string>();
 
-        private bool NotExtract = false;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="NativeLibrary"/> class with the specified JSON data.
         /// </summary>
@@ -45,17 +43,15 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         protected internal NativeLibrary() : base()
         {
             libraryType = LibraryType.Native;
-            NotExtract = true;
         }
 
         /// <summary>
         /// Extracts the files in the native library's JAR file to the specified directory.
         /// </summary>
         /// <param name="nativesPath">The directory to extract files to.</param>
-        public void Extract(string nativesPath)
+        public void Extract(string librarypath, string nativesPath)
         {
-            if (NotExtract) return;
-            FileStream fs = new(libraryPath + "/" + Path, FileMode.Open);
+            FileStream fs = new(librarypath + "/" + Path, FileMode.Open);
             ZipArchive archive = new(fs);
             foreach (ZipArchiveEntry entry in archive.Entries)
             {
@@ -95,21 +91,6 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
                 if (fullPath.StartsWith(path)) return false;
             }
             return true;
-        }
-
-        /// <summary>
-        /// Creates a copy of the current <see cref="NativeLibrary"/> instance.
-        /// </summary>
-        /// <returns>A new instance of <see cref="NativeLibrary"/> with the same properties.</returns>
-        public override NativeLibrary Copy()
-        {
-            return new NativeLibrary()
-            {
-                Exclude = Exclude,
-                _name = _name,
-                _url = _url,
-                _sha1 = _sha1,
-            };
         }
     }
 }
