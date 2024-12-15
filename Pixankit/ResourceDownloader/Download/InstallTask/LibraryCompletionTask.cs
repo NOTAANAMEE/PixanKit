@@ -30,15 +30,18 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         internal void Set(GameBase game)
         {
-            List<string> urls = new();
-            List<string> paths = new();
+            List<string> urls = [];
+            List<string> files = [];
             foreach (var library in game.GetLibraries())
             {
+                string libpath = library.Path.Replace("${library_directory}", game.LibraryDir);
                 if (library.LibraryType == LibraryType.Mod) continue;
-                if (File.Exists(Localize.PathLocalize(library.Path))) continue;
+                if (File.Exists(Localize.PathLocalize(libpath))) continue;
                 urls.Add(library.Url);
-                paths.Add(library.Path);
+                files.Add(libpath);
             }
+            _url = urls.ToArray();
+            _fileName = files.ToArray();
             Init();
         }
     }

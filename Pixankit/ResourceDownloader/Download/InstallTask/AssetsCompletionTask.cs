@@ -4,6 +4,7 @@ using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.Server;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.ResourceDownloader.SystemInf;
+using PixanKit.ResourceDownloader.Tasks;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,8 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         GameBase _game;
 
         string indexpath = "";
+
+        private MultiFileDownloadTask task2;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AssetsCompletionTask"/> class.
@@ -46,34 +49,48 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void Init(JObject jdata)
         {
-            FileDownloadTask task;MultiFileDownloadTask task2;
+            FileDownloadTask task;
             
             string url = jdata["assetIndex"]["url"].ToString();
             string index = jdata["assetIndex"]["id"].ToString();
 
             indexpath = $"{_game.AssetsDir}/indexes/{index}.json";
 
-            Add(task = new FileDownloadTask(url, indexpath));
-            Add(task2 = new MultiFileDownloadTask());
-            task.OnFinish += (a) =>
+            if (File.Exists(Localize.PathLocalize(indexpath)))
             {
-                List<string> urls = [], paths = [];
+                Add(task = new FileDownloadTask(url, indexpath));
+                task.OnFinish += TaskFinish;
+            }
+            else TaskFinish(null);
+            Add(task2 = new MultiFileDownloadTask());
+        }
+        
+        private void TaskFinish(ProgressTask t)
+        {
+            List<string> urls = [], paths = [];
 
-                JObject jobj = JObject.Parse(File.ReadAllText(
-                        Localize.PathLocalize(indexpath)
-                        ));
+            JObject jobj = JObject.Parse(File.ReadAllText(
+                    Localize.PathLocalize(indexpath)
+                    ));
 
-                foreach (JObject asset in jobj["objects"].Cast<JObject>())
+            var count = 0;
+            foreach (var asset in jobj["objects"])
+            {
+                try
                 {
-                    string hash = asset["hash"].ToString();
+                    string hash = asset.First["hash"].ToString();
                     string rpath = $"{hash[0..2]}/{hash}";
                     string path = $"{_game.AssetsDir}/objects/{rpath}";
+                    Console.WriteLine(++count);
                     if (File.Exists(Localize.PathLocalize(path))) continue;
                     urls.Add(ServerList.MinecraftAssetsServer.GetAssetsUrl(hash));
                     paths.Add(path);
                 }
-                task2.Set([.. urls], [.. paths]);
-            };
+                catch(Exception ex) { Console.WriteLine(ex.Message); }
+
+            }
+            task2.Set([.. urls], [.. paths]);
         }
+
     }
 }

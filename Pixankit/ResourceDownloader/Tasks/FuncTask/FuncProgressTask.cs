@@ -47,7 +47,7 @@ namespace PixanKit.ResourceDownloader.Tasks.FuncTask
             }
             catch (Exception ex) 
             {
-                OnException?.Invoke(ex);
+                ReportException(ex);
             }
             await base.Running();
         }

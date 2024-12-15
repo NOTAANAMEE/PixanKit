@@ -22,12 +22,12 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// <summary>
         /// The URLs of the files to download.
         /// </summary>
-        protected string[] _url;
+        protected string[] _url = [];
 
         /// <summary>
         /// The file paths where the downloaded files will be saved.
         /// </summary>
-        protected string[] _fileName;
+        protected string[] _fileName = [];
 
         /// <summary>
         /// The number of threads to use for downloading.
@@ -91,12 +91,16 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
 
             for (int i = 0; i < _url.Length; i++) 
             {
-                ProgressTask task;
+                ProgressTask? task = null;
 
                 //If ProgressTasks Does Not Have So Many Tasks, Add A New Task
                 if (ProgressTasks.Count < count + 1) Add(new SequenceProgressTask());
-
-                task = new FileDownloadTask(_url[i], _fileName[i], 1);
+                try
+                {
+                    Console.WriteLine(i);
+                    task = new FileDownloadTask(_url[i], _fileName[i], 1);
+                }
+                catch (Exception e) { Console.WriteLine(e.Message); }
 
                 
 

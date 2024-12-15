@@ -16,6 +16,9 @@ using System.Xml.Linq;
 using System.Diagnostics;
 using System.IO;
 using PixanKit.ResourceDownloader.SystemInf;
+using PixanKit.ResourceDownloader.Tasks.FuncTask;
+using HtmlAgilityPack;
+using System.Runtime.CompilerServices;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
@@ -42,6 +45,14 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         string path;
 
+        public FuncProgressTask<int> FuncProgressTask = new();
+        public FileDownloadTask jsondownload;
+        public AsyncProgressTask asyncTask = new();
+        public LibraryCompletionTask lct;
+        public FileDownloadTask dt;
+        public AssetsCompletionTask act;
+
+
         /// <summary>
         /// Initor
         /// </summary>
@@ -56,37 +67,29 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             this.name = name;
             this.version = version;
             path = folder.VersionDir + '/' + name;
+            FuncProgressTask.Function += GetVersion;
             Init();
         }
 
         private void Init()
         {
-            JObject? jData = (JObject?)ServerList.MinecraftVersionServer.GetVersions()
-                [version] ?? throw new ArgumentException($"Does not exist {version}");
-            
             if (Directory.Exists(path)) throw new IOException($"Already Exists {path}");
-            AsyncProgressTask asyncTask = new();
-            LibraryCompletionTask lct;
-            FileDownloadTask dt;
-            AssetsCompletionTask act;
-            Directory.CreateDirectory(path);
 
-            Add(new FileDownloadTask("", path + $"/{name}.json"));
+            Directory.CreateDirectory(path);
+            Add(FuncProgressTask);
+            Add(jsondownload = new FileDownloadTask("", path + $"/{name}.json"));
 
             asyncTask.Add(dt = new FileDownloadTask("", path + $"/{name}.jar"));
             asyncTask.Add(lct = new LibraryCompletionTask());
             asyncTask.Add(act = new AssetsCompletionTask());
             Add(asyncTask);
 
-            ProgressTasks[0].OnFinish += Task1Finish;
+            jsondownload.OnFinish += Task1Finish;
         }
 
         private void Task1Finish(ProgressTask task)
         {
             Console.WriteLine("Task 0 Finished");
-            FileDownloadTask dt = ProgressTasks[1] as FileDownloadTask;
-            LibraryCompletionTask lct = ProgressTasks[2] as LibraryCompletionTask;
-            AssetsCompletionTask act = ProgressTasks[3] as AssetsCompletionTask;
 
             JObject mcjData = JObject.Parse(
                 File.ReadAllText(Localize.PathLocalize($"{path}/{name}.json")));
@@ -98,21 +101,20 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             act.Set(mcjData, _game);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        protected override async Task Running()
+        private async Task<int> GetVersion(Action<double> report, CancellationToken token)
         {
-            Logger.Info("PixanKit.ResourceDownloader", "Start Installing Minecraft");
-            ProgressTasks[0].Start();
-            await ProgressTasks[0].MainTask;
-            if (Status != ProgressStatus.Running) return;
-            Logger.Info("PixanKit.ResourceDownloader", "Process 0 finished. Start running process 1 2 3");
-            ProgressTasks[1].Start();
-            ProgressTasks[2].Start();
-            ProgressTasks[3].Start();
-            _ = base.Running();
+            var jarray = await ServerList.MinecraftVersionServer.GetVersionsAsync(token);
+            if (token.IsCancellationRequested) return 1;
+            foreach (var item in jarray)
+            {
+                if (item["id"].ToString() == version)
+                {
+                    jsondownload.SetURL(item["url"].ToString());
+                    report?.Invoke(1);
+                    return 0;
+                }
+            }
+            throw new Exception();
         }
     }
 }

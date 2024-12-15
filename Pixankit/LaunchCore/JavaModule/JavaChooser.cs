@@ -1,5 +1,6 @@
 ﻿using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.JavaModule.Java;
+using PixanKit.LaunchCore.SystemInf;
 using System;
 using System.Collections.Generic;
 using System.Linq;

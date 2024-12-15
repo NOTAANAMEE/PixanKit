@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResourceDownloader", "Pixan
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LaunchCore", "Pixankit\LaunchCore\LaunchCore.csproj", "{65E1466F-F789-4C69-AF63-3D49454BB4D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModModule", "ModModule\ModModule.csproj", "{C4EE4ED8-4AFE-46A7-B0A6-1C5A510F468C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModModule", "ModModule\ModModule.csproj", "{C4EE4ED8-4AFE-46A7-B0A6-1C5A510F468C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

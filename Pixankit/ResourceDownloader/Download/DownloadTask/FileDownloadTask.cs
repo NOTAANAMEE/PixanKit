@@ -50,6 +50,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             this.threadnum = threadnum;
             _url = url;
             _fileName = path;
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
             _stream = new FileStream(path, FileMode.Create);
             OnCancel += ChunkReturn;
             OnFinish += (a) =>
@@ -116,10 +117,11 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         private async void ChunkReturn(ProgressTask task)
         {
             FileChunkDownloadTask downloadTask = (FileChunkDownloadTask)task;
-
+            Console.WriteLine($"{downloadTask._start} - {downloadTask._end}");
             lock (_filelock) 
             {
                 _stream.Position = downloadTask._start;
+                downloadTask.Return.Position = 0;
                 downloadTask.Return.CopyTo(_stream);
                 _stream.Flush();
             }

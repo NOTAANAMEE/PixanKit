@@ -31,12 +31,12 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// After called, the cache will be saved for 1 day
         /// </summary>
         /// <returns>The JArray that contains every version</returns>
-        public async Task<JArray> GetVersionsAsync()
+        public async Task<JArray> GetVersionsAsync(CancellationToken token)
         {
             if (cache == null || DateTime.Now - cache.UpdateTime > TimeSpan.FromDays(1))
             {
-                UpdateIndex();
-                await GetArrayFromNetwork();
+                //UpdateIndex();
+                await GetArrayFromNetwork(token);
             }
             return cache.Versions;
         }
@@ -48,9 +48,16 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <returns>The JArray that contains every version</returns>
         public JArray GetVersions()
         {
+            var task =  GetVersions(new CancellationToken());
+            task.Wait();
+            return task.Result;
+        }
+
+        public async Task<JArray> GetVersions(CancellationToken token)
+        {
             if (cache == null || DateTime.Now - cache.UpdateTime > TimeSpan.FromDays(1))
             {
-                Update();   
+                await Update(token);
             }
             return cache.Versions;
         }
@@ -121,17 +128,17 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <summary>
         /// Update The Cache
         /// </summary>
-        public void Update()
+        public async Task Update(CancellationToken token)
         {
-            UpdateIndex();
-            GetArrayFromNetwork().Wait();
+            //UpdateIndex();
+            GetArrayFromNetwork(token);
         }
 
-        private async Task GetArrayFromNetwork()
+        private async Task GetArrayFromNetwork(CancellationToken token)
         {
             HttpClient client = new();
             var ret = await client.GetAsync(
-                Replace("https://piston-meta.mojang.com/mc/game/version_manifest.json"));
+                Replace("https://piston-meta.mojang.com/mc/game/version_manifest.json"), token);
             string tmp = await ret.Content.ReadAsStringAsync();
             JObject jObj = JObject.Parse(tmp);
             cache = new Cache(jObj["versions"] as JArray, DateTime.Now);
