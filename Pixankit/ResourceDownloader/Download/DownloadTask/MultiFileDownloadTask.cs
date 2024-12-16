@@ -1,6 +1,7 @@
 ﻿using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.ResourceDownloader.Tasks;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
+using ResourceDownloader.Download.DownloadTask;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
     /// <summary>
     /// Represents a task for downloading multiple files concurrently using multiple threads.
     /// </summary>
-    public class MultiFileDownloadTask: AsyncProgressTask
+    public class MultiFileDownloadTask: AsyncProgressTask, IFileDownload
     {
         /// <summary>
         /// The default number of threads to use for downloading.
@@ -33,6 +34,57 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// The number of threads to use for downloading.
         /// </summary>
         protected int threadnum = 1;
+
+        /// <inheritdoc/>
+        public long Size 
+        {
+            get
+            {
+                long ret = 0;
+                foreach (var thread in ProgressTasks)
+                    foreach(var task in (thread as MultiProgressTask).ProgressTasks)
+                    {
+                        ret += (task as FileDownloadTask).Size;
+                    }
+                return ret;
+            } 
+        }
+
+        /// <inheritdoc/>
+        public long DownloadedBytes 
+        {
+            get
+            {
+                long ret = 0;
+                foreach (var thread in ProgressTasks)
+                    foreach (var task in (thread as MultiProgressTask).ProgressTasks)
+                    {
+                        ret += (task as FileDownloadTask).DownloadedBytes;
+                    }
+                return ret;
+            }
+        }
+
+        /// <inheritdoc/>
+        public int TotalFiles 
+        {
+            get => _fileName.Length;
+        }
+
+        /// <inheritdoc/>
+        public int DownloadedFiles 
+        {
+            get
+            {
+                int ret = 0;
+                foreach (var thread in ProgressTasks)
+                    foreach (var task in (thread as MultiProgressTask).ProgressTasks)
+                    {
+                        ret += (task as FileDownloadTask).DownloadedFiles;
+                    }
+                return ret;
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiFileDownloadTask"/> class 

@@ -1,4 +1,5 @@
 ﻿using PixanKit.ResourceDownloader.Tasks.FuncTask;
+using ResourceDownloader.Download.DownloadTask;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
     /// <summary>
     /// Represents a task for downloading a specific chunk of a file from a given URL.
     /// </summary>
-    public class FileChunkDownloadTask : FuncProgressTask<Stream>
+    public class FileChunkDownloadTask : FuncProgressTask<Stream>, IFileDownload
     {
         /// <summary>
         /// The default size of a file chunk in bytes.
@@ -18,6 +19,18 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         public static readonly long ChunkSize = 1024 * 1024;
 
         private readonly string _url;
+
+        /// <inheritdoc/>
+        public long Size { get => _end - _start + 1; }
+
+        /// <inheritdoc/>
+        public long DownloadedBytes { get => downloadedBytes; }
+
+        /// <inheritdoc/>
+        public int TotalFiles { get => 0; }
+
+        /// <inheritdoc/>
+        public int DownloadedFiles { get => 0; }
 
         /// <summary>
         /// The starting byte position of the file chunk to download.
@@ -28,6 +41,8 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// The ending byte position of the file chunk to download.
         /// </summary>
         public readonly long _end;
+
+        long downloadedBytes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileChunkDownloadTask"/> class 
@@ -63,7 +78,6 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             HttpClient client = new();
             var buffer = new byte[8192];
             int bytesRead;
-            long downloadedBytes = 0;
             var totalBytes = _end - _start + 1;
             var request = new HttpRequestMessage(HttpMethod.Get, _url);
             Stream stream;
