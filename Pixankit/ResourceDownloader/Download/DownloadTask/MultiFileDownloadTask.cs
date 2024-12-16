@@ -1,6 +1,7 @@
 ﻿using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.ResourceDownloader.Tasks;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
+using ResourceDownloader.Download.DownloadTask;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
     /// <summary>
     /// Represents a task for downloading multiple files concurrently using multiple threads.
     /// </summary>
-    public class MultiFileDownloadTask: AsyncProgressTask
+    public class MultiFileDownloadTask: AsyncProgressTask, IFileDownload
     {
         /// <summary>
         /// The default number of threads to use for downloading.
@@ -22,17 +23,68 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// <summary>
         /// The URLs of the files to download.
         /// </summary>
-        protected string[] _url = [];
+        protected string[] urls = [];
 
         /// <summary>
         /// The file paths where the downloaded files will be saved.
         /// </summary>
-        protected string[] _fileName = [];
+        protected string[] paths = [];
 
         /// <summary>
         /// The number of threads to use for downloading.
         /// </summary>
         protected int threadnum = 1;
+
+        /// <inheritdoc/>
+        public long Size 
+        {
+            get
+            {
+                long ret = 0;
+                foreach (var thread in ProgressTasks)
+                    foreach(var task in (thread as MultiProgressTask).ProgressTasks)
+                    {
+                        ret += (task as FileDownloadTask).Size;
+                    }
+                return ret;
+            } 
+        }
+
+        /// <inheritdoc/>
+        public long DownloadedBytes 
+        {
+            get
+            {
+                long ret = 0;
+                foreach (var thread in ProgressTasks)
+                    foreach (var task in (thread as MultiProgressTask).ProgressTasks)
+                    {
+                        ret += (task as FileDownloadTask).DownloadedBytes;
+                    }
+                return ret;
+            }
+        }
+
+        /// <inheritdoc/>
+        public int TotalFiles 
+        {
+            get => paths.Length;
+        }
+
+        /// <inheritdoc/>
+        public int DownloadedFiles 
+        {
+            get
+            {
+                int ret = 0;
+                foreach (var thread in ProgressTasks)
+                    foreach (var task in (thread as MultiProgressTask).ProgressTasks)
+                    {
+                        ret += (task as FileDownloadTask).DownloadedFiles;
+                    }
+                return ret;
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiFileDownloadTask"/> class 
@@ -61,8 +113,8 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             if (url.Length != path.Length) 
                 throw new InvalidOperationException("url Should Contain Same Amount Of path");
             this.threadnum = threanum;
-            _url = url;
-            _fileName = path;
+            urls = url;
+            paths = path;
             Init();
         }
 
@@ -70,8 +122,8 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
 
         internal void Set(string[] url, string[] path)
         {
-            _url = url;
-            _fileName = path;
+            urls = url;
+            paths = path;
             Init();
         }
 
@@ -89,7 +141,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         {
             int count = 0;
 
-            for (int i = 0; i < _url.Length; i++) 
+            for (int i = 0; i < urls.Length; i++) 
             {
                 ProgressTask? task = null;
 
@@ -98,7 +150,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
                 try
                 {
                     Console.WriteLine(i);
-                    task = new FileDownloadTask(_url[i], _fileName[i], 1);
+                    task = new FileDownloadTask(urls[i], paths[i], 1);
                 }
                 catch (Exception e) { Console.WriteLine(e.Message); }
 

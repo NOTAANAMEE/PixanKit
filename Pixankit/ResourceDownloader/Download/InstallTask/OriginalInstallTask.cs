@@ -94,7 +94,6 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             JObject mcjData = JObject.Parse(
                 File.ReadAllText(Localize.PathLocalize($"{path}/{name}.json")));
             _game = new OriginalGame(path, mcjData);
-            Owner.AddGame(_game);
             if (_game == null) throw new Exception();
             dt.SetURL(mcjData["downloads"]["client"]["url"].ToString());
             lct.Set(_game);

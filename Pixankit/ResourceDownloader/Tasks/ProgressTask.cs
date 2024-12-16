@@ -134,7 +134,13 @@ namespace PixanKit.ResourceDownloader.Tasks
         /// </summary>
         protected virtual void Finish()
         {
-            OnFinish?.Invoke(this);
+            try
+            {
+                OnFinish?.Invoke(this);
+            }
+            catch (Exception ex) {Console.WriteLine(ex.ToString());
+                Console.WriteLine(ex.StackTrace);
+            }
             _status = ProgressStatus.Finished;
         }
 

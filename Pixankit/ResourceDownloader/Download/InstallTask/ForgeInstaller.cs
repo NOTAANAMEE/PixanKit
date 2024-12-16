@@ -5,6 +5,7 @@ using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.JavaModule;
 using PixanKit.LaunchCore.Server;
+using PixanKit.LaunchCore.Server.Servers.ModLoader;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.ResourceDownloader.Download.ModLoaders;
 using PixanKit.ResourceDownloader.Tasks.FuncTask;
@@ -23,7 +24,6 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// </summary>
     public class ForgeInstaller:SequenceProgressTask
     {
-        string MCVersion = "";
 
         Folder Owner;
 
@@ -33,9 +33,15 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         JObject forgeversion;
 
-        string installerpath = $"{Files.CacheDir}/Installer/forge.jar";
+        string installerpath { get => $"{Files.CacheDir}/Installer/forge.jar"; }
 
         string url = "";
+
+        FuncProgressTask<int> InitProgressTask;
+
+        AsyncProgressTask DownloadTask;
+
+        CLITask CommandTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ForgeInstaller"/> class.
@@ -55,39 +61,34 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void Init()
         {
-            FuncProgressTask<int> trackFuncTask = new();
-            trackFuncTask.Function += InitTask;
-            AddMinecraftInstallTask();
+            InitProgressTask = new();
+            InitProgressTask.Function += InitTask;
+            Add(InitProgressTask);
             AddDownloadTask();
             AddCommandTask();
         }
 
-        private void AddMinecraftInstallTask()
-        {
-            if (Owner.FindVersion(MCVersion, LaunchCore.GameModule.Game.GameType.Original) == null)
-            Add(new OriginalInstallTask(Owner, MCVersion, MCVersion));
-        }
-
         private void AddDownloadTask()
         {
+            DownloadTask = new();
             FileDownloadTask download = new("", installerpath);
-            var process = ProgressTasks[0] as FuncProgressTask<string>;
-            process.OnFinish += (a) =>
+            InitProgressTask.OnFinish += (a) =>
             {
-                download.SetURL(process.Return);
+                download.SetURL(url);
             };
-            Add(download);
+            DownloadTask.Add(download);
+            Add(DownloadTask);
         }
 
         private void AddCommandTask()
         {
             var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes);
-            CLITask task = new(java.JavaEXE, $"-jar {installerpath} --installClient " +
-                $"{Owner.Path}");
+            CLITask task = new(java.JavaEXE, $"-jar \"{installerpath}\" --installClient " +
+                $"\"{Owner.Path}\"");
             ProgressTasks.Add(task);
             task.OnFinish += (a) =>
             {
-                Owner.AddGame(new ModLoaderGame($"{Owner.VersionDir}/{Name}"));
+                ModLoaderServer.Move(Owner, $"{version}-forge-{forgeversion[version]}", Name);
             };
         }
 
@@ -99,5 +100,25 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             progress(1.0);
             return 0;
         }
+    }
+
+    public class GamePostProcess
+    {
+        public required Folder Owner;
+
+        public required string MinecraftVersion;
+
+        public required string Name;
+
+        public required bool JSONProcess;
+
+        public void Process()
+        {
+            string gamepath_o = $"{Owner.VersionDir}/{MinecraftVersion}";
+            string jarpath = $"{gamepath_o}/{MinecraftVersion}.jar";
+            string jarpath_new = $"{Owner.VersionDir}/{Name}/{Name}.jar";
+            File.Move(jarpath, jarpath_new);
+            if (Owner.FindGame(jarpath) == null) Directory.Delete(gamepath_o);
+        } 
     }
 }

@@ -17,7 +17,9 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         ProcessStartInfo StartInfo;
 
-        Process Process;
+        Process process;
+
+        StreamReader Output { get => process.StandardOutput; }
 
         /// <summary>
         /// Initor
@@ -29,9 +31,10 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             StartInfo = new ProcessStartInfo()
             {
                 FileName = file,
-                Arguments = args
+                Arguments = args,
+                RedirectStandardOutput = true
             };
-            Process = new Process()
+            process = new Process()
             {
                 StartInfo = StartInfo
             };
@@ -42,8 +45,9 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// </summary>
         protected override async Task Running()
         {
-            Process.Start();
-            await Process.WaitForExitAsync();
+            process.Start();
+            while (!process.HasExited)
+                Console.WriteLine($"Process Output: {Output.ReadLine()}");
             await base.Running();
         }
 
@@ -54,7 +58,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         public override void Cancel()
         {
             if (_status >= ProgressStatus.Canceled) throw new InvalidOperationException();
-            Process.Kill();
+            process.Kill();
             base.Cancel();
         }
     }

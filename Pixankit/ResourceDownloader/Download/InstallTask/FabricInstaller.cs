@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
+using PixanKit.LaunchCore.Server.Servers.ModLoader;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
@@ -24,8 +25,6 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     public class FabricInstaller : SequenceProgressTask
     {
 
-        string MCVersion = "";
-
         Folder Owner;
 
         string Name;
@@ -34,9 +33,20 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         JObject fabricversion;
 
-        string installerpath = $"{Files.CacheDir}/Installer/fabric.jar";
+        string installerpath
+        {
+            get => $"{Files.CacheDir}/Installer/fabric.jar";
+        }
+
+        string fabricversioname = "";
 
         string url = "";
+
+        FuncProgressTask<int> InitProgressTask;
+
+        AsyncProgressTask DownloadTask;
+
+        CLITask CommandTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FabricInstaller"/> class.
@@ -56,41 +66,43 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void Init()
         {
-            FuncProgressTask<int> trackFuncTask = new();
-            trackFuncTask.Function += InitTask;
-            AddMinecraftInstallTask();
+            InitProgressTask = new();
+            InitProgressTask.Function += InitTask;
+            InitProgressTask.OnFinish += (a) => { Console.WriteLine("InitProgressTask Finish"); };
+            Add(InitProgressTask);
             AddDownloadTask();
             AddCommandTask();
-        }
-
-        private void AddMinecraftInstallTask()
-        {
-            if (Owner.FindVersion(MCVersion, GameType.Original) == null)
-                Add(new OriginalInstallTask(Owner, MCVersion, MCVersion));
+            fabricversioname = $"fabric-loader-{fabricversion["version"]}-{version}";
+            this.OnFinish += (a) => { FinishTask(); };
         }
 
         private void AddDownloadTask()
         {
+            DownloadTask = new();
             FileDownloadTask download = new ("", installerpath);
-            var process = ProgressTasks[0] as FuncProgressTask<string>;
-            process.OnFinish += (a) =>
+            InitProgressTask.OnFinish += (a) =>
             {
                 download.SetURL(url);
             };
-            Add(download);
+            DownloadTask.Add(download);
+            if (Owner.FindVersion(version, GameType.Original) == null)
+                DownloadTask.Add(new OriginalInstallTask(Owner, version, version));
+            Add(DownloadTask);
+            DownloadTask.OnFinish += (a) => { Console.WriteLine("DownloadTask Finish"); };
         }
 
         private void AddCommandTask()
         {
             var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes);
-            CLITask task = new(java.JavaEXE, $"-jar {installerpath} client " +
-                $"-dir {Owner.Path} -mcversion {MCVersion} -loader {fabricversion["version"]}" +
-                $"{Owner.Path}");
-            ProgressTasks.Add(task);
-            task.OnFinish += (a) =>
-            {
-                Owner.AddGame(new ModLoaderGame($"{Owner.VersionDir}/{Name}"));
-            };
+            CommandTask = new(java.JavaEXE, $"-jar \"{installerpath}\" client " +
+                $"-dir \"{Owner.Path}\" -mcversion {version} -loader {fabricversion["version"]} " +
+                $"\"{Owner.Path}\"");
+            Add(CommandTask);
+        }
+
+        private void FinishTask()
+        {
+            ModLoaderServer.Move(Owner, fabricversioname, Name);
         }
 
         private async Task<int> InitTask(Action<double> progress, CancellationToken token)

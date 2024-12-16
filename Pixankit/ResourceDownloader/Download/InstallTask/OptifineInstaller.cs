@@ -17,6 +17,8 @@ using PixanKit.LaunchCore.JavaModule;
 using System.IO.Compression;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
+using PixanKit.LaunchCore.Server.Servers.ModLoader;
+using System.Runtime.CompilerServices;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
@@ -33,7 +35,17 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         string version;
 
-        string installerpath = $"{Files.CacheDir}/Installer/optifine.jar";
+        string installerpath { get => $"{Files.CacheDir}/Installer/optifine.jar"; }
+
+        string url = "";
+
+        JObject OptifineVersion;
+
+        FuncProgressTask<int> InitProgressTask;
+
+        AsyncProgressTask DownloadTask;
+
+        CLITask CommandTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OptifineInstaller"/> class.
@@ -49,6 +61,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             MCVersion = mcversion;
             Init_CheckExists(folder);
             version = optifineversion["version"].ToString();
+            OptifineVersion = optifineversion;
             Init(optifineversion);
         }
 
@@ -66,23 +79,28 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         private void Init(JObject optifineversion)
         {
             string file = Localize.PathLocalize($"{Files.CacheDir}/Installer/optifine.jar");
-            FuncProgressTask<string> funcTask = new();
-            funcTask.Function += async (a, b) =>
-            {
-                var tmp = await ServerList.ModLoaderServers["optifine"]
-                    .GetURL(optifineversion, b);
-                a(1.0);
-                return tmp;
-            };
-            FileDownloadTask download = new("", file);
-            funcTask.OnFinish += (a) =>
-            {
-                download.SetURL(funcTask.Return);
-            };
-            download.OnFinish += (a) => { UnpressWrapperFile(); };
+            InitProgressTask = new();
+            InitProgressTask.Function += GetURL;
+            AddDownloadTask();
+            AddCommandTask();
         }
 
-        private void ArgGenerator()
+        private void AddDownloadTask()
+        {
+            DownloadTask = new();
+            FileDownloadTask download = new("", installerpath);
+            InitProgressTask.OnFinish += (a) =>
+            {
+                download.SetURL(url);
+            };
+            download.OnFinish += (a) => { UnpressWrapperFile(); };
+            if (Owner.FindVersion(MCVersion, GameType.Original) == null)
+                DownloadTask.Add(new OriginalInstallTask(Owner, MCVersion, MCVersion));
+            DownloadTask.Add(download);
+            Add(DownloadTask);
+        }
+
+        private void AddCommandTask()
         {
             var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes);
             var id = version[(version.LastIndexOf('-') + 1)..];
@@ -92,17 +110,17 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             Localize.CheckDir(mcpath);
             Localize.CheckDir(librarypath);
 
-            CLITask task = new(java.JavaEXE,
+            CommandTask = new(java.JavaEXE,
                 "-cp " +
                $"\"{Localize.PathLocalize(installerpath)}\" " +
                 "optifine.Patcher " +
                $"\"{mcpath}\" " +
                $"\"{Localize.PathLocalize(librarypath)}\"");
-            task.OnFinish += (a) =>
+            CommandTask.OnFinish += (a) =>
             {
-                Owner.AddGame(new ModifiedGame(mcpath));
+                ModLoaderServer.Move(Owner, "", Name);
             };
-            Add(task);
+            Add(CommandTask);
         }
 
         private void UnpressWrapperFile()
@@ -128,6 +146,13 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
             archive.Dispose();
             fs.Close();
+        }
+
+        private async Task<int> GetURL(Action<double> report, CancellationToken token)
+        {
+            url = await ServerList.ModLoaderServers["optifine"]
+                    .GetURL(OptifineVersion, token);
+            return 0;
         }
     }
 }

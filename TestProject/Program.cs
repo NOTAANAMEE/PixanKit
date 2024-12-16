@@ -11,6 +11,7 @@ using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.LaunchCore.Server;
 using PixanKit.ResourceDownloader.Download.InstallTask;
 using PixanKit.ResourceDownloader.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace TestProject
 {
@@ -34,9 +35,10 @@ namespace TestProject
             //tmp.Launch();
             //var jarr = ServerList.MinecraftVersionServer.GetVersions();
             //var jdata = ServerList.MinecraftVersionServer.GetLatestRelease(jarr);
-            OriginalInstallTask task = new(Launcher.Instance.Folders[0], "MyName", "1.21.4");
+            var jarr = await ServerList.ModLoaderServers["forge"].GetVersionsForMinecraft("1.21.4");
+            ForgeInstaller task = new(Launcher.Instance.Folders[0], "MyForge", "1.21.3", jarr.First as JObject);
             task.Start();
-            GetProgress(task);
+            //GetProgress(task);
             await task.MainTask;
 
         }

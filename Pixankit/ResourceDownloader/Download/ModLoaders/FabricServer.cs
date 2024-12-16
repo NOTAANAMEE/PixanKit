@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Log;
+using PixanKit.LaunchCore.Server;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,6 +20,12 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// </remarks>
     public class FabricServer : ModLoaderServer
     {
+        [ModuleInitializer]
+        public static void Init()
+        {
+            _ = new FabricServer();
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FabricServer"/> class.
         /// </summary>
@@ -45,7 +53,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// </remarks>
             public OfficialFabricMirror()
             {
-                BaseURL = "";
+                BaseURL = "https://meta.fabricmc.net/";
                 OriginalURL = "";
             }
 

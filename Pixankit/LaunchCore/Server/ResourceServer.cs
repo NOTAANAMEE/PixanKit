@@ -21,7 +21,7 @@ namespace PixanKit.LaunchCore.Server
         /// <summary>
         /// Current Mirror Server
         /// </summary>
-        public MirrorServer Current;
+        public MirrorServer Current { get; set; }
 
         /// <summary>
         /// Selects the best mirror server from the list based on ping times.

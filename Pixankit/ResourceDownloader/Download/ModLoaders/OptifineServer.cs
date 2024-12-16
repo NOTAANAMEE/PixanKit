@@ -4,6 +4,7 @@ using PixanKit.LaunchCore.Server.Servers.ModLoader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +15,13 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// </summary>
     public class OptifineServer: ModLoaderServer
     {
+        [ModuleInitializer]
+        public static void Init() 
+        {
+            _ = new OptifineServer();
+        }
+            
+
         /// <summary>
         /// Initor
         /// </summary>
@@ -29,6 +37,11 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         public class OfficialOptifineServer : ModLoaderMirror
         {
             HttpClient client = new();
+
+            public OfficialOptifineServer()
+            {
+                BaseURL = "https://optifine.net";
+            }
 
             private async Task<HtmlNodeCollection> GetNodes(CancellationToken token)
             {

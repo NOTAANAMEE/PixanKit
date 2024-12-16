@@ -3,6 +3,7 @@ using PixanKit.LaunchCore.Server.Servers.ModLoader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,11 +14,18 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// </summary>
     public class QuiltServer: ModLoaderServer
     {
+        [ModuleInitializer]
+        public static void Init()
+        {
+            _ = new QuiltServer();
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="QuiltServer"/> class.
         /// </summary>
         public QuiltServer() : base("quilt") 
         {
+
             Mirrors.Add(new OfficialQuiltMirror());
             UpdateIndex();
         }
@@ -28,6 +36,11 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         public class OfficialQuiltMirror : ModLoaderMirror
         {
             HttpClient client = new();
+
+            public OfficialQuiltMirror()
+            {
+                BaseURL = "https://meta.quiltmc.org";
+            }
 
             /// <inheritdoc/>
             public override async Task<bool> CheckBuild(string mcversion, CancellationToken token)

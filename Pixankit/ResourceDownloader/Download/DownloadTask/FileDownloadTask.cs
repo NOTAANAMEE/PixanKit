@@ -6,28 +6,57 @@ using System.Threading.Tasks;
 using PixanKit.ResourceDownloader.SystemInf;
 using PixanKit.ResourceDownloader.Tasks;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
+using ResourceDownloader.Download.DownloadTask;
 
 namespace PixanKit.ResourceDownloader.Download.DownloadTask
 {
     /// <summary>
     /// Represents a task for downloading a file from a given URL using multiple threads.
     /// </summary>
-    public class FileDownloadTask:AsyncProgressTask
+    public class FileDownloadTask:AsyncProgressTask, IFileDownload
     {
         /// <summary>
         /// The default number of threads to use for downloading.
         /// </summary>
         public static int ThreadNum = 64;
 
+        /// <inheritdoc/>
+        public long Size 
+        {
+            get => size;
+        }
+
+        /// <inheritdoc/>
+        public long DownloadedBytes 
+        {
+            get
+            {
+                long ret = 0;
+                foreach (var item in ProgressTasks)
+                {
+                    ret += ((FileChunkDownloadTask)item).DownloadedBytes;
+                }
+                return ret;
+            }
+        }
+
+        /// <inheritdoc/>
+        public int TotalFiles { get => 1; }
+
+        /// <inheritdoc/>
+        public int DownloadedFiles { get => (Status == ProgressStatus.Finished)? 1 : 0; }
+
         private string _url;
 
-        private string _fileName;
+        private string path;
 
         private FileStream _stream;
 
         private object _filelock = new();
 
         private int threadnum = 1;
+
+        private long size;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileDownloadTask"/> class 
@@ -49,7 +78,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         {
             this.threadnum = threadnum;
             _url = url;
-            _fileName = path;
+            this.path = path;
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             _stream = new FileStream(path, FileMode.Create);
             OnCancel += ChunkReturn;
@@ -132,7 +161,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         private void CancelRun(ProgressTask t)
         {
             _stream.Dispose();
-            File.Delete(_fileName);
+            File.Delete(path);
         }
     }
 }

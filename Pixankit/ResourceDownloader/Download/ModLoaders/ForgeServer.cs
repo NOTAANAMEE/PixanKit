@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using static PixanKit.ResourceDownloader.Download.ModLoaders.QuiltServer;
 
 namespace PixanKit.ResourceDownloader.Download.ModLoaders
 {
@@ -16,6 +17,12 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// </summary>
     public class ForgeServer: ModLoaderServer
     {
+        [ModuleInitializer]
+        public static void Init()
+        {
+            _ = new ForgeServer();
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ForgeServer"/> class.
         /// </summary>
@@ -74,7 +81,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 var response = await client.GetAsync(
                     $"https://files.minecraftforge.net/net/minecraftforge/forge/index_{mcversion}.html", token);
                 if (token.IsCancellationRequested) return new JArray();
-                var content = await response.Content.ReadAsStringAsync(token);
+                var content = await response.Content.ReadAsStreamAsync(token);
                 if (token.IsCancellationRequested) return new JArray();
                 HtmlDocument document = new();
                 document.Load(content);
@@ -91,13 +98,13 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
 
             private JObject Parse(HtmlNode node)
             {
-                string name = node.SelectSingleNode("/td[1]").InnerText;
-                string url = node.SelectSingleNode("/td[3]/ul/li[2]/a[2]").Attributes["href"].Value;
-                string release = node.SelectSingleNode("/td[2]").Attributes["title"].Value;
+                string name = node.SelectSingleNode("td[1]").InnerText;
+                string url = node.SelectSingleNode("td[3]/ul/li[2]/a[2]").Attributes["href"].Value;
+                string release = node.SelectSingleNode("td[2]").Attributes["title"].Value;
                 string source = "official";
                 return new()
                 {
-                    { "version", name },
+                    { "version", name.Trim() },
                     { "url", url },
                     { "source", source },
                     { "release", release },

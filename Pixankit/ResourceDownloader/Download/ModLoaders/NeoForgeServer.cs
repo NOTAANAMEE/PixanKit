@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +15,12 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// </summary>
     public class NeoForgeServer: ModLoaderServer
     {
+        [ModuleInitializer]
+        public static void Init()
+        {
+            _ = new NeoForgeServer();
+        }
+
         /// <summary>
         /// Initor
         /// </summary>
@@ -29,6 +36,11 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         public class OfficialNeoforgeServer : ModLoaderMirror
         {
             HttpClient client = new();
+
+            public OfficialNeoforgeServer()
+            {
+                BaseURL = "https://maven.neoforged.net";
+            }
 
             private async Task<List<string>> GetBuild(CancellationToken token)
             {

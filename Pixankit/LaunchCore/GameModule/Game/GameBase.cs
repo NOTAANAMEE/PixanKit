@@ -313,7 +313,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             _path = path;
             if (initFromFile)
             {
-                gameJSONData = ReadJObj(path);
+                gameJSONData = ReadJObj($"{path}/{Name}.json");
             }
             Logger.Info($"Game Base Added. Path:{_path}");
         }

@@ -40,8 +40,8 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                 urls.Add(library.Url);
                 files.Add(libpath);
             }
-            _url = urls.ToArray();
-            _fileName = files.ToArray();
+            this.urls = [.. urls];
+            paths = [.. files];
             Init();
         }
     }

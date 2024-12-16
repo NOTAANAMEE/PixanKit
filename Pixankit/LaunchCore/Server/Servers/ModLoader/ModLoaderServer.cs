@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PixanKit.LaunchCore.GameModule;
 
 namespace PixanKit.LaunchCore.Server.Servers.ModLoader
 {
@@ -14,14 +15,31 @@ namespace PixanKit.LaunchCore.Server.Servers.ModLoader
     public abstract class ModLoaderServer:ResourceServer
     {
         /// <summary>
-        /// Mirror Servers
+        /// 
         /// </summary>
-        public new List<ModLoaderMirror> Mirrors = new();
+        /// <param name="folder"></param>
+        /// <param name="loaderversion"></param>
+        /// <param name="name"></param>
+        public static string Move(Folder folder, string loaderversion, string name)
+        {
+            string folderpath = $"{folder.VersionDir}/{name}";
+            string folderpath_old = $"{folder.VersionDir}/{loaderversion}";
+            string jarpath = $"{folderpath}/{name}.jar";
+            string jarpath_old = $"{folderpath}/{loaderversion}.jar";
+            string jsonpath = $"{folderpath}/{name}.json";
+            string jsonpath_old = $"{folderpath}/{loaderversion}.json";
+            Directory.Move(folderpath_old, folderpath);
+            if (File.Exists(jarpath_old)) File.Move(jarpath_old, jarpath);
+            if (File.Exists(jsonpath_old)) File.Move(jsonpath_old, jsonpath);
+            return folderpath;
+        }
 
         /// <summary>
         /// Current Server
         /// </summary>
-        public new ModLoaderMirror? Current;
+        public new ModLoaderMirror? Current { get => base.Current as ModLoaderMirror;
+            set => base.Current = value;
+        }
 
         /// <summary>
         /// The Name Of The Mo Loader
