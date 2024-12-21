@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
+using ResourceDownloader.Download.InstallTask;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
@@ -76,8 +77,8 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             {
                 download.SetURL(url);
             };
-            if (Owner.FindVersion(MCVersion, GameType.Original) == null)
-                DownloadTask.Add(new OriginalInstallTask(Owner, MCVersion, MCVersion));
+            if (Owner.FindGame(MCVersion) == null)
+                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, MCVersion, MCVersion));
             DownloadTask.Add(download);
             Add(DownloadTask);
         }
@@ -96,7 +97,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private async Task<int> InitTask(Action<double> progress, CancellationToken token)
         {
-            url = await ServerList.ModLoaderServers["forge"]
+            url = await ServerList.ModLoaderServers["neoforge"]
                     .GetURL(neoforgeversion, token);
             if (token.IsCancellationRequested) return 1;
             progress(1.0);

@@ -10,6 +10,7 @@ using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.ResourceDownloader.Download.ModLoaders;
 using PixanKit.ResourceDownloader.Tasks.FuncTask;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
+using ResourceDownloader.Download.InstallTask;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -76,6 +77,8 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             {
                 download.SetURL(url);
             };
+            if (Owner.FindGame(version) == null)
+                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, version, version));
             DownloadTask.Add(download);
             Add(DownloadTask);
         }
@@ -88,7 +91,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             ProgressTasks.Add(task);
             task.OnFinish += (a) =>
             {
-                ModLoaderServer.Move(Owner, $"{version}-forge-{forgeversion[version]}", Name);
+                ModLoaderServer.Move(Owner, $"{version}-forge-{forgeversion["version"]}", Name);
             };
         }
 
@@ -100,25 +103,5 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             progress(1.0);
             return 0;
         }
-    }
-
-    public class GamePostProcess
-    {
-        public required Folder Owner;
-
-        public required string MinecraftVersion;
-
-        public required string Name;
-
-        public required bool JSONProcess;
-
-        public void Process()
-        {
-            string gamepath_o = $"{Owner.VersionDir}/{MinecraftVersion}";
-            string jarpath = $"{gamepath_o}/{MinecraftVersion}.jar";
-            string jarpath_new = $"{Owner.VersionDir}/{Name}/{Name}.jar";
-            File.Move(jarpath, jarpath_new);
-            if (Owner.FindGame(jarpath) == null) Directory.Delete(gamepath_o);
-        } 
     }
 }

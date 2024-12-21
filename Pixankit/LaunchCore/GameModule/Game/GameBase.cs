@@ -236,7 +236,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         #endregion
 
         #region Fields
-        private JObject gameJSONData = new();
+        protected JObject gameJSONData = new();
 
         internal Folder? folder = null;
 

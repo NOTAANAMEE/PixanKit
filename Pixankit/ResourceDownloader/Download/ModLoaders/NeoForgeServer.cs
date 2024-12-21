@@ -85,51 +85,81 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
 
             }
 
+            private int FindBuildsStart(List<string> array, string mcpatch, int lft, int rgh)
+            {
+                if (array == null || array.Count == 0) return -1;
+                if (lft > rgh) return -1;
+                int current = (lft + rgh) / 2;
+
+                string currentbuild = array[current];
+                string currentbuildmcver = currentbuild[..currentbuild.LastIndexOf('.')];
+
+                string beforebuild = array[current - 1];
+                string beforebuildmcver = beforebuild[..beforebuild.LastIndexOf('.')];
+
+                Console.WriteLine($"Checking: {currentbuildmcver}, Target: {mcpatch}");
+
+                if (currentbuildmcver == mcpatch && beforebuildmcver != mcpatch)
+                    return current;
+
+
+                if (currentbuildmcver.CompareTo(mcpatch) >= 0)
+                    return FindBuildsStart(array, mcpatch, lft, current - 1);
+
+
+                return FindBuildsStart(array, mcpatch, current + 1, rgh);
+            }
+
+            /// <summary>
+            /// The method gets the patch version number of Minecraft
+            /// For example: 1.20.1 it will return 20.1
+            /// </summary>
+            /// <param name="version"></param>
+            /// <returns></returns>
+            private static string GetPatch(string version)
+                => version[(version.IndexOf('.') + 1)..];
+
+            private static JArray GetBuildsObject(List<string> versions, string patch, int start)
+            {
+                JArray builds = [];
+                while (++start < versions.Count && versions[start].StartsWith(patch))
+                {
+                    builds.Add(
+                        new JObject()
+                        {
+                            { "version", versions[start] },
+                            { "url",
+                                "https://maven.neoforged.net/releases/net/neoforged/neoforge/" +
+                                versions[start] +
+                               $"/neoforge-{versions[start]}-installer.jar"}
+                        });
+                }
+                return builds;
+            }
+
             /// <inheritdoc/>
             public override async Task<bool> CheckBuild(string mcversion, CancellationToken token)
             {
                 if (mcversion == "1.20.1") return true;//The First Supported Minecraft Of NeoForge
                 if (!mcversion.Contains('.')) return false; //No Snapshot Builds
                 var builds = await GetBuild(token);
-                if (token.IsCancellationRequested) return false;
-                var version = mcversion.Split('.');
-                int minor = int.Parse(version[1]), patch = int.Parse(
-                    version.ElementAtOrDefault(2) ?? "0");
-                //Get Minor Version and Patch Version
-                foreach (var build in builds)
-                {
-                    if (token.IsCancellationRequested) return false;
-                    var nfversion = mcversion.Split('.');
-                    int nfminor = int.Parse(version[1]), nfpatch = int.Parse(version[2]);
-                    if (nfminor == minor && nfpatch == patch) return true;
-                    else if (nfminor > minor || nfpatch > patch) return false;
-                    //Arrange In Order From Smallest To Largest
-                }
-                return false;
+                return FindBuildsStart(builds, GetPatch(mcversion), 0, builds.Count - 1) 
+                    != -1;
             }
 
             /// <inheritdoc/>
             public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
-                var version = mcversion.Split('.');
-                int minor = int.Parse(version[1]), patch = int.Parse(
-                    version.ElementAtOrDefault(2) ?? "0");
+                string patch = GetPatch(mcversion);
                 List<string> builds;
-                if (mcversion == "1.20.1") builds = await GetLagacyBuild();
-                else builds = await GetBuild(token);
-                if (token.IsCancellationRequested) return new JArray();
-                JArray ret = new();
-                foreach (string build in builds)
+                if (mcversion == "1.20.1")
                 {
-                    if (token.IsCancellationRequested) return new JArray();
-                    var nfversion = mcversion.Split('.');
-                    int nfminor = int.Parse(version[1]), nfpatch = int.Parse(version[2]);
-                    if (nfminor == minor && nfpatch == patch)
-                        ret.Add(build);
-                    else if (nfminor > minor || nfpatch > patch)
-                        break;
+                    builds = await GetLagacyBuild();
+                    return GetBuildsObject(builds, "", 0);
                 }
-                return ret;
+                builds = await GetBuild(token);
+                return GetBuildsObject(builds, patch,
+                    FindBuildsStart(builds, patch, 0, builds.Count));
             }
 
             /// <inheritdoc/>

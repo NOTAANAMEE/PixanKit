@@ -24,5 +24,12 @@ namespace PixanKit.LaunchCore.GameModule.Game
             assetsID = ((jData["assetIndex"] ?? new JObject())["id"]?? "").ToString();
             javaVersion = (short)(int)(jData["minimumLauncherVersion"]?? 0);
         }
+
+        public OriginalGame(string path) : base(path) 
+        {
+            _gameType = GameType.Original;
+            assetsID = ((gameJSONData["assetIndex"] ?? new JObject())["id"] ?? "").ToString();
+            javaVersion = (short)(int)(gameJSONData["minimumLauncherVersion"] ?? 0);
+        }
     }
 }

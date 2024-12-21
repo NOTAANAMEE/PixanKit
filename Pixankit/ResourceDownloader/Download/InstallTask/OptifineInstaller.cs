@@ -19,6 +19,7 @@ using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
 using System.Runtime.CompilerServices;
+using ResourceDownloader.Download.InstallTask;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
@@ -59,28 +60,18 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             Name = name;
             Owner = folder;
             MCVersion = mcversion;
-            Init_CheckExists(folder);
             version = optifineversion["version"].ToString();
             OptifineVersion = optifineversion;
             Init(optifineversion);
         }
 
-        /// <summary>
-        /// This method will check whether version exists in this folder.
-        /// If exists, skil. If not, add a Minecraft install task
-        /// </summary>
-        /// <param name="folder"></param>
-        private void Init_CheckExists(Folder folder) 
-        {
-            if (folder.FindVersion(MCVersion, GameType.Original) != null) return;
-            Add(new OriginalInstallTask(folder, MCVersion, MCVersion));
-        }
 
         private void Init(JObject optifineversion)
         {
             string file = Localize.PathLocalize($"{Files.CacheDir}/Installer/optifine.jar");
             InitProgressTask = new();
             InitProgressTask.Function += GetURL;
+            Add(InitProgressTask);
             AddDownloadTask();
             AddCommandTask();
         }
@@ -94,8 +85,8 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                 download.SetURL(url);
             };
             download.OnFinish += (a) => { UnpressWrapperFile(); };
-            if (Owner.FindVersion(MCVersion, GameType.Original) == null)
-                DownloadTask.Add(new OriginalInstallTask(Owner, MCVersion, MCVersion));
+            if (Owner.FindGame(MCVersion) == null)
+                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, MCVersion, MCVersion, true));
             DownloadTask.Add(download);
             Add(DownloadTask);
         }

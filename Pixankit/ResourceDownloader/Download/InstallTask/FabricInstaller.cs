@@ -16,6 +16,7 @@ using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
+using ResourceDownloader.Download.InstallTask;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
@@ -24,7 +25,6 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// </summary>
     public class FabricInstaller : SequenceProgressTask
     {
-
         Folder Owner;
 
         string Name;
@@ -85,8 +85,8 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                 download.SetURL(url);
             };
             DownloadTask.Add(download);
-            if (Owner.FindVersion(version, GameType.Original) == null)
-                DownloadTask.Add(new OriginalInstallTask(Owner, version, version));
+            if (Owner.FindGame(version) == null)
+                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, version, version, true));
             Add(DownloadTask);
             DownloadTask.OnFinish += (a) => { Console.WriteLine("DownloadTask Finish"); };
         }
@@ -115,3 +115,17 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         }
     }
 }
+
+
+/*
+ * 
+ * 让我们整理一下思路：
+ * 1.需求的安装方法:
+ *      a.直接安装
+ *      b.删除残余文件安装
+ *      c.合并JSON并删除一切文件
+ * 2.需要添加的方法:
+ *      a.最小化原版安装
+ *      b.合并JSON方法 ok
+ *      c.判断残余文件并删除 
+ */

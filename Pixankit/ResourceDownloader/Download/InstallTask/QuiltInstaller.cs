@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
+using ResourceDownloader.Download.InstallTask;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
@@ -24,8 +25,6 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// </summary>
     public class QuiltInstaller : SequenceProgressTask
     {
-        string MCVersion = "";
-
         Folder Owner;
 
         string Name;
@@ -77,8 +76,8 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             {
                 download.SetURL(url);
             };
-            if (Owner.FindVersion(MCVersion, GameType.Original) == null)
-                DownloadTask.Add(new OriginalInstallTask(Owner, MCVersion, MCVersion));
+            if (Owner.FindGame(version) == null)
+                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, version, version, true));
             DownloadTask.Add(download);
             Add(DownloadTask);
         }
@@ -87,7 +86,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         {
             var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes);
             CLITask task = new(java.JavaEXE, $"-jar \"{installerpath}\" install client " +
-                $"{MCVersion} {quiltversion["version"]} --install-dir \"{Owner.Path}\"");
+                $"{version} {quiltversion["version"]} --install-dir \"{Owner.Path}\"");
             ProgressTasks.Add(task);
             task.OnFinish += (a) =>
             {

@@ -35,8 +35,8 @@ namespace TestProject
             //tmp.Launch();
             //var jarr = ServerList.MinecraftVersionServer.GetVersions();
             //var jdata = ServerList.MinecraftVersionServer.GetLatestRelease(jarr);
-            var jarr = await ServerList.ModLoaderServers["forge"].GetVersionsForMinecraft("1.21.4");
-            ForgeInstaller task = new(Launcher.Instance.Folders[0], "MyForge", "1.21.3", jarr.First as JObject);
+            var jarr = await ServerList.ModLoaderServers["neoforge"].GetVersionsForMinecraft("1.21.4");
+            NeoForgeInstaller task = new(Launcher.Instance.Folders[0], "MyNeoForge", "1.21.4", jarr.First as JObject);
             task.Start();
             //GetProgress(task);
             await task.MainTask;
@@ -52,5 +52,20 @@ namespace TestProject
                 await Task.Delay(1000);
             }
         }
+
+        private static int FindBuildsStart(List<string> array, string mcpatch, int lft, int rgh)
+        {
+            int current = (lft + rgh) / 2;
+            int before = current - 1;
+            string currentbuild = array[current];
+            string beforebuild = array[before];
+            if (currentbuild == mcpatch && beforebuild != currentbuild)
+                return current;
+            else if (lft >= rgh - 1) return -1;
+            else if (beforebuild.CompareTo(mcpatch) >= 0)
+                return FindBuildsStart(array, mcpatch, lft, current - 1);
+            else return FindBuildsStart(array, mcpatch, current + 1, rgh);
+        }
+
     }
 }
