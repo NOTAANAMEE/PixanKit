@@ -20,7 +20,8 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         public LoaderLibrary(string folder, JToken libraryJData) : base(libraryJData, folder)
         {
             libraryType = LibraryType.Mod;
-            if (libraryJData["url"] != null) _url = libraryJData["url"].ToString();
+            if (libraryJData["url"] != null) _url = libraryJData["url"]?.ToString() ?? 
+                    throw new();
         }
 
         /// <summary>

@@ -41,9 +41,12 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             public OfficialOptifineServer()
             {
                 BaseURL = "https://optifine.net";
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+                    "(KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36");//UA
             }
 
-            private async Task<HtmlNodeCollection> GetNodes(CancellationToken token)
+            private async Task<HtmlNodeCollection?> GetNodes(CancellationToken token)
             {
                 var response = await client.GetAsync("https://optifine.net/downloads", token);
                 if (token.IsCancellationRequested) return null;
@@ -52,29 +55,33 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 var versions = new List<string>();
                 HtmlDocument document = new();
                 document.LoadHtml(content);
+                File.WriteAllText("a.html", content);
                 if (token.IsCancellationRequested) return null;
-                return document.DocumentNode.SelectNodes(
-                    "/html/body/table/tbody/tr[2]/td/span/h2 | " +
-                    "/html/body/table/tbody/tr[2]/td/span/div[position() != last()] | " +
-                    "/html/body/table/tbody/tr[2]/td/span/div[last()]/h2 | " +
-                    "/html/body/table/tbody/tr[2]/td/span/div[last()]/div");
+                string xpath = "/html/body/table/tr[2]/td/span//tr | " +
+                               "/html/body/table/tr[2]/td/span//h2";//WTF no tbody
+                return document.DocumentNode.SelectNodes(xpath);
             }
 
-            private JArray Parse(HtmlNode node)
+            private static JObject Parse(HtmlNode node)
             {
-                JArray ret = new();
-                var nodes = node.SelectNodes("/div/table/tbody/tr");
-                foreach (var opt in nodes)
-                {
-                    ret.Add(new JObject()
+                return new JObject()
                     {
-                        { "version", opt.SelectSingleNode("/tr/td[1]").InnerText },
-                        { "url",  opt.SelectSingleNode("/tr/td[3]/a").Attributes["href"].Value },
-                        { "forge", opt.SelectSingleNode("/tr/td[5]").InnerText },
-                        { "release", opt.SelectSingleNode("/tr/td[6]").InnerText }
-                    });
+                        { "version", node.SelectSingleNode("td[1]").InnerText },
+                        { "url", node.SelectSingleNode("td[3]/a").Attributes["href"].Value },
+                        { "forge", node.SelectSingleNode("td[5]").InnerText },
+                        { "release", node.SelectSingleNode("td[6]").InnerText }
+                    };
+            }
+
+            private static int GetStartIndex(HtmlNodeCollection collection, string mcversion)
+            {
+                for (var i = 0; i < collection.Count; i++) 
+                {
+                    var node = collection[i];
+                    if (node.Name == "h2" && node.InnerText == $"Minecraft {mcversion}")
+                        return i;
                 }
-                return ret;
+                return -1;
             }
 
             /// <summary>
@@ -85,13 +92,8 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <returns><inheritdoc/></returns>
             public override async Task<bool> CheckBuild(string mcversion, CancellationToken token)
             {
-                HtmlNodeCollection nodes = await GetNodes(token);
-                for (var i = 0; i < nodes.Count; i += 2)
-                {
-                    if (token.IsCancellationRequested) return false;
-                    if (nodes[i].InnerText == mcversion) return true;
-                }
-                return false;
+                HtmlNodeCollection? nodes = await GetNodes(token);
+                return nodes != null && GetStartIndex(nodes, mcversion) != -1;
             }
 
             /// <summary>
@@ -102,19 +104,19 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <returns><inheritdoc/></returns>
             public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
-                HtmlNodeCollection nodes = await GetNodes(token);
-                HtmlNode? node = null;
-                for (var i = 0; i < nodes.Count; i += 2)
+                HtmlNodeCollection? nodes = await GetNodes(token);
+                JArray array = [];
+                if (nodes == null) return array;
+                if (token.IsCancellationRequested) return array;
+                int index = GetStartIndex(nodes, mcversion);
+                if (index == -1 || token.IsCancellationRequested) return array;
+
+                for (var i = index + 1; i < nodes.Count; i++) 
                 {
-                    if (token.IsCancellationRequested)return new JArray();
-                    if (nodes[i].InnerText == mcversion)
-                    {
-                        node = nodes[i + 1];
-                        break;
-                    }
+                    if (nodes[i].Name != "tr") break;
+                    array.Add(Parse(nodes[i]));
                 }
-                if (node == null) return new JArray();
-                return Parse(node);
+                return array;
             }
 
             /// <summary>
@@ -134,8 +136,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 document.LoadHtml(content);
                 if (token.IsCancellationRequested) return "";
                 return "https://optifine.net/" + document.DocumentNode.SelectSingleNode(
-                    "/html/body/table/tbody/tr[2]/td/table/tbody/tr/td[2]/table/tbody/tr[2]" +
-                    "/td/span/a"
+                    "/html/body/table/tr[2]/td/table/tbody/tr/td[2]/table/tbody/tr[2]/td/span/a"
                     ).Attributes["href"].Value;
             }
         }

@@ -76,7 +76,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
         protected string SameVersionGameArguments()
         {
-            var target = Owner.FindVersion(_version, GameType.Original);
+            var target = Owner?.FindVersion(_version, GameType.Original);
             if (target == null)
             {
                 Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
@@ -98,7 +98,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
         protected string SameVersionAssetsID()
         {
-            var target = Owner.FindVersion(_version, GameType.Original);
+            var target = Owner?.FindVersion(_version, GameType.Original);
             if (target == null)
             {
                 Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
@@ -134,7 +134,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
         protected string SameVersionCPArgs()
         {
-            var target = Owner.FindVersion(_version, GameType.Original);
+            var target = Owner?.FindVersion(_version, GameType.Original);
             if (target == null)
             {
                 Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
@@ -204,7 +204,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             return ret;
         }
 
-        private string GetOptionalArgs(JObject jData, OptionalArgs arg)
+        private static string GetOptionalArgs(JObject jData, OptionalArgs arg)
         {
             foreach (var rule in arg.rules) 
             {
@@ -213,19 +213,22 @@ namespace PixanKit.LaunchCore.GameModule.Game
             return arg.arg;
         }
 
-        private bool JudgeArg(JObject jData, string rule)
+        private static bool JudgeArg(JObject jData, string rule)
         {
-            Regex reg = new("(?<Name>\\w+)\\s*(?<Sign>=|=!)\\s*(?<Condition>[^\\s,]+)");
+            Regex reg = MyRegex();
             var matches = reg.Matches(rule);
             var match = matches.FirstOrDefault();
 
-            string key = match.Groups["Name"].Value;
-            bool sign = match.Groups["Sign"].Value == "=!";
-            string condition = match.Groups["Condition"].Value;
+            string key = match?.Groups["Name"].Value ?? "";
+            bool sign = match?.Groups["Sign"].Value == "=!";
+            string condition = match?.Groups["Condition"].Value ?? "";
 
             if (!jData.ContainsKey(key)) return !sign;
-            return sign == (jData[key].ToString() == condition);
+            return sign == (jData[key]?.ToString() == condition);
         }
+
+        [GeneratedRegex("(?<Name>\\w+)\\s*(?<Sign>=|=!)\\s*(?<Condition>[^\\s,]+)")]
+        public static partial Regex MyRegex();
         #endregion
     }
 }

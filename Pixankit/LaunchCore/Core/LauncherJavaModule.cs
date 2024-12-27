@@ -58,7 +58,7 @@ namespace PixanKit.LaunchCore.Core
         public JavaRuntime? ChooseRuntime(GameBase game)
         {
             JavaRuntime? runtime;
-            switch (game.Settings["java"].ToString())
+            switch (game.Settings["java"]?.ToString() ?? "overall")
             {
                 case "overall":
                     game.Settings["java"] = Settings["java"];

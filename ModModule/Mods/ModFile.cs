@@ -57,7 +57,7 @@ namespace PixanKit.ModModule.Mods
         /// <summary>
         /// Gets the dependencies of the mod, where the key is the dependency ID, and the value is the version range.
         /// </summary>
-        public Dictionary<string, string> Dependencies { get; private set; } = new();
+        public Dictionary<string, string> Dependencies { get; private set; } = [];
 
         /// <summary>
         /// Gets a value indicating whether the mod is a release version.
@@ -121,13 +121,13 @@ namespace PixanKit.ModModule.Mods
         /// <returns>A list of missing dependency IDs.</returns>
         public List<string> LostDependenciesR(Dictionary<string, ModFile?> mods)
         {
-            List<string> list = new();
+            List<string> list = [];
             foreach (var dependency in Dependencies)
             {
                 string depid = dependency.Key;
-                if (mods.ContainsKey(depid))
+                if (mods.TryGetValue(depid, out ModFile? value))
                 {
-                    if (mods[depid] != null) list.AddRange(mods[depid].LostDependenciesR(mods));
+                    if (value != null) list.AddRange(value.LostDependenciesR(mods));
                 }
                 else list.Add(depid);
             }
@@ -161,12 +161,15 @@ namespace PixanKit.ModModule.Mods
 
         internal void LoadDependencies(TomlTable tomldoc)
         {
-            var array = (tomldoc["dependencies"] as TomlTable).First().Value as TomlTableArray;
+            if (((TomlTable)tomldoc["dependencies"]).First().Value is not 
+                TomlTableArray array) return;
             foreach (TomlTable item in array)
             {
                 if (item == null) continue;
                 if (item.ContainsKey("mandatory") && (bool)item["mandatory"] == false) continue;
-                Dependencies.Add(item["modId"] as string, item["versionRange"] as string);
+                Dependencies.Add(
+                    item["modId"] is string str1 ? str1 : "",
+                    item["modId"] is string str2 ? str2 : "");
             }
         }
         #endregion
@@ -212,7 +215,11 @@ namespace PixanKit.ModModule.Mods
         {
             ModInf inf;
             if (json)
-            { inf = ModInf.Load(Jconf); LoadDependencies(Jconf["depends"] as JObject); Version = new(Jconf["version"].ToString()); }
+            { 
+                inf = ModInf.Load(Jconf); 
+                LoadDependencies(Jconf["depends"] is JObject data ? data : []); 
+                Version = new(Jconf["version"]?.ToString() ?? ""); 
+            }
             else { inf = ModInf.Load(toml); LoadDependencies(toml); }
             Information = inf;
         }
@@ -230,7 +237,8 @@ namespace PixanKit.ModModule.Mods
         {
             var table = Toml.Parse(File.ReadAllText(config.FilePath)).ToModel();
 
-            ID = (table["mods"] as TomlTableArray)[0]["modId"] as string;
+            ID = (table["mods"] is TomlTableArray array? array : [])?[0]?["modId"]?.ToString() ?? 
+                throw new Exception("Toml serialization exception");
             return table;
         }
 
@@ -263,14 +271,13 @@ namespace PixanKit.ModModule.Mods
         private ConfigFile ExtractConfigFile(ZipArchiveInf zip)
         {
             ZipArchiveEntry? entry;
-            string name;
-            bool type = (entry = zip.Archive.GetEntry(name = "fabric.mod.json")) != null;
-            if (!type) entry = zip.Archive.GetEntry(name = "META-INF/mods.toml");
+            bool type = (entry = zip.Archive.GetEntry("fabric.mod.json")) != null;
+            if (!type) entry = zip.Archive.GetEntry("META-INF/mods.toml");
 
             if (entry == null) throw new FileNotFoundException("FileNotFound");
 
             string configpath = Localize.PathLocalize($"{Files.CacheDir}/mods/{SHA1}-conf");
-            Directory.CreateDirectory(Path.GetDirectoryName(configpath));
+            Directory.CreateDirectory(Path.GetDirectoryName(configpath) ?? "./");
             if (!File.Exists(configpath))
             entry.ExtractToFile(configpath);
 

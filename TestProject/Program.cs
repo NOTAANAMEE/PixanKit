@@ -20,7 +20,6 @@ namespace TestProject
         static async Task Main(string[] args)
         {
             await TestFileDownload();
-            //await DownloadFileMultithreadedAsync("https://piston-meta.mojang.com/mc/game/version_manifest.json", "a.json", 2);
         }
 
         
@@ -28,29 +27,19 @@ namespace TestProject
         static async Task TestFileDownload()
         {
             Files.Load();
-            var tmp = new Launcher();
+            _ = new Launcher();
             //MultiThreadDownload task = new MultiThreadDownload("https://piston-meta.mojang.com/mc/game/version_manifest.json", "./a.json");
             //task.Start();
             //task.MainTask.Wait();
             //tmp.Launch();
             //var jarr = ServerList.MinecraftVersionServer.GetVersions();
             //var jdata = ServerList.MinecraftVersionServer.GetLatestRelease(jarr);
-            var jarr = await ServerList.ModLoaderServers["neoforge"].GetVersionsForMinecraft("1.21.4");
-            NeoForgeInstaller task = new(Launcher.Instance.Folders[0], "MyNeoForge", "1.21.4", jarr.First as JObject);
+            var jarr = await ServerList.ModLoaderServers["optifine"].GetVersionsForMinecraft("1.21.4");
+            OptifineInstaller task = new(Launcher.Instance.Folders[0], "MyOptifine", "1.21.4", jarr.First as JObject);
             task.Start();
             //GetProgress(task);
             await task.MainTask;
 
-        }
-
-        static async void GetProgress(OriginalInstallTask task)
-        {
-            while (task.Progress != 1)
-            {
-                Console.WriteLine(task.Progress);
-                Console.WriteLine($"act:{task.act.Status}, lct:{task.lct.Status}, fdt:{task.dt.Status}");
-                await Task.Delay(1000);
-            }
         }
 
         private static int FindBuildsStart(List<string> array, string mcpatch, int lft, int rgh)

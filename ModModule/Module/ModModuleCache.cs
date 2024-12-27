@@ -20,6 +20,7 @@ namespace PixanKit.ModModule.Module
         /// </summary>
         public static void Init()
         {
+            if (Instance == null) throw new();
             _ = new ModModule();
             Launcher.LauncherInit += Instance.Init;
             Path = "${Files.ConfigDir}/ModSettings.json";
@@ -45,22 +46,22 @@ namespace PixanKit.ModModule.Module
             Cache = JObject.Parse(content);
             LoadGameCache(Cache);
             LoadModInfCache(Cache);
-            Cache = new();
+            Cache = [];
         }
 
         private static void LoadGameCache(JObject jsondoc)
         {
-            foreach (var item in jsondoc["games"] as JObject) 
+            foreach (var item in jsondoc["games"] is JObject data ? data: []) 
             {
-                gameCache.Add(item.Key, item.Value as JObject);
+                gameCache.Add(item.Key, item.Value is JObject data2 ? data2 : []);
             }
         }
 
         private static void LoadModInfCache(JObject jsondoc)
         {
-            foreach (var item in jsondoc["children"] as JObject)
+            foreach (var item in jsondoc["children"] is JObject data ? data : [])
             {
-                gameCache.Add(item.Key, item.Value as JObject);
+                gameCache.Add(item.Key, item.Value is JObject data2 ? data2 : []);
             }
         }
 

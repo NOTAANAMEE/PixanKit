@@ -23,8 +23,8 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         public OriginalLibrary(string folder, JToken libraryJData) : base(libraryJData, folder)
         {
             libraryType = LibraryType.Original;
-            _url = libraryJData["downloads"]["artifact"]["url"].ToString();
-            _sha1 = libraryJData["downloads"]["artifact"]["sha1"].ToString();
+            _url = libraryJData["downloads"]?["artifact"]?["url"]?.ToString() ?? "";
+            _sha1 = libraryJData["downloads"]?["artifact"]?["sha1"]?.ToString() ?? "";
         }
 
         /// <summary>

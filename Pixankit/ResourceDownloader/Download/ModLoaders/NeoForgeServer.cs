@@ -28,6 +28,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         {
             Mirrors.Add(new OfficialNeoforgeServer());
             UpdateIndex();
+
         }
 
         /// <summary>
@@ -40,6 +41,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             public OfficialNeoforgeServer()
             {
                 BaseURL = "https://maven.neoforged.net";
+
             }
 
             private async Task<List<string>> GetBuild(CancellationToken token)

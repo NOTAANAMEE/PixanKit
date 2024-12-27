@@ -40,6 +40,21 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             };
         }
 
+        public CLITask(string file, string args, string workingdirectory)
+        {
+            StartInfo = new ProcessStartInfo()
+            {
+                FileName = file,
+                Arguments = args,
+                RedirectStandardOutput = true,
+                WorkingDirectory = workingdirectory
+            };
+            process = new Process()
+            { 
+                StartInfo = StartInfo
+            };
+        }
+
         /// <summary>
         /// <inheritdoc/>
         /// </summary>

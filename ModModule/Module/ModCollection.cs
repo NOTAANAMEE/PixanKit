@@ -23,28 +23,22 @@ namespace PixanKit.ModModule.Module
     /// <summary>
     /// Represents a collection of mods managed by a specific mod loader and owner.
     /// </summary>
-    public class ModCollection
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="ModCollection"/> class.
+    /// </remarks>
+    /// <param name="game">The game instance associated with the mod loader.</param>
+    /// <param name="owner">The owner module managing this mod collection.</param>
+    public class ModCollection(ModLoaderGame game, ModModule owner)
     {
         /// <summary>
         /// The game associated with this mod collection.
         /// </summary>
-        public ModLoaderGame Game;
+        public ModLoaderGame Game = game;
 
         /// <summary>
         /// The owner module of this mod collection.
         /// </summary>
-        public ModModule Owner;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ModCollection"/> class.
-        /// </summary>
-        /// <param name="game">The game instance associated with the mod loader.</param>
-        /// <param name="owner">The owner module managing this mod collection.</param>
-        public ModCollection(ModLoaderGame game, ModModule owner)
-        {
-            Game = game;
-            Owner = owner;
-        }
+        public ModModule Owner = owner;
 
         #region Init
         /// <summary>
@@ -62,11 +56,11 @@ namespace PixanKit.ModModule.Module
         {
             foreach (var item in jobj["files"] as JObject ?? new JObject()) 
             {
-                JObject value = item.Value as JObject;
-                string id = value["id"].ToString();
+                JObject value = item.Value is JObject data ? data : throw new();
+                string id = value["id"]?.ToString() ?? throw new();
                 ModFileSHACache.Add(item.Key, value);
                 ModFileIDCache.Add(id, value.ToString());
-                if (Owner.Mods.ContainsKey(id)) ModIDCache.Add(id, Owner.Mods[id]);
+                if (Owner.Mods.TryGetValue(id, out ModInf? inf)) ModIDCache.Add(id, inf);
             }
             LoadMods();
         }
@@ -80,16 +74,16 @@ namespace PixanKit.ModModule.Module
             {
                 Logger.Info("PixanKit.ModModule", $"Start Initing File {file}");
                 if (!file.EndsWith(".jar") && !file.EndsWith(".jar.disabled")) continue;
-                ModFile? f = null;
+                ModFile? modfile;
                 try
                 {
-                    f = new(file, this);
+                    modfile = new(file, this);
                 }
                 catch
                 {
                     continue;
                 }
-                if (f != null) Mods.Add(f.ID, f);
+                if (modfile != null) Mods.Add(modfile.ID, modfile);
             }
             ModFileSHACache.Clear();
             ModFileIDCache.Clear();
@@ -98,16 +92,16 @@ namespace PixanKit.ModModule.Module
         #endregion
 
         #region Dicts
-        private Dictionary<string, JObject> ModFileSHACache = new();
+        private Dictionary<string, JObject> ModFileSHACache = [];
 
-        private Dictionary<string, string> ModFileIDCache = new();
+        private Dictionary<string, string> ModFileIDCache = [];
 
-        private Dictionary<string, ModInf> ModIDCache = new();
+        private Dictionary<string, ModInf> ModIDCache = [];
 
         /// <summary>
         /// Dictionary of mods loaded in this collection.
         /// </summary>
-        public Dictionary<string, ModFile> Mods = new();
+        public Dictionary<string, ModFile?> Mods = [];
         #endregion
 
         #region Cache
@@ -177,7 +171,7 @@ namespace PixanKit.ModModule.Module
         /// <returns>A list of missing dependency identifiers.</returns>
         public List<string> LostDependencies()
         {
-            var copy = new Dictionary<string, ModFile>(Mods);
+            var copy = new Dictionary<string, ModFile?>(Mods);
             if (copy == null) return [];
             List<string> ret = [];
             foreach (var key in copy.Keys)
@@ -202,12 +196,13 @@ namespace PixanKit.ModModule.Module
         /// </returns>
         public JObject ToJSON()
         {
-            JObject JOb = new();
+            JObject ret = [];
             foreach (var mod in Mods)
             {
-                JOb.Add(mod.Value.SHA1, mod.Value.ToJSON());
+                if (mod.Value != null)
+                ret.Add(mod.Value.SHA1, mod.Value.ToJSON());
             }
-            return JOb;
+            return ret;
         }
     }
 }

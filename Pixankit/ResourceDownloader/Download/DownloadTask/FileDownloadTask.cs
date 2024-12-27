@@ -79,7 +79,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             this.threadnum = threadnum;
             _url = url;
             this.path = path;
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "./");
             _stream = new FileStream(path, FileMode.Create);
             OnCancel += ChunkReturn;
             OnFinish += (a) =>
@@ -143,24 +143,25 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             response.Dispose();
         }
 
-        private async void ChunkReturn(ProgressTask task)
+        private void ChunkReturn(ProgressTask task)
         {
             FileChunkDownloadTask downloadTask = (FileChunkDownloadTask)task;
-            Console.WriteLine($"{downloadTask._start} - {downloadTask._end}");
+            
             lock (_filelock) 
             {
                 _stream.Position = downloadTask._start;
+                Console.WriteLine($"{downloadTask._start} - {downloadTask._end}");
+                if (downloadTask.Return == null) throw new Exception();
                 downloadTask.Return.Position = 0;
                 downloadTask.Return.CopyTo(_stream);
                 _stream.Flush();
             }
-
-            await downloadTask.Return.DisposeAsync().AsTask();
+            downloadTask.Return.Dispose();
         }
 
         private void CancelRun(ProgressTask t)
         {
-            _stream.Dispose();
+            _stream.Close();
             File.Delete(path);
         }
     }

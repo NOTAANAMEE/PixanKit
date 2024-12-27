@@ -50,8 +50,8 @@ namespace PixanKit.LaunchCore.Core
 
         private void InitGameModule()
         {
-            List<Folder> folders = new();
-            foreach (JToken jData in Files.FolderJData["children"])
+            List<Folder> folders = [];
+            foreach (JToken jData in Files.FolderJData["children"] ?? new JObject())
             {
                 var tmp = new Folder((JObject)jData);
                 tmp.SetOwner(this);
@@ -59,30 +59,30 @@ namespace PixanKit.LaunchCore.Core
                 FolderAdd?.Invoke(tmp);
             }
             _folders = folders;
-            string tmpstr = Files.FolderJData["target"].ToString();
+            string tmpstr = (Files.FolderJData["target"]?? "").ToString();
             if (tmpstr != "") TargetGame = FindGame(tmpstr);
             UpdateTargetGame();
         }
 
         private void InitPlayerModule()
         {
-            List<PlayerBase> players = new();
-            foreach (JToken jData in Files.PlayerJData["children"])
+            List<PlayerBase> players = [];
+            foreach (JToken jData in Files.PlayerJData["children"] ?? new JArray())
             {
-                PlayerBase? ret = Initors.PlayerInitor((JObject)jData) ?? throw new NullReferenceException();
+                PlayerBase ret = Initors.PlayerInitor((JObject)jData) ?? throw new NullReferenceException();
                 players.Add(ret);
                 PlayerLoad?.Invoke(ret);
             }
             _players = players;
-            string tmpstr = Files.PlayerJData["target"].ToString();
-            if (tmpstr != "") TargetPlayer = FindPlayer(tmpstr);
+            string targetID = Files.PlayerJData["target"]?.ToString() ?? "";
+            if (targetID != "") TargetPlayer = FindPlayer(targetID);
             ResetTargetPlayer();
         }
 
         private void InitJavaModule()
         {
             List<JavaRuntime> javaRuntimes = new();
-            foreach (JToken jData in Files.RuntimeJData["children"])
+            foreach (JToken jData in Files.RuntimeJData["children"] ?? new JObject())
             {
                 javaRuntimes.Add(new JavaRuntime((JObject)jData));
             }

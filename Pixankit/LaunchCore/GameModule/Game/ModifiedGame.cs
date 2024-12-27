@@ -46,12 +46,12 @@ namespace PixanKit.LaunchCore.GameModule.Game
             if (!gameJdata.ContainsKey("inheritsFrom"))
             {
                 useBaseGeneration = true;
-                assetsID = gameJdata["assetIndex"]["id"].ToString();
-                _version = gameJdata["clientVersion"].ToString();
+                assetsID = gameJdata["assetIndex"]?["id"]?.ToString() ?? "";
+                _version = gameJdata["clientVersion"]?.ToString() ?? "";
             }
             else
             {
-                _version = gameJdata["inheritsFrom"].ToString();
+                _version = gameJdata["inheritsFrom"]?.ToString() ?? "";
             }
         }
 

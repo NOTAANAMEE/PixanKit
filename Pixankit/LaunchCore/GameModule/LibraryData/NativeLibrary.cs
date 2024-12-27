@@ -15,7 +15,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
     /// </summary>
     public class NativeLibrary : LibraryBase
     {
-        private string[] Exclude = Array.Empty<string>();
+        private string[] Exclude = [];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NativeLibrary"/> class with the specified JSON data.
@@ -24,17 +24,18 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         public NativeLibrary(JToken libraryJData) : base()
         {
             libraryType = LibraryType.Native;
-            JToken? current = libraryJData["downloads"]["classifiers"][libraryJData["natives"][SystemInformation.OSName].ToString()];
-            _name = current["path"].ToString();
-            _sha1 = current["sha1"].ToString();
-            _url = current["url"].ToString();
-            List<string> excludelist = new();
-            if (libraryJData["extract"] != null && libraryJData["extract"]["exclude"] != null)
+            JToken? current = libraryJData["downloads"]?["classifiers"]?
+                [libraryJData["natives"]?[SystemInformation.OSName]?.ToString() ?? ""];
+            _name = current?["path"]?.ToString() ?? "";
+            _sha1 = current?["sha1"]?.ToString() ?? "";
+            _url = current?["url"]?.ToString() ?? "";
+            List<string> excludelist = [];
+            if (libraryJData["extract"] != null && libraryJData["extract"]?["exclude"] != null)
             {
-                foreach (JToken token in libraryJData["extract"]["exclude"])
+                foreach (JToken token in libraryJData["extract"]?["exclude"] ?? new JArray())
                     excludelist.Add(token.ToString());
             }
-            Exclude = excludelist.ToArray();
+            Exclude = [..excludelist];
         }
 
         /// <summary>

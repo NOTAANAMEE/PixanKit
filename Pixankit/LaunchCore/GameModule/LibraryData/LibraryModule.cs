@@ -30,7 +30,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         public static void Parse(JObject jData, List<LibraryBase> gamelibraries)
         {
             if (!SystemSupport(jData)) return;
-            if (libraries.TryGetValue(GetName(jData), out LibraryBase ret)) 
+            if (libraries.TryGetValue(GetName(jData), out LibraryBase? ret)) 
                 gamelibraries.Add(ret);
             switch (GetLibraryType(jData))
             {
@@ -38,8 +38,9 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
                     gamelibraries.Add(new OriginalLibrary(jData));
                     break;
                 case LibraryType.Native:
+                    if (jData["natives"]?[SystemInformation.OSName] == null) break;
                     gamelibraries.Add(new NativeLibrary(jData));
-                    if ((jData["downloads"] as JObject ?? new JObject()).Count > 1)
+                    if ((jData["downloads"] as JObject ?? []).Count > 1)
                         gamelibraries.Add(new OriginalLibrary(jData));
                     break;
                 case LibraryType.Mod:
@@ -126,6 +127,11 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Checks whether the system suits for the argument or library
+        /// </summary>
+        /// <param name="libraryToken"></param>
+        /// <returns></returns>
         public static bool SystemSupport(JToken libraryToken)
             => GetAllowedSystem(libraryToken).Contains(SystemInformation.OSName);
 
@@ -147,25 +153,28 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <returns></returns>
         public static string[] GetAllowedSystem(JToken jData)
         {
-            if (jData["rules"] == null) return new string[] { "osx", "linux", "windows" };
+            if (jData["rules"] == null) return ["osx", "linux", "windows"];
             List<string> OSSet = new();
-            foreach (JToken ruleData in jData["rules"])
+            foreach (JToken ruleData in jData["rules"] ?? new JArray())
             {
-                if (ruleData["action"].ToString() == "allow")
+                if (ruleData["action"]?.ToString() == "allow")
                 {
-                    if (ruleData["os"] == null) OSSet = new List<string> { "osx", "linux", "windows" };
-                    else if (ruleData["os"]["name"] != null) OSSet.Add(ruleData["os"]["name"].ToString());
+                    if (ruleData["os"] == null) OSSet = ["osx", "linux", "windows"];
+                    else if (ruleData["os"]?["name"] != null) 
+                        OSSet.Add(ruleData["os"]?["name"]?.ToString() ?? "");
 
-                    if (ruleData["os"] == null || ruleData["os"]["arch"] == null) continue;
-                    if (ruleData["os"]["arch"].ToString() == SystemInformation.CPUArch) continue;
-                    return Array.Empty<string>();
+                    if (ruleData["os"] == null || ruleData["os"]?["arch"] == null) 
+                        continue;
+                    if (ruleData["os"]?["arch"]?.ToString() == SystemInformation.CPUArch) 
+                        continue;
+                    return [];
                 }
                 else
                 {
-                    OSSet.Remove(ruleData["os"].ToString());
+                    OSSet.Remove(ruleData["os"]?.ToString() ?? "");
                 }
             }
-            return OSSet.ToArray();
+            return [.. OSSet];
         }
 
         /// <summary>

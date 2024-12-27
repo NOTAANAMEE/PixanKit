@@ -21,8 +21,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// Init A MinecraftVersionServer
         /// </summary>
         public MinecraftVersionServer() {
-            Mirrors = new List<MirrorServer>() 
-            { new("", "https://piston-meta.mojang.com") };
+            Mirrors = [new("", "https://piston-meta.mojang.com")];
             Current = Mirrors[0]; 
         }
 
@@ -38,7 +37,8 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
                 //UpdateIndex();
                 await GetArrayFromNetwork(token);
             }
-            return cache.Versions;
+            if (cache != null) return cache.Versions;
+            throw new Exception();
         }
 
         /// <summary>
@@ -53,13 +53,20 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
             return task.Result;
         }
 
+        /// <summary>
+        /// Get the version from the Mojang Server
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<JArray> GetVersions(CancellationToken token)
         {
             if (cache == null || DateTime.Now - cache.UpdateTime > TimeSpan.FromDays(1))
             {
                 await Update(token);
             }
-            return cache.Versions;
+            if (cache != null) return cache.Versions;
+            throw new Exception();
         }
 
         /// <summary>
@@ -71,7 +78,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         {
             foreach (JToken token in jArray)
             {
-                if (token["type"].ToString() == "release") 
+                if (token["type"]?.ToString() == "release") 
                     return token as JObject;
             }
             return null;
@@ -86,7 +93,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         {
             foreach (JToken token in jArray)
             {
-                if (token["type"].ToString() != "release")
+                if (token["type"]?.ToString() != "release")
                     return token as JObject;
             }
             return null;
@@ -100,7 +107,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <returns>The URL for Json</returns>
         public string GetJsonUrl(JObject jObject) 
         {
-            return Replace(jObject["downloads"]["client"]["url"].ToString()); 
+            return Replace(jObject["downloads"]?["client"]?["url"]?.ToString() ?? ""); 
         }
 
         /// <summary>
@@ -130,8 +137,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// </summary>
         public async Task Update(CancellationToken token)
         {
-            //UpdateIndex();
-            GetArrayFromNetwork(token);
+            await GetArrayFromNetwork(token);
         }
 
         private async Task GetArrayFromNetwork(CancellationToken token)
@@ -139,9 +145,9 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
             HttpClient client = new();
             var ret = await client.GetAsync(
                 Replace("https://piston-meta.mojang.com/mc/game/version_manifest.json"), token);
-            string tmp = await ret.Content.ReadAsStringAsync();
+            string tmp = await ret.Content.ReadAsStringAsync(token);
             JObject jObj = JObject.Parse(tmp);
-            cache = new Cache(jObj["versions"] as JArray, DateTime.Now);
+            cache = new Cache(jObj["versions"] is JArray array ? array : [], DateTime.Now);
         }
     }
 }

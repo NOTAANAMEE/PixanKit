@@ -17,6 +17,7 @@ using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
 using ResourceDownloader.Download.InstallTask;
+using PixanKit.ResourceDownloader.PostProcess;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
@@ -102,7 +103,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void FinishTask()
         {
-            ModLoaderServer.Move(Owner, fabricversioname, Name);
+            GamePostProcess.Move(Owner, fabricversioname, Name);
         }
 
         private async Task<int> InitTask(Action<double> progress, CancellationToken token)
@@ -115,17 +116,3 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         }
     }
 }
-
-
-/*
- * 
- * 让我们整理一下思路：
- * 1.需求的安装方法:
- *      a.直接安装
- *      b.删除残余文件安装
- *      c.合并JSON并删除一切文件
- * 2.需要添加的方法:
- *      a.最小化原版安装
- *      b.合并JSON方法 ok
- *      c.判断残余文件并删除 
- */

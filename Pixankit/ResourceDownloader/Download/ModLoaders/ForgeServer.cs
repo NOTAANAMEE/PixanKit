@@ -45,6 +45,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             public OfficialForgeMirror()
             {
                 BaseURL = "https://files.minecraftforge.net";
+                OriginalURL = "";
             }
 
             /// <inheritdoc/>
@@ -96,7 +97,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 return array;
             }
 
-            private JObject Parse(HtmlNode node)
+            private static JObject Parse(HtmlNode node)
             {
                 string name = node.SelectSingleNode("td[1]").InnerText;
                 string url = node.SelectSingleNode("td[3]/ul/li[2]/a[2]").Attributes["href"].Value;
@@ -118,7 +119,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// A task that represents the asynchronous operation. The task result contains the URL of the mod loader installer.
             /// </returns>
             public override Task<string> GetURL(JObject modloaderinf, CancellationToken token)
-                => Task.FromResult(Replace(modloaderinf["url"].ToString()));
+                => Task.FromResult(Replace(modloaderinf["url"]?.ToString() ?? ""));
 
         }
     }

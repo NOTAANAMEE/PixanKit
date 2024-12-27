@@ -21,11 +21,11 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// </summary>
     public class AssetsCompletionTask:SequenceProgressTask
     {
-        GameBase _game;
+        GameBase? _game;
 
         string indexpath = "";
 
-        private MultiFileDownloadTask task2;
+        private MultiFileDownloadTask? task2;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AssetsCompletionTask"/> class.
@@ -51,21 +51,21 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         {
             FileDownloadTask task;
             
-            string url = jdata["assetIndex"]["url"].ToString();
-            string index = jdata["assetIndex"]["id"].ToString();
+            string url = jdata["assetIndex"]?["url"]?.ToString() ?? "";
+            string index = jdata["assetIndex"]?["id"]?.ToString() ?? "";
 
-            indexpath = $"{_game.AssetsDir}/indexes/{index}.json";
+            indexpath = $"{_game?.AssetsDir}/indexes/{index}.json";
 
             if (File.Exists(Localize.PathLocalize(indexpath)))
             {
                 Add(task = new FileDownloadTask(url, indexpath));
-                task.OnFinish += TaskFinish;
+                task.OnFinish += (a) => TaskFinish();
             }
-            else TaskFinish(null);
+            else TaskFinish();
             Add(task2 = new MultiFileDownloadTask());
         }
         
-        private void TaskFinish(ProgressTask t)
+        private void TaskFinish()
         {
             List<string> urls = [], paths = [];
 
@@ -74,13 +74,13 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                     ));
 
             var count = 0;
-            foreach (var asset in jobj["objects"])
+            foreach (var asset in jobj["objects"] ?? new JArray())
             {
                 try
                 {
-                    string hash = asset.First["hash"].ToString();
+                    string hash = asset.First?["hash"]?.ToString() ?? "";
                     string rpath = $"{hash[0..2]}/{hash}";
-                    string path = $"{_game.AssetsDir}/objects/{rpath}";
+                    string path = $"{_game?.AssetsDir}/objects/{rpath}";
                     Console.WriteLine(++count);
                     if (File.Exists(Localize.PathLocalize(path))) continue;
                     urls.Add(ServerList.MinecraftAssetsServer.GetAssetsUrl(hash));
@@ -89,7 +89,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                 catch(Exception ex) { Console.WriteLine(ex.Message); }
 
             }
-            task2.Set([.. urls], [.. paths]);
+            task2?.Set([.. urls], [.. paths]);
         }
 
     }

@@ -51,7 +51,7 @@ namespace PixanKit.ModModule
 
         public static void CheckDir(string path)
         {
-            string dir = Path.GetDirectoryName(path);
+            string dir = Path.GetDirectoryName(path) ?? "./";
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
         }
     }

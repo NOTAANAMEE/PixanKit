@@ -55,20 +55,20 @@ namespace PixanKit.LaunchCore.GameModule.Game
             public static OptionalArgs Parse(JObject jData)
             {
                 List<string> rules = [];
-                foreach (var rule in jData["rules"])
-                {
-                    rules.Add(ParseRule(rule as JObject));
-                }
-                return new OptionalArgs(ParseArg(jData), rules.ToArray());
+                rules.AddRange(from rule in jData[nameof(rules)]
+                               select ParseRule((JObject)rule));
+                return new OptionalArgs(ParseArg(jData), [.. rules]);
             }
 
             private static string ParseArg(JObject jData)
             {
                 string ret = "";
-                if (jData["value"].Type == JTokenType.String) return (string)jData["value"];
-                foreach (var token in jData["value"])
+                if (jData["value"] == null) throw new();
+                if (jData["value"]?.Type == JTokenType.String) 
+                    return (jData["value"] ?? "").ToString();
+                foreach (var token in jData["value"] ?? new JArray())
                 {
-                    ret += $"{token.ToString()} ";
+                    ret += $"{token} ";
                 }
                 return ret;
             }
@@ -76,18 +76,22 @@ namespace PixanKit.LaunchCore.GameModule.Game
             private static string ParseRule(JObject jData)
             {
                 string sign = Allow(jData) ? "" : "!";
-                foreach (var rule in (jData["features"] as JObject))
+
+                if (jData["features"] is JObject features)
                 {
-                    return $"{rule.Key}=" +
-                           $"{sign}" +
-                           $"{rule.Value.ToString()}";
+                    foreach (var rule in features)
+                    {
+                        return $"{rule.Key}=" +
+                               $"{sign}" +
+                               $"{rule.Value}";
+                    }
                 }
-                return "";
+
+                return string.Empty;
             }
 
             private static bool Allow(JObject jData)
-                => jData["action"].ToString() == "allow";
-
+                => jData["action"]?.ToString() == "allow";
         }
 
         #region Properties
@@ -181,7 +185,8 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <remarks>
         /// This is the base directory containing all versions and global assets.
         /// </remarks>
-        public string RootDir{ get => (this.folder != null)? _path.Remove(_path.LastIndexOf("/versions/")):folder.Path; }
+        public string RootDir{ get => 
+        (folder == null)? _path.Remove(_path.LastIndexOf("/versions/")):folder.Path; }
 
         /// <summary>
         /// Gets the Minecraft version for this game instance.
@@ -233,33 +238,76 @@ namespace PixanKit.LaunchCore.GameModule.Game
             { "runningfolder", "self" }, //"overall":the same as the overall settings, "self": self folder defult: user specified
             { "description", "A Minecraft Game" }
         };
+
+        /// <summary>
+        /// Gets the minimal java version for choosing the java runtime
+        /// </summary>
+        public short MinimalJavaVersion { get => javaVersion; }
         #endregion
 
         #region Fields
-        protected JObject gameJSONData = new();
+        /// <summary>
+        /// Represents a temporary JSON data of the Minecraft version
+        /// </summary>
+        protected JObject gameJSONData = [];
 
-        internal Folder? folder = null;
+        /// <summary>
+        /// Represents the folder of the game
+        /// </summary>
+        protected Folder? folder = null;
 
-        internal string _path = "";
+        /// <summary>
+        /// Represents the path of the directory which contains the game jar file 
+        /// </summary>
+        protected string _path = "";
 
-        internal string _version = "";
+        /// <summary>
+        /// Represents the version name of the game
+        /// </summary>
+        protected string _version = "";
 
-        internal GameType _gameType;
+        /// <summary>
+        /// Represents the 
+        /// <see cref="PixanKit.LaunchCore.GameModule.Game.GameType"/> 
+        /// of the game
+        /// </summary>
+        protected GameType _gameType;
 
-        internal List<LibraryBase> libraries = new();
+        /// <summary>
+        /// Represents the collection of the libraries
+        /// </summary>
+        protected List<LibraryBase> libraries = [];
 
-        internal string className = "";
+        /// <summary>
+        /// Represents the main class name of the jar file
+        /// </summary>
+        protected string className = "";
 
-        internal string gameArguments = "";
+        /// <summary>
+        /// Represents the game arguments that required to launch
+        /// </summary>
+        protected string gameArguments = "";
 
-        internal string javaArguments = "";
+        /// <summary>
+        /// Represents the java arguments that required to launch Minecraft
+        /// </summary>
+        protected string javaArguments = "";
 
-        internal short javaVersion = 8;
+        /// <summary>
+        /// Represents the minimal version of Java
+        /// </summary>
+        protected short javaVersion = 8;
 
-        internal string assetsID = "";
+        /// <summary>
+        /// Represents the id of the assetsindex file
+        /// </summary>
+        protected string assetsID = "";
 
         internal string releaseType = "";
 
+        /// <summary>
+        /// Represents the game args which is optional
+        /// </summary>
         protected List<OptionalArgs> optionalArgs = [];
         #endregion
 
@@ -368,7 +416,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         {
             foreach (JToken token in (gameJSONData["libraries"] ?? new JObject()))
             {
-                LibraryBase.Parse(token as JObject, libraries);
+                LibraryBase.Parse(token is JObject data ? data : [], libraries);
             }
             Logger.Info($"Libraries Added. Number:{libraries.Count}");
         }
@@ -397,20 +445,19 @@ namespace PixanKit.LaunchCore.GameModule.Game
         #region ArgsParser
         internal virtual void SetGameArgs()
         {
-            if (gameJSONData["minecraftArguments"] != null)
+            if (gameJSONData.ContainsKey("minecraftArguments"))
             {
-                gameArguments = gameJSONData["minecraftArguments"].ToString();
+                gameArguments = gameJSONData["minecraftArguments"]?.ToString() ?? "";
+                return;
             }
-            else
+            foreach (JToken token in gameJSONData["arguments"]?["game"] ?? new JArray())
             {
-                foreach (JToken token in gameJSONData["arguments"]["game"])
+                if (token.Type != JTokenType.String)
                 {
-                    if (token.Type != JTokenType.String)
-                    {
-                        optionalArgs.Add(OptionalArgs.Parse(token as JObject)); continue;
-                    }
-                    gameArguments += token.ToString() + " ";
+                    optionalArgs.Add(OptionalArgs.Parse(token as JObject ?? []));
+                    continue;
                 }
+                gameArguments += token.ToString() + " ";
             }
         }
 
@@ -430,15 +477,16 @@ namespace PixanKit.LaunchCore.GameModule.Game
         {
             string tmp = "[{\"rules\": [{\"action\": \"allow\",\"os\": {\"name\": \"osx\"}}],\"value\": [\"-XstartOnFirstThread\"]},{\"rules\": [{\"action\": \"allow\",\"os\": {\"name\": \"windows\"}}],\"value\": \"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump\"},{\"rules\": [{\"action\": \"allow\",\"os\": {\"arch\": \"x86\"}}],\"value\": \"-Xss1M\"},\"-Djava.library.path=${natives_directory}\"" +
                 ",\"-Dminecraft.launcher.brand=${launcher_name}\",\"-Dminecraft.launcher.version=${launcher_version}\",\"-cp\",\"${classpath}\"]";
-            JArray? jvmargArray = new();
+            JArray? jvmargArray;
             if (gameJSONData["arguments"] != null && (gameJSONData["arguments"] ?? new JObject())["jvm"] != null)
             {
-                jvmargArray = gameJSONData["arguments"]["jvm"] as JArray;
+                jvmargArray = gameJSONData["arguments"]?["jvm"] as JArray;
             }
             else
             {
                 jvmargArray = JArray.Parse(tmp);
             }
+            if (jvmargArray == null) throw new();
             return jvmargArray;
         }
 
@@ -452,8 +500,11 @@ namespace PixanKit.LaunchCore.GameModule.Game
             }
             else if (LibraryBase.SystemSupport(token))
             {
-                if (token["value"].Type == JTokenType.String) return (token["value"] ?? "").ToString();
-                arg = string.Join(" ", (JArray)token["value"]);
+                if (token["value"]?.Type == JTokenType.String) 
+                    return (token["value"] ?? "").ToString();
+                //arg = string.Join(" ", (JArray)token["value"] ?? []);
+                arg = string.Join(" ", 
+                    token["value"] is JArray array ? array : Array.Empty<JToken>());
             }
             return arg;
         }
@@ -473,7 +524,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </remarks>
         public virtual LibraryBase[] GetLibraries()
         {
-            return libraries.ToArray();
+            return [..libraries];
         }
 
         /// <summary>
@@ -489,7 +540,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </remarks>
         protected List<LibraryBase> SameVersionLibraries()
         {
-            var target = Owner.FindVersion(_version, GameType.Original);
+            var target = Owner?.FindVersion(_version, GameType.Original);
             if (target == null)
             {
                 Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");

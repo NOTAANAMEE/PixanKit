@@ -8,6 +8,7 @@ using PixanKit.LaunchCore.Server;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.ResourceDownloader.Download.ModLoaders;
+using PixanKit.ResourceDownloader.PostProcess;
 using PixanKit.ResourceDownloader.Tasks.FuncTask;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using ResourceDownloader.Download.InstallTask;
@@ -38,11 +39,11 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         string url = "";
 
-        FuncProgressTask<int> InitProgressTask;
+        FuncProgressTask<int> InitProgressTask = new();
 
-        AsyncProgressTask DownloadTask;
+        AsyncProgressTask? DownloadTask;
 
-        CLITask CommandTask;
+        CLITask? CommandTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ForgeInstaller"/> class.
@@ -62,7 +63,6 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void Init()
         {
-            InitProgressTask = new();
             InitProgressTask.Function += InitTask;
             Add(InitProgressTask);
             AddDownloadTask();
@@ -85,13 +85,15 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void AddCommandTask()
         {
-            var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes);
+            if (Launcher.Instance == null) throw new Exception();
+            var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes) ??
+                throw new Exception();
             CLITask task = new(java.JavaEXE, $"-jar \"{installerpath}\" --installClient " +
                 $"\"{Owner.Path}\"");
             ProgressTasks.Add(task);
             task.OnFinish += (a) =>
             {
-                ModLoaderServer.Move(Owner, $"{version}-forge-{forgeversion["version"]}", Name);
+                GamePostProcess.Move(Owner, $"{version}-forge-{forgeversion["version"]}", Name);
             };
         }
 

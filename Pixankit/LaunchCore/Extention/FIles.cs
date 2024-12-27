@@ -157,7 +157,7 @@ namespace PixanKit.LaunchCore.Extention
             foldersw.Write(FolderJData.ToString());
             playersw.Write(PlayerJData.ToString());
             runtimesw.Write(RuntimeJData.ToString());
-            settingsw.Write(SettingsJData.ToString());
+            settingsw.Write(SettingsJData?.ToString() ?? "");
             foldersw.Close();
             playersw.Close();
             runtimesw.Close();

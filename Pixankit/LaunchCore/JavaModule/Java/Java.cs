@@ -87,8 +87,8 @@ namespace PixanKit.LaunchCore.JavaModule.Java
         /// <param name="jData"></param>
         public JavaRuntime(JObject jData)
         {
-            _javaFolder = jData["path"].ToString();
-            _version = (ushort)jData["version"];
+            _javaFolder = jData["path"]?.ToString() ?? "";
+            _version = (ushort)(jData["version"] ?? 0);
         }
 
         /// <summary>

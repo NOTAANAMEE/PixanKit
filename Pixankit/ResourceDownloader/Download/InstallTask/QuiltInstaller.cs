@@ -17,6 +17,7 @@ using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
 using ResourceDownloader.Download.InstallTask;
+using PixanKit.ResourceDownloader.PostProcess;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
@@ -25,23 +26,23 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// </summary>
     public class QuiltInstaller : SequenceProgressTask
     {
-        Folder Owner;
+        readonly Folder Owner;
 
-        string Name;
+        readonly string Name;
 
-        string version;
+        readonly string version;
 
-        JObject quiltversion;
+        readonly JObject quiltversion;
 
-        string installerpath = $"{Files.CacheDir}/Installer/quilt.jar";
+        readonly string installerpath = $"{Files.CacheDir}/Installer/quilt.jar";
 
         string url = "";
 
-        FuncProgressTask<int> InitProgressTask;
+        FuncProgressTask<int> InitProgressTask = new();
 
-        AsyncProgressTask DownloadTask;
+        AsyncProgressTask? DownloadTask;
 
-        CLITask CommandTask;
+        CLITask? CommandTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="QuiltInstaller"/> class.
@@ -61,7 +62,6 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void Init()
         {
-            InitProgressTask = new();
             InitProgressTask.Function += InitTask;
             Add(InitProgressTask);
             AddDownloadTask();
@@ -84,19 +84,23 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void AddCommandTask()
         {
-            var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes);
-            CLITask task = new(java.JavaEXE, $"-jar \"{installerpath}\" install client " +
-                $"{version} {quiltversion["version"]} --install-dir \"{Owner.Path}\"");
-            ProgressTasks.Add(task);
-            task.OnFinish += (a) =>
+            var java = JavaChooser.Newest(Launcher.Instance?.JavaRuntimes ?? []) ?? 
+                throw new Exception("No Java");
+            string workingdir = Owner.Path.Remove(Owner.Path.LastIndexOf('/'));
+            CommandTask = new(java.JavaEXE, $"-jar \"{Path.GetFullPath(installerpath)}\" " +
+                $"install client " +
+                $"{version} {quiltversion["version"]} \"--install-dir=./.minecraft\"", workingdir);
+            ProgressTasks.Add(CommandTask);
+            CommandTask.OnFinish += (a) =>
             {
-                ModLoaderServer.Move(Owner, "", Name);
+                GamePostProcess.Move(Owner, 
+                    $"quilt-loader-{quiltversion["version"]}-{version}", Name);
             };
         }
 
         private async Task<int> InitTask(Action<double> progress, CancellationToken token)
         {
-            url = await ServerList.ModLoaderServers["fabric"]
+            url = await ServerList.ModLoaderServers["quilt"]
                     .GetURL(quiltversion, token);
             if (token.IsCancellationRequested) return 1;
             progress(1.0);

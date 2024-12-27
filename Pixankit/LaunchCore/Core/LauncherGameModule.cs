@@ -133,12 +133,22 @@ namespace PixanKit.LaunchCore.Core
             return cmd;
         }
 
+        /// <summary>
+        /// Checks whether the game is one of the games that exists in any foldr
+        /// </summary>
+        /// <param name="game"></param>
+        /// <returns></returns>
         public bool Contains(GameBase? game)
         {
             if (game == null) return false;
-            return Contains(game.Owner) && game.Owner.Contains(game);
+            return Contains(game.Owner) && (game.Owner?.Contains(game) ?? false);
         }
 
+        /// <summary>
+        /// Checks whether the folder is in the folder collection
+        /// </summary>
+        /// <param name="folder"></param>
+        /// <returns></returns>
         public bool Contains(Folder? folder)
         {
             if(folder == null) return false;

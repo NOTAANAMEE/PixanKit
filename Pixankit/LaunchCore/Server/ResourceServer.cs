@@ -21,19 +21,27 @@ namespace PixanKit.LaunchCore.Server
         /// <summary>
         /// Current Mirror Server
         /// </summary>
-        public MirrorServer Current { get; set; }
+        public MirrorServer? Current { get; set; }
 
         /// <summary>
         /// Selects the best mirror server from the list based on ping times.
         /// </summary>
         public void UpdateIndex()
         {
-            List<KeyValuePair<long, MirrorServer>> dict = new();
+            List<KeyValuePair<long, MirrorServer>> dict = [];
             foreach (var item in Mirrors)
             {
-                long pingtime = GetPing(item.BaseURL);
-                if (pingtime > 0)
-                    dict.Add(new(pingtime, item));
+                try
+                {
+                    long pingtime = GetPing(item.BaseURL);
+                    if (pingtime > 0)
+                        dict.Add(new(pingtime, item));
+                }
+                catch 
+                {
+                    Current = Mirrors[0];
+                    return;
+                }
             }
             dict.Sort((a, b) => a.Key.CompareTo(b.Key));
             Current = dict.First().Value;
@@ -54,6 +62,7 @@ namespace PixanKit.LaunchCore.Server
         /// <returns>The round-trip time in milliseconds to ping the current server, or -1 if the ping fails.</returns>
         public long Ping()
         {
+            if (Current == null) throw new Exception();
             return GetPing(Current.BaseURL);
         }
 
@@ -84,12 +93,18 @@ namespace PixanKit.LaunchCore.Server
         /// </summary>
         /// <param name="OriginalUrl">The original URL of the resource.</param>
         /// <returns>The URL of the resource on the current mirror server.</returns>
-        protected string Replace(string OriginalUrl) => Current.Replace(OriginalUrl);
+        protected string Replace(string OriginalUrl)
+        {
+            if (Current == null) throw new Exception();
+            return Current.Replace(OriginalUrl);
+        }
 
         private static string GetHost(string OriginalUrl)
         {
-            Uri uri = new(OriginalUrl);
-            return uri.Host;
+
+                Uri uri = new(OriginalUrl);
+                return uri.Host;
+
         }
     }
 }

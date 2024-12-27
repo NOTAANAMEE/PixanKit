@@ -131,8 +131,8 @@ namespace PixanKit.LaunchCore.GameModule
         /// }</c></param>
         public Folder(JObject jData) 
         {
-            _path = jData["path"].ToString();
-            Alias = jData["alias"].ToString();
+            _path = jData["path"]?.ToString() ?? throw new Exception("JSON parse Wrong");
+            Alias = jData["alias"]?.ToString() ?? "${defaultalias}";
             AddSelf();
             InitGames();
         }
@@ -178,7 +178,7 @@ namespace PixanKit.LaunchCore.GameModule
             {
                 GameBase game;
                 try {
-                    game = Initors.GameInitor(dir);
+                    game = Initors.GameInitor(dir) ?? throw new Exception();
                 }
                 catch(Exception ex)
                 {
@@ -306,7 +306,6 @@ namespace PixanKit.LaunchCore.GameModule
 
         internal void InternalRemoveGame(GameBase game)
         {
-            game.folder = null;
             _games.Remove(game);
             Directory.Delete(game.GameFolder);
             Launcher.GameRemove?.Invoke(game);

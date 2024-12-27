@@ -25,6 +25,10 @@ namespace PixanKit.LaunchCore.GameModule.Game
             javaVersion = (short)(int)(jData["minimumLauncherVersion"]?? 0);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OriginalGame"/> class.
+        /// </summary>
+        /// <param name="path">The file path to the game directory.</param>
         public OriginalGame(string path) : base(path) 
         {
             _gameType = GameType.Original;

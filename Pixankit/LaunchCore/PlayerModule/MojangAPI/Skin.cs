@@ -68,9 +68,9 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
         {
             var response = await client.GetStringAsync($"https://sessionserver.mojang.com/session/minecraft/profile/{player.UID}");
             JObject jData = JObject.Parse(response);
-            string base64code = jData["properties"][0]["value"].ToString();
+            string base64code = jData["properties"]?[0]?["value"]?.ToString() ?? "";
             jData = JObject.Parse(Base64Decode(base64code));
-            return jData["textures"]["CAPE"]["url"].ToString();
+            return jData["textures"]?["CAPE"]?["url"]?.ToString() ?? "";
         }
 
         private static string Base64Decode(string encodedString)

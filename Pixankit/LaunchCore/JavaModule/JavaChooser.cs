@@ -24,7 +24,7 @@ namespace PixanKit.LaunchCore.JavaModule
         {
             foreach (JavaRuntime runtime in runtimes) 
             {
-                if (runtime.Version == game.javaVersion)return runtime;
+                if (runtime.Version == game.MinimalJavaVersion)return runtime;
             }
             return null;
         }
@@ -45,7 +45,7 @@ namespace PixanKit.LaunchCore.JavaModule
             });
             foreach (JavaRuntime runtime in runtimes_) 
             {
-                if (runtime.Version >= game.javaVersion) return runtime;
+                if (runtime.Version >= game.MinimalJavaVersion) return runtime;
             }
             return null;
         }

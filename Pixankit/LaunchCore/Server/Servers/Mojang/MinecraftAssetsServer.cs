@@ -29,8 +29,8 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <returns>The URL</returns>
         public string GetAssetsUrl(string hash)
         {
-            return Current.Replace(
-                $"https://resources.download.minecraft.net/{hash[0..2]}/{hash}");
+            string oriurl = $"https://resources.download.minecraft.net/{hash[0..2]}/{hash}";
+            return Current?.Replace(oriurl) ?? oriurl;
         }
 
         /// <summary>
@@ -40,9 +40,10 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <returns>The URL Of The Asset</returns>
         public string GetAssetsUrl(JObject jData)
         {
-            string hash = jData.First["hash"].ToString();
-            return Current.Replace(
-                $"https://resources.download.minecraft.net/{hash[0..2]}/{hash}");
+            string hash = jData.First?["hash"]?.ToString() ?? throw new Exception();
+            return Current?.Replace(
+                $"https://resources.download.minecraft.net/{hash[0..2]}/{hash}")??
+                throw new Exception();
         }
 
         /// <summary>
@@ -52,7 +53,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <returns></returns>
         public string GetFileLocation(JObject jData)
         {
-            string hash = jData.First["hash"].ToString();
+            string hash = jData.First?["hash"]?.ToString() ?? throw new Exception();
             return $"/{hash[0..2]}/{hash}";
         }
     }

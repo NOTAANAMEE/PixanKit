@@ -20,6 +20,8 @@ using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
 using System.Runtime.CompilerServices;
 using ResourceDownloader.Download.InstallTask;
+using ResourceDownloader.Download.DownloadTask;
+using PixanKit.ResourceDownloader.PostProcess;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
@@ -28,19 +30,22 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// </summary>
     public class OptifineInstaller: SequenceProgressTask
     {
-        string MCVersion = "";
+        readonly string MCVersion = "";
 
-        Folder Owner;
+        readonly Folder Owner;
 
-        string Name;
-
-        string version;
+        readonly string Name;
 
         string installerpath { get => $"{Files.CacheDir}/Installer/optifine.jar"; }
 
+        //The Java Program I made myself. It is just used to handle the optifine install task
+        string programpath { get => $"{Files.CacheDir}/Installer/optifineinstaller.jar"; }
+
         string url = "";
 
-        JObject OptifineVersion;
+        string mcjarpath = "";
+
+        readonly JObject OptifineVersion;
 
         FuncProgressTask<int> InitProgressTask;
 
@@ -60,7 +65,6 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             Name = name;
             Owner = folder;
             MCVersion = mcversion;
-            version = optifineversion["version"].ToString();
             OptifineVersion = optifineversion;
             Init(optifineversion);
         }
@@ -79,14 +83,15 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         private void AddDownloadTask()
         {
             DownloadTask = new();
-            FileDownloadTask download = new("", installerpath);
+            SimpleFileDownloadTask download = new("", installerpath);
             InitProgressTask.OnFinish += (a) =>
             {
                 download.SetURL(url);
             };
-            download.OnFinish += (a) => { UnpressWrapperFile(); };
             if (Owner.FindGame(MCVersion) == null)
+            {
                 DownloadTask.Add(new MinimalOriginalInstallTask(Owner, MCVersion, MCVersion, true));
+            }
             DownloadTask.Add(download);
             Add(DownloadTask);
         }
@@ -94,49 +99,17 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         private void AddCommandTask()
         {
             var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes);
-            var id = version[(version.LastIndexOf('-') + 1)..];
-            var mcpath = Localize.PathLocalize(Owner.VersionDir + $"/{Name}");
-            var librarypath = Localize.PathLocalize(
-                $"{Owner.LibraryDir}/optifine/Optifine/{id}/{version}.jar");
-            Localize.CheckDir(mcpath);
-            Localize.CheckDir(librarypath);
+            string dir =
+                $"{MCVersion}-{OptifineVersion["version"].ToString().Replace(" ", "_")}";
 
-            CommandTask = new(java.JavaEXE,
-                "-cp " +
-               $"\"{Localize.PathLocalize(installerpath)}\" " +
-                "optifine.Patcher " +
-               $"\"{mcpath}\" " +
-               $"\"{Localize.PathLocalize(librarypath)}\"");
+            CommandTask = new(java.JavaEXE, "-cp " +
+                $"\"{installerpath}{Localize.LocalParser}{programpath}\" Program " +
+                $"\"{Owner.Path}\"");
             CommandTask.OnFinish += (a) =>
             {
-                ModLoaderServer.Move(Owner, "", Name);
+                GamePostProcess.Move(Owner, dir, Name);
             };
             Add(CommandTask);
-        }
-
-        private void UnpressWrapperFile()
-        {
-            string extractpath;
-            string config = Localize.PathLocalize(Files.CacheDir + "/optifine.txt");
-            FileStream fs = new(Localize.PathLocalize(installerpath), FileMode.Open);
-            ZipArchive archive = new(fs);
-            var entry = archive.GetEntry("launcherwrapper-of.txt");
-            entry.ExtractToFile(config);
-            string content = File.ReadAllText(config).Trim();
-
-            extractpath = Localize.PathLocalize(
-                    Owner.LibraryDir +
-                    $"/optifine/launcherwrapper-of/{content}/" +
-                    $"launcherwrapper-of-{content}.jar");
-            Localize.CheckDir(extractpath);
-
-            var extractfile = archive.GetEntry($"launcherwrapper-of-{content}.jar");
-            if (extractfile != null)
-                extractfile.ExtractToFile(extractpath);
-            File.Delete(config);
-
-            archive.Dispose();
-            fs.Close();
         }
 
         private async Task<int> GetURL(Action<double> report, CancellationToken token)

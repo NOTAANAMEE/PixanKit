@@ -25,7 +25,7 @@ namespace PixanKit.ResourceDownloader.Tasks.FuncTask
         /// <summary>
         /// Gets the result returned by the executed function.
         /// </summary>
-        public T Return;
+        public T? Return;
 
         /// <summary>
         /// Executes the user-defined function and handles progress reporting and exceptions.
@@ -43,7 +43,8 @@ namespace PixanKit.ResourceDownloader.Tasks.FuncTask
         {
             try
             {
-                Return = await Function?.Invoke(ReportProgress, CancellationToken.Token);
+                if (Function != null) 
+                    Return = await Function.Invoke(ReportProgress, CancellationToken.Token);
             }
             catch (Exception ex) 
             {

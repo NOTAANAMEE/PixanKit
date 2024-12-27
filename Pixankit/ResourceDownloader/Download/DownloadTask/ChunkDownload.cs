@@ -1,8 +1,11 @@
-﻿using PixanKit.ResourceDownloader.Tasks.FuncTask;
+﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Log;
+using PixanKit.ResourceDownloader.Tasks.FuncTask;
 using ResourceDownloader.Download.DownloadTask;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -76,32 +79,38 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         private async Task<Stream> DownloadAsync(Action<double> progress, CancellationToken token)
         {
             HttpClient client = new();
-            var buffer = new byte[8192];
-            int bytesRead;
             var totalBytes = _end - _start + 1;
-            var request = new HttpRequestMessage(HttpMethod.Get, _url);
-            Stream stream;
             MemoryStream ret = new();
-            HttpResponseMessage response;
-
-                request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(_start, _end);
-                response = client.Send(request, HttpCompletionOption.ResponseHeadersRead, CancellationToken.Token);
+            HttpResponseMessage? response = null;
+            client.DefaultRequestHeaders.Range = new System.Net.Http.Headers.RangeHeaderValue(_start, _end);
+            try
+            {
+                response = await client.GetAsync(_url,  HttpCompletionOption.ResponseHeadersRead, CancellationToken.Token);
                 response.EnsureSuccessStatusCode();
-                stream = await response.Content.ReadAsStreamAsync(token);
+                await LoopRead(response.Content, ret, progress);
+            }
+            catch (Exception ex) 
+            {
+                response?.Dispose();
+                Logger.Warn("PixanKit.ResourceDownloader", ex.Message);
+            }
+            client.Dispose();
 
-                while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0 && !CancellationToken.IsCancellationRequested)
-                {
-                        ret.Write(buffer, 0, bytesRead);
-
-
-                    downloadedBytes += bytesRead;    
-                    progress((double)downloadedBytes / totalBytes);
-                }
-                if (!token.IsCancellationRequested) progress(1.0);
-                client.Dispose();
-                response.Dispose();
-                request.Dispose();
             return ret;
+        }
+
+        private async Task LoopRead(HttpContent content, Stream ret, Action<double> progress) 
+        {
+            int bytesRead;
+            var stream = await content.ReadAsStreamAsync();
+            var buffer = new byte[8192];
+            while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, CancellationToken.Token)) > 0 
+                && !CancellationToken.IsCancellationRequested)
+            {
+                ret.Write(buffer, 0, bytesRead);
+                downloadedBytes += bytesRead;
+                progress((double)downloadedBytes / Size);
+            }
         }
     }
 

@@ -37,20 +37,23 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         GameBase? _game;
 
-        Folder Owner;
+        readonly string name;
 
-        string name;
+        readonly string version;
 
-        string version;
+        readonly string path;
 
-        string path;
-
-        public FuncProgressTask<int> FuncProgressTask = new();
-        public FileDownloadTask jsondownload;
-        public AsyncProgressTask asyncTask = new();
-        public LibraryCompletionTask lct;
-        public FileDownloadTask dt;
-        public AssetsCompletionTask act;
+        FuncProgressTask<int> InitTask = new();
+        
+        FileDownloadTask? jsondownload;
+        
+        readonly AsyncProgressTask asyncTask = new();
+        
+        LibraryCompletionTask? libraryTask;
+        
+        FileDownloadTask? jarTask;
+        
+        AssetsCompletionTask? assetsTask;
 
 
         /// <summary>
@@ -63,11 +66,10 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// <exception cref="Exception"></exception>
         public OriginalInstallTask(Folder folder, string name, string version)
         {
-            this.Owner = folder;
             this.name = name;
             this.version = version;
             path = folder.VersionDir + '/' + name;
-            FuncProgressTask.Function += GetVersion;
+            InitTask.Function += GetVersion;
             Init();
         }
 
@@ -76,12 +78,12 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             if (Directory.Exists(path)) throw new IOException($"Already Exists {path}");
 
             Directory.CreateDirectory(path);
-            Add(FuncProgressTask);
+            Add(InitTask);
             Add(jsondownload = new FileDownloadTask("", path + $"/{name}.json"));
 
-            asyncTask.Add(dt = new FileDownloadTask("", path + $"/{name}.jar"));
-            asyncTask.Add(lct = new LibraryCompletionTask());
-            asyncTask.Add(act = new AssetsCompletionTask());
+            asyncTask.Add(jarTask = new FileDownloadTask("", path + $"/{name}.jar"));
+            asyncTask.Add(libraryTask = new LibraryCompletionTask());
+            asyncTask.Add(assetsTask = new AssetsCompletionTask());
             Add(asyncTask);
 
             jsondownload.OnFinish += Task1Finish;
@@ -95,9 +97,9 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                 File.ReadAllText(Localize.PathLocalize($"{path}/{name}.json")));
             _game = new OriginalGame(path, mcjData);
             if (_game == null) throw new Exception();
-            dt.SetURL(mcjData["downloads"]["client"]["url"].ToString());
-            lct.Set(_game);
-            act.Set(mcjData, _game);
+            jarTask?.SetURL(mcjData["downloads"]?["client"]?["url"]?.ToString() ?? "");
+            libraryTask?.Set(_game);
+            assetsTask?.Set(mcjData, _game);
         }
 
         private async Task<int> GetVersion(Action<double> report, CancellationToken token)
@@ -106,9 +108,9 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             if (token.IsCancellationRequested) return 1;
             foreach (var item in jarray)
             {
-                if (item["id"].ToString() == version)
+                if (item["id"]?.ToString() == version)
                 {
-                    jsondownload.SetURL(item["url"].ToString());
+                    jsondownload?.SetURL(item["url"]?.ToString() ?? throw new Exception());
                     report?.Invoke(1);
                     return 0;
                 }

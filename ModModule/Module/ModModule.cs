@@ -7,6 +7,7 @@ using PixanKit.ModModule.Module;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -74,10 +75,12 @@ namespace PixanKit.ModModule.Module
                 foreach (var game in folder.Games)
                 {
                     if (game.GameType != GameType.Mod) continue;
-                    var collection = AddGame(game as ModLoaderGame, false);
+                    var collection = AddGame(
+                        (game as ModLoaderGame) ?? throw new()
+                        , false);
                     tasks.Add(Task.Run(() =>
                     {
-                        JObject cache = [];
+                        JObject? cache = [];
                         if (gameCache.TryGetValue(game.Path, out cache))
                             collection.SetCache(cache);
                         else collection.SetCache([]);
@@ -89,7 +92,7 @@ namespace PixanKit.ModModule.Module
 
         private void AddGame(GameBase game)
         {
-            if (game.GameType == GameType.Mod) AddGame(game as ModLoaderGame);
+            if (game.GameType == GameType.Mod) AddGame(game as ModLoaderGame ?? throw new());
         }
 
         private void AddGame(ModLoaderGame game)
@@ -103,7 +106,7 @@ namespace PixanKit.ModModule.Module
             ModCollection modcollection;
             ModGames.Add(game.Path, modcollection = new ModCollection(game, this));
             if (!init) return modcollection;
-            if (gameCache.TryGetValue(game.Path, out JObject cache)) 
+            if (gameCache.TryGetValue(game.Path, out JObject? cache)) 
                 modcollection.SetCache(cache);
             else modcollection.SetCache([]);
             return modcollection;

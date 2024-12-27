@@ -10,28 +10,19 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using PixanKit.LaunchCore.Json;
 
-namespace ResourceDownloader.PostProcess
+namespace PixanKit.ResourceDownloader.PostProcess
 {
-    public class GamePostProcess
+    public class GamePostProcess(Folder folder, string name, string version, bool processJSON)
     {
-        string name = "";
+        string name = name;
 
-        string version = "";
+        string version = version;
 
-        string versiondir = "";
+        string versiondir = folder.VersionDir;
 
-        bool processjson = false;
+        bool processjson = processJSON;
 
-        Folder owner;
-
-        public GamePostProcess(Folder folder, string name, string version, bool processJSON)
-        {
-            this.name = name;
-            this.version = version;
-            processjson = processJSON;
-            versiondir = folder.VersionDir;
-            owner = folder;
-        }
+        Folder owner = folder;
 
         public void Process()
         {
@@ -61,6 +52,31 @@ namespace ResourceDownloader.PostProcess
             JSON.SaveFromFile(name, target);
 
             Directory.Delete($"{versiondir}/{version}");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="folder"></param>
+        /// <param name="loaderversion"></param>
+        /// <param name="name"></param>
+        public static string Move(Folder folder, string loaderversion, string name)
+        {
+            string folderpath = $"{folder.VersionDir}/{name}";
+            string folderpath_old = $"{folder.VersionDir}/{loaderversion}";
+            Directory.Move(folderpath_old, folderpath);
+            foreach (var entry in Directory.GetFileSystemEntries(folderpath))
+            {
+                string filename = Path.GetFileName(entry);
+                string newname = "";
+                string newpath;
+                if (!filename.StartsWith(loaderversion)) continue;
+                newname = filename.Replace(loaderversion, name);
+                newpath = $"{Path.GetDirectoryName(entry)}/{newname}";
+                if (newname.EndsWith('/')) Directory.Move(entry, newpath);
+                else File.Move(entry, newpath);
+            }
+            return folderpath;
         }
     }
 }

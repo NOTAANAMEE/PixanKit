@@ -53,10 +53,10 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// <param name="jData">The JSON data representing the player.</param>
         public MicrosoftPlayer(JObject jData):base(jData)
         {
-            _latestLoginTime = DateTime.Parse(jData["logintime"].ToString());
-            _skinURL = jData["skinurl"].ToString();
-            _capeURL = jData["capeurl"].ToString();
-            refreshtoken = jData["refreshtoken"].ToString();
+            _latestLoginTime = DateTime.Parse(jData["logintime"]?.ToString() ?? "");
+            _skinURL = jData["skinurl"]?.ToString() ?? "";
+            _capeURL = jData["capeurl"]?.ToString() ?? "";
+            refreshtoken = jData["refreshtoken"]?.ToString() ?? "";
             _type = PlayerType.microsoft;
             if (DateTime.Now - _latestLoginTime >= TimeSpan.FromDays(1))
             {

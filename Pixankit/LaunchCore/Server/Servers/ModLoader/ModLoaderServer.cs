@@ -14,30 +14,14 @@ namespace PixanKit.LaunchCore.Server.Servers.ModLoader
     /// </summary>
     public abstract class ModLoaderServer:ResourceServer
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="folder"></param>
-        /// <param name="loaderversion"></param>
-        /// <param name="name"></param>
-        public static string Move(Folder folder, string loaderversion, string name)
-        {
-            string folderpath = $"{folder.VersionDir}/{name}";
-            string folderpath_old = $"{folder.VersionDir}/{loaderversion}";
-            string jarpath = $"{folderpath}/{name}.jar";
-            string jarpath_old = $"{folderpath}/{loaderversion}.jar";
-            string jsonpath = $"{folderpath}/{name}.json";
-            string jsonpath_old = $"{folderpath}/{loaderversion}.json";
-            Directory.Move(folderpath_old, folderpath);
-            if (File.Exists(jarpath_old)) File.Move(jarpath_old, jarpath);
-            if (File.Exists(jsonpath_old)) File.Move(jsonpath_old, jsonpath);
-            return folderpath;
-        }
+        
 
         /// <summary>
         /// Current Server
         /// </summary>
-        public new ModLoaderMirror? Current { get => base.Current as ModLoaderMirror;
+        public new ModLoaderMirror Current 
+        { 
+            get => base.Current as ModLoaderMirror;
             set => base.Current = value;
         }
 

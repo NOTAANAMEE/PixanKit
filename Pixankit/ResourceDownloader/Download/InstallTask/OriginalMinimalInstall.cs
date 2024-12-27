@@ -19,17 +19,18 @@ namespace ResourceDownloader.Download.InstallTask
 {
     public class MinimalOriginalInstallTask : SequenceProgressTask
     {
+        readonly Folder Owner;
 
-        Folder Owner;
+        readonly string name;
 
-        string name;
+        readonly string version;
 
-        string version;
+        readonly string path;
 
-        string path;
+        readonly FuncProgressTask<int> FuncProgressTask = new();
 
-        FuncProgressTask<int> FuncProgressTask = new();
         FileDownloadTask jsondownload;
+
         FileDownloadTask jardownload;
 
         /// <summary>
@@ -60,19 +61,19 @@ namespace ResourceDownloader.Download.InstallTask
         /// <exception cref="Exception"></exception>
         public MinimalOriginalInstallTask(Folder folder, string name, string version, bool withjar):this(folder, name, version) 
         {
-            GameBase? inheritgame = null;
             if (!withjar) return;
-            if ((inheritgame = folder.FindVersion(version, GameType.Original)) != null) 
-            {
-                File.Copy(inheritgame.Path, $"{path}/{name}.jar"); return;
-            }
+            if (File.Exists(path + $"/{name}.jar")) return;
             Add(jardownload = new("", path + $"/{name}.jar"));
             jsondownload.OnFinish += Task1Finish;
         }
 
         private void Init()
         {
-            if (Directory.Exists(path)) throw new IOException($"Already Exists {path}");
+            if (File.Exists(path + $"/{name}.json"))
+            {
+                Task1Finish(new SequenceProgressTask());
+                return;
+            }
 
             Directory.CreateDirectory(path);
             Add(FuncProgressTask);
@@ -101,7 +102,7 @@ namespace ResourceDownloader.Download.InstallTask
             Console.WriteLine("Task 0 Finished");
             JObject mcjData = JObject.Parse(
                 File.ReadAllText(Localize.PathLocalize($"{path}/{name}.json")));
-            jardownload.SetURL(mcjData["downloads"]["client"]["url"].ToString());
+            jardownload?.SetURL(mcjData["downloads"]["client"]["url"].ToString());
         }
     }
 }

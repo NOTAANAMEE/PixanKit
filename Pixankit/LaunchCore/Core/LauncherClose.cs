@@ -37,7 +37,7 @@ namespace PixanKit.LaunchCore.Core
             return new JObject()
             {
                 { "children", folders},
-                { "target", TargetGame.Path }
+                { "target", TargetGame?.Path ?? "" }
             };
         }
 
@@ -64,7 +64,7 @@ namespace PixanKit.LaunchCore.Core
             return new JObject()
             {
                 { "children", players},
-                { "target", TargetPlayer.UID }
+                { "target", TargetPlayer?.UID ?? "" }
             };
         }
     }

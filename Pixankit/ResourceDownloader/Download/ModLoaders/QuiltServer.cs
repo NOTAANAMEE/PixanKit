@@ -25,7 +25,6 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         /// </summary>
         public QuiltServer() : base("quilt") 
         {
-
             Mirrors.Add(new OfficialQuiltMirror());
             UpdateIndex();
         }
@@ -37,6 +36,9 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         {
             HttpClient client = new();
 
+            /// <summary>
+            /// 
+            /// </summary>
             public OfficialQuiltMirror()
             {
                 BaseURL = "https://meta.quiltmc.org";
@@ -72,11 +74,11 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <inheritdoc/>
             public override async Task<string> GetURL(JObject modloaderinf, CancellationToken token)
             {
-                var response = await client.GetAsync("https://meta.quiltmc.org/v3/versions/loader", token);
-                if (token.IsCancellationRequested) return "";
+                string url = "https://meta.quiltmc.org/v3/versions/installer";
+                var response = await client.GetAsync(url, token);
                 var content = await response.Content.ReadAsStringAsync(token);
-                if (token.IsCancellationRequested) return "";
-                return JArray.Parse(content)[0]["url"].ToString();
+                JArray array = JArray.Parse(content);
+                return array[0]?["url"]?.ToString() ?? "";
             }
         }
     }

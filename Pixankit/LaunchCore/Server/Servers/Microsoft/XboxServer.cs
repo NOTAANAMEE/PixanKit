@@ -54,8 +54,8 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
             ret = await response.Content.ReadAsStringAsync();
             JObject jresponse = JObject.Parse(ret);
             return new 
-                (jresponse["Token"].ToString(), 
-                jresponse["DisplayClaims"]["xui"][0]["uhs"].ToString());
+                (jresponse["Token"]?.ToString() ?? "", 
+                jresponse["DisplayClaims"]?["xui"]?[0]?["uhs"]?.ToString() ?? "");
         }
 
         /// <summary>

@@ -54,7 +54,7 @@ namespace PixanKit.LaunchCore.Extention
                 jobj = JObject.Parse(File.ReadAllText(Localize.PathLocalize(jsonPath)));
 
 
-            if (jobj["mainClass"].ToString() != "net.minecraft.client.main.Main") return new ModLoaderGame(path, jobj);
+            if (jobj["mainClass"]?.ToString() != "net.minecraft.client.main.Main") return new ModLoaderGame(path, jobj);
             else return new OriginalGame(path, jobj);
         }
 
@@ -74,16 +74,13 @@ namespace PixanKit.LaunchCore.Extention
         /// <returns></returns>
         public static PlayerBase? DefaultPlayerInitor(JObject? jData) 
         {
-            switch (jData["type"].ToString())
+            if (jData == null) return null;
+            return (jData["type"]?.ToString()) switch
             {
-                case "offline":
-                    return new OfflinePlayer(jData);
-                case "microsoft":
-                    return new MicrosoftPlayer(jData);
-                case "yggdrasil":
-                default:
-                    return null;
-            }
+                "offline" => new OfflinePlayer(jData),
+                "microsoft" => new MicrosoftPlayer(jData),
+                _ => null,
+            };
         }
 
         /// <summary>
@@ -100,7 +97,7 @@ namespace PixanKit.LaunchCore.Extention
 
         }
 
-        private static void LoadExtention(string file)
+       /* private static void LoadExtention(string file)
         {
             Logger.Info($"Loading File {file}");
             Assembly assembly;
@@ -132,6 +129,6 @@ namespace PixanKit.LaunchCore.Extention
             }
             method.Invoke(null, null);
             Logger.Info($"{file} Loaded Successfully");
-        }
+        }*/
     }
 }

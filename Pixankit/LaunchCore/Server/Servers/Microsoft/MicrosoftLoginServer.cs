@@ -69,8 +69,8 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
             string responseContent = await response.Content.ReadAsStringAsync();
             JObject jresponse = JObject.Parse(responseContent);
             return new MSAuthorize(
-                jresponse["access_token"].ToString(), 
-                jresponse["refresh_token"].ToString());
+                jresponse["access_token"]?.ToString() ?? "", 
+                jresponse["refresh_token"]?.ToString() ?? "");
         }
 
         internal async Task<MSAuthorize> ReAuthorize(string code)
@@ -93,8 +93,8 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
             string responseContent = await response.Content.ReadAsStringAsync();
             JObject jresponse = JObject.Parse(responseContent);
             return new MSAuthorize(
-                jresponse["access_token"].ToString(), 
-                jresponse["refresh_token"].ToString());
+                jresponse["access_token"]?.ToString() ?? "", 
+                jresponse["refresh_token"]?.ToString() ?? "");
         }
 
         /// <summary>

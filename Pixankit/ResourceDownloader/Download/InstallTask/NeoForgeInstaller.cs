@@ -15,6 +15,7 @@ using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
 using ResourceDownloader.Download.InstallTask;
+using PixanKit.ResourceDownloader.PostProcess;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
@@ -23,7 +24,6 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// </summary>
     public class NeoForgeInstaller : SequenceProgressTask
     {
-        string MCVersion = "";
 
         Folder Owner;
 
@@ -77,8 +77,8 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             {
                 download.SetURL(url);
             };
-            if (Owner.FindGame(MCVersion) == null)
-                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, MCVersion, MCVersion));
+            if (Owner.FindGame(version) == null)
+                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, version, version));
             DownloadTask.Add(download);
             Add(DownloadTask);
         }
@@ -91,7 +91,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             ProgressTasks.Add(task);
             task.OnFinish += (a) =>
             {
-                ModLoaderServer.Move(Owner, "", Name);
+                GamePostProcess.Move(Owner, $"neoforge-{neoforgeversion["version"]}", Name);
             };
         }
 

@@ -47,7 +47,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
             var response = await Client.PostAsync("/authentication/login_with_xbox", content);
             ret = await response.Content.ReadAsStringAsync();
             JObject jresponse = JObject.Parse(ret);
-            return jresponse["access_token"].ToString();
+            return jresponse["access_token"]?.ToString() ?? "";
         }
 
         internal async Task<PlayerInf> GetPlayerInformation(string accessToken)
@@ -59,9 +59,9 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
 
             JObject jresponse = JObject.Parse(ret);
             if (jresponse.ContainsKey("error")) throw new InvalidOperationException("Player Does Not Have Minecraft");
-            return new PlayerInf(jresponse["id"].ToString(), 
-                jresponse["name"].ToString(), 
-                jresponse["skins"][0]["url"].ToString());
+            return new PlayerInf(jresponse["id"]?.ToString() ?? "", 
+                jresponse["name"]?.ToString() ?? "", 
+                jresponse["skins"]?[0]?["url"]?.ToString() ?? "");
         }
 
         /// <summary>

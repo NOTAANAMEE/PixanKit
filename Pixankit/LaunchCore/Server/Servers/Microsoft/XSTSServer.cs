@@ -51,8 +51,8 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
             var response = await Client.PostAsync("https://xsts.auth.xboxlive.com/xsts/authorize", content);
             ret = await response.Content.ReadAsStringAsync();
             JObject jresponse = JObject.Parse(ret);
-            return new XSTSVerification(jresponse["Token"].ToString(),
-                jresponse["DisplayClaims"]["xui"][0]["uhs"].ToString());
+            return new XSTSVerification(jresponse["Token"]?.ToString() ?? "",
+                jresponse["DisplayClaims"]?["xui"]?[0]?["uhs"]?.ToString() ?? "");
         }
 
         /// <summary>
