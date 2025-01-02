@@ -37,15 +37,11 @@ namespace PixanKit.LaunchCore.GameModule.Game
             arg = Localize.CPLocalize(arg);
             Logger.Info($"Arguments Generated. Targeted Game:{_path}");
             if (Settings == null) return arg;
-            switch ((Settings["argument"] ?? 1).ToString())
+            arg = (Settings["argument"] ?? 1).ToString() switch
             {
-                case "overall":
-                    arg = "${arguments} " + arg;
-                    break;
-                default:
-                    arg = (Settings["arguments"] ?? 1).ToString() + " " + arg;
-                    break;
-            }
+                "overall" => "${arguments} " + arg,
+                _ => (Settings["arguments"] ?? 1).ToString() + " " + arg,
+            };
             return arg;
         }
 
@@ -190,6 +186,9 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// GRetrieves the optional args with different rules. Add the args after the command 
         /// as all of them are game arguments
         /// </summary>
+        /// <remarks>
+        /// 
+        /// </remarks>
         /// <param name="jData">Matching conditions</param>
         /// <returns>The arguments. Add them after the command</returns>
         public string GetOptionalArgs(JObject jData)

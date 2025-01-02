@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <AssemblyName>ResourceDownloader</AssemblyName>
+    <RootNamespace>PixanKit.ResourceDownloader</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

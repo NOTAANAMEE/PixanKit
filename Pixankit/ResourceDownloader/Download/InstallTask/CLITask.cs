@@ -1,4 +1,5 @@
-﻿using PixanKit.ResourceDownloader.Tasks;
+﻿using PixanKit.LaunchCore.Log;
+using PixanKit.ResourceDownloader.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,7 +23,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         StreamReader Output { get => process.StandardOutput; }
 
         /// <summary>
-        /// Initor
+        /// Inits the instance with the file path and the arguments
         /// </summary>
         /// <param name="file">file path</param>
         /// <param name="args">arguments</param>
@@ -40,6 +41,12 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             };
         }
 
+        /// <summary>
+        /// Inits the instance with the file path, the arguments and the running dir
+        /// </summary>
+        /// <param name="file">the exact path of the file</param>
+        /// <param name="args">the arguments</param>
+        /// <param name="workingdirectory">the directory where the process is expected to run</param>
         public CLITask(string file, string args, string workingdirectory)
         {
             StartInfo = new ProcessStartInfo()
@@ -62,7 +69,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         {
             process.Start();
             while (!process.HasExited)
-                Console.WriteLine($"Process Output: {Output.ReadLine()}");
+                Logger.Info("PixanKit.ResourceDownloader", $"Porcess: {Output.ReadLine()}");
             await base.Running();
         }
 

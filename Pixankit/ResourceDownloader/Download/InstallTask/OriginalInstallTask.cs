@@ -91,7 +91,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void Task1Finish(ProgressTask task)
         {
-            Console.WriteLine("Task 0 Finished");
+            //Console.WriteLine("Task 0 Finished");
 
             JObject mcjData = JObject.Parse(
                 File.ReadAllText(Localize.PathLocalize($"{path}/{name}.json")));

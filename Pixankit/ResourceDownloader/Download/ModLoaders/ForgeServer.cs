@@ -17,6 +17,9 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// </summary>
     public class ForgeServer: ModLoaderServer
     {
+        /// <summary>
+        /// Initor. Do not touch it
+        /// </summary>
         [ModuleInitializer]
         public static void Init()
         {

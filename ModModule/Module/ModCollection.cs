@@ -7,17 +7,8 @@ using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Log;
 using PixanKit.ModModule.Mods;
 using PixanKit.LaunchCore.GameModule.Game;
+using PixanKit.LaunchCore.Exceptions;
 
-/*Redesign
- * process:
- * 1.GetList Of Mod Files
- * 2.Load Cache Of Mod Inf And JSON Data
- * 3.For Each Mod Do:
- *  i.Get SHA1
- *  ii.Contains SHA1? If No, Try Load ID From Mod Config
- *  iii.Contains ID? If No, Try Load Data From Mod Config->iv
- *  iv.Add Mod Cache
- */
 namespace PixanKit.ModModule.Module
 {
     /// <summary>
@@ -54,10 +45,12 @@ namespace PixanKit.ModModule.Module
         /// </param>
         public void SetCache(JObject jobj)
         {
-            foreach (var item in jobj["files"] as JObject ?? new JObject()) 
+            foreach (var item in jobj["files"] as JObject ?? []) 
             {
-                JObject value = item.Value is JObject data ? data : throw new();
-                string id = value["id"]?.ToString() ?? throw new();
+                JObject value = item.Value is JObject data ? data : 
+                    throw new InvalidOperationException("JToken not JObject");
+                string id = value["id"]?.ToString() ?? 
+                    throw new JSONKeyException(value, "id", "Fabric JSON Mod Document");
                 ModFileSHACache.Add(item.Key, value);
                 ModFileIDCache.Add(id, value.ToString());
                 if (Owner.Mods.TryGetValue(id, out ModInf? inf)) ModIDCache.Add(id, inf);

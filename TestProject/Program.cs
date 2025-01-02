@@ -34,11 +34,11 @@ namespace TestProject
             //tmp.Launch();
             //var jarr = ServerList.MinecraftVersionServer.GetVersions();
             //var jdata = ServerList.MinecraftVersionServer.GetLatestRelease(jarr);
-            var jarr = await ServerList.ModLoaderServers["optifine"].GetVersionsForMinecraft("1.21.4");
-            OptifineInstaller task = new(Launcher.Instance.Folders[0], "MyOptifine", "1.21.4", jarr.First as JObject);
-            task.Start();
+            //var jarr = await ServerList.ModLoaderServers["optifine"].GetVersionsForMinecraft("1.21.4");
+            //OptifineInstaller task = new(Launcher.Instance.Folders[0], "MyOptifine", "1.21.4", jarr.First as JObject);
+            //task.Start();
             //GetProgress(task);
-            await task.MainTask;
+            //await task.MainTask;
 
         }
 

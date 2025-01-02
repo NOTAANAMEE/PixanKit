@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
-using ResourceDownloader.Download.InstallTask;
+using PixanKit.ResourceDownloader.Download.InstallTask;
 using PixanKit.ResourceDownloader.PostProcess;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
@@ -37,11 +37,11 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         string url = "";
 
-        FuncProgressTask<int> InitProgressTask;
+        FuncProgressTask<int> InitProgressTask = new();
 
-        AsyncProgressTask DownloadTask;
+        AsyncProgressTask? DownloadTask;
 
-        CLITask CommandTask;
+        CLITask? CommandTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NeoForgeInstaller"/> class.
@@ -61,7 +61,6 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void Init()
         {
-            InitProgressTask = new();
             InitProgressTask.Function += InitTask;
             Add(InitProgressTask);
             AddDownloadTask();
@@ -85,11 +84,14 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void AddCommandTask()
         {
-            var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes);
-            CLITask task = new(java.JavaEXE, $"-jar \"{installerpath}\" --installClient " +
+            if (Launcher.Instance == null) 
+                throw new InvalidOperationException("Launcher hasn't inited yet");
+            var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes)??
+                throw new InvalidOperationException("No available java found");
+            CommandTask = new(java.JavaEXE, $"-jar \"{installerpath}\" --installClient " +
                 $"\"{Owner.Path}\"");
-            ProgressTasks.Add(task);
-            task.OnFinish += (a) =>
+            ProgressTasks.Add(CommandTask);
+            CommandTask.OnFinish += (a) =>
             {
                 GamePostProcess.Move(Owner, $"neoforge-{neoforgeversion["version"]}", Name);
             };

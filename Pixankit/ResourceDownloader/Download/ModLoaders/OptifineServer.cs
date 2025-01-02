@@ -15,6 +15,9 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// </summary>
     public class OptifineServer: ModLoaderServer
     {
+        /// <summary>
+        /// Initor. Dont touch it
+        /// </summary>
         [ModuleInitializer]
         public static void Init() 
         {
@@ -38,6 +41,9 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         {
             HttpClient client = new();
 
+            /// <summary>
+            /// 
+            /// </summary>
             public OfficialOptifineServer()
             {
                 BaseURL = "https://optifine.net";
@@ -127,7 +133,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <returns></returns>
             public override async Task<string> GetURL(JObject modloaderinf, CancellationToken token)
             {
-                var response = await client.GetAsync(modloaderinf["url"].ToString(), token);
+                var response = await client.GetAsync(modloaderinf["url"]?.ToString(), token);
                 if (token.IsCancellationRequested) return "";
                 var content = await response.Content.ReadAsStringAsync(token);
                 if (token.IsCancellationRequested) return "";

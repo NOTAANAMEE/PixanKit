@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Extention;
 using PixanKit.LaunchCore.GameModule.Game;
+using PixanKit.LaunchCore.Log;
 using PixanKit.LaunchCore.Server;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.ResourceDownloader.SystemInf;
@@ -72,8 +73,6 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             JObject jobj = JObject.Parse(File.ReadAllText(
                     Localize.PathLocalize(indexpath)
                     ));
-
-            var count = 0;
             foreach (var asset in jobj["objects"] ?? new JArray())
             {
                 try
@@ -81,12 +80,13 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                     string hash = asset.First?["hash"]?.ToString() ?? "";
                     string rpath = $"{hash[0..2]}/{hash}";
                     string path = $"{_game?.AssetsDir}/objects/{rpath}";
-                    Console.WriteLine(++count);
+                    //Console.WriteLine(++count);
                     if (File.Exists(Localize.PathLocalize(path))) continue;
                     urls.Add(ServerList.MinecraftAssetsServer.GetAssetsUrl(hash));
                     paths.Add(path);
                 }
-                catch(Exception ex) { Console.WriteLine(ex.Message); }
+                catch(Exception ex) 
+                { Logger.Warn("PixanKit.ResourceDownloader", ex.Message); }
 
             }
             task2?.Set([.. urls], [.. paths]);

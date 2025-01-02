@@ -11,8 +11,18 @@ namespace PixanKit.LaunchCore.Log
     /// </summary>
     public static class Logger
     {
+        static Logger()
+        {
+            Output = Console.Out;
+        }
+
         /// <summary>
-        /// Add A Info Data
+        /// The output of the logger. The logger will use this writer for log
+        /// </summary>
+        public static TextWriter Output;
+
+        /// <summary>
+        /// Add A Info Message
         /// </summary>
         /// <param name="from">The Package Name</param>
         /// <param name="message">The Message</param>
@@ -22,7 +32,7 @@ namespace PixanKit.LaunchCore.Log
         }
 
         /// <summary>
-        /// Add A Warn Data
+        /// Add A Warn Message
         /// </summary>
         /// <param name="from">The Package Name</param>
         /// <param name="message">The Message</param>
@@ -59,7 +69,7 @@ namespace PixanKit.LaunchCore.Log
         private static void Record(string from, string type, string message)
         {
             string log = $"[{DateTime.Now} {from}] [{type}] {message}";
-            Console.WriteLine(log);
+            Output.WriteLine(log);
         }
     }
 }

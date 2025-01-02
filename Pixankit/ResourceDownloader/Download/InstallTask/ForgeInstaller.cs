@@ -11,7 +11,7 @@ using PixanKit.ResourceDownloader.Download.ModLoaders;
 using PixanKit.ResourceDownloader.PostProcess;
 using PixanKit.ResourceDownloader.Tasks.FuncTask;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
-using ResourceDownloader.Download.InstallTask;
+using PixanKit.ResourceDownloader.Download.InstallTask;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -88,10 +88,10 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             if (Launcher.Instance == null) throw new Exception();
             var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes) ??
                 throw new Exception();
-            CLITask task = new(java.JavaEXE, $"-jar \"{installerpath}\" --installClient " +
+            CommandTask = new(java.JavaEXE, $"-jar \"{installerpath}\" --installClient " +
                 $"\"{Owner.Path}\"");
-            ProgressTasks.Add(task);
-            task.OnFinish += (a) =>
+            ProgressTasks.Add(CommandTask);
+            CommandTask.OnFinish += (a) =>
             {
                 GamePostProcess.Move(Owner, $"{version}-forge-{forgeversion["version"]}", Name);
             };

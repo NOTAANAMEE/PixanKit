@@ -36,11 +36,16 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <param name="jData"><inheritdoc/></param>
         public ModLoaderGame(string path, JObject jData):base(path, jData) { _gameType = GameType.Mod; }
 
+        /// <summary>
+        /// Inits the game instance with specific path
+        /// </summary>
+        /// <param name="path">the path of the folder which contains the jar file</param>
         public ModLoaderGame(string path) : base(path)
         {
             _gameType = GameType.Mod;
         }
 
+        /// <inheritdoc/>
         protected override void LoadJSON(JObject gameJdata)
         {
             base.LoadJSON(gameJdata);

@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <AssemblyName>PixanKit.ModModule</AssemblyName>
+    <RootNamespace>PixanKit.ModModule</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

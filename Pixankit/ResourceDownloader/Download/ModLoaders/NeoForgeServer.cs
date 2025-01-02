@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Log;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,9 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// </summary>
     public class NeoForgeServer: ModLoaderServer
     {
+        /// <summary>
+        /// Initor. Dont touch it
+        /// </summary>
         [ModuleInitializer]
         public static void Init()
         {
@@ -38,6 +42,9 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         {
             HttpClient client = new();
 
+            /// <summary>
+            /// Inits the instance of the official server.
+            /// </summary>
             public OfficialNeoforgeServer()
             {
                 BaseURL = "https://maven.neoforged.net";
@@ -53,9 +60,8 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 var content = await response.Content.ReadAsStringAsync(token);
                 if (token.IsCancellationRequested) return new();
                 var array = (JObject.Parse(content)["versions"] as JArray ??
-                    new JArray()).ToObject<List<string>>();//Parse The Content To List<string>
-                if (array == null)
-                    throw new Exception("Impossible exception");//This Exception Will Not Be Thrown
+                    []).ToObject<List<string>>()//Parse The Content To List<string>
+                    ?? throw new Exception("Impossible exception");//This Exception Will Not Be Thrown
                 if (token.IsCancellationRequested) return new();
 
                 return array;
@@ -68,9 +74,8 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                     "https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/forge");
                 var content = await response.Content.ReadAsStringAsync();
                 var arrayl = (JObject.Parse(content)["versions"] as JArray ??
-                    new JArray()).ToObject<List<string>>();//Parse The Content To List<string>
-
-                if (arrayl == null) throw new Exception("Impossible exception");
+                    []).ToObject<List<string>>()//Parse The Content To List<string>
+                    ?? throw new Exception("Impossible exception");
 
 
                 return arrayl;
@@ -99,7 +104,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 string beforebuild = array[current - 1];
                 string beforebuildmcver = beforebuild[..beforebuild.LastIndexOf('.')];
 
-                Console.WriteLine($"Checking: {currentbuildmcver}, Target: {mcpatch}");
+                Logger.Info("PixanKit.ResourceDownloader", $"Checking: {currentbuildmcver}, Target: {mcpatch}");
 
                 if (currentbuildmcver == mcpatch && beforebuildmcver != mcpatch)
                     return current;

@@ -92,7 +92,8 @@ namespace PixanKit.ModModule.Module
 
         private void AddGame(GameBase game)
         {
-            if (game.GameType == GameType.Mod) AddGame(game as ModLoaderGame ?? throw new());
+            if (game.GameType == GameType.Mod) 
+                AddGame(game as ModLoaderGame ?? throw new());
         }
 
         private void AddGame(ModLoaderGame game)

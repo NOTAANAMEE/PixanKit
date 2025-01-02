@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.GameModule.Exceptions;
 using PixanKit.LaunchCore.SystemInf;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Reflection;
-using PixanKit.LaunchCore.GameModule.Game;
 
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
@@ -27,6 +18,11 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         #region StaticFields
         static Dictionary<string, LibraryBase> libraries = new();
 
+        /// <summary>
+        /// Parses the library according to the JSON data
+        /// </summary>
+        /// <param name="jData">the JSON data of the object</param>
+        /// <param name="gamelibraries">The list of the library</param>
         public static void Parse(JObject jData, List<LibraryBase> gamelibraries)
         {
             if (!SystemSupport(jData)) return;

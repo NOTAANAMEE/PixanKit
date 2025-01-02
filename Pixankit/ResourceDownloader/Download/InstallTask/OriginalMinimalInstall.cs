@@ -14,9 +14,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using PixanKit.LaunchCore.Exceptions;
+using PixanKit.LaunchCore.GameModule.LibraryData;
 
-namespace ResourceDownloader.Download.InstallTask
+namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
+    /// <summary>
+    /// Represents the task that only install the JSON file and the jar file of Minecraft
+    /// </summary>
     public class MinimalOriginalInstallTask : SequenceProgressTask
     {
         readonly Folder Owner;
@@ -27,11 +32,11 @@ namespace ResourceDownloader.Download.InstallTask
 
         readonly string path;
 
-        readonly FuncProgressTask<int> FuncProgressTask = new();
+        readonly FuncProgressTask<int> InitTask = new();
 
-        FileDownloadTask jsondownload;
+        FileDownloadTask? jsondownload;
 
-        FileDownloadTask jardownload;
+        FileDownloadTask? jardownload;
 
         /// <summary>
         /// Initor
@@ -43,66 +48,55 @@ namespace ResourceDownloader.Download.InstallTask
         /// <exception cref="Exception"></exception>
         public MinimalOriginalInstallTask(Folder folder, string name, string version)
         {
-            this.Owner = folder;
+            Owner = folder;
             this.name = name;
             this.version = version;
             path = folder.VersionDir + '/' + name;
-            FuncProgressTask.Function += GetVersion;
+            InitTask.Function += GetVersion;
             Init();
-        }
-
-        /// <summary>
-        /// Initor
-        /// </summary>
-        /// <param name="folder">The Owner Of The Game</param>
-        /// <param name="name">The Name Of The Game</param>
-        /// <param name="version">The Version Of Minecraft</param>
-        /// <exception cref="ArgumentException"></exception>
-        /// <exception cref="Exception"></exception>
-        public MinimalOriginalInstallTask(Folder folder, string name, string version, bool withjar):this(folder, name, version) 
-        {
-            if (!withjar) return;
-            if (File.Exists(path + $"/{name}.jar")) return;
-            Add(jardownload = new("", path + $"/{name}.jar"));
-            jsondownload.OnFinish += Task1Finish;
         }
 
         private void Init()
         {
-            if (File.Exists(path + $"/{name}.json"))
-            {
-                Task1Finish(new SequenceProgressTask());
-                return;
-            }
+            if (Directory.Exists(path)) throw new IOException($"Already Exists {path}");
 
             Directory.CreateDirectory(path);
-            Add(FuncProgressTask);
+            Add(InitTask);
             Add(jsondownload = new FileDownloadTask("", path + $"/{name}.json"));
+
+            Add(jardownload = new FileDownloadTask("", path + $"/{name}.jar"));
+
+            jsondownload.OnFinish += Task1Finish;
         }
 
 
         private async Task<int> GetVersion(Action<double> report, CancellationToken token)
         {
-            var jarray = await ServerList.MinecraftVersionServer.GetVersionsAsync(token);
-            if (token.IsCancellationRequested) return 1;
-            foreach (var item in jarray)
+            JArray jArray;
+            try
             {
-                if (item["id"].ToString() == version)
+                jArray = await ServerList.MinecraftVersionServer.GetVersionsAsync(token);
+                foreach (var item in jArray)
                 {
-                    jsondownload.SetURL(item["url"].ToString());
-                    report?.Invoke(1);
-                    return 0;
+                    if (item["id"]?.ToString() == version)
+                    {
+                        jsondownload?.SetURL(item["url"]?.ToString() ??
+                            throw new JSONKeyException(item, "url", "impossible"));
+                        report?.Invoke(1);
+                        return 0;
+                    }
                 }
+                return 1;
             }
-            throw new Exception();
+            catch { return 1; }
         }
 
         private void Task1Finish(ProgressTask task)
         {
-            Console.WriteLine("Task 0 Finished");
             JObject mcjData = JObject.Parse(
                 File.ReadAllText(Localize.PathLocalize($"{path}/{name}.json")));
-            jardownload?.SetURL(mcjData["downloads"]["client"]["url"].ToString());
+            jardownload?.SetURL(mcjData["downloads"]?["client"]?["url"]?.ToString()??
+                throw new JSONKeyException(mcjData, "downloads/client/url", "Version JSON document"));
         }
     }
 }

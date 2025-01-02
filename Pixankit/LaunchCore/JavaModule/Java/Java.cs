@@ -56,7 +56,7 @@ namespace PixanKit.LaunchCore.JavaModule.Java
             get => BinaryFolder + "/javaw.exe"; 
         }
 
-        private string _javaFolder = "";
+        private readonly string _javaFolder = "";
 
         private ushort _version;
 

@@ -45,13 +45,9 @@ namespace PixanKit.LaunchCore.SystemInf
                 case Architecture.Arm64:
                     CPUArch = "arm64";
                     break;
-                /*case Architecture.LoongArch64://Just For Fun
                 default:
-                    Console.WriteLine("Fuck You");
-                    throw new Exception("Fuck You");*/
-                default:
-                    Logger.Warn("The Program And Minecraft Is Not Tested On Your CPU Arch, " +
-                        "You Might Lose Your Gaming Data");
+                    Logger.Warn("The Program And Minecraft might not be able to run on your PC" +
+                        ", The game might crash");
                     break;
             }
         }

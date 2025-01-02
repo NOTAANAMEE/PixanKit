@@ -7,6 +7,7 @@ using System.IO.Compression;
 using PixanKit.LaunchCore.SystemInf;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Log;
 
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
@@ -49,6 +50,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <summary>
         /// Extracts the files in the native library's JAR file to the specified directory.
         /// </summary>
+        /// <param name="librarypath">The library directory</param>
         /// <param name="nativesPath">The directory to extract files to.</param>
         public void Extract(string librarypath, string nativesPath)
         {
@@ -60,8 +62,8 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
 
                 if (!Judge(entry.FullName))
                     continue;
-                Console.WriteLine($"Decompressing {fullPath}");
-                if (fullPath.EndsWith("/"))
+                Logger.Info($"Decompressing {fullPath}");
+                if (fullPath.EndsWith('/'))
                 {
                     fullPath = Localize.PathLocalize(fullPath);
                     Directory.CreateDirectory(fullPath);
@@ -72,10 +74,10 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
                 if (!Directory.Exists(fullDir))
                     Directory.CreateDirectory(fullDir);
                 if (File.Exists(fullPath))
-                    Console.WriteLine($"{fullPath} Already exists, canceled");
+                    Logger.Info($"{fullPath} Already exists, canceled");
                 else
                     entry.ExtractToFile(fullPath);
-                Console.WriteLine($"Finish decompressing {fullPath}");
+                Logger.Info($"Finish decompressing {fullPath}");
             }
             fs.Close();
         }

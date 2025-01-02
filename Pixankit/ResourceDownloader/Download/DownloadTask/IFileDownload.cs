@@ -4,8 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ResourceDownloader.Download.DownloadTask
+namespace PixanKit.ResourceDownloader.Download.DownloadTask
 {
+    /// <summary>
+    /// The interface defines the methods that help track the progress of the downloading task
+    /// </summary>
     public interface IFileDownload
     {
         /// <summary>

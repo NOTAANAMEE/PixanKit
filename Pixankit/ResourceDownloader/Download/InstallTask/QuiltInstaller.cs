@@ -16,7 +16,6 @@ using System.Threading.Tasks;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
-using ResourceDownloader.Download.InstallTask;
 using PixanKit.ResourceDownloader.PostProcess;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
@@ -77,7 +76,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                 download.SetURL(url);
             };
             if (Owner.FindGame(version) == null)
-                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, version, version, true));
+                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, version, version));
             DownloadTask.Add(download);
             Add(DownloadTask);
         }

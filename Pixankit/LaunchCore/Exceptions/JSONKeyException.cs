@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LaunchCore.Exceptions
+namespace PixanKit.LaunchCore.Exceptions
 {
     /// <summary>
     /// Represents the exception that some keys might not contains in the JSON document

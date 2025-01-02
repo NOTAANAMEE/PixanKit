@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Log;
 using PixanKit.ResourceDownloader.Tasks.FuncTask;
-using ResourceDownloader.Download.DownloadTask;
+using PixanKit.ResourceDownloader.Download.DownloadTask;
 using System;
 using System.Collections.Generic;
 using System.Linq;
