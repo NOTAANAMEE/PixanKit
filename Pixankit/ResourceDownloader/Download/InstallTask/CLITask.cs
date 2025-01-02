@@ -22,7 +22,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         StreamReader Output { get => process.StandardOutput; }
 
         /// <summary>
-        /// Initor
+        /// Inits the instance with the file path and the arguments
         /// </summary>
         /// <param name="file">file path</param>
         /// <param name="args">arguments</param>
@@ -40,6 +40,12 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             };
         }
 
+        /// <summary>
+        /// Inits the instance with the file path, the arguments and the running dir
+        /// </summary>
+        /// <param name="file">the exact path of the file</param>
+        /// <param name="args">the arguments</param>
+        /// <param name="workingdirectory">the directory where the process is expected to run</param>
         public CLITask(string file, string args, string workingdirectory)
         {
             StartInfo = new ProcessStartInfo()

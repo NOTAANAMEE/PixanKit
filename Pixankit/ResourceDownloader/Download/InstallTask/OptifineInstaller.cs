@@ -19,9 +19,9 @@ using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
 using System.Runtime.CompilerServices;
-using ResourceDownloader.Download.InstallTask;
-using ResourceDownloader.Download.DownloadTask;
+using PixanKit.ResourceDownloader.Download.InstallTask;
 using PixanKit.ResourceDownloader.PostProcess;
+using PixanKit.LaunchCore.JavaModule.Java;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
@@ -36,22 +36,20 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         readonly string Name;
 
-        string installerpath { get => $"{Files.CacheDir}/Installer/optifine.jar"; }
+        static string installerpath { get => $"{Files.CacheDir}/Installer/optifine.jar"; }
 
         //The Java Program I made myself. It is just used to handle the optifine install task
-        string programpath { get => $"{Files.CacheDir}/Installer/optifineinstaller.jar"; }
+        static string programpath { get => $"{Files.CacheDir}/Installer/optifineinstaller.jar"; }
 
         string url = "";
 
-        string mcjarpath = "";
-
         readonly JObject OptifineVersion;
 
-        FuncProgressTask<int> InitProgressTask;
+        FuncProgressTask<int> InitProgressTask = new();
 
-        AsyncProgressTask DownloadTask;
+        AsyncProgressTask? DownloadTask;
 
-        CLITask CommandTask;
+        CLITask? CommandTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OptifineInstaller"/> class.
@@ -73,7 +71,6 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         private void Init(JObject optifineversion)
         {
             string file = Localize.PathLocalize($"{Files.CacheDir}/Installer/optifine.jar");
-            InitProgressTask = new();
             InitProgressTask.Function += GetURL;
             Add(InitProgressTask);
             AddDownloadTask();
@@ -90,7 +87,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             };
             if (Owner.FindGame(MCVersion) == null)
             {
-                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, MCVersion, MCVersion, true));
+                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, MCVersion, MCVersion));
             }
             DownloadTask.Add(download);
             Add(DownloadTask);
@@ -98,9 +95,13 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void AddCommandTask()
         {
-            var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes);
+            JavaRuntime? java;
+            if (Launcher.Instance == null) throw new InvalidOperationException("Init Launcher first");
+            java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes);
+            if (java == null) throw new Exception("No java found");
+            
             string dir =
-                $"{MCVersion}-{OptifineVersion["version"].ToString().Replace(" ", "_")}";
+                $"{MCVersion}-{(OptifineVersion["version"] ?? "").ToString().Replace(" ", "_")}";
 
             CommandTask = new(java.JavaEXE, "-cp " +
                 $"\"{installerpath}{Localize.LocalParser}{programpath}\" Program " +

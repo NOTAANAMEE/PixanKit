@@ -14,6 +14,9 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// </summary>
     public class QuiltServer: ModLoaderServer
     {
+        /// <summary>
+        /// Initor. Dont touch it
+        /// </summary>
         [ModuleInitializer]
         public static void Init()
         {
@@ -48,15 +51,12 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             public override async Task<bool> CheckBuild(string mcversion, CancellationToken token)
             {
                 var response = await client.GetAsync("https://meta.quiltmc.org/v3/versions/game", token);
-                if (token.IsCancellationRequested) return false;
                 var content = await response.Content.ReadAsStringAsync(token);
-                if (token.IsCancellationRequested) return false;
                 var array = JArray.Parse(content);
 
                 foreach (var item in array) 
                 {
-                    if (token.IsCancellationRequested) return false;
-                    if (mcversion == item["version"].ToString()) return true;
+                    if (mcversion == item["version"]?.ToString()) return true;
                 }
                 return false;
             }

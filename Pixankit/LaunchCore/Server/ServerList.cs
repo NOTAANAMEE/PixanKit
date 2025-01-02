@@ -45,9 +45,9 @@ namespace PixanKit.LaunchCore.Server
         public static MinecraftAssetsServer MinecraftAssetsServer = new();
 
         /// <summary>
-        /// Mod Loader Servers
+        /// The list of <see cref="ModLoaderServer"/>. The keys are the name of the mod loaders
         /// </summary>
-        public static Dictionary<string, ModLoaderServer> ModLoaderServers = new();
+        public static Dictionary<string, ModLoaderServer> ModLoaderServers = [];
     }
 
     

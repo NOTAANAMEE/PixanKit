@@ -32,9 +32,7 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         public GameBase? TargetGame { get; set; }
 
-        private List<Folder> _folders = new();
-
-        private bool nogame;//Judge whether there is a game. It will be changed automatically  
+        private List<Folder> _folders = [];
 
         /// <summary>
         /// Launch the game
@@ -42,7 +40,6 @@ namespace PixanKit.LaunchCore.Core
         /// <param name="game"></param>
         /// <returns></returns>
         /// <exception cref="NullReferenceException"></exception>
-        /// <exception cref="DependencyException"></exception>
         public ProcessResult Launch(GameBase game)
         {
             string cmd = InlineCommand(game);
@@ -63,7 +60,7 @@ namespace PixanKit.LaunchCore.Core
             game.Decompress().Wait();
             string runningdir = 
                 string.Concat(AppDomain.CurrentDomain.BaseDirectory, 
-                Localize.PathLocalize(Files.ConfigDir.Substring(2)));
+                Localize.PathLocalize(Files.ConfigDir[2..]));
 
             ProcessStartInfo info = new()
             {
@@ -272,6 +269,7 @@ namespace PixanKit.LaunchCore.Core
         private void UpdateTargetGame()
         {
             if (TargetGame is null) FirstGame();
+            else if (TargetGame.Owner is null) throw new Exception();
             else if (!_folders.Contains(TargetGame.Owner)) FirstGame();
             else if (TargetGame.Owner.Contains(TargetGame)) return;
             else if (TargetGame.Owner.Count > 0) TargetGame = TargetGame.Owner.First;

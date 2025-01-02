@@ -49,6 +49,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <summary>
         /// Extracts the files in the native library's JAR file to the specified directory.
         /// </summary>
+        /// <param name="librarypath">The library directory</param>
         /// <param name="nativesPath">The directory to extract files to.</param>
         public void Extract(string librarypath, string nativesPath)
         {

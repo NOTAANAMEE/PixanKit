@@ -8,6 +8,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using PixanKit;
+using PixanKit.LaunchCore.Exceptions;
 
 namespace PixanKit.ResourceDownloader.Download.ModLoaders
 {
@@ -20,6 +22,9 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// </remarks>
     public class FabricServer : ModLoaderServer
     {
+        /// <summary>
+        /// Initor. Do not touch it
+        /// </summary>
         [ModuleInitializer]
         public static void Init()
         {
@@ -99,11 +104,11 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
                 var response = await client.GetAsync("https://meta.fabricmc.net/v2/versions", token);
-                if (token.IsCancellationRequested) return new();
+                if (token.IsCancellationRequested) return [];
                 var content = await response.Content.ReadAsStringAsync(token);
-                if (token.IsCancellationRequested) return new();
+                if (token.IsCancellationRequested) return [];
                 JObject jobj = JObject.Parse(content);
-                return jobj["loader"] as JArray ?? new JArray();
+                return jobj["loader"] as JArray ?? [];
             }
 
             /// <summary>
@@ -125,7 +130,8 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 var content = await response.Content.ReadAsStringAsync(token);
                 if (token.IsCancellationRequested) return "";
                 JObject jobj = JObject.Parse(content);
-                string url = jobj["installer"][0]["url"].ToString();
+                string url = jobj["installer"]?[0]?["url"]?.ToString()??
+                    throw new JSONKeyException(jobj, "/installer/0/url", "loader version");
                 return Replace(url);
             }
         }

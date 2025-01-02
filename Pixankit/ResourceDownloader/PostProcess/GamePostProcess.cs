@@ -12,18 +12,28 @@ using PixanKit.LaunchCore.Json;
 
 namespace PixanKit.ResourceDownloader.PostProcess
 {
+    /// <summary>
+    /// This class helps to process the game after downloading
+    /// </summary>
+    /// <param name="folder">the folder which contains the game</param>
+    /// <param name="name">the expected name of the game</param>
+    /// <param name="version">the version of the game</param>
+    /// <param name="processJSON">whether process JSON document or not</param>
     public class GamePostProcess(Folder folder, string name, string version, bool processJSON)
     {
-        string name = name;
+        readonly string name = name;
 
-        string version = version;
+        readonly string version = version;
 
-        string versiondir = folder.VersionDir;
+        readonly string versiondir = folder.VersionDir;
 
-        bool processjson = processJSON;
+        readonly bool processjson = processJSON;
 
-        Folder owner = folder;
+        readonly Folder owner = folder;
 
+        /// <summary>
+        /// Start the process
+        /// </summary>
         public void Process()
         {
             ProcessGame();
@@ -49,17 +59,18 @@ namespace PixanKit.ResourceDownloader.PostProcess
             JObject merge = JSON.ReadFromFile($"{versiondir}/{name}/{name}.json");
 
             JSON.MergeJObject(target, merge);
-            JSON.SaveFromFile(name, target);
+            JSON.SaveFile(name, target);
 
             Directory.Delete($"{versiondir}/{version}");
         }
 
         /// <summary>
-        /// 
+        /// Move the version folder to the new name
         /// </summary>
-        /// <param name="folder"></param>
-        /// <param name="loaderversion"></param>
-        /// <param name="name"></param>
+        /// <param name="folder">the foler which contains the game</param>
+        /// <param name="loaderversion">the old name of the game</param>
+        /// <param name="name">the name of the game</param>
+        /// <returns>the new directory of the game</returns>
         public static string Move(Folder folder, string loaderversion, string name)
         {
             string folderpath = $"{folder.VersionDir}/{name}";

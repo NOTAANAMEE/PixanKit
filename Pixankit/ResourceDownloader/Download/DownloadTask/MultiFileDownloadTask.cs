@@ -1,7 +1,6 @@
 ﻿using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.ResourceDownloader.Tasks;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
-using ResourceDownloader.Download.DownloadTask;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,17 +34,18 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// </summary>
         protected int threadnum = 1;
 
+        List<FileDownloadTask> files = [];
+
         /// <inheritdoc/>
         public long Size 
         {
             get
             {
                 long ret = 0;
-                foreach (var thread in ProgressTasks)
-                    foreach(var task in (thread as MultiProgressTask).ProgressTasks)
-                    {
-                        ret += (task as FileDownloadTask).Size;
-                    }
+                foreach (var task in files)
+                {
+                    ret += task.Size;
+                }
                 return ret;
             } 
         }
@@ -56,11 +56,10 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             get
             {
                 long ret = 0;
-                foreach (var thread in ProgressTasks)
-                    foreach (var task in (thread as MultiProgressTask).ProgressTasks)
-                    {
-                        ret += (task as FileDownloadTask).DownloadedBytes;
-                    }
+                foreach (var task in files)
+                {
+                    ret += task .DownloadedBytes;
+                }
                 return ret;
             }
         }
@@ -77,11 +76,10 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             get
             {
                 int ret = 0;
-                foreach (var thread in ProgressTasks)
-                    foreach (var task in (thread as MultiProgressTask).ProgressTasks)
-                    {
-                        ret += (task as FileDownloadTask).DownloadedFiles;
-                    }
+                foreach (var task in files)
+                {
+                    ret += task.DownloadedFiles;
+                }
                 return ret;
             }
         }
@@ -141,25 +139,21 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         {
             int count = 0;
 
+            List<SequenceProgressTask> tasks = [];
+
             for (int i = 0; i < urls.Length; i++) 
             {
-                ProgressTask? task = null;
+                FileDownloadTask? task;
 
                 //If ProgressTasks Does Not Have So Many Tasks, Add A New Task
-                if (ProgressTasks.Count < count + 1) Add(new SequenceProgressTask());
-                try
-                {
-                    Console.WriteLine(i);
-                    task = new FileDownloadTask(urls[i], paths[i], 1);
-                }
-                catch (Exception e) { Console.WriteLine(e.Message); }
-
-                
-
-                (ProgressTasks[count] as SequenceProgressTask).Add(task);
+                if (ProgressTasks.Count < count + 1) tasks.Add(new SequenceProgressTask());
+                task = new FileDownloadTask(urls[i], paths[i], 1);
+                files.Add(task);
+                tasks[count].Add(task);
                 count++;
                 if (count == threadnum) count = 0;
             }
+            ProgressTasks = tasks.Cast<ProgressTask>().ToList();
         }
     }
 }

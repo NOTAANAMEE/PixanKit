@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using PixanKit.ResourceDownloader.SystemInf;
 using PixanKit.ResourceDownloader.Tasks;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
-using ResourceDownloader.Download.DownloadTask;
+using PixanKit.ResourceDownloader.Download.DownloadTask;
 
 namespace PixanKit.ResourceDownloader.Download.DownloadTask
 {
@@ -48,13 +48,13 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
 
         private string _url;
 
-        private string path;
+        private readonly string path;
 
-        private FileStream _stream;
+        private readonly FileStream _stream;
 
-        private object _filelock = new();
+        private readonly object _filelock = new();
 
-        private int threadnum = 1;
+        private readonly int threadnum = 1;
 
         private long size;
 
@@ -112,32 +112,32 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             HttpClient client = new();
             var request = new HttpRequestMessage(HttpMethod.Get, _url);
             var response = client.Send(request, HttpCompletionOption.ResponseHeadersRead);
-            long length = response.Content.Headers.ContentLength ?? 0;
+            size = response.Content.Headers.ContentLength ?? 0;
             int count = 0;
-
-            while (length > 0) 
+            List<SequenceProgressTask> tasks = [];
+            while (size > 0)
             {
                 ProgressTask task;
 
                 //If ProgressTasks Does Not Have So Many Tasks, Add A New Task
-                if (ProgressTasks.Count < count + 1) Add(new SequenceProgressTask());
+                if (ProgressTasks.Count < count + 1) tasks.Add(new SequenceProgressTask());
 
-                length -= FileChunkDownloadTask.ChunkSize;
+                size -= FileChunkDownloadTask.ChunkSize;
 
-                if (length < 0)
-                    task = new FileChunkDownloadTask(_url, 
-                        0, length + FileChunkDownloadTask.ChunkSize - 1);
-                else 
-                    task = new FileChunkDownloadTask(_url, 
-                        length);
+                if (size < 0)
+                    task = new FileChunkDownloadTask(_url,
+                        0, size + FileChunkDownloadTask.ChunkSize - 1);
+                else
+                    task = new FileChunkDownloadTask(_url,
+                        size);
 
-                (ProgressTasks[count] as SequenceProgressTask).
+                tasks[count].
                     Add(task);
                 task.OnFinish += ChunkReturn;
                 count++;
                 if (count == threadnum) count = 0;
             }
-
+            ProgressTasks = tasks.Cast<ProgressTask>().ToList();
             client.Dispose();
             request.Dispose();
             response.Dispose();

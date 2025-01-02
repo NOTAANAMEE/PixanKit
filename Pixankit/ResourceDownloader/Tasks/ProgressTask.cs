@@ -54,16 +54,34 @@ namespace PixanKit.ResourceDownloader.Tasks
         /// </summary>
         public ProgressStatus Status { get => _status; }
 
+        /// <summary>
+        /// The CancellationTokenSource used to signal task cancellation.
+        /// </summary>
         protected CancellationTokenSource CancellationToken = new();
 
+        /// <summary>
+        /// The TaskCompletionSource used to signal the completion of the task.
+        /// </summary>
         protected TaskCompletionSource TaskStopped = new();
 
+        /// <summary>
+        /// The progress of the current task.
+        /// </summary>
         protected double _progress;
 
+        /// <summary>
+        /// The subtasks of the current task.
+        /// </summary>
         protected List<Task> _tasks = new();
 
+        /// <summary>
+        /// The status of the current task.
+        /// </summary>
         protected ProgressStatus _status;
 
+        /// <summary>
+        /// Lock object for progress reporting.
+        /// </summary>
         protected object _progresslock = new();
 
         /// <summary>

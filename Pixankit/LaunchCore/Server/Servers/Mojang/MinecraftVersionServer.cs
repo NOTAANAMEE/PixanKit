@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -100,6 +101,28 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         }
 
         /// <summary>
+        /// Get the latest release minecraft from the server
+        /// This is a cancellable task
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns>The JSON data of the minecraft</returns>
+        public async Task<JObject?> GetLatestRelease(CancellationToken token)
+        {
+            return GetLatestRelease(await GetVersions(token));
+        }
+
+        /// <summary>
+        /// Get the latest snapshot minecraft from the server
+        /// This is a cancellable task
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns>The JSON data of the minecraft</returns>
+        public async Task<JObject?> GetLatestSnapshot(CancellationToken token)
+        {
+            return GetLatestSnapshot(await GetVersions(token));
+        }
+
+        /// <summary>
         /// Get the URL of Json for Specific Minecraft Version
         /// </summary>
         /// <param name="jObject">The JObject from the Array returned by GetVersions
@@ -107,7 +130,9 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <returns>The URL for Json</returns>
         public string GetJsonUrl(JObject jObject) 
         {
-            return Replace(jObject["downloads"]?["client"]?["url"]?.ToString() ?? ""); 
+            return Replace(jObject["url"]?.ToString() ?? 
+                throw new JSONKeyException(jObject, "url",
+                "Minecraft JSON Document")); 
         }
 
         /// <summary>
@@ -119,7 +144,9 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <exception cref="NotImplementedException"></exception>
         public string GetMinecraftJarUrl(JObject jObject)
         {
-            return Replace(jObject["downloads"]["client"]["url"].ToString());
+            return Replace(jObject["downloads"]?["client"]?["url"]?.ToString() ?? 
+                throw new JSONKeyException(jObject,"downloads/client/url", 
+                "Minecraft JSON Document"));
         }
 
         /// <summary>
@@ -129,7 +156,8 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <returns>The URL</returns>
         public string GetAssetsJsonUrl(JObject jObject)
         {
-            return Replace(jObject["assetIndex"]["url"].ToString());
+            return Replace(jObject["assetIndex"]?["url"]?.ToString()??
+                throw new JSONKeyException(jObject, "/assetIndex/url", "Version JSON document"));
         }
 
         /// <summary>

@@ -14,7 +14,7 @@ namespace PixanKit.ResourceDownloader.Tasks.MultiProgressTask
         /// <summary>
         /// Gets the list of progress tasks managed by this multi-progress task.
         /// </summary>
-        public List<ProgressTask> ProgressTasks = new();
+        public List<ProgressTask> ProgressTasks = [];
 
         /// <summary>
         /// Adds a progress task to the multi-progress task.
