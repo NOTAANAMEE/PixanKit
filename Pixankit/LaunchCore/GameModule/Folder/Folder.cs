@@ -21,38 +21,38 @@ namespace PixanKit.LaunchCore.GameModule
     /// </summary>
     public class Folder:IToJSON
     {
-        internal static List<Folder> Folders = new();
+        internal static List<Folder> Folders = [];
 
         /// <summary>
         /// The path of the folder. Like C:/Users/admin/AppData/Roaming/.minecraft
         /// </summary>
-        public string Path
+        public string FolderPath
         {
-            get => _path;
+            get => _folderpath;
         }
 
         /// <summary>
-        /// The path of the library folder. Path + "/libraries"
+        /// The path of the library folder. FolderPath + "/libraries"
         /// </summary>
-        public string LibraryDir
+        public string LibraryDirPath
         {
-            get => Path + "/libraries";
+            get => FolderPath + "/libraries";
         }
 
         /// <summary>
-        /// The path of the Assets folder. Path + "/assets"
+        /// The path of the Assets folder. FolderPath + "/assets"
         /// </summary>
-        public string AssetsDir
+        public string AssetsDirPath
         {
-            get => Path + "/assets";
+            get => FolderPath + "/assets";
         }
 
         /// <summary>
-        /// The path of the version folder. <c>Path</c> + "/versions"
+        /// The path of the version folder. <c>FolderPath</c> + "/versions"
         /// </summary>
-        public string VersionDir
+        public string VersionDirPath
         {
-            get => Path + "/versions";
+            get => FolderPath + "/versions";
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// </summary>
         public GameBase[] Games
         {
-            get => _games.ToArray();
+            get => [.. _games];
         }
 
         /// <summary>
@@ -101,9 +101,9 @@ namespace PixanKit.LaunchCore.GameModule
             get => _owner;
         }
 
-        private List<GameBase> _games = new();
+        private List<GameBase> _games = [];
 
-        private string _path = "";
+        private string _folderpath = "";
 
         private Launcher? _owner;
 
@@ -114,7 +114,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// <c>"C:\\Users\\Admin\\AppData\\Roaming\\.minecrafy"</c></param>
         public Folder(string path)
         {
-            _path = path;
+            _folderpath = path;
             AddSelf();
             InitGames();
         }
@@ -131,7 +131,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// }</c></param>
         public Folder(JObject jData) 
         {
-            _path = jData["path"]?.ToString() ?? throw new Exception("JSON parse Wrong");
+            _folderpath = jData["path"]?.ToString() ?? throw new Exception("JSON parse Wrong");
             Alias = jData["alias"]?.ToString() ?? "${defaultalias}";
             AddSelf();
             InitGames();
@@ -155,7 +155,7 @@ namespace PixanKit.LaunchCore.GameModule
         {
             foreach (var folder in Folders)
             {
-                if (path.StartsWith(folder.Path)) return folder;
+                if (path.StartsWith(folder.FolderPath)) return folder;
             }
             return null;
         }
@@ -164,7 +164,7 @@ namespace PixanKit.LaunchCore.GameModule
         {
             foreach (var folder in Folders) 
             {
-                if (folder.Path == _path)
+                if (folder.FolderPath == _folderpath)
                     return;
             }
             Folders.Add(this);
@@ -173,7 +173,7 @@ namespace PixanKit.LaunchCore.GameModule
         private void InitGames()
         {
             _games.Clear();
-            string[] dirs = Directory.GetDirectories(Localize.PathLocalize(VersionDir));
+            string[] dirs = Directory.GetDirectories(Localize.PathLocalize(VersionDirPath));
             foreach (string dir in dirs) 
             {
                 GameBase game;
@@ -192,11 +192,11 @@ namespace PixanKit.LaunchCore.GameModule
                 {
                     _games.Add(game);
                     game.SetOwner(this);
-                    Logger.Info($"Folder {Path} Add Game {game.Path}");
+                    Logger.Info($"Folder {FolderPath} Add Game {game.GameJarFilePath}");
                     Launcher.GameLoad?.Invoke(game);
                 }
             }
-            Logger.Info($"Folder {Path} Added");
+            Logger.Info($"Folder {FolderPath} Added");
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// Find The Specific Version And Type Of A Game In The Folder
         /// </summary>
         /// <param name="version">The Version. Like <c>"1.14"</c></param>
-        /// <param name="type">Type Of The Game. Like <c>GameType.Original</c></param>
+        /// <param name="type">Type Of The Game. Like <c>GameType.Vanilla</c></param>
         /// <returns>Return The GameBase If Exists</returns>
         public GameBase? FindVersion(string version, GameType type) 
         {
@@ -261,7 +261,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// </summary>
         public void Scan()
         {
-            string[] dirs = Directory.GetDirectories(Localize.PathLocalize(VersionDir));
+            string[] dirs = Directory.GetDirectories(Localize.PathLocalize(VersionDirPath));
             foreach (string dir in dirs)
             {
                 foreach (GameBase game in _games) if (game.Name == dir) continue;
@@ -290,7 +290,7 @@ namespace PixanKit.LaunchCore.GameModule
         {
             return new JObject()
             {
-                { "path" , _path },
+                { "path" , _folderpath },
                 { "alias" , Alias },
 
             };
@@ -307,7 +307,7 @@ namespace PixanKit.LaunchCore.GameModule
         internal void InternalRemoveGame(GameBase game)
         {
             _games.Remove(game);
-            Directory.Delete(game.GameFolder);
+            Directory.Delete(game.GameFolderPath);
             Launcher.GameRemove?.Invoke(game);
         }
     }

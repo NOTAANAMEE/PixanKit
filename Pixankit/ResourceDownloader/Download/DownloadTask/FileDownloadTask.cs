@@ -48,7 +48,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
 
         private string _url;
 
-        private readonly string path;
+        private readonly string savePath;
 
         private readonly FileStream _stream;
 
@@ -78,10 +78,10 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         {
             this.threadnum = threadnum;
             _url = url;
-            this.path = path;
+            this.savePath = path;
             Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "./");
             _stream = new FileStream(path, FileMode.Create);
-            OnCancel += ChunkReturn;
+            OnCancel += CancelRun;
             OnFinish += (a) =>
             {
                 _stream.Close();
@@ -162,7 +162,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         private void CancelRun(ProgressTask t)
         {
             _stream.Close();
-            File.Delete(path);
+            File.Delete(savePath);
         }
     }
 }

@@ -77,7 +77,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                 download.SetURL(url);
             };
             if (Owner.FindGame(version) == null)
-                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, version, version));
+                DownloadTask.Add(new VanillaMinimalInstallTask(Owner, version, version));
             DownloadTask.Add(download);
             Add(DownloadTask);
         }
@@ -89,7 +89,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes)??
                 throw new InvalidOperationException("No available java found");
             CommandTask = new(java.JavaEXE, $"-jar \"{installerpath}\" --installClient " +
-                $"\"{Owner.Path}\"");
+                $"\"{Owner.FolderPath}\"");
             ProgressTasks.Add(CommandTask);
             CommandTask.OnFinish += (a) =>
             {

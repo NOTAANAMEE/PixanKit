@@ -24,7 +24,7 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         public Folder[] Folders
         {
-            get => _folders.ToArray();
+            get => [.. _folders];
         }
 
         /// <summary>
@@ -92,9 +92,9 @@ namespace PixanKit.LaunchCore.Core
             Dictionary<long, string> files;
             try
             {
-                files = GetTimestampAndFilePath(game.CrashReportDir);
+                files = GetTimestampAndFilePath(game.CrashReportDirPath);
             }
-            catch { files = new Dictionary<long, string>(); }
+            catch {  }
             return new ProcessResult()
             {
                 ReturnCode = p.ExitCode,
@@ -123,7 +123,7 @@ namespace PixanKit.LaunchCore.Core
 
             cmd = PlayerInLine(cmd);
             cmd = Localize.PathLocalize(cmd);
-            string pth = game.Path[game.Path.LastIndexOf(".minecraft/versions/")..];
+            string pth = Path.GetDirectoryName(game.GameRootFolderPath) ?? "./";
             cmd = $"-Xmx{Initors.GetMemory()}m " + cmd;
             cmd = cmd.Replace("${launcher_name}", LauncherName);
             cmd = cmd.Replace("${launcher_version}", VersionName);
@@ -161,13 +161,13 @@ namespace PixanKit.LaunchCore.Core
         {
             foreach(Folder f in _folders)
             {
-                if (f.Path == folder.Path) throw new InvalidOperationException("Folder has added before");
+                if (f.FolderPath == folder.FolderPath) throw new InvalidOperationException("Folder has added before");
             }
             _folders.Add(folder);
             folder.SetOwner(this);
             FolderAdd?.Invoke(folder);
             UpdateTargetGame();
-            Logger.Info($"Folder {folder.Path} Added");
+            Logger.Info($"Folder {folder.FolderPath} Added");
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace PixanKit.LaunchCore.Core
         {
             foreach(Folder folder in _folders)
             {
-                if (folder.Path == path) return folder;
+                if (folder.FolderPath == path) return folder;
             }
             return null;
         }
@@ -215,7 +215,7 @@ namespace PixanKit.LaunchCore.Core
         {
             foreach(Folder f in _folders)
             {
-                if (game.GameFolder.StartsWith(f.Path))
+                if (game.GameFolderPath.StartsWith(f.FolderPath))
                 {
                     f.InternalAddGame(game);
                     GameAdd?.Invoke(game);

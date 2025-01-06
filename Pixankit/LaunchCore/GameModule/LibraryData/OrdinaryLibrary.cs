@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
     /// <summary>
-    /// Represents an original library in the Minecraft environment.
+    /// Represents an Vanilla library in the Minecraft environment.
     /// </summary>
     public class OriginalLibrary : LibraryBase
     {
@@ -22,7 +22,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <param name="libraryJData">The JSON data representing the library.</param>
         public OriginalLibrary(string folder, JToken libraryJData) : base(libraryJData, folder)
         {
-            libraryType = LibraryType.Original;
+            libraryType = LibraryType.Vanilla;
             _url = libraryJData["downloads"]?["artifact"]?["url"]?.ToString() ?? "";
             _sha1 = libraryJData["downloads"]?["artifact"]?["sha1"]?.ToString() ?? "";
         }
@@ -38,7 +38,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// </summary>
         protected OriginalLibrary() : base()
         {
-            libraryType = LibraryType.Original;
+            libraryType = LibraryType.Vanilla;
         }
     }
 }

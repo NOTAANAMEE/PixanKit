@@ -76,7 +76,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                 download.SetURL(url);
             };
             if (Owner.FindGame(version) == null)
-                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, version, version));
+                DownloadTask.Add(new VanillaMinimalInstallTask(Owner, version, version));
             DownloadTask.Add(download);
             Add(DownloadTask);
         }
@@ -85,7 +85,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         {
             var java = JavaChooser.Newest(Launcher.Instance?.JavaRuntimes ?? []) ?? 
                 throw new Exception("No Java");
-            string workingdir = Owner.Path.Remove(Owner.Path.LastIndexOf('/'));
+            string workingdir = Path.GetDirectoryName(Owner.FolderPath) ?? "./";
             CommandTask = new(java.JavaEXE, $"-jar \"{Path.GetFullPath(installerpath)}\" " +
                 $"install client " +
                 $"{version} {quiltversion["version"]} \"--install-dir=./.minecraft\"", workingdir);

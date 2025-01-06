@@ -19,12 +19,12 @@ namespace PixanKit.ModModule.Module
     /// </remarks>
     /// <param name="game">The game instance associated with the mod loader.</param>
     /// <param name="owner">The owner module managing this mod collection.</param>
-    public class ModCollection(ModLoaderGame game, ModModule owner)
+    public class ModCollection(ModdedGame game, ModModule owner)
     {
         /// <summary>
         /// The game associated with this mod collection.
         /// </summary>
-        public ModLoaderGame Game = game;
+        public ModdedGame Game = game;
 
         /// <summary>
         /// The owner module of this mod collection.

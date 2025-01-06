@@ -22,7 +22,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// <summary>
     /// Represents the task that only install the JSON file and the jar file of Minecraft
     /// </summary>
-    public class MinimalOriginalInstallTask : SequenceProgressTask
+    public class VanillaMinimalInstallTask : SequenceProgressTask
     {
         readonly Folder Owner;
 
@@ -46,12 +46,12 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// <param name="version">The Version Of Minecraft</param>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="Exception"></exception>
-        public MinimalOriginalInstallTask(Folder folder, string name, string version)
+        public VanillaMinimalInstallTask(Folder folder, string name, string version)
         {
             Owner = folder;
             this.name = name;
             this.version = version;
-            path = folder.VersionDir + '/' + name;
+            path = Path.Combine(folder.VersionDirPath, name);
             InitTask.Function += GetVersion;
             Init();
         }

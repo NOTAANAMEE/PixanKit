@@ -101,7 +101,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <remarks>
         /// This is derived from the folder name containing the game files.
         /// </remarks>
-        public string Name { get => System.IO.Path.GetFileName(_path) ?? ""; }
+        public string Name { get => Path.GetFileName(_gameFolderPath) ?? ""; }
 
         /// <summary>
         /// Gets or sets the description of the Minecraft game.
@@ -118,7 +118,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <summary>
         /// Gets the folder where the main game files (e.g., game.jar) are located.
         /// </summary>
-        public string GameFolder { get =>_path; }
+        public string GameFolderPath { get => _gameFolderPath; }
 
         /// <summary>
         /// Gets the owner folder of the Minecraft game.
@@ -132,9 +132,9 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// Gets the full path to the game JAR file.
         /// </summary>
         /// <remarks>
-        /// Combines the <see cref="GameFolder"/> and the <see cref="Name"/> to locate the JAR file.
+        /// Combines the <see cref="GameFolderPath"/> and the <see cref="Name"/> to locate the JAR file.
         /// </remarks>
-        public string Path { get => _path + $"/{Name}.jar"; }
+        public string GameJarFilePath { get => _gameFolderPath + $"/{Name}.jar"; }
 
         /// <summary>
         /// Gets the full path to the game's JSON configuration file.
@@ -142,7 +142,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <remarks>
         /// This file stores metadata about the game instance.
         /// </remarks>
-        public string JsonPath { get => _path + $"/{Name}.json"; }
+        public string GameJsonFilePath { get => _gameFolderPath + $"/{Name}.json"; }
 
         /// <summary>
         /// Gets or sets the folder used to store world data, mods, and other runtime files.
@@ -150,7 +150,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <remarks>
         /// Also known as the "game directory".
         /// </remarks>
-        public string RunningDir
+        public string GameRunningDirPath
         {
             get => GetRunningFolder();
             set => Settings["runningfolder"] = value;
@@ -162,9 +162,10 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <remarks>
         /// Defaults to the global libraries folder if no specific owner folder is defined.
         /// </remarks>
-        public string LibraryDir
+        public string LibrariesDirPath
         {
-            get => (folder == null)? RootDir + "/libraries":folder.LibraryDir;
+            get => (folder == null)? GameRootFolderPath + 
+                "/libraries":folder.LibraryDirPath;
         }
 
         /// <summary>
@@ -173,10 +174,10 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <remarks>
         /// Defaults to the global assets folder derived from the Minecraft directory structure.
         /// </remarks>
-        public string AssetsDir 
+        public string AssetsDirPath 
         { 
-            get => (folder == null)? _path.Remove(_path.LastIndexOf("/versions/")) + "/assets"
-                :folder.AssetsDir; 
+            get => (folder == null)? _gameFolderPath.Remove(_gameFolderPath.LastIndexOf("/versions/")) + "/assets"
+                :folder.AssetsDirPath; 
         }
 
         /// <summary>
@@ -185,8 +186,9 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <remarks>
         /// This is the base directory containing all versions and global assets.
         /// </remarks>
-        public string RootDir{ get => 
-        (folder == null)? _path.Remove(_path.LastIndexOf("/versions/")):folder.Path; }
+        public string GameRootFolderPath{ get => 
+        (folder == null)? _gameFolderPath.Remove(_gameFolderPath.LastIndexOf("/versions/")):
+                folder.FolderPath; }
 
         /// <summary>
         /// Gets the Minecraft version for this game instance.
@@ -199,7 +201,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <remarks>
         /// These binaries are required for platform-specific functionality.
         /// </remarks>
-        public string NativeDir { get => _path + $"/{Name}-natives"; }
+        public string NativeDirPath { get => _gameFolderPath + $"/{Name}-natives"; }
 
         /// <summary>
         /// Gets the path to the settings configuration file.
@@ -207,7 +209,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <remarks>
         /// The settings file contains user and game-specific configurations.
         /// </remarks>
-        public string SettingsPath { get => _path + Files.SettingsPath; }
+        public string SettingsPath { get => _gameFolderPath + Files.SettingsPath; }
 
         /// <summary>
         /// Gets the folder where crash reports are stored.
@@ -215,7 +217,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <remarks>
         /// Crash reports are saved as compressed tar.gz files in this directory.
         /// </remarks>
-        public string CrashReportDir { get => RunningDir + "/crash-reports"; }
+        public string CrashReportDirPath { get => GameRunningDirPath + "/crash-reports"; }
 
         /// <summary>
         /// Gets the type of the game instance.
@@ -259,7 +261,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <summary>
         /// Represents the path of the directory which contains the game jar file 
         /// </summary>
-        protected string _path = "";
+        protected string _gameFolderPath = "";
 
         /// <summary>
         /// Represents the version name of the game
@@ -358,12 +360,12 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </remarks>
         protected GameBase(string path, bool initFromFile) 
         {
-            _path = path;
+            _gameFolderPath = path;
             if (initFromFile)
             {
                 gameJSONData = ReadJObj($"{path}/{Name}.json");
             }
-            Logger.Info($"Game Base Added. Path:{_path}");
+            Logger.Info($"Game Base Added. Path:{_gameFolderPath}");
         }
 
         /// <summary>
@@ -400,7 +402,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <param name="owner">folder. Should be the actual folder that it is in</param>
         public virtual void SetOwner(Folder owner)
         {
-            if (_path.StartsWith(owner.Path))
+            if (_gameFolderPath.StartsWith(owner.FolderPath))
             folder = owner;
         }
 
@@ -540,7 +542,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </remarks>
         protected List<LibraryBase> SameVersionLibraries()
         {
-            var target = Owner?.FindVersion(_version, GameType.Original);
+            var target = Owner?.FindVersion(_version, GameType.Vanilla);
             if (target == null)
             {
                 Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
@@ -581,14 +583,14 @@ namespace PixanKit.LaunchCore.GameModule.Game
             FileStream fs;
             StreamWriter sw;
             string settingpath = Localize.PathLocalize(SettingsPath);
-            Logger.Info($"{Path} Closing");
-            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(settingpath)?? "");
+            Logger.Info($"{GameJarFilePath} Closing");
+            Directory.CreateDirectory(Path.GetDirectoryName(settingpath)?? "");
             fs = new(settingpath, FileMode.Create);
             sw = new(fs);
             if (Settings != null) sw.Write(Settings.ToString());
             sw.Close();
             fs.Close();
-            Logger.Info($"{Path} Closed. File Saved");
+            Logger.Info($"{GameJarFilePath} Closed. File Saved");
         }
     }
 
@@ -596,21 +598,21 @@ namespace PixanKit.LaunchCore.GameModule.Game
     /// Different types of Minecraft
     /// Mod:ModLoader like Fabric, Quilt, Liteloader, Forge and NeoForge
     /// Optifine:Only With Optifine
-    /// Original:No modloader or Optifine.
+    /// Vanilla:No modloader or Optifine.
     /// </summary>
     public enum GameType
     {
         /// <summary>
-        /// Original Game
+        /// Vanilla Game
         /// </summary>
-        Original,
+        Vanilla,
         /// <summary>
-        /// Optifine Game
+        /// Customized Game. Usually optifine
         /// </summary>
-        Optifine,
+        Customized,
         /// <summary>
         /// Mod Game
         /// </summary>
-        Mod
+        Modded
     }
 }

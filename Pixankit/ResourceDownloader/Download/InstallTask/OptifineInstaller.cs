@@ -87,7 +87,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             };
             if (Owner.FindGame(MCVersion) == null)
             {
-                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, MCVersion, MCVersion));
+                DownloadTask.Add(new VanillaMinimalInstallTask(Owner, MCVersion, MCVersion));
             }
             DownloadTask.Add(download);
             Add(DownloadTask);
@@ -105,7 +105,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
             CommandTask = new(java.JavaEXE, "-cp " +
                 $"\"{installerpath}{Localize.LocalParser}{programpath}\" Program " +
-                $"\"{Owner.Path}\"");
+                $"\"{Owner.FolderPath}\"");
             CommandTask.OnFinish += (a) =>
             {
                 GamePostProcess.Move(Owner, dir, Name);

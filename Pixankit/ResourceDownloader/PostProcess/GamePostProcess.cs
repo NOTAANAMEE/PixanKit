@@ -25,7 +25,7 @@ namespace PixanKit.ResourceDownloader.PostProcess
 
         readonly string version = version;
 
-        readonly string versiondir = folder.VersionDir;
+        readonly string versiondir = folder.VersionDirPath;
 
         readonly bool processjson = processJSON;
 
@@ -45,7 +45,7 @@ namespace PixanKit.ResourceDownloader.PostProcess
             File.Copy($"{versiondir}/{version}/{version}.jar",
                 $"{versiondir}/{name}/{name}.jar");
             if (owner.FindGame(version) != null) return;
-            if (owner.FindVersion(version, GameType.Original) != null)
+            if (owner.FindVersion(version, GameType.Vanilla) != null)
             {
                 Directory.Delete($"{versiondir}/{version}");
                 return;
@@ -73,8 +73,8 @@ namespace PixanKit.ResourceDownloader.PostProcess
         /// <returns>the new directory of the game</returns>
         public static string Move(Folder folder, string loaderversion, string name)
         {
-            string folderpath = $"{folder.VersionDir}/{name}";
-            string folderpath_old = $"{folder.VersionDir}/{loaderversion}";
+            string folderpath = $"{folder.VersionDirPath}/{name}";
+            string folderpath_old = $"{folder.VersionDirPath}/{loaderversion}";
             Directory.Move(folderpath_old, folderpath);
             foreach (var entry in Directory.GetFileSystemEntries(folderpath))
             {

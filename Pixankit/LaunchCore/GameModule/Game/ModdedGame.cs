@@ -14,14 +14,14 @@ namespace PixanKit.LaunchCore.GameModule.Game
     /// <summary>
     /// Minecraft Game With Mod Loader
     /// </summary>
-    public class ModLoaderGame : ModifiedGame
+    public class ModdedGame: CustomizedGame
     {
         /// <summary>
         /// The Mod path. For instance: C:\Users\Admin\AppData\.minecraft\versions\1.12.2-Forge\mods
         /// </summary>
         public string ModDir
         {
-            get => _path + "/mods";
+            get => _gameFolderPath + "/mods";
         }
 
         /// <summary>
@@ -34,15 +34,18 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </summary>
         /// <param name="path"><inheritdoc/></param>
         /// <param name="jData"><inheritdoc/></param>
-        public ModLoaderGame(string path, JObject jData):base(path, jData) { _gameType = GameType.Mod; }
+        public ModdedGame(string path, JObject jData):base(path, jData) 
+        { 
+            _gameType = GameType.Modded; 
+        }
 
         /// <summary>
         /// Inits the game instance with specific path
         /// </summary>
         /// <param name="path">the path of the folder which contains the jar file</param>
-        public ModLoaderGame(string path) : base(path)
+        public ModdedGame(string path) : base(path)
         {
-            _gameType = GameType.Mod;
+            _gameType = GameType.Modded;
         }
 
         /// <inheritdoc/>
