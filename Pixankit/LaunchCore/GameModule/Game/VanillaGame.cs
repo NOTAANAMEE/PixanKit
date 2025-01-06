@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 namespace PixanKit.LaunchCore.GameModule.Game
 {
     /// <summary>
-    /// Represents the original Minecraft game without Optifine or mod loaders.
+    /// Represents the Vanilla Minecraft game without Optifine or mod loaders.
     /// </summary>
     public class OriginalGame: GameBase
     {
@@ -20,7 +20,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <param name="jData">The JSON data containing game information.</param>
         public OriginalGame(string path, JObject jData): base(path, jData)
         {
-            _gameType = GameType.Original;
+            _gameType = GameType.Vanilla;
             assetsID = ((jData["assetIndex"] ?? new JObject())["id"]?? "").ToString();
             javaVersion = (short)(int)(jData["minimumLauncherVersion"]?? 0);
         }
@@ -31,7 +31,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <param name="path">The file path to the game directory.</param>
         public OriginalGame(string path) : base(path) 
         {
-            _gameType = GameType.Original;
+            _gameType = GameType.Vanilla;
             assetsID = ((gameJSONData["assetIndex"] ?? new JObject())["id"] ?? "").ToString();
             javaVersion = (short)(int)(gameJSONData["minimumLauncherVersion"] ?? 0);
         }

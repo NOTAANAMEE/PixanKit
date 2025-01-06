@@ -26,16 +26,16 @@ namespace PixanKit.LaunchCore.GameModule.Game
         public virtual string GetLaunchArgument()
         {
             string arg = GetJVMArguments() + $" {className} " + GetGameArguments();
-            arg = arg.Replace("${natives_directory}", $"\"{NativeDir}\"");
-            arg = arg.Replace("${game_directory}", $"\"{RunningDir}\"");
-            arg = arg.Replace("${assets_root}", $"\"{AssetsDir}\"");
+            arg = arg.Replace("${natives_directory}", $"\"{NativeDirPath}\"");
+            arg = arg.Replace("${game_directory}", $"\"{GameRunningDirPath}\"");
+            arg = arg.Replace("${assets_root}", $"\"{AssetsDirPath}\"");
             arg = arg.Replace("${assets_index_name}", GetAssetsID());
             arg = arg.Replace("${classpath}", "\"" + GetCPArgs() + "\"");
             arg = arg.Replace("${version_name}", Version);
             arg = arg.Replace("${version_type}", releaseType);
-            arg = arg.Replace("${library_directory}", LibraryDir);
+            arg = arg.Replace("${library_directory}", LibrariesDirPath);
             arg = Localize.CPLocalize(arg);
-            Logger.Info($"Arguments Generated. Targeted Game:{_path}");
+            Logger.Info($"Arguments Generated. Targeted Game:{_gameFolderPath}");
             if (Settings == null) return arg;
             arg = (Settings["argument"] ?? 1).ToString() switch
             {
@@ -72,7 +72,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
         protected string SameVersionGameArguments()
         {
-            var target = Owner?.FindVersion(_version, GameType.Original);
+            var target = Owner?.FindVersion(_version, GameType.Vanilla);
             if (target == null)
             {
                 Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
@@ -94,7 +94,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
         protected string SameVersionAssetsID()
         {
-            var target = Owner?.FindVersion(_version, GameType.Original);
+            var target = Owner?.FindVersion(_version, GameType.Vanilla);
             if (target == null)
             {
                 Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
@@ -119,7 +119,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             {
                 classpath += library.Path + Localize.LocalParser;
             }
-            classpath += Path;
+            classpath += GameJarFilePath;
             return classpath;
         }
 
@@ -130,7 +130,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
         protected string SameVersionCPArgs()
         {
-            var target = Owner?.FindVersion(_version, GameType.Original);
+            var target = Owner?.FindVersion(_version, GameType.Vanilla);
             if (target == null)
             {
                 Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
@@ -153,7 +153,8 @@ namespace PixanKit.LaunchCore.GameModule.Game
                 if (library.LibraryType != LibraryType.Native) continue;
                 await Task.Run(
                     () => {
-                        (library as NativeLibrary ?? new NativeLibrary()).Extract(LibraryDir, NativeDir);
+                        (library as NativeLibrary ?? new NativeLibrary())
+                        .Extract(LibrariesDirPath, NativeDirPath);
                     }
                 );
             }
@@ -173,7 +174,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
                     Settings["runningfolder"] = JToken.FromObject("overall");
                     break;
                 case "self":
-                    ret = _path;
+                    ret = _gameFolderPath;
                     break;
                 default:
                     ret = runningfolder;

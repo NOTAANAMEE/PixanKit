@@ -54,7 +54,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// Initializes a new instance of the <see cref="OfficialFabricMirror"/> class.
             /// </summary>
             /// <remarks>
-            /// The base URL and original URL properties are initialized as empty by default.
+            /// The base URL and Vanilla URL properties are initialized as empty by default.
             /// </remarks>
             public OfficialFabricMirror()
             {

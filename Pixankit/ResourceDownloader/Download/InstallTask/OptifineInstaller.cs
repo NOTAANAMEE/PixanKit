@@ -14,11 +14,9 @@ using PixanKit.ResourceDownloader.SystemInf;
 using PixanKit.LaunchCore.Extention;
 using PixanKit.LaunchCore.Core;
 using PixanKit.LaunchCore.JavaModule;
-using System.IO.Compression;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
-using System.Runtime.CompilerServices;
 using PixanKit.ResourceDownloader.Download.InstallTask;
 using PixanKit.ResourceDownloader.PostProcess;
 using PixanKit.LaunchCore.JavaModule.Java;
@@ -30,7 +28,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// </summary>
     public class OptifineInstaller: SequenceProgressTask
     {
-        readonly string MCVersion = "";
+        readonly string version = "";
 
         readonly Folder Owner;
 
@@ -62,7 +60,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         {
             Name = name;
             Owner = folder;
-            MCVersion = mcversion;
+            version = mcversion;
             OptifineVersion = optifineversion;
             Init(optifineversion);
         }
@@ -85,9 +83,9 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             {
                 download.SetURL(url);
             };
-            if (Owner.FindGame(MCVersion) == null)
+            if (Owner.FindGame(version) == null)
             {
-                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, MCVersion, MCVersion));
+                DownloadTask.Add(new VanillaMinimalInstallTask(Owner, version, version));
             }
             DownloadTask.Add(download);
             Add(DownloadTask);
@@ -101,11 +99,11 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             if (java == null) throw new Exception("No java found");
             
             string dir =
-                $"{MCVersion}-{(OptifineVersion["version"] ?? "").ToString().Replace(" ", "_")}";
+                $"{version}-{(OptifineVersion["version"] ?? "").ToString().Replace(" ", "_")}";
 
             CommandTask = new(java.JavaEXE, "-cp " +
                 $"\"{installerpath}{Localize.LocalParser}{programpath}\" Program " +
-                $"\"{Owner.Path}\"");
+                $"\"{Owner.FolderPath}\"");
             CommandTask.OnFinish += (a) =>
             {
                 GamePostProcess.Move(Owner, dir, Name);

@@ -37,7 +37,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         string url = "";
 
-        FuncProgressTask<int> InitProgressTask = new();
+        FuncProgressTask<int> InitTask = new();
 
         AsyncProgressTask? DownloadTask;
 
@@ -61,8 +61,8 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void Init()
         {
-            InitProgressTask.Function += InitTask;
-            Add(InitProgressTask);
+            InitTask.Function += Init;
+            Add(InitTask);
             AddDownloadTask();
             AddCommandTask();
         }
@@ -72,12 +72,12 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         {
             DownloadTask = new();
             FileDownloadTask download = new("", installerpath);
-            InitProgressTask.OnFinish += (a) =>
+            InitTask.OnFinish += (a) =>
             {
                 download.SetURL(url);
             };
             if (Owner.FindGame(version) == null)
-                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, version, version));
+                DownloadTask.Add(new VanillaMinimalInstallTask(Owner, version, version));
             DownloadTask.Add(download);
             Add(DownloadTask);
         }
@@ -89,7 +89,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes)??
                 throw new InvalidOperationException("No available java found");
             CommandTask = new(java.JavaEXE, $"-jar \"{installerpath}\" --installClient " +
-                $"\"{Owner.Path}\"");
+                $"\"{Owner.FolderPath}\"");
             ProgressTasks.Add(CommandTask);
             CommandTask.OnFinish += (a) =>
             {
@@ -97,7 +97,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             };
         }
 
-        private async Task<int> InitTask(Action<double> progress, CancellationToken token)
+        private async Task<int> Init(Action<double> progress, CancellationToken token)
         {
             url = await ServerList.ModLoaderServers["neoforge"]
                     .GetURL(neoforgeversion, token);

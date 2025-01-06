@@ -9,7 +9,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
     /// </summary>
     /// <remarks>
     /// This abstract class defines the structure and behavior of various library types, 
-    /// such as original libraries, native libraries, and mod libraries. 
+    /// such as Vanilla libraries, native libraries, and mod libraries. 
     /// It includes functionality for initializing libraries from JSON data, 
     /// determining their type and compatibility, and managing their paths and URLs.
     /// </remarks>
@@ -30,7 +30,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
                 gamelibraries.Add(ret);
             switch (GetLibraryType(jData))
             {
-                case LibraryType.Original:
+                case LibraryType.Vanilla:
                     gamelibraries.Add(new OriginalLibrary(jData));
                     break;
                 case LibraryType.Native:
@@ -97,7 +97,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <summary>
         /// Type
         /// </summary>
-        protected LibraryType libraryType = LibraryType.Original;
+        protected LibraryType libraryType = LibraryType.Vanilla;
         #endregion
 
         #region Initors
@@ -181,7 +181,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         public static LibraryType GetLibraryType(JToken jData)
         {
             if (jData["natives"] != null) return LibraryType.Native;
-            if (jData["downloads"] != null) return LibraryType.Original;
+            if (jData["downloads"] != null) return LibraryType.Vanilla;
             return LibraryType.Mod;
         }
 
@@ -214,9 +214,9 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
     public enum LibraryType
     {
         /// <summary>
-        /// Original Library Type. Just Download
+        /// Vanilla Library Type. Just Download
         /// </summary>
-        Original,
+        Vanilla,
         /// <summary>
         /// Native Library Type. Need Extract
         /// </summary>

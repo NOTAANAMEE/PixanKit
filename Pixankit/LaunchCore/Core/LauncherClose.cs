@@ -37,7 +37,7 @@ namespace PixanKit.LaunchCore.Core
             return new JObject()
             {
                 { "children", folders},
-                { "target", TargetGame?.Path ?? "" }
+                { "target", TargetGame?.GameJarFilePath?? "" }
             };
         }
 

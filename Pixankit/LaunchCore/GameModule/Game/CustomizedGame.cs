@@ -14,7 +14,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
     /// <summary>
     /// Modified Game. Game With ModLoader/ Optifine
     /// </summary>
-    public class ModifiedGame: GameBase
+    public class CustomizedGame: GameBase
     {
         /// <summary>
         /// Whether It Is useBaseGeneration Created
@@ -26,18 +26,18 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </summary>
         /// <param name="path"></param>
         /// <param name="jData"></param>
-        public ModifiedGame(string path, JObject jData) : base(path, jData)
+        public CustomizedGame(string path, JObject jData) : base(path, jData)
         {
-            _gameType = GameType.Optifine;
+            _gameType = GameType.Customized;
         }
 
         /// <summary>
         /// Init A Modified Game With Its Path
         /// </summary>
         /// <param name="path"></param>
-        public ModifiedGame(string path):base(path, true)
+        public CustomizedGame(string path):base(path, true)
         {
-            _gameType = GameType.Optifine;
+            _gameType = GameType.Customized;
         }
 
         /// <inheritdoc/>

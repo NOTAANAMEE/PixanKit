@@ -46,7 +46,7 @@ namespace PixanKit.LaunchCore.Core
         /// Occurs before launching a game. Allows modification of the launch parameters.
         /// </summary>
         /// <remarks>
-        /// The first parameter is the game being launched, and the second is the original launch arguments.
+        /// The first parameter is the game being launched, and the second is the Vanilla launch arguments.
         /// The method should return the modified launch arguments.
         /// </remarks>
         public static Func<GameBase, string, string>? GamePreLaunch;

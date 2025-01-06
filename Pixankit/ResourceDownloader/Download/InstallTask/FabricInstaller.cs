@@ -42,7 +42,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         string url = "";
 
-        FuncProgressTask<int> InitProgressTask = new();
+        FuncProgressTask<int> InitTask = new();
 
         AsyncProgressTask? DownloadTask;
 
@@ -66,9 +66,8 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void Init()
         {
-            InitProgressTask.Function += InitTask;
-            //InitProgressTask.OnFinish += (a) => { Console.WriteLine("InitProgressTask Finish"); };
-            Add(InitProgressTask);
+            InitTask.Function += Init;
+            Add(InitTask);
             AddDownloadTask();
             AddCommandTask();
             fabricversioname = $"fabric-loader-{fabricversion["version"]}-{version}";
@@ -79,13 +78,13 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         {
             DownloadTask = new();
             FileDownloadTask download = new ("", installerpath);
-            InitProgressTask.OnFinish += (a) =>
+            InitTask.OnFinish += (a) =>
             {
                 download.SetURL(url);
             };
             DownloadTask.Add(download);
             if (Owner.FindGame(version) == null)
-                DownloadTask.Add(new MinimalOriginalInstallTask(Owner, version, version));
+                DownloadTask.Add(new VanillaMinimalInstallTask(Owner, version, version));
             Add(DownloadTask);
             //DownloadTask.OnFinish += (a) => { Console.WriteLine("DownloadTask Finish"); };
         }
@@ -97,8 +96,8 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes)??
                 throw new InvalidOperationException("No java found");
             CommandTask = new(java.JavaEXE, $"-jar \"{installerpath}\" client " +
-                $"-dir \"{Owner.Path}\" -mcversion {version} -loader {fabricversion["version"]} " +
-                $"\"{Owner.Path}\"");
+                $"-dir \"{Owner.FolderPath}\" -mcversion {version} -loader {fabricversion["version"]} " +
+                $"\"{Owner.FolderPath}\"");
             Add(CommandTask);
         }
 
@@ -107,7 +106,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             GamePostProcess.Move(Owner, fabricversioname, Name);
         }
 
-        private async Task<int> InitTask(Action<double> progress, CancellationToken token)
+        private async Task<int> Init(Action<double> progress, CancellationToken token)
         {
             url = await ServerList.ModLoaderServers["fabric"]
                     .GetURL(fabricversion, token);

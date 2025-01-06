@@ -54,7 +54,8 @@ namespace PixanKit.LaunchCore.Extention
                 jobj = JObject.Parse(File.ReadAllText(Localize.PathLocalize(jsonPath)));
 
 
-            if (jobj["mainClass"]?.ToString() != "net.minecraft.client.main.Main") return new ModLoaderGame(path, jobj);
+            if (jobj["mainClass"]?.ToString() != "net.minecraft.client.main.Main") 
+                return new ModdedGame(path, jobj);
             else return new OriginalGame(path, jobj);
         }
 

@@ -25,7 +25,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// <summary>
     /// 
     /// </summary>
-    public class OriginalInstallTask : SequenceProgressTask
+    public class VanillaInstallTask : SequenceProgressTask
     {
         /// <summary>
         /// The Return Game
@@ -64,11 +64,11 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// <param name="version">The Version Of Minecraft</param>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="Exception"></exception>
-        public OriginalInstallTask(Folder folder, string name, string version)
+        public VanillaInstallTask(Folder folder, string name, string version)
         {
             this.name = name;
             this.version = version;
-            path = folder.VersionDir + '/' + name;
+            path = Path.Combine(folder.VersionDirPath, name);
             InitTask.Function += GetVersion;
             Init();
         }

@@ -12,7 +12,7 @@ namespace PixanKit.LaunchCore.Server
     public class MirrorServer
     {
         /// <summary>
-        /// The original base url of the network assets
+        /// The Vanilla base url of the network assets
         /// </summary>
         protected string OriginalURL;
 
@@ -38,7 +38,7 @@ namespace PixanKit.LaunchCore.Server
         /// <summary>
         /// Replace The URL
         /// </summary>
-        /// <param name="url">The Original URL</param>
+        /// <param name="url">The Vanilla URL</param>
         /// <returns>The Replaced URL</returns>
         public virtual string Replace(string url)
         {

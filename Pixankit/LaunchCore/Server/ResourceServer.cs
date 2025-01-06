@@ -89,9 +89,9 @@ namespace PixanKit.LaunchCore.Server
         }
 
         /// <summary>
-        /// Replaces the original URL of a resource with the corresponding URL from the current mirror server.
+        /// Replaces the Vanilla URL of a resource with the corresponding URL from the current mirror server.
         /// </summary>
-        /// <param name="OriginalUrl">The original URL of the resource.</param>
+        /// <param name="OriginalUrl">The Vanilla URL of the resource.</param>
         /// <returns>The URL of the resource on the current mirror server.</returns>
         protected string Replace(string OriginalUrl)
         {

@@ -1,4 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Core;
+using PixanKit.LaunchCore.Extention;
+using PixanKit.LaunchCore.PlayerModule.Player;
 
 namespace TestProject
 {
@@ -6,6 +9,8 @@ namespace TestProject
     {
         static void Main(string[] args)
         {
+            Files.Generate();
+            
         }
 
         

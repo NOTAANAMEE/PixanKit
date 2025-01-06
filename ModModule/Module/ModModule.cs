@@ -74,14 +74,14 @@ namespace PixanKit.ModModule.Module
             {
                 foreach (var game in folder.Games)
                 {
-                    if (game.GameType != GameType.Mod) continue;
+                    if (game.GameType != GameType.Modded) continue;
                     var collection = AddGame(
-                        (game as ModLoaderGame) ?? throw new()
+                        (game as ModdedGame) ?? throw new()
                         , false);
                     tasks.Add(Task.Run(() =>
                     {
                         JObject? cache = [];
-                        if (gameCache.TryGetValue(game.Path, out cache))
+                        if (gameCache.TryGetValue(game.GameJarFilePath, out cache))
                             collection.SetCache(cache);
                         else collection.SetCache([]);
                     }));
@@ -92,30 +92,30 @@ namespace PixanKit.ModModule.Module
 
         private void AddGame(GameBase game)
         {
-            if (game.GameType == GameType.Mod) 
-                AddGame(game as ModLoaderGame ?? throw new());
+            if (game.GameType == GameType.Modded) 
+                AddGame(game as ModdedGame ?? throw new());
         }
 
-        private void AddGame(ModLoaderGame game)
+        private void AddGame(ModdedGame game)
         {
             AddGame(game, true);
         }
 
-        private ModCollection AddGame(ModLoaderGame game, bool init)
+        private ModCollection AddGame(ModdedGame game, bool init)
         {
             Logger.Info("PixanKit.ModModule", "Start Initing Games");
             ModCollection modcollection;
-            ModGames.Add(game.Path, modcollection = new ModCollection(game, this));
+            ModGames.Add(game.GameJarFilePath, modcollection = new ModCollection(game, this));
             if (!init) return modcollection;
-            if (gameCache.TryGetValue(game.Path, out JObject? cache)) 
+            if (gameCache.TryGetValue(game.GameJarFilePath, out JObject? cache)) 
                 modcollection.SetCache(cache);
             else modcollection.SetCache([]);
             return modcollection;
         }
 
-        private void RemoveGame(ModLoaderGame game) 
+        private void RemoveGame(ModdedGame game) 
         {
-            ModGames.Remove(game.Path);
+            ModGames.Remove(game.GameJarFilePath);
         }
 
         /// <summary>
