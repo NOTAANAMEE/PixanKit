@@ -13,14 +13,14 @@ namespace PixanKit.LaunchCore.SystemInf
         static Localize()
         {
             UserPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            if (SystemInformation.OSName == "windows") 
+            if (SysInfo.OSName == "windows") 
                 UserPath = UserPath[0..UserPath.LastIndexOf('\\')];
         }
 
         public static string PathLocalize(string path)
         {
-            if (SystemInformation.OSName == "windows") path = path.Replace("~", UserPath);
-            switch (SystemInformation.OSName)
+            if (SysInfo.OSName == "windows") path = path.Replace("~", UserPath);
+            switch (SysInfo.OSName)
             {
                 case "windows":
                     return path.Replace("/", "\\");
@@ -31,7 +31,7 @@ namespace PixanKit.LaunchCore.SystemInf
 
         public static string CPLocalize(string cparg)
         {
-            switch (SystemInformation.OSName) 
+            switch (SysInfo.OSName) 
             {
                 case "windows":
                     return PathLocalize(cparg).Replace("${classpath_separator}", ";");

@@ -26,7 +26,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         {
             libraryType = LibraryType.Native;
             JToken? current = libraryJData["downloads"]?["classifiers"]?
-                [libraryJData["natives"]?[SystemInformation.OSName]?.ToString() ?? ""];
+                [libraryJData["natives"]?[SysInfo.OSName]?.ToString() ?? ""];
             _name = current?["path"]?.ToString() ?? "";
             _sha1 = current?["sha1"]?.ToString() ?? "";
             _url = current?["url"]?.ToString() ?? "";

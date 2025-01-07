@@ -34,7 +34,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
                     gamelibraries.Add(new OriginalLibrary(jData));
                     break;
                 case LibraryType.Native:
-                    if (jData["natives"]?[SystemInformation.OSName] == null) break;
+                    if (jData["natives"]?[SysInfo.OSName] == null) break;
                     gamelibraries.Add(new NativeLibrary(jData));
                     if ((jData["downloads"] as JObject ?? []).Count > 1)
                         gamelibraries.Add(new OriginalLibrary(jData));
@@ -112,7 +112,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
             //test System
             var os = GetAllowedSystem(jData);
             //Output Error
-            if (!os.Contains(SystemInformation.OSName)) throw new SystemNotSupportedException(string.Join(',', os), SystemInformation.OSName);
+            if (!os.Contains(SysInfo.OSName)) throw new SystemNotSupportedException(string.Join(',', os), SysInfo.OSName);
             _name = (jData["name"]?? "").ToString();
         }
 
@@ -129,7 +129,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <param name="libraryToken"></param>
         /// <returns></returns>
         public static bool SystemSupport(JToken libraryToken)
-            => GetAllowedSystem(libraryToken).Contains(SystemInformation.OSName);
+            => GetAllowedSystem(libraryToken).Contains(SysInfo.OSName);
 
         /// <summary>
         /// This is for judging which system is suitable for this library
@@ -161,7 +161,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
 
                     if (ruleData["os"] == null || ruleData["os"]?["arch"] == null) 
                         continue;
-                    if (ruleData["os"]?["arch"]?.ToString() == SystemInformation.CPUArch) 
+                    if (ruleData["os"]?["arch"]?.ToString() == SysInfo.CPUArch) 
                         continue;
                     return [];
                 }

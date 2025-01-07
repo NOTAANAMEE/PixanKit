@@ -12,7 +12,7 @@ namespace PixanKit.LaunchCore.SystemInf
     /// <summary>
     /// Provides Information Like Operating System And Computer Architecture
     /// </summary>
-    public static class SystemInformation
+    public static class SysInfo
     {
         [ModuleInitializer]
         internal static void Init()
@@ -46,6 +46,7 @@ namespace PixanKit.LaunchCore.SystemInf
                     CPUArch = "arm64";
                     break;
                 default:
+                    CPUArch = "other";
                     Logger.Warn("The Program And Minecraft might not be able to run on your PC" +
                         ", The game might crash");
                     break;
@@ -59,7 +60,7 @@ namespace PixanKit.LaunchCore.SystemInf
         /// osx: OSX, MacOS 11 -> Latest MacOS<br/>
         /// unix: others<br/>
         /// </summary>
-        public static string OSName = "windows";
+        public static string OSName { get; private set; } = "windows";
 
         /// <summary>
         /// Represents the architecture of the cpu
@@ -69,6 +70,6 @@ namespace PixanKit.LaunchCore.SystemInf
         /// arm64: Arm64 AArch64 Arm_v8
         /// arm: Arm A32
         /// </summary>
-        public static string CPUArch = "x86_64";
+        public static string CPUArch { get; private set; } = "x86_64";
     }
 }

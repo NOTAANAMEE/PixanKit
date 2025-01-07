@@ -14,14 +14,14 @@ namespace PixanKit.ModModule
         static Localize()
         {
             UserPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            if (SystemInformation.OSName == "windows") 
+            if (SysInfo.OSName == "windows") 
                 UserPath = UserPath[0..UserPath.LastIndexOf('\\')];
         }
 
         public static string PathLocalize(string path)
         {
-            if (SystemInformation.OSName == "windows") path = path.Replace("~", UserPath);
-            switch (SystemInformation.OSName)
+            if (SysInfo.OSName == "windows") path = path.Replace("~", UserPath);
+            switch (SysInfo.OSName)
             {
                 case "windows":
                     return path.Replace("/", "\\");
@@ -39,7 +39,7 @@ namespace PixanKit.ModModule
         {
             get
             {
-                if (SystemInformation.OSName == "windows") return ";";
+                if (SysInfo.OSName == "windows") return ";";
                 else return ":";
             }
         }
