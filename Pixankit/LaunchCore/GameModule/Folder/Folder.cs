@@ -173,7 +173,7 @@ namespace PixanKit.LaunchCore.GameModule
         private void InitGames()
         {
             _games.Clear();
-            string[] dirs = Directory.GetDirectories(Localize.PathLocalize(VersionDirPath));
+            string[] dirs = Directory.GetDirectories(VersionDirPath);
             foreach (string dir in dirs) 
             {
                 GameBase game;
@@ -261,7 +261,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// </summary>
         public void Scan()
         {
-            string[] dirs = Directory.GetDirectories(Localize.PathLocalize(VersionDirPath));
+            string[] dirs = Directory.GetDirectories(VersionDirPath);
             foreach (string dir in dirs)
             {
                 foreach (GameBase game in _games) if (game.Name == dir) continue;

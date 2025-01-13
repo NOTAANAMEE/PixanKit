@@ -48,10 +48,9 @@ namespace PixanKit.LaunchCore.Extention
         /// <returns>Game Inited</returns>
         public static GameBase DefaultGameInitor(string path)
         {
-            path = Localize.DeLocalize(path);
             string jsonPath = path + "/" + Path.GetFileName(path) + ".json";
             JObject jobj;
-                jobj = JObject.Parse(File.ReadAllText(Localize.PathLocalize(jsonPath)));
+                jobj = JObject.Parse(File.ReadAllText(jsonPath));
 
 
             if (jobj["mainClass"]?.ToString() != "net.minecraft.client.main.Main") 

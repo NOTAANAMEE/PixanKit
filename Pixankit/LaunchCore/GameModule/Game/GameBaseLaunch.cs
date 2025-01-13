@@ -117,7 +117,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             string classpath = "";
             foreach (LibraryBase library in libraries)
             {
-                classpath += library.Path + Localize.LocalParser;
+                classpath += library.LibraryPath + Localize.LocalParser;
             }
             classpath += GameJarFilePath;
             return classpath;

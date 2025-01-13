@@ -17,7 +17,7 @@ namespace PixanKit.LaunchCore.SystemInf
                 UserPath = UserPath[0..UserPath.LastIndexOf('\\')];
         }
 
-        public static string PathLocalize(string path)
+        /*public static string PathLocalize(string path)
         {
             if (SysInfo.OSName == "windows") path = path.Replace("~", UserPath);
             switch (SysInfo.OSName)
@@ -27,14 +27,14 @@ namespace PixanKit.LaunchCore.SystemInf
                 default:
                     return path;
             }
-        }
+        }*/
 
         public static string CPLocalize(string cparg)
         {
             switch (SysInfo.OSName) 
             {
                 case "windows":
-                    return PathLocalize(cparg).Replace("${classpath_separator}", ";");
+                    return cparg.Replace("${classpath_separator}", ";");
                 default:
                     return cparg;
             }
@@ -42,9 +42,9 @@ namespace PixanKit.LaunchCore.SystemInf
 
         public static string LocalParser = "${classpath_separator}";
 
-        public static string DeLocalize(string path)
+        /*public static string DeLocalize(string path)
         {
             return path.Replace('\\', '/');
-        }
+        }*/
     }
 }

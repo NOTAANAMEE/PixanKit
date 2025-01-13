@@ -114,7 +114,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
             var ret5 = await MojangLogin.MinecraftUid(_accesstoken);
             _name = ret5.Name;
             _uid = ret5.Uid;
-            if (_skinURL == ret5.SkinUrl && File.Exists(Localize.PathLocalize(SkinCachePath))) return;
+            if (_skinURL == ret5.SkinUrl && File.Exists(SkinCachePath)) return;
             _skinURL = ret5.SkinUrl;
             await RefreshSkinCache();
         }
@@ -128,7 +128,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
             HttpClient client = new();
             var response = await client.GetStreamAsync(this._skinURL);
             FileStream fs = new(
-                Localize.PathLocalize(SkinCachePath), FileMode.Create);
+                SkinCachePath, FileMode.Create);
             response.CopyTo(fs);
             fs.Close();
             response.Dispose();

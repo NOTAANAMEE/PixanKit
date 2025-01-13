@@ -408,10 +408,9 @@ namespace PixanKit.LaunchCore.GameModule.Game
 
         private void SetSettings()
         {
-            string path = Localize.PathLocalize(SettingsPath);
-            if (File.Exists(path))
+            if (File.Exists(SettingsPath))
                 Settings = JObject.Parse(
-                    File.ReadAllText(path));
+                    File.ReadAllText(SettingsPath));
         }
 
         private void SetLibrary()
@@ -582,7 +581,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         {
             FileStream fs;
             StreamWriter sw;
-            string settingpath = Localize.PathLocalize(SettingsPath);
+            string settingpath = SettingsPath;
             Logger.Info($"{GameJarFilePath} Closing");
             Directory.CreateDirectory(Path.GetDirectoryName(settingpath)?? "");
             fs = new(settingpath, FileMode.Create);

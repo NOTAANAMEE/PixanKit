@@ -40,7 +40,19 @@ namespace PixanKit.ModModule.Mods
         /// </summary>
         public string[] Authors { get; set; } = [];
 
-        internal int Ref = 0;
+        internal int Ref {
+            get
+            {
+                int ret = 0;
+                foreach (var reference in References)
+                {
+                    ret += reference.Value.Count;
+                }
+                return ret;
+            }
+        }
+
+        internal Dictionary<string, List<ModFile>> References { get; set; } = [];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ModInf"/> class using data from a TOML document.
@@ -98,6 +110,25 @@ namespace PixanKit.ModModule.Mods
             return new(jsondoc);
         }
         #endregion
+
+        public void AddReference(ModFile mod)
+        {
+            string version = mod.Owner.Game.Version;
+            References.TryGetValue(version, out List<ModFile>? files);
+            if (files is null) References.Add(version, [mod]);
+            else files.Add(mod);
+        }
+
+        public Dictionary<string, string> CheckUpates()
+        {
+            return [];
+        }
+
+        public async Task<string?> CheckSingleUpdate(string mcversion)
+        {
+
+            return null;
+        }
 
         /// <summary>
         /// Converts the current instance of <see cref="ModInf"/> to a JSON object.

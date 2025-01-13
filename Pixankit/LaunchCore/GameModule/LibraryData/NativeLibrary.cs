@@ -54,30 +54,14 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <param name="nativesPath">The directory to extract files to.</param>
         public void Extract(string librarypath, string nativesPath)
         {
-            FileStream fs = new(librarypath + "/" + Path, FileMode.Open);
+            FileStream fs = new(Path.Combine(librarypath, LibraryPath), FileMode.Open);
             ZipArchive archive = new(fs);
             foreach (ZipArchiveEntry entry in archive.Entries)
             {
-                string fullPath = $"{nativesPath}/{entry.FullName}";
 
-                if (!Judge(entry.FullName))
+                if (!NeedsDecompress(entry.FullName))
                     continue;
-                Logger.Info($"Decompressing {fullPath}");
-                if (fullPath.EndsWith('/'))
-                {
-                    fullPath = Localize.PathLocalize(fullPath);
-                    Directory.CreateDirectory(fullPath);
-                    continue;
-                }
-                string fullDir = Localize.PathLocalize(fullPath.Remove(fullPath.LastIndexOf('/')));
-                fullPath = Localize.PathLocalize(fullPath);
-                if (!Directory.Exists(fullDir))
-                    Directory.CreateDirectory(fullDir);
-                if (File.Exists(fullPath))
-                    Logger.Info($"{fullPath} Already exists, canceled");
-                else
-                    entry.ExtractToFile(fullPath);
-                Logger.Info($"Finish decompressing {fullPath}");
+                Decompress(entry, nativesPath);
             }
             fs.Close();
         }
@@ -87,13 +71,25 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// </summary>
         /// <param name="fullPath">The full path of the file.</param>
         /// <returns><c>true</c> if the file should be included; otherwise, <c>false</c>.</returns>
-        private bool Judge(string fullPath)
+        private bool NeedsDecompress(string fullPath)
         {
             foreach (string path in Exclude)
             {
                 if (fullPath.StartsWith(path)) return false;
             }
             return true;
+        }
+
+        private void Decompress(ZipArchiveEntry entry, string nativesdirpath)
+        {
+            if (entry.FullName.EndsWith('/')) return;
+            string fullPath = $"{nativesdirpath}/{entry.FullName}";
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath) ?? "./");
+            if (File.Exists(fullPath))
+                Logger.Info($"{fullPath} Already exists, canceled");
+            else
+                entry.ExtractToFile(fullPath);
+            Logger.Info($"Finish decompressing {fullPath}");
         }
     }
 }

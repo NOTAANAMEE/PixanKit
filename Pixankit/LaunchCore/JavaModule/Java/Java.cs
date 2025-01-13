@@ -66,7 +66,7 @@ namespace PixanKit.LaunchCore.JavaModule.Java
         /// <param name="javafolder">C:\Program Files\Java\JDK-21\</param>
         public JavaRuntime(string javafolder) 
         {
-            _javaFolder = Localize.DeLocalize(javafolder);
+            _javaFolder = javafolder;
             GetVersion();
         }
 
@@ -109,7 +109,7 @@ namespace PixanKit.LaunchCore.JavaModule.Java
             if (!File.Exists(JavaEXE)) throw new FileNotFoundException($"File Not Found. Target File:{JavaEXE}");
             ProcessStartInfo processStartInfo = new()
             {
-                FileName = Localize.PathLocalize(JavaEXE),
+                FileName = JavaEXE,
                 Arguments = "-version",
                 RedirectStandardError = true,
                 CreateNoWindow = true,

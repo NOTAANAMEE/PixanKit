@@ -48,10 +48,10 @@ namespace PixanKit.ResourceDownloader.Tasks.FuncTask
             }
             catch (Exception ex) 
             {
+                if (ex is not TaskCanceledException)
                 ReportException(ex);
             }
             await base.Running();
         }
-
     }
 }

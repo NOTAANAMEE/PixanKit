@@ -55,7 +55,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <summary>
         /// The Absolute Path Of The Library
         /// </summary>
-        public string Path { get => "${library_directory}" + GetPath(_name); }
+        public string LibraryPath { get => "${library_directory}" + GetPath(_name); }
 
         /// <summary>
         /// Download URL Of The Library

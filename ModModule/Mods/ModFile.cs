@@ -76,7 +76,10 @@ namespace PixanKit.ModModule.Mods
 
         private bool Valid { get=> Information != null; }
 
-        ModCollection Owner;
+        /// <summary>
+        /// Represents the owner of the mod
+        /// </summary>
+        public readonly ModCollection Owner;
         #endregion
 
         /// <summary>
@@ -109,8 +112,8 @@ namespace PixanKit.ModModule.Mods
         public void SetInfEnforced(ModInf modInf)
         {
             Owner.AddCache(modInf);
+            modInf.AddReference(this);
             Information = modInf;
-            modInf.Ref++;
         }
 
         #region Dependencies

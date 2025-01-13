@@ -7,13 +7,14 @@ using PixanKit.ResourceDownloader.SystemInf;
 using PixanKit.ResourceDownloader.Tasks;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
+using PixanKit.ResourceDownloader.Tasks.FuncTask;
 
 namespace PixanKit.ResourceDownloader.Download.DownloadTask
 {
     /// <summary>
     /// Represents a task for downloading a file from a given URL using multiple threads.
     /// </summary>
-    public class FileDownloadTask:AsyncProgressTask, IFileDownload
+    public class FileDownloadTask:SequenceProgressTask, IFileDownload
     {
         /// <summary>
         /// The default number of threads to use for downloading.
@@ -46,7 +47,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// <inheritdoc/>
         public int DownloadedFiles { get => (Status == ProgressStatus.Finished)? 1 : 0; }
 
-        private string _url;
+        private string _url = "";
 
         private readonly string savePath;
 
@@ -56,7 +57,12 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
 
         private readonly int threadnum = 1;
 
-        private long size;
+        private readonly long size;
+
+        private FuncProgressTask<int> InitTask = new();
+
+        private AsyncProgressTask<DownloadThread> DownloadTask = new();
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileDownloadTask"/> class 
@@ -78,7 +84,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         {
             this.threadnum = threadnum;
             _url = url;
-            this.savePath = path;
+            savePath = path;
             Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "./");
             _stream = new FileStream(path, FileMode.Create);
             OnCancel += CancelRun;
@@ -87,6 +93,40 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
                 _stream.Close();
             };
             Init();
+        }
+
+        private void Init()
+        {
+            Add(InitTask);
+            Add(DownloadTask);
+            InitTask.Function += InitRun;
+            for (int i = 0; i < threadnum; i++)
+            {
+                DownloadTask.Add(new DownloadThread(_stream, _filelock));
+            }
+        }
+
+        private async Task<int> InitRun(Action<double> report, CancellationToken token)
+        {
+            HttpClient client = new();
+            long length, baselength, mod, startcounter = 0;
+            var response = await client.GetAsync(_url, 
+                HttpCompletionOption.ResponseHeadersRead, token);
+            response.EnsureSuccessStatusCode();
+            length = response.Content.Headers.ContentLength ?? 0;
+            baselength = length / threadnum;
+            mod = baselength % threadnum;
+
+            response.Dispose();
+            client.Dispose();
+            foreach (var thread in DownloadTask.ProgressTasks)
+            {
+                if (token.IsCancellationRequested) throw new TaskCanceledException();
+                long end = startcounter + baselength + ((--mod >= 0) ? 1 : 0);
+                thread.SetURL(_url, startcounter, end - 1);
+                startcounter = end;
+            }
+            return 0;
         }
 
         /// <summary>
@@ -103,61 +143,9 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         internal void SetURL(string url)
         {
             _url = url;
-            Init();
         }
 
-        private void Init()
-        {
-            if (_url == "") return;
-            HttpClient client = new();
-            var request = new HttpRequestMessage(HttpMethod.Get, _url);
-            var response = client.Send(request, HttpCompletionOption.ResponseHeadersRead);
-            size = response.Content.Headers.ContentLength ?? 0;
-            int count = 0;
-            List<SequenceProgressTask> tasks = [];
-            while (size > 0)
-            {
-                ProgressTask task;
-
-                //If ProgressTasks Does Not Have So Many Tasks, Add A New Task
-                if (ProgressTasks.Count < count + 1) tasks.Add(new SequenceProgressTask());
-
-                size -= FileChunkDownloadTask.ChunkSize;
-
-                if (size < 0)
-                    task = new FileChunkDownloadTask(_url,
-                        0, size + FileChunkDownloadTask.ChunkSize - 1);
-                else
-                    task = new FileChunkDownloadTask(_url,
-                        size);
-
-                tasks[count].
-                    Add(task);
-                task.OnFinish += ChunkReturn;
-                count++;
-                if (count == threadnum) count = 0;
-            }
-            ProgressTasks = tasks.Cast<ProgressTask>().ToList();
-            client.Dispose();
-            request.Dispose();
-            response.Dispose();
-        }
-
-        private void ChunkReturn(ProgressTask task)
-        {
-            FileChunkDownloadTask downloadTask = (FileChunkDownloadTask)task;
-            
-            lock (_filelock) 
-            {
-                _stream.Position = downloadTask._start;
-                //Console.WriteLine($"{downloadTask._start} - {downloadTask._end}");
-                if (downloadTask.Return == null) throw new Exception();
-                downloadTask.Return.Position = 0;
-                downloadTask.Return.CopyTo(_stream);
-                _stream.Flush();
-            }
-            downloadTask.Return.Dispose();
-        }
+        
 
         private void CancelRun(ProgressTask t)
         {

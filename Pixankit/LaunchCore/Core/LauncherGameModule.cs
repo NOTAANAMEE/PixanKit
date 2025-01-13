@@ -45,10 +45,7 @@ namespace PixanKit.LaunchCore.Core
             string cmd = InlineCommand(game);
 
 
-            JavaRuntime? java = ChooseRuntime(game);
-            if (java == null) throw new NullReferenceException();
-
-
+            JavaRuntime? java = ChooseRuntime(game) ?? throw new NullReferenceException();
             Logger.Info("Game Arg Generated Successfully. Stored in a.bat");
             FileStream fs = new("./a.bat", FileMode.Create);
             StreamWriter sw = new(fs);
@@ -60,7 +57,7 @@ namespace PixanKit.LaunchCore.Core
             game.Decompress().Wait();
             string runningdir = 
                 string.Concat(AppDomain.CurrentDomain.BaseDirectory, 
-                Localize.PathLocalize(Files.ConfigDir[2..]));
+                Files.ConfigDir);
 
             ProcessStartInfo info = new()
             {
@@ -122,7 +119,6 @@ namespace PixanKit.LaunchCore.Core
             string cmd = GenerateCommand(game);
 
             cmd = PlayerInLine(cmd);
-            cmd = Localize.PathLocalize(cmd);
             string pth = Path.GetDirectoryName(game.GameRootFolderPath) ?? "./";
             cmd = $"-Xmx{Initors.GetMemory()}m " + cmd;
             cmd = cmd.Replace("${launcher_name}", LauncherName);
@@ -288,7 +284,7 @@ namespace PixanKit.LaunchCore.Core
 
         private static Dictionary<long, string> GetTimestampAndFilePath(string dir)
         {
-            string[] files = Directory.GetFiles(Localize.PathLocalize(dir));
+            string[] files = Directory.GetFiles(dir);
             Dictionary<long, string> keyValuePairs = new();
             foreach (string file in files) 
             {

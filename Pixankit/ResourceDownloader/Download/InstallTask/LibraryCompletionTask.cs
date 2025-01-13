@@ -34,7 +34,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             List<string> files = [];
             foreach (var library in game.GetLibraries())
             {
-                string libpath = library.Path.Replace("${library_directory}",
+                string libpath = library.LibraryPath.Replace("${library_directory}",
                     game.LibrariesDirPath);
                 if (library.LibraryType == LibraryType.Mod) continue;
                 if (File.Exists(Localize.PathLocalize(libpath))) continue;
