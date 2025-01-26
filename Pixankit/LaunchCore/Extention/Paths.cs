@@ -10,9 +10,9 @@ namespace PixanKit.LaunchCore.Extention
     /// <summary>
     /// Path Dictionary
     /// </summary>
-    public static class Paths
+    public static partial class Paths
     {
-        static Dictionary<string, string> Path = new();
+        static Dictionary<string, string> PathDict = new();
 
         /// <summary>
         /// Add A New Path
@@ -21,7 +21,7 @@ namespace PixanKit.LaunchCore.Extention
         /// <param name="value">The Actual Path</param>
         public static void Add(string key, string value)
         {
-            Path.Add(key, value);
+            PathDict.Add(key, value);
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace PixanKit.LaunchCore.Extention
         /// <param name="value">The Final Path</param>
         public static void Set(string key, string value)
         {
-            Path[key] = value;
+            PathDict[key] = value;
         }
 
         /// <summary>
@@ -41,8 +41,29 @@ namespace PixanKit.LaunchCore.Extention
         /// <param name="value"></param>
         public static void TrySet(string key, string value)
         {
-            if (!Path.ContainsKey(key)) Add(key, value);
+            if (!PathDict.ContainsKey(key)) Add(key, value);
             else Set(key, value);
+        }
+
+        /// <summary>
+        /// Try get the value. If exists, value will be he path. Else, value
+        /// will be null and return false
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool TryGetValue(string key, out string? value)
+        {
+            try
+            {
+                value = Get(key);
+                return true;
+            }
+            catch
+            {
+                value = null;
+                return false;
+            }
         }
 
         /// <summary>
@@ -51,31 +72,35 @@ namespace PixanKit.LaunchCore.Extention
         /// <param name="key"></param>
         /// <returns>THe FInal Path After Replacement</returns>
         public static string Get(string key)
+            => Replace(PathDict[key]);
+
+        /// <summary>
+        /// Get the Path. If not exist, add the item.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string GetOrAdd(string key, string value)
         {
-            string Ret = Path[key];
-            string pat = Match(Ret);
-            return Replace(pat, Ret);
+            if (!PathDict.TryGetValue(key, out string? Ret)) {
+                Add(key, value);
+                Ret = value; 
+            }
+            return Replace(Ret);
         }
 
-        private static string Match(string val)
+
+        private static string Replace(string value)
         {
-            string pattern = @"\$\{.*?\}";
-            Regex.Match(val, pattern);
-            MatchCollection matches = Regex.Matches(val, pattern);
-            if (matches.Count > 1) throw new Exception();
-            if (matches.Count == 0) return "";
-            return matches[0].Value;
+            string result = MyRegex().Replace(value, match =>
+            {
+                string key = match.Groups[1].Value; 
+                return PathDict.TryGetValue(key, out string? value) ? value : match.Value; 
+            });
+            return value;
         }
 
-        private static string KeyProcess(string key)
-            => key.Substring(2, key.Length - 3).Trim();
-
-        private static string Replace(string dictkey, string val)
-        {
-            if (dictkey == "") return val;
-            var key = KeyProcess(dictkey);
-            if (!Path.TryGetValue(key, out string? value)) return val;
-            return val.Replace(dictkey, value);
-        }
+        [GeneratedRegex(@"\${(.*?)}")]
+        private static partial Regex MyRegex();
     }
 }

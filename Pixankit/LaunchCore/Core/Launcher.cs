@@ -45,7 +45,6 @@ namespace PixanKit.LaunchCore.Core
             Logger.Info("Launcher Inited Successfully");
             InitSettings();
             LauncherInit?.Invoke(this);
-            
         }
 
         private void InitGameModule()

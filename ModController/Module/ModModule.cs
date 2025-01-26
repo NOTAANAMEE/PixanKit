@@ -1,0 +1,213 @@
+﻿using PixanKit.ModController.Mod;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Core;
+using PixanKit.LaunchCore.Extention;
+using PixanKit.LaunchCore.GameModule.Game;
+using PixanKit.LaunchCore.Json;
+using PixanKit.ModController.Interfaces;
+using PixanKit.ModController.ModReader;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+
+namespace PixanKit.ModController.Module
+{
+    /// <summary>
+    /// Represents the module responsible for managing mods within the launcher.
+    /// </summary>
+    public class ModModule: IToJSON
+    {
+        /// <summary>
+        /// Initializes the ModModule class and sets up event handlers for the launcher.
+        /// </summary>
+        public void Init()
+        {
+            Launcher.LauncherInit += (a) => { _ = new ModModule(); };
+            Launcher.GameAdd += (a) => { Instance?.AddJudgeGame(a); };
+            Launcher.GameRemove += (a) => 
+            { if (a.GetType() == typeof(ModdedGame))
+                  Instance?.ModdedGames.Remove(a as ModdedGame ?? 
+                  throw new Exception("Impossible exception")); };
+        }
+
+        /// <summary>
+        /// Gets or sets the singleton instance of the ModModule.
+        /// </summary>
+        public static ModModule? Instance;
+
+        /// <summary>
+        /// Gets or sets the path to the icon cache for mods.
+        /// </summary>
+        public static string IconCachePath
+        {
+            get => Paths.GetOrAdd("ModController_IconCache", "${CacheDir}/ModIcon");
+            set => Paths.TrySet("ModController_IconCache", value);
+        }
+
+        /// <summary>
+        /// Gets or sets the path to the settings file for mods.
+        /// </summary>
+        public static string SettingsPath
+        {
+            get => Paths.GetOrAdd("ModController_SettingsPath", "${SettingsDir}/modsettings.json");
+            set => Paths.TrySet("ModController_SettingsPath", value);
+        }
+
+        /// <summary>
+        /// A list of supported mod loaders.
+        /// </summary>
+        public static readonly List<string> ModLoaders = ["forge", "neoforge", "fabric", "quilt"];
+
+        /// <summary>
+        /// Gets or sets the mod version getter implementation.
+        /// </summary>
+        public IModVersionGetter? ModVersionGetter;
+
+        /// <summary>
+        /// A cache for storing mod-related data as a JSON object.
+        /// </summary>
+        private JObject ModCache = [];
+
+        /// <summary>
+        /// A dictionary containing metadata for mods.
+        /// </summary>
+        public Dictionary<string, ModMetaData> ModDatas = [];
+
+        public List<Task> InitTasks = [];
+
+        /// <summary>
+        /// A dictionary containing collections of mods associated with specific modded games.
+        /// </summary>
+        private Dictionary<ModdedGame, ModCollection> ModdedGames = [];
+
+        /// <summary>
+        /// Initializes a new instance of the ModModule class.
+        /// Reads existing mod data and sets up collections for the launcher's games.
+        /// </summary>
+        public ModModule() 
+        {
+            Instance = this;
+            if (Launcher.Instance == null) return;
+            ReadFile();
+            foreach (var folder in Launcher.Instance.Folders)
+            {
+                foreach (var game in folder.Games)
+                    InitTasks.Add(Task.Run(() =>
+                    {
+                        AddJudgeGame(game);
+                    }));
+                    
+            }
+            ModCache = [];
+        }
+
+        /// <summary>
+        /// Reads the mod settings file and loads it into the cache.
+        /// </summary>
+        private void ReadFile()
+        {
+            var jsoncontent = JObject.Parse(File.ReadAllText(SettingsPath));
+            OpenContent(jsoncontent);
+        }
+
+        /// <summary>
+        /// Reads the mod settings JObject and loads it into the cache.
+        /// </summary>
+        /// <param name="jsoncontent">The settings JObject</param>
+        /// <exception cref="JsonException"></exception>
+        public void OpenContent(JObject jsoncontent)
+        {
+            ModCache = jsoncontent["games"] as JObject ??
+                throw new JsonException();
+            foreach (var jsondata in jsoncontent["metadata"] ??
+                throw new JsonException())
+            {
+                var metadata = JsonModReader.GetMetaData(jsondata as JObject ??
+                    throw new JsonException());
+                ModDatas.Add(metadata.ModID, metadata);
+            }
+        }
+
+        /// <summary>
+        /// Adds metadata for a mod.
+        /// </summary>
+        /// <param name="data">The metadata to add.</param>
+        public void AddMetaData(ModMetaData data)
+            => ModDatas.Add(data.ModID, data);
+
+        /// <summary>
+        /// Adds a collection of mods for a specific modded game.
+        /// </summary>
+        /// <param name="game">The modded game to associate with the mod collection.</param>
+        public void AddCollection(ModdedGame game)
+            => ModdedGames.Add(game, new ModCollection(
+                ModCache[game.GameFolderPath] as JObject ?? [], game));
+
+        /// <summary>
+        /// Gets the collection of mods for a specific modded game.
+        /// </summary>
+        /// <param name="game">The modded game for which to retrieve the mod collection.</param>
+        /// <returns>The mod collection associated with the game.</returns>
+        public ModCollection GetCollection(ModdedGame game)
+            => ModdedGames[game];
+
+        /// <summary>
+        /// Adds a game to the mod module if it is a modded game.
+        /// </summary>
+        /// <param name="game">The game to evaluate and add.</param>
+        internal void AddJudgeGame(GameBase game)
+        {
+            if (game.GetType() == typeof(ModdedGame))
+                AddCollection(game as ModdedGame ?? 
+                    throw new Exception("Impossible exception"));
+        }
+
+        /// <summary>
+        /// Cleans up metadata by removing entries with a reference time of 0.
+        /// </summary>
+        public void CleanMetaData()
+        {
+            var removingId = ModDatas
+                .Where(pair => pair.Value.ReferenceTime == 0)
+                .Select(pair => pair.Key).ToArray();//LINQ
+            foreach (var item in removingId) ModDatas.Remove(item);
+        }
+
+        /// <inheritdoc/>
+        public JObject ToJSON()
+        {
+            JObject moddedGamedata = [];
+            foreach (var item in ModdedGames)
+                moddedGamedata.Add(
+                    item.Key.GameFolderPath,
+                    item.Value.ToJSON());
+
+            JArray modMetadata = [];
+            foreach (var item in ModDatas)
+                modMetadata.Add(item.Value.ToJSON());
+
+            return new()
+            {
+                { "metadata", modMetadata },
+                { "games" , moddedGamedata }
+            };
+
+        }
+
+        /// <summary>
+        /// Save the cache to the file.
+        /// </summary>
+        public void SaveFile()
+        {
+            JObject obj = ToJSON();
+            FileStream fs = new(SettingsPath, FileMode.Create);
+            StreamWriter sw = new(fs);
+            sw.Write(obj.ToString());
+        }
+    }
+}
