@@ -17,7 +17,7 @@ namespace PixanKit.LaunchCore.Extention
         static Files()
         {
             ConfigDir = "./Launcher/Config";
-            CacheDir = "${ConfigDir}/Cache";
+            CacheDir = "./Launcher/Cache";
             SettingsPath = "/Launcher/settings.json";
             ManifestDir = "${CacheDir}/manifest.json";
             SkinCacheDir = "${CacheDir}/Skin";

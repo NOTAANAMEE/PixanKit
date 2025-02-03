@@ -49,9 +49,11 @@ namespace PixanKit.ModController.Module
             ModCache = cache;
             foreach (var mod in Directory.GetFiles(Owner.ModDir))
             {
-                var modfile = ModReader.ModReader.ReadFile(this, mod);
-                ModFiles.Add(modfile.MetaData.ModID, modfile);
+                
+                var modfile = ModParser.Parse(mod, this);
+                ModFiles.TryAdd(modfile.MetaData.ModID, modfile);
             }
+            ModCache = [];
         }
 
         /// <summary>
@@ -87,30 +89,6 @@ namespace PixanKit.ModController.Module
         }
 
         /// <summary>
-        /// Register the mod with its path and JSON data 
-        /// </summary>
-        /// <param name="path">The path of the mod file</param>
-        /// <param name="jsonData">The JSON data of the mod file<br/>
-        /// <code>
-        /// {
-        ///     "id": "",//The ID of the mod
-        ///     "release_date": "",//The release date of the mod
-        ///     "version": "",//The version of the mod
-        ///     "depends": ["id"]//The array of the mod id of the dependencies
-        /// }</code>
-        /// </param>
-        public void Register(string path, JObject jsonData)
-        {
-            if (!path.StartsWith(Owner.ModDir)) return;
-            var tmp = ModReader.ModReader.Open(path);
-            string id = jsonData["id"]?.ToString() ?? "";
-            ModFile file = JsonModReader.LoadFromFile(this,
-                jsonData, tmp, id);
-            ModFiles.Add(id, file);
-            ModReader.ModReader.Free(tmp);
-        }
-
-        /// <summary>
         /// Register the mod with its path.
         /// The data of the mod will be read from its file.
         /// </summary>
@@ -120,7 +98,8 @@ namespace PixanKit.ModController.Module
         public void Register(string path)
         {
             if (!path.StartsWith(Owner.ModDir)) return;
-            ModFile file = ModReader.ModReader.ReadFile(this, path);
+            ModFile file = ModParser.Parse(path, this);
+            if (file.MetaData == null) throw new Exception("WTF");
             ModFiles.Add(file.MetaData.ModID, file);
         }
 

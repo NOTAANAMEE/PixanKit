@@ -14,6 +14,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using PixanKit.LaunchCore.Log;
 
 namespace PixanKit.ModController.Module
 {
@@ -25,7 +26,7 @@ namespace PixanKit.ModController.Module
         /// <summary>
         /// Initializes the ModModule class and sets up event handlers for the launcher.
         /// </summary>
-        public void Init()
+        public static void Init()
         {
             Launcher.LauncherInit += (a) => { _ = new ModModule(); };
             Launcher.GameAdd += (a) => { Instance?.AddJudgeGame(a); };
@@ -54,7 +55,7 @@ namespace PixanKit.ModController.Module
         /// </summary>
         public static string SettingsPath
         {
-            get => Paths.GetOrAdd("ModController_SettingsPath", "${SettingsDir}/modsettings.json");
+            get => Paths.GetOrAdd("ModController_SettingsPath", "${ConfigDir}/Modsettings.json");
             set => Paths.TrySet("ModController_SettingsPath", value);
         }
 
@@ -83,7 +84,9 @@ namespace PixanKit.ModController.Module
         /// <summary>
         /// A dictionary containing collections of mods associated with specific modded games.
         /// </summary>
-        private Dictionary<ModdedGame, ModCollection> ModdedGames = [];
+        public Dictionary<ModdedGame, ModCollection> ModdedGames = [];
+
+        object Locker = new();
 
         /// <summary>
         /// Initializes a new instance of the ModModule class.
@@ -101,7 +104,7 @@ namespace PixanKit.ModController.Module
                     {
                         AddJudgeGame(game);
                     }));
-                    
+
             }
             ModCache = [];
         }
@@ -113,6 +116,20 @@ namespace PixanKit.ModController.Module
         {
             var jsoncontent = JObject.Parse(File.ReadAllText(SettingsPath));
             OpenContent(jsoncontent);
+        }
+
+        public static void DefaultFile()
+        {
+            var obj = new JObject()
+            {
+                { "games", new JObject() },
+                { "metadata", new JArray() }
+            };
+            FileStream fs = new(SettingsPath, FileMode.Create);
+            StreamWriter sw = new(fs);
+            sw.Write(obj.ToString());
+            sw.Close();
+            fs.Close();
         }
 
         /// <summary>
@@ -127,7 +144,8 @@ namespace PixanKit.ModController.Module
             foreach (var jsondata in jsoncontent["metadata"] ??
                 throw new JsonException())
             {
-                var metadata = JsonModReader.GetMetaData(jsondata as JObject ??
+                var metadata = FabricModParser.ParseModMetaDataFromJSON(
+                    jsondata as JObject ??
                     throw new JsonException());
                 ModDatas.Add(metadata.ModID, metadata);
             }
@@ -145,8 +163,14 @@ namespace PixanKit.ModController.Module
         /// </summary>
         /// <param name="game">The modded game to associate with the mod collection.</param>
         public void AddCollection(ModdedGame game)
-            => ModdedGames.Add(game, new ModCollection(
-                ModCache[game.GameFolderPath] as JObject ?? [], game));
+        {
+            lock (Locker)
+            {
+                if (!ModdedGames.ContainsKey(game))
+                ModdedGames.Add(game, new ModCollection(
+                    ModCache[game.GameFolderPath] as JObject ?? [], game));
+            }
+        }
 
         /// <summary>
         /// Gets the collection of mods for a specific modded game.
@@ -162,9 +186,16 @@ namespace PixanKit.ModController.Module
         /// <param name="game">The game to evaluate and add.</param>
         internal void AddJudgeGame(GameBase game)
         {
-            if (game.GetType() == typeof(ModdedGame))
-                AddCollection(game as ModdedGame ?? 
-                    throw new Exception("Impossible exception"));
+            try
+            {
+                if (game.GetType() == typeof(ModdedGame))
+                    AddCollection(game as ModdedGame ??
+                        throw new Exception("Impossible exception"));
+            }
+            catch (DirectoryNotFoundException)
+            {
+                Logger.Warn("PixanKit.ModController", $"{game.Name} is not a modded game");
+            }
         }
 
         /// <summary>
@@ -208,6 +239,8 @@ namespace PixanKit.ModController.Module
             FileStream fs = new(SettingsPath, FileMode.Create);
             StreamWriter sw = new(fs);
             sw.Write(obj.ToString());
+            sw.Close();
+            fs.Close();
         }
     }
 }

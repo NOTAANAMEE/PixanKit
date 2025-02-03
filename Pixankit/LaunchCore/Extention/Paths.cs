@@ -54,16 +54,17 @@ namespace PixanKit.LaunchCore.Extention
         /// <returns></returns>
         public static bool TryGetValue(string key, out string? value)
         {
-            try
+            value = null;
+            if (!PathDict.TryGetValue(key, out string? ret))
             {
-                value = Get(key);
-                return true;
-            }
-            catch
-            {
-                value = null;
                 return false;
             }
+            if (ret != null)
+            {
+                value = Replace(ret);
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -97,7 +98,7 @@ namespace PixanKit.LaunchCore.Extention
                 string key = match.Groups[1].Value; 
                 return PathDict.TryGetValue(key, out string? value) ? value : match.Value; 
             });
-            return value;
+            return result;
         }
 
         [GeneratedRegex(@"\${(.*?)}")]
