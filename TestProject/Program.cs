@@ -19,14 +19,7 @@ namespace TestProject
             modModule.AddCollection(Launcher.Instance.Folders.First().FindGame("Create Train") as ModdedGame);
             await Task.WhenAll(modModule.InitTasks);
             Console.WriteLine(modModule.ModdedGames.Values.First().GetDependencies());
-        }
-
-        
-
-        static async Task TestFileDownload()
-        {
-            
-
+            modModule.SaveFile();
         }
 
     }

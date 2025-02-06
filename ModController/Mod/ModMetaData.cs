@@ -14,13 +14,15 @@ namespace PixanKit.ModController.Mod
     {
         public string[] Authors { get; internal set; } = [];
 
-        public string ModID { get; set; } = "";
+        public string ModID { get; set; } = "Unkonwn";
 
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = "Unkonwn";
 
-        public string Description { get; set; } = "";
+        public string Description { get; set; } = "Unkonwn";
 
         public Dictionary<string, List<ModFile>> ModFiles { get; private set; } = [];
+
+        public readonly object ModFiles_Locker = new();
 
         public string ImageCache { get; set; } = "";
 
@@ -34,9 +36,12 @@ namespace PixanKit.ModController.Mod
             modFile.MetaData = this;
             mcversion = modFile.Owner?.Owner?.Version ??
                 throw new NullReferenceException();
-            if (!ModFiles.TryGetValue(mcversion, out var list))
-                ModFiles.Add(mcversion, [modFile]);
-            else list.Add(modFile);
+            lock (ModFiles_Locker)
+            {
+                if (!ModFiles.TryGetValue(mcversion, out var list))
+                    ModFiles.Add(mcversion, [modFile]);
+                else list.Add(modFile);
+            }
         }
 
         public async Task GetUpdate(CancellationToken token)

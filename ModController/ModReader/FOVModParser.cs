@@ -13,7 +13,7 @@ namespace PixanKit.ModController.ModReader
 {
     public static class FOVModParser
     {
-        public static ModFile ParseJson(string jsonContent, ModCollection modCollection, ZipArchive archive)
+        public static ModFile ParseJson(string jsonContent, string filepath, ModCollection modCollection, ZipArchive archive)
         {
             JArray modArray = JArray.Parse(jsonContent);
             if (modArray.Count == 0)
@@ -30,7 +30,7 @@ namespace PixanKit.ModController.ModReader
 
             ModMetaData metaData = LoadMetaData(modID, modEntry, archive);
 
-            var modFile = new ModFile()
+            var modFile = new ModFile(filepath)
             {
                 Owner = modCollection,
                 Version = version,
@@ -47,6 +47,7 @@ namespace PixanKit.ModController.ModReader
         private static ModMetaData LoadMetaData(string modID, JObject modEntry, ZipArchive archive)
         {
             ModMetaData? metaData = null;
+            lock (ModModule.Instance?.ModDatas ?? new object())
             if (!ModModule.Instance?.ModDatas.TryGetValue(modID, out metaData) ?? false)
             {
                 metaData = new ModMetaData
@@ -60,6 +61,7 @@ namespace PixanKit.ModController.ModReader
                     LoadIcon(archive, modEntry["logoFile"]?.ToString() ?? "", modID),
                     Name = modEntry["displayName"]?.ToString() ?? ""
                 };
+                ModModule.Instance?.AddMetaData(metaData);
             }
             return metaData ?? throw new Exception("Exception avoid null warning");
         }

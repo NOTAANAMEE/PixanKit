@@ -11,6 +11,7 @@ using Tomlyn;
 using System.Dynamic;
 using System.Security.Cryptography;
 using System.IO.Compression;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PixanKit.ModController.ModReader
 {
@@ -18,7 +19,7 @@ namespace PixanKit.ModController.ModReader
     {
         static object Locker = new object();
 
-        public static ModFile ParseToml(string tomlContent, ModCollection modCollection, ZipArchive archive)
+        public static ModFile ParseToml(string tomlContent, string filepath, ModCollection modCollection, ZipArchive archive)
         {
             var table = Toml.ToModel(tomlContent) ??
                 throw new Exception("Failed to parse TOML");
@@ -37,7 +38,7 @@ namespace PixanKit.ModController.ModReader
 
             ModMetaData metaData = LoadMetaData(modID, modEntry, archive);
 
-            var modFile = new ModFile()
+            var modFile = new ModFile(filepath)
             {
                 Owner = modCollection,
                 Version = version,
@@ -54,6 +55,7 @@ namespace PixanKit.ModController.ModReader
         private static ModMetaData LoadMetaData(string modID, TomlTable modEntry, ZipArchive archive)
         {
             ModMetaData? metaData = null;
+            lock (ModModule.Instance?.MetaDataLocker?? new object())
             if (!ModModule.Instance?.ModDatas.TryGetValue(modID, out metaData) ?? false)
             {
                 string logofile = "";
@@ -67,6 +69,7 @@ namespace PixanKit.ModController.ModReader
                     ImageCache = LoadIcon(archive, logofile, modID),
                     Name = modEntry["displayName"]?.ToString() ?? ""
                 };
+                ModModule.Instance?.AddMetaData(metaData);
             }
             return metaData ?? throw new Exception("Exception avoid null warning");
         }

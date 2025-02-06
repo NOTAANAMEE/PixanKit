@@ -12,7 +12,7 @@ namespace PixanKit.ModController.ModReader
 {
     public static class FabricModParser
     {
-        public static ModFile ParseJson(string jsonContent, ModCollection modCollection, ZipArchive archive)
+        public static ModFile ParseJson(string jsonContent, string filepath, ModCollection modCollection, ZipArchive archive)
         {
             JObject modEntry = JObject.Parse(jsonContent);
 
@@ -22,10 +22,10 @@ namespace PixanKit.ModController.ModReader
                 modEntry, archive,
                 out List<string> dependenciesList,
                 out string version, out DateTime releaseDate);
-
+            
             ModMetaData metaData = LoadMetaData(modID, modEntry, archive);
-
-            var modFile = new ModFile()
+            
+            var modFile = new ModFile(filepath)
             {
                 Owner = modCollection,
                 Version = version,
@@ -42,6 +42,7 @@ namespace PixanKit.ModController.ModReader
         private static ModMetaData LoadMetaData(string modID, JObject modEntry, ZipArchive archive)
         {
             ModMetaData? metaData = null;
+            lock (ModModule.Instance?.ModDatas ?? new object())
             if (!ModModule.Instance?.ModDatas.TryGetValue(modID, out metaData) ?? false)
             {
                 metaData = new ModMetaData
@@ -55,6 +56,7 @@ namespace PixanKit.ModController.ModReader
                         LoadIcon(archive, modEntry["icon"]?.ToString() ?? "", modID),
                     Name = modEntry["name"]?.ToString() ?? ""
                 };
+                ModModule.Instance?.AddMetaData(metaData);
             }
             return metaData ?? throw new Exception("Exception avoid null warning");
         }
@@ -89,7 +91,31 @@ namespace PixanKit.ModController.ModReader
                 dependenciesList.Add(item.Key);
         }
 
-        internal static ModMetaData ParseModMetaDataFromJSON(JObject modEntry)
+        internal static ModMetaData GetFromModEntry(JObject modEntry)
+        {
+            var id = modEntry["id"]?.ToString() ?? "";
+            if (ModModule.Instance == null) 
+                throw new InvalidOperationException("ModModule Not Inited Yet");
+            return ModModule.Instance.ModDatas[id];
+        }
+
+        internal static ModFile LoadAllFromJSON(string filepath, ZipArchive archive, JObject modEntry) 
+        {
+            var metadata = GetFromModEntry(modEntry);
+            ZipArchiveEntry? archiveEntry = archive.GetEntry("META-INF/MANIFEST.MF");
+            List<string> dependenciesList = modEntry?.ToObject<List<string>>() ?? [];
+            var version = modEntry?["version"]?.ToString() ?? "";
+            var releaseDate = DateTime.Parse(modEntry?["release_date"]?.ToString() ?? "");
+            var modFile = new ModFile(filepath) { 
+                Dependencies = dependenciesList, 
+                Version = version, 
+                ReleaseDate = releaseDate 
+            };
+            metadata.Register(modFile);
+            return modFile;            
+        }
+
+        internal static ModMetaData ParseModMetaDataFromJSON(JObject modEntry) 
         {
             return new ModMetaData()
             {

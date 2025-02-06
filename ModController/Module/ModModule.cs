@@ -86,7 +86,12 @@ namespace PixanKit.ModController.Module
         /// </summary>
         public Dictionary<ModdedGame, ModCollection> ModdedGames = [];
 
-        object Locker = new();
+        readonly object Locker = new();
+
+        /// <summary>
+        /// The locker that locks <see cref="ModDatas"/>
+        /// </summary>
+        public readonly object MetaDataLocker = new();
 
         /// <summary>
         /// Initializes a new instance of the ModModule class.
@@ -118,6 +123,9 @@ namespace PixanKit.ModController.Module
             OpenContent(jsoncontent);
         }
 
+        /// <summary>
+        /// Save the default file to the file system.
+        /// </summary>
         public static void DefaultFile()
         {
             var obj = new JObject()
@@ -156,7 +164,9 @@ namespace PixanKit.ModController.Module
         /// </summary>
         /// <param name="data">The metadata to add.</param>
         public void AddMetaData(ModMetaData data)
-            => ModDatas.Add(data.ModID, data);
+        { 
+            lock(MetaDataLocker) ModDatas.Add(data.ModID, data); 
+        }
 
         /// <summary>
         /// Adds a collection of mods for a specific modded game.
