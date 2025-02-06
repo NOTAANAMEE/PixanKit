@@ -13,20 +13,13 @@ namespace TestProject
         static async Task Main(string[] args)
         {
             ModModule.Init();
-            Files.Load();
             _ = new Launcher();
+            ModModule.DefaultFile();
             ModModule modModule = new();
-            modModule.AddCollection(Launcher.Instance.Folders.First().FindGame("Create Train") as ModdedGame);
+            //modModule.AddCollection(Launcher.Instance.Folders.First().FindGame("Create Train") as ModdedGame);
             await Task.WhenAll(modModule.InitTasks);
             Console.WriteLine(modModule.ModdedGames.Values.First().GetDependencies());
-        }
-
-        
-
-        static async Task TestFileDownload()
-        {
-            
-
+            modModule.SaveFile();
         }
 
     }

@@ -13,7 +13,10 @@ namespace PixanKit.ModController.Mod
     /// <summary>
     /// Represents a mod file. The class helps manage the version and dependencies
     /// </summary>
-    public class ModFile
+    /// <remarks>
+    /// Inits the mod file. It is not recommended to init it by yourself.
+    /// </remarks>
+    public class ModFile(string filepath)
     {
         /// <summary>
         /// The meta data of the mod file. For example, the description and authors
@@ -33,7 +36,12 @@ namespace PixanKit.ModController.Mod
         /// <summary>
         /// Retrieves the actual path of the file
         /// </summary>
-        public string FilePath { get; internal set; } = "";
+        public string FilePath { get; internal set; } = filepath;
+
+        /// <summary>
+        /// Retrieves the file name of the file.
+        /// </summary>
+        public string FileName { get => Path.GetFileName(FilePath); }
 
         /// <summary>
         /// The list of the ID of the dependencies
@@ -46,12 +54,11 @@ namespace PixanKit.ModController.Mod
         public required DateTime ReleaseDate;
 
         /// <summary>
-        /// Inits the mod file. It is not recommended to init it by yourself.
+        /// Whether the mod is a valid struture. 
+        /// If true, load the id from the file.
+        /// else, load the id from JSON data.
         /// </summary>
-        public ModFile()
-        {
-
-        }
+        public bool ValidStructure = true;
 
         /// <summary>
         /// Adds unique dependencies from the current object to the provided list.

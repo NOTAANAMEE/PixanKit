@@ -11,14 +11,28 @@ using Tomlyn;
 using System.Dynamic;
 using System.Security.Cryptography;
 using System.IO.Compression;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PixanKit.ModController.ModReader
 {
+    /// <summary>
+    /// The config parser class for the latest(1.13.x-current) Forge and NeoForge mod files.
+    /// </summary>
     public static class FMLModParser
     {
-        static object Locker = new object();
+        static object IconLocker = new ();
 
-        public static ModFile ParseToml(string tomlContent, ModCollection modCollection, ZipArchive archive)
+        /// <summary>
+        /// This method parses the toml config of the Forge mod file and read the data to
+        /// generate <see cref="ModFile"/> instance.
+        /// </summary>
+        /// <param name="tomlContent">The content of the toml config</param>
+        /// <param name="filepath">The path of the mod file</param>
+        /// <param name="modCollection">The mod collection that the mod file belongs to</param>
+        /// <param name="archive">The zip archive of the mod file</param>
+        /// <returns>ModFile instance represents the mod file</returns>
+        /// <exception cref="Exception">toml config is not valid</exception>
+        public static ModFile ParseToml(string tomlContent, string filepath, ModCollection modCollection, ZipArchive archive)
         {
             var table = Toml.ToModel(tomlContent) ??
                 throw new Exception("Failed to parse TOML");
@@ -35,9 +49,11 @@ namespace PixanKit.ModController.ModReader
                 out List<string> dependenciesList, 
                 out string version, out DateTime releaseDate);
 
-            ModMetaData metaData = LoadMetaData(modID, modEntry, archive);
+            ModMetaData metaData;
+            lock(ModModule.Instance.MetaDataLocker)
+                metaData = LoadMetaData(modID, modEntry, archive);
 
-            var modFile = new ModFile()
+            var modFile = new ModFile(filepath)
             {
                 Owner = modCollection,
                 Version = version,
@@ -53,11 +69,11 @@ namespace PixanKit.ModController.ModReader
 
         private static ModMetaData LoadMetaData(string modID, TomlTable modEntry, ZipArchive archive)
         {
-            ModMetaData? metaData = null;
-            if (!ModModule.Instance?.ModDatas.TryGetValue(modID, out metaData) ?? false)
+            if (ModModule.Instance == null) throw new InvalidOperationException();
+            if (!ModModule.Instance.ModDatas.TryGetValue(modID, out ModMetaData? metaData))
             {
                 string logofile = "";
-                if (modEntry.ContainsKey("logoFile")) 
+                if (modEntry.ContainsKey("logoFile"))
                     logofile = modEntry["logoFile"]?.ToString() ?? "";
                 metaData = new ModMetaData
                 {
@@ -67,7 +83,9 @@ namespace PixanKit.ModController.ModReader
                     ImageCache = LoadIcon(archive, logofile, modID),
                     Name = modEntry["displayName"]?.ToString() ?? ""
                 };
+                ModModule.Instance?.AddMetaData(metaData);
             }
+
             return metaData ?? throw new Exception("Exception avoid null warning");
         }
 
@@ -114,7 +132,7 @@ namespace PixanKit.ModController.ModReader
         /// <summary>
         /// FUCK U
         /// </summary>
-        /// <param name="archive"></param>
+        /// <param name="manifestEntry"></param>
         /// <returns></returns>
         internal static string GetVersionFromManifest(ZipArchiveEntry manifestEntry) 
         {
@@ -189,7 +207,7 @@ namespace PixanKit.ModController.ModReader
             string path = $"{ModModule.IconCachePath}/{modID}" +
                 $"{Path.GetExtension(entry.FullName)}";
             //Directory.CreateDirectory(ModModule.IconCachePath);
-            lock (Locker)
+            lock (IconLocker)
             {
                 if (File.Exists(path)) File.Delete(path);
                 entry.ExtractToFile(path);

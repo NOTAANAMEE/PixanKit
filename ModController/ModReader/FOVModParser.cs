@@ -11,9 +11,22 @@ using Tomlyn.Model;
 
 namespace PixanKit.ModController.ModReader
 {
+    /// <summary>
+    /// The config parser class for the old version(1.12.x) Forge mod files.
+    /// </summary>
     public static class FOVModParser
     {
-        public static ModFile ParseJson(string jsonContent, ModCollection modCollection, ZipArchive archive)
+        /// <summary>
+        /// This method parses the json config of the Forge mod file and read the data to
+        /// generate <see cref="ModFile"/> instance.
+        /// </summary>
+        /// <param name="jsonContent">The content of the json config</param>
+        /// <param name="filepath">The path of the mod file</param>
+        /// <param name="modCollection">The mod collection that the mod file belongs to</param>
+        /// <param name="archive">The zip archive of the mod file</param>
+        /// <returns>ModFile instance represents the mod file</returns>
+        /// <exception cref="Exception">json config is not valid</exception>
+        public static ModFile ParseJson(string jsonContent, string filepath, ModCollection modCollection, ZipArchive archive)
         {
             JArray modArray = JArray.Parse(jsonContent);
             if (modArray.Count == 0)
@@ -28,9 +41,11 @@ namespace PixanKit.ModController.ModReader
                 out List<string> dependenciesList,
                 out string version, out DateTime releaseDate);
 
-            ModMetaData metaData = LoadMetaData(modID, modEntry, archive);
+            ModMetaData metaData;
+            lock(ModModule.Instance.MetaDataLocker) 
+                metaData = LoadMetaData(modID, modEntry, archive);
 
-            var modFile = new ModFile()
+            var modFile = new ModFile(filepath)
             {
                 Owner = modCollection,
                 Version = version,
@@ -46,20 +61,21 @@ namespace PixanKit.ModController.ModReader
 
         private static ModMetaData LoadMetaData(string modID, JObject modEntry, ZipArchive archive)
         {
-            ModMetaData? metaData = null;
-            if (!ModModule.Instance?.ModDatas.TryGetValue(modID, out metaData) ?? false)
+            if (ModModule.Instance == null) throw new InvalidOperationException();
+            if (!ModModule.Instance.ModDatas.TryGetValue(modID, out ModMetaData? metaData))
             {
                 metaData = new ModMetaData
                 {
                     ModID = modID,
                     Description = modEntry["description"]?.ToString() ?? "",
-                    Authors = 
+                    Authors =
                     modEntry["authors"]?.Select(a => a.ToString()).ToArray() ?? [],
-                    ImageCache = 
+                    ImageCache =
                     FMLModParser.
                     LoadIcon(archive, modEntry["logoFile"]?.ToString() ?? "", modID),
                     Name = modEntry["displayName"]?.ToString() ?? ""
                 };
+                ModModule.Instance?.AddMetaData(metaData);
             }
             return metaData ?? throw new Exception("Exception avoid null warning");
         }

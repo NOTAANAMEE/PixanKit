@@ -5,60 +5,107 @@ using System;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace PixanKit.ModController.ModReader
 {
+    /// <summary>
+    /// The delegate that parses the mod file from the params.
+    /// </summary>
+    /// <param name="filepath">The path of the file</param>
+    /// <param name="archive">The <see cref="ZipArchive"/> of the file</param>
+    /// <param name="entry">The entry of the config</param>
+    /// <param name="collection">The <see cref="ModCollection"/> that the
+    /// file belongs to</param>
+    /// <returns>Returns the <see cref="ModFile"/> instance represents the file</returns>
+    public delegate ModFile ModParserFunc(string filepath, 
+        ZipArchive archive, 
+        ZipArchiveEntry entry,
+        ModCollection collection);
+
+    /// <summary>
+    /// This static class parses the mod from the mod file.
+    /// </summary>
     public static class ModParser
     {
+        public static List<KeyValuePair<string, ModParserFunc>> ModParsers = new()
+        {
+            new("fabric.mod.json", ParseFabric),
+            new("META-INF/mods.toml", ParseFML),
+            new("mcmod.info", ParseFOV),
+        };
+
         public static ModFile Parse(string filePath, ModCollection collection)
         {
             var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
             var archive = new ZipArchive(fs);
-            var entry = archive.GetEntry("fabric.mod.json");
-            if (entry is not null)
-                return ParseFabric(archive, entry, collection);
-            else if ((entry = archive.GetEntry("META-INF/mods.toml")) is not null)
-                return ParseFML(archive, entry, collection);
-            else if ((entry = archive.GetEntry("mcmod.info")) is not null)
-                return ParseFOV(archive, entry, collection);
-            else return new ModFile()
+            ModFile? modFile = null;
+
+            foreach (var item in ModParsers)
+            {
+                ZipArchiveEntry? entry = archive.GetEntry(item.Key);
+                if (entry == null) continue;
+                modFile = item.Value(filePath, 
+                    archive,
+                    entry,
+                    collection);
+                break;
+            }
+
+            modFile ??= ParseInv(filePath,
+                    collection);
+            archive.Dispose();
+            fs.Close();
+            return modFile;
+        }
+
+        private static ModFile ParseFabric(string filepath, ZipArchive archive, ZipArchiveEntry entry,
+            ModCollection collection)
+        {
+            var stream = entry.Open();
+            StreamReader sr = new(stream);
+            var content = sr.ReadToEnd();
+            return FabricModParser.ParseJson(content, filepath, collection, archive);
+        }
+
+        private static ModFile ParseFML(string filepath, ZipArchive archive, ZipArchiveEntry entry,
+            ModCollection collection)
+        {
+            var stream = entry.Open();
+            StreamReader sr = new(stream);
+            var content = sr.ReadToEnd();
+            return FMLModParser.ParseToml(content, filepath, collection, archive);
+        }
+
+        private static ModFile ParseFOV(string filepath, ZipArchive archive, ZipArchiveEntry entry,
+            ModCollection collection)
+        {
+            var stream = entry.Open();
+            StreamReader sr = new(stream);
+            var content = sr.ReadToEnd();
+            return FOVModParser.ParseJson(content, filepath, collection, archive);
+        }
+
+        private static ModFile ParseInv(string filepath, ModCollection collection)
+        {
+            string filename = Path.GetFileName(filepath);
+            ModFile modFile;
+            if (collection.ModCache.ContainsKey(filename))
+                modFile = FabricModParser.LoadAllFromJSON(
+                    filepath, 
+                    collection.ModCache[filename] as JObject ?? []);
+            else modFile = new ModFile(filepath)
             {
                 Dependencies = [],
                 ReleaseDate = DateTime.Now,
                 Version = "unknown",
-                MetaData = new()
+                MetaData = new(),
+                ValidStructure = false,
             };
+
+            return modFile;
         }
-
-        private static ModFile ParseFabric(ZipArchive archive, ZipArchiveEntry entry,
-            ModCollection collection)
-        {
-            var stream = entry.Open();
-            StreamReader sr = new(stream);
-            var content = sr.ReadToEnd();
-            return FabricModParser.ParseJson(content, collection, archive);
-        }
-
-        private static ModFile ParseFML(ZipArchive archive, ZipArchiveEntry entry,
-            ModCollection collection)
-        {
-            var stream = entry.Open();
-            StreamReader sr = new(stream);
-            var content = sr.ReadToEnd();
-            return FMLModParser.ParseToml(content, collection, archive);
-        }
-
-        private static ModFile ParseFOV(ZipArchive archive, ZipArchiveEntry entry,
-            ModCollection collection)
-        {
-            var stream = entry.Open();
-            StreamReader sr = new(stream);
-            var content = sr.ReadToEnd();
-            return FOVModParser.ParseJson(content, collection, archive);
-        }
-
-
     }
 }

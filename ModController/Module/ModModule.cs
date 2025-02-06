@@ -86,7 +86,12 @@ namespace PixanKit.ModController.Module
         /// </summary>
         public Dictionary<ModdedGame, ModCollection> ModdedGames = [];
 
-        object Locker = new();
+        readonly object Locker = new();
+
+        /// <summary>
+        /// The locker that locks <see cref="ModDatas"/>
+        /// </summary>
+        public readonly object MetaDataLocker = new();
 
         /// <summary>
         /// Initializes a new instance of the ModModule class.
@@ -96,15 +101,13 @@ namespace PixanKit.ModController.Module
         {
             Instance = this;
             if (Launcher.Instance == null) return;
-            ReadFile();
+            lock (MetaDataLocker) ReadFile();
             foreach (var folder in Launcher.Instance.Folders)
             {
                 foreach (var game in folder.Games)
-                    InitTasks.Add(Task.Run(() =>
-                    {
-                        AddJudgeGame(game);
-                    }));
-
+                {
+                    InitTasks.Add(Task.Run(() => { AddJudgeGame(game); }));
+                }
             }
             ModCache = [];
         }
@@ -118,6 +121,9 @@ namespace PixanKit.ModController.Module
             OpenContent(jsoncontent);
         }
 
+        /// <summary>
+        /// Save the default file to the file system.
+        /// </summary>
         public static void DefaultFile()
         {
             var obj = new JObject()
@@ -147,7 +153,7 @@ namespace PixanKit.ModController.Module
                 var metadata = FabricModParser.ParseModMetaDataFromJSON(
                     jsondata as JObject ??
                     throw new JsonException());
-                ModDatas.Add(metadata.ModID, metadata);
+                AddMetaData(metadata);
             }
         }
 
@@ -156,7 +162,9 @@ namespace PixanKit.ModController.Module
         /// </summary>
         /// <param name="data">The metadata to add.</param>
         public void AddMetaData(ModMetaData data)
-            => ModDatas.Add(data.ModID, data);
+        {
+            ModDatas.Add(data.ModID, data); 
+        }
 
         /// <summary>
         /// Adds a collection of mods for a specific modded game.

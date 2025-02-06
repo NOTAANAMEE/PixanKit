@@ -49,7 +49,6 @@ namespace PixanKit.ModController.Module
             ModCache = cache;
             foreach (var mod in Directory.GetFiles(Owner.ModDir))
             {
-                
                 var modfile = ModParser.Parse(mod, this);
                 ModFiles.TryAdd(modfile.MetaData.ModID, modfile);
             }
@@ -108,7 +107,12 @@ namespace PixanKit.ModController.Module
         {
             JObject jsonData = [];
             foreach (var item in ModFiles)
-                jsonData.Add(item.Key, item.Value.ToJSON());
+            {
+                if (item.Value.ValidStructure)
+                    jsonData.Add(item.Key, item.Value.ToJSON());
+                else
+                    jsonData.Add(item.Value.FileName, item.Value.ToJSON());
+            }
             return jsonData;
         }
     }

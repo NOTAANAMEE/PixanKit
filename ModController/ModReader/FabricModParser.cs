@@ -10,9 +10,23 @@ using System.Threading.Tasks;
 
 namespace PixanKit.ModController.ModReader
 {
+    /// <summary>
+    /// The config parser class for the Fabric mod files.
+    /// </summary>
     public static class FabricModParser
     {
-        public static ModFile ParseJson(string jsonContent, ModCollection modCollection, ZipArchive archive)
+        /// <summary>
+        /// This method parses the json config of the Fabric mod file and read the data to
+        /// generate <see cref="ModFile"/> instance.
+        /// </summary>
+        /// <param name="jsonContent">The content of the json config</param>
+        /// <param name="filepath">The path of the mod file</param>
+        /// <param name="modCollection">The mod collection that the mod file belongs to</param>
+        /// <param name="archive">The zip archive of the mod file</param>
+        /// <returns>ModFile instance represents the mod file</returns>
+        /// <exception cref="Exception">json config is not valid</exception>
+
+        public static ModFile ParseJson(string jsonContent, string filepath, ModCollection modCollection, ZipArchive archive)
         {
             JObject modEntry = JObject.Parse(jsonContent);
 
@@ -23,9 +37,12 @@ namespace PixanKit.ModController.ModReader
                 out List<string> dependenciesList,
                 out string version, out DateTime releaseDate);
 
-            ModMetaData metaData = LoadMetaData(modID, modEntry, archive);
+            ModMetaData metaData; 
 
-            var modFile = new ModFile()
+            lock (ModModule.Instance.MetaDataLocker)
+                metaData = LoadMetaData(modID, modEntry, archive);
+
+            var modFile = new ModFile(filepath)
             {
                 Owner = modCollection,
                 Version = version,
@@ -41,10 +58,13 @@ namespace PixanKit.ModController.ModReader
 
         private static ModMetaData LoadMetaData(string modID, JObject modEntry, ZipArchive archive)
         {
-            ModMetaData? metaData = null;
-            if (!ModModule.Instance?.ModDatas.TryGetValue(modID, out metaData) ?? false)
+            if (ModModule.Instance == null) throw new InvalidOperationException("Exception");
+            var idInCache = ModModule.Instance.ModDatas.TryGetValue(modID, 
+                out ModMetaData? metaData);
+
+            if (!idInCache)
             {
-                metaData = new ModMetaData
+                metaData = new ModMetaData()
                 {
                     ModID = modID,
                     Description = modEntry["description"]?.ToString() ?? "",
@@ -55,6 +75,7 @@ namespace PixanKit.ModController.ModReader
                         LoadIcon(archive, modEntry["icon"]?.ToString() ?? "", modID),
                     Name = modEntry["name"]?.ToString() ?? ""
                 };
+                ModModule.Instance.AddMetaData(metaData);
             }
             return metaData ?? throw new Exception("Exception avoid null warning");
         }
@@ -89,7 +110,31 @@ namespace PixanKit.ModController.ModReader
                 dependenciesList.Add(item.Key);
         }
 
-        internal static ModMetaData ParseModMetaDataFromJSON(JObject modEntry)
+        internal static ModMetaData GetFromModEntry(JObject modEntry)
+        {
+            var id = modEntry["id"]?.ToString() ?? "";
+            if (ModModule.Instance == null) 
+                throw new InvalidOperationException("ModModule Not Inited Yet");
+            return ModModule.Instance.ModDatas[id];
+        }
+
+        internal static ModFile LoadAllFromJSON(string filepath, JObject modEntry) 
+        {
+            var metadata = GetFromModEntry(modEntry);
+            List<string> dependenciesList = modEntry?.ToObject<List<string>>() ?? [];
+            var version = modEntry?["version"]?.ToString() ?? "";
+            var releaseDate = DateTime.Parse(modEntry?["release_date"]?.ToString() ?? "");
+            var modFile = new ModFile(filepath) { 
+                Dependencies = dependenciesList, 
+                Version = version, 
+                ReleaseDate = releaseDate,
+                ValidStructure = false,
+            };
+            metadata.Register(modFile);
+            return modFile;            
+        }
+
+        internal static ModMetaData ParseModMetaDataFromJSON(JObject modEntry) 
         {
             return new ModMetaData()
             {
