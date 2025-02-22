@@ -12,7 +12,10 @@ namespace PixanKit.LaunchCore.Extention
     /// </summary>
     public static partial class Paths
     {
-        static Dictionary<string, string> PathDict = new();
+        static readonly Dictionary<string, string> PathDict = [];
+
+        static readonly object locker = new();
+
 
         /// <summary>
         /// Add A New Path
@@ -21,7 +24,8 @@ namespace PixanKit.LaunchCore.Extention
         /// <param name="value">The Actual Path</param>
         public static void Add(string key, string value)
         {
-            PathDict.Add(key, value);
+            lock (locker)
+                PathDict.Add(key, value);
         }
 
         /// <summary>
@@ -31,7 +35,7 @@ namespace PixanKit.LaunchCore.Extention
         /// <param name="value">The Final Path</param>
         public static void Set(string key, string value)
         {
-            PathDict[key] = value;
+            lock (locker) PathDict[key] = value;
         }
 
         /// <summary>
@@ -41,8 +45,11 @@ namespace PixanKit.LaunchCore.Extention
         /// <param name="value"></param>
         public static void TrySet(string key, string value)
         {
-            if (!PathDict.ContainsKey(key)) Add(key, value);
-            else Set(key, value);
+            lock (locker)
+            {
+                if (!PathDict.ContainsKey(key)) Add(key, value);
+                else Set(key, value);
+            }
         }
 
         /// <summary>
@@ -83,9 +90,10 @@ namespace PixanKit.LaunchCore.Extention
         /// <returns></returns>
         public static string GetOrAdd(string key, string value)
         {
-            if (!PathDict.TryGetValue(key, out string? Ret)) {
+            if (!PathDict.TryGetValue(key, out string? Ret))
+            {
                 Add(key, value);
-                Ret = value; 
+                Ret = value;
             }
             return Replace(Ret);
         }
