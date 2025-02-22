@@ -1,0 +1,8 @@
+﻿What does this JAR file do?
+
+This JAR file is a simple program which helps install Optifine.
+
+Usage:
+java -cp <Optifine Installer Path>:<This File Path> <Minecraft Folder Path>
+
+This program calls optifine.Installer.doInstall() function.

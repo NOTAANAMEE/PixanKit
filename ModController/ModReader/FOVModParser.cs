@@ -28,6 +28,9 @@ namespace PixanKit.ModController.ModReader
         /// <exception cref="Exception">json config is not valid</exception>
         public static ModFile ParseJson(string jsonContent, string filepath, ModCollection modCollection, ZipArchive archive)
         {
+            if (ModModule.Instance == null) 
+                throw new InvalidOperationException();
+
             JArray modArray = JArray.Parse(jsonContent);
             if (modArray.Count == 0)
                 throw new Exception("Invalid JSON: No mod data found");

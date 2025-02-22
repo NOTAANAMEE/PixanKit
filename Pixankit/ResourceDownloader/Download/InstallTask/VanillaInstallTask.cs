@@ -3,7 +3,6 @@ using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.Log;
 using PixanKit.LaunchCore.Server;
-using PixanKit.ResourceDownloader.Download.InstallTask;
 using PixanKit.ResourceDownloader.Tasks;
 using System;
 using System.Collections.Generic;
@@ -12,13 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
-using System.Xml.Linq;
-using System.Diagnostics;
 using System.IO;
 using PixanKit.ResourceDownloader.SystemInf;
 using PixanKit.ResourceDownloader.Tasks.FuncTask;
-using HtmlAgilityPack;
-using System.Runtime.CompilerServices;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {

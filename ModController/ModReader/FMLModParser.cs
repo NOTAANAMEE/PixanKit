@@ -20,7 +20,7 @@ namespace PixanKit.ModController.ModReader
     /// </summary>
     public static class FMLModParser
     {
-        static object IconLocker = new ();
+        static readonly object IconLocker = new ();
 
         /// <summary>
         /// This method parses the toml config of the Forge mod file and read the data to
@@ -40,6 +40,9 @@ namespace PixanKit.ModController.ModReader
             var mods = table["mods"] as TomlTableArray ??
                 throw new Exception("Invalid TOML: No mods found");
 
+            _ = ModModule.Instance ??
+                throw new InvalidOperationException("ModModule has not being inited");
+
             var modEntry = mods[0];
 
             var modID = GetID(modEntry);
@@ -50,6 +53,8 @@ namespace PixanKit.ModController.ModReader
                 out string version, out DateTime releaseDate);
 
             ModMetaData metaData;
+
+            
             lock(ModModule.Instance.MetaDataLocker)
                 metaData = LoadMetaData(modID, modEntry, archive);
 
