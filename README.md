@@ -66,7 +66,7 @@ Whether you're creating a custom launcher or automating tasks related to Minecra
 
 ## Something else?
 
-Well, due to the author's limited programming ability, some designs, codes and documentation might be cumbersome, especially in the context-dependent code. Properties naming may not be uniform. I hope you can be more tolerant and help improve it.
+Well, due to the author's limited programming ability, certain designs, code and documentation might be cumbersome, especially in the context-dependent code. Properties naming may not be uniform. I hope you can be more tolerant and help improve it.
 
 # Contribution
 Contributions are welcome!
