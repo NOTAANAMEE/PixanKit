@@ -12,7 +12,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
     /// <summary>
     /// Represents a base class for a player in the Minecraft environment.
     /// </summary>
-    public class PlayerBase:IToJSON
+    public partial class PlayerBase:IToJSON
     {
         /// <summary>
         /// Gets the player's name. Necessary for launch.
@@ -83,9 +83,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         public PlayerBase(JObject? jData)
         {
             if (jData == null) return;
-            _uid = (jData["uid"]?? "").ToString();
-            _name = (jData["name"] ?? "").ToString();
-            _accesstoken = (jData["accesstoken"] ?? "").ToString();
+            LoadFromJSON(jData);
             Logger.Info($"Player Init, Name:{Name} UID:{UID}");
         }
 
@@ -143,21 +141,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
             return !(player1 == player2);
         }
 
-        /// <summary>
-        /// Converts the player's data to a JSON object.
-        /// </summary>
-        /// <returns>A <see cref="JObject"/> representing the player's data.</returns>
-        public virtual JObject ToJSON()
-        {
-            JObject jobj = new()
-            {
-                { "uid", _uid },
-                { "name", _name },
-                { "accesstoken", _accesstoken },
-                { "type", _type.ToString()}
-            };
-            return jobj;
-        }
+
 
         /// <summary>
         /// Gets a hash code for the player.

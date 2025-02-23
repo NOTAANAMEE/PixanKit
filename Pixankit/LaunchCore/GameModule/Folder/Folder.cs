@@ -19,7 +19,7 @@ namespace PixanKit.LaunchCore.GameModule
     /// <summary>
     /// Folder Class<br/> An Abstraction For A .minecraft Folder
     /// </summary>
-    public class Folder:IToJSON
+    public partial class Folder:IToJSON
     {
         internal static List<Folder> Folders = [];
 
@@ -131,8 +131,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// }</c></param>
         public Folder(JObject jData) 
         {
-            _folderpath = jData["path"]?.ToString() ?? throw new Exception("JSON parse Wrong");
-            Alias = jData["alias"]?.ToString() ?? "${defaultalias}";
+            LoadFromJSON(jData);
             AddSelf();
             InitGames();
         }
@@ -280,20 +279,6 @@ namespace PixanKit.LaunchCore.GameModule
         public void Close()
         {
             foreach (GameBase game in _games) { game.Close(); }
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns><inheritdoc/></returns>
-        public JObject ToJSON()
-        {
-            return new JObject()
-            {
-                { "path" , _folderpath },
-                { "alias" , Alias },
-
-            };
         }
 
         internal void InternalAddGame(GameBase game)

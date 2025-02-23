@@ -12,10 +12,17 @@ namespace PixanKit.LaunchCore.Json
     /// </summary>
     public interface IToJSON
     {
+        public void LoadFromJSON(JObject obj);
+
         /// <summary>
         /// Converts the implementing object to a JSON object.
         /// </summary>
         /// <returns>A <see cref="JObject"/> representing the object's data.</returns>
         public JObject ToJSON();
+    }
+
+    public interface IFromJSON
+    {
+        
     }
 }

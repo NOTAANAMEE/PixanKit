@@ -14,7 +14,7 @@ namespace PixanKit.LaunchCore.JavaModule.Java
     /// <summary>
     /// The JavaRuntime Class To Choose suitable Java runtime
     /// </summary>
-    public class JavaRuntime:IToJSON
+    public partial class JavaRuntime:IToJSON
     {
         /// <summary>
         /// From Java 8 to Java 11 or later
@@ -56,7 +56,7 @@ namespace PixanKit.LaunchCore.JavaModule.Java
             get => BinaryFolder + "/javaw.exe"; 
         }
 
-        private readonly string _javaFolder = "";
+        private string _javaFolder = "";
 
         private ushort _version;
 
@@ -87,21 +87,7 @@ namespace PixanKit.LaunchCore.JavaModule.Java
         /// <param name="jData"></param>
         public JavaRuntime(JObject jData)
         {
-            _javaFolder = jData["path"]?.ToString() ?? "";
-            _version = (ushort)(jData["version"] ?? 0);
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns><inheritdoc/></returns>
-        public JObject ToJSON()
-        {
-            return new JObject()
-            {
-                { "path", _javaFolder },
-                { "version", _version }, 
-            };
+            LoadFromJSON(jData);
         }
 
         private void GetVersion()

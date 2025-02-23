@@ -17,7 +17,7 @@ namespace PixanKit.ModController.Module
     /// Represents a mod collection. This class helps control the mod under
     /// the mod directory.
     /// </summary>
-    public class ModCollection: IToJSON
+    public partial class ModCollection: IToJSON
     {
         /// <summary>
         /// The modded game of the mods
@@ -46,11 +46,11 @@ namespace PixanKit.ModController.Module
         public ModCollection(JObject cache, ModdedGame game)
         {
             Owner = game;
-            ModCache = cache;
+            LoadFromJSON(cache);
             foreach (var mod in Directory.GetFiles(Owner.ModDir))
             {
                 var modfile = ModParser.Parse(mod, this);
-                ModFiles.TryAdd(modfile.MetaData.ModID, modfile);
+                ModFiles.TryAdd(modfile.MetaData?.ModID ?? "", modfile);
             }
             ModCache = [];
         }
@@ -102,18 +102,6 @@ namespace PixanKit.ModController.Module
             ModFiles.Add(file.MetaData.ModID, file);
         }
 
-        ///<inheritdoc/>
-        public JObject ToJSON()
-        {
-            JObject jsonData = [];
-            foreach (var item in ModFiles)
-            {
-                if (item.Value.ValidStructure)
-                    jsonData.Add(item.Key, item.Value.ToJSON());
-                else
-                    jsonData.Add(item.Value.FileName, item.Value.ToJSON());
-            }
-            return jsonData;
-        }
+        
     }
 }

@@ -21,7 +21,7 @@ namespace PixanKit.ModController.Module
     /// <summary>
     /// Represents the module responsible for managing mods within the launcher.
     /// </summary>
-    public class ModModule: IToJSON
+    public partial class ModModule: IToJSON
     {
         /// <summary>
         /// Initializes the ModModule class and sets up event handlers for the launcher.
@@ -118,7 +118,7 @@ namespace PixanKit.ModController.Module
         private void ReadFile()
         {
             var jsoncontent = JObject.Parse(File.ReadAllText(SettingsPath));
-            OpenContent(jsoncontent);
+            LoadFromJSON(jsoncontent);
         }
 
         /// <summary>
@@ -217,26 +217,7 @@ namespace PixanKit.ModController.Module
             foreach (var item in removingId) ModDatas.Remove(item);
         }
 
-        /// <inheritdoc/>
-        public JObject ToJSON()
-        {
-            JObject moddedGamedata = [];
-            foreach (var item in ModdedGames)
-                moddedGamedata.Add(
-                    item.Key.GameFolderPath,
-                    item.Value.ToJSON());
-
-            JArray modMetadata = [];
-            foreach (var item in ModDatas)
-                modMetadata.Add(item.Value.ToJSON());
-
-            return new()
-            {
-                { "metadata", modMetadata },
-                { "games" , moddedGamedata }
-            };
-
-        }
+        
 
         /// <summary>
         /// Save the cache to the file.
