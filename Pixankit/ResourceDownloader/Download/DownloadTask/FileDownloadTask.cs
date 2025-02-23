@@ -57,7 +57,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
 
         private readonly int threadnum = 1;
 
-        private readonly long size;
+        private long size;
 
         private FuncProgressTask<int> InitTask = new();
 
@@ -116,7 +116,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             length = response.Content.Headers.ContentLength ?? 0;
             baselength = length / threadnum;
             mod = baselength % threadnum;
-
+            size = length;
             response.Dispose();
             client.Dispose();
             foreach (var thread in DownloadTask.ProgressTasks)

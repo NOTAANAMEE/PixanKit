@@ -12,6 +12,10 @@ namespace PixanKit.LaunchCore.Json
     /// </summary>
     public interface IToJSON
     {
+        /// <summary>
+        /// Load the data from a JSON object
+        /// </summary>
+        /// <param name="obj">The JSON object</param>
         public void LoadFromJSON(JObject obj);
 
         /// <summary>
@@ -19,10 +23,5 @@ namespace PixanKit.LaunchCore.Json
         /// </summary>
         /// <returns>A <see cref="JObject"/> representing the object's data.</returns>
         public JObject ToJSON();
-    }
-
-    public interface IFromJSON
-    {
-        
     }
 }

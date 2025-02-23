@@ -3,6 +3,7 @@ using PixanKit.ModController.Mod;
 using PixanKit.ModController.Module;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
@@ -37,8 +38,9 @@ namespace PixanKit.ModController.ModReader
                 out List<string> dependenciesList,
                 out string version, out DateTime releaseDate);
 
-            ModMetaData metaData; 
-
+            ModMetaData metaData;
+            if (ModModule.Instance == null) 
+                throw new InvalidOperationException("Init ModModule first!");
             lock (ModModule.Instance.MetaDataLocker)
                 metaData = LoadMetaData(modID, modEntry, archive);
 

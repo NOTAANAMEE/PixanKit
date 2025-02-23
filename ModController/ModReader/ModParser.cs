@@ -30,13 +30,22 @@ namespace PixanKit.ModController.ModReader
     /// </summary>
     public static class ModParser
     {
-        public static List<KeyValuePair<string, ModParserFunc>> ModParsers = new()
-        {
+        /// <summary>
+        /// The info path and matched parsing function
+        /// </summary>
+        public static readonly List<KeyValuePair<string, ModParserFunc>> ModParsers =
+        [
             new("fabric.mod.json", ParseFabric),
             new("META-INF/mods.toml", ParseFML),
             new("mcmod.info", ParseFOV),
-        };
+        ];
 
+        /// <summary>
+        /// Get the information of the mod from the file and the owner.
+        /// </summary>
+        /// <param name="filePath">The path of the mod file</param>
+        /// <param name="collection">The owner of the mod</param>
+        /// <returns>A ModFile instance which represents the mod file</returns>
         public static ModFile Parse(string filePath, ModCollection collection)
         {
             var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);

@@ -79,6 +79,9 @@ namespace PixanKit.ModController.Module
         /// </summary>
         public Dictionary<string, ModMetaData> ModDatas = [];
 
+        /// <summary>
+        /// A list of the tasks. Use Task.WhenAll() to wait.
+        /// </summary>
         public List<Task> InitTasks = [];
 
         /// <summary>
@@ -216,7 +219,6 @@ namespace PixanKit.ModController.Module
                 .Select(pair => pair.Key).ToArray();//LINQ
             foreach (var item in removingId) ModDatas.Remove(item);
         }
-
         
 
         /// <summary>
