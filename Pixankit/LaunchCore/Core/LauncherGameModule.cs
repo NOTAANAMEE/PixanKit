@@ -80,7 +80,7 @@ namespace PixanKit.LaunchCore.Core
             sw.Write(p.StandardOutput.ReadToEnd());
 
 
-            DateTime now = DateTime.Now;
+            //DateTime now = DateTime.Now;
             Logger.Info($"Game Exited with code {p.ExitCode}");
             if (p.ExitCode != 0) Logger.Warn("Error happened to the game!");
             ms.Position = 0;

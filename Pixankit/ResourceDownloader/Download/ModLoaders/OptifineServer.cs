@@ -58,7 +58,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 if (token.IsCancellationRequested) return null;
                 var content = await response.Content.ReadAsStringAsync(token);
                 if (token.IsCancellationRequested) return null;
-                var versions = new List<string>();
+                //var versions = new List<string>();
                 HtmlDocument document = new();
                 document.LoadHtml(content);
                 File.WriteAllText("a.html", content);

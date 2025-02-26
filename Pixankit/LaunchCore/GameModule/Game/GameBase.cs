@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PixanKit.LaunchCore.Json;
 
 namespace PixanKit.LaunchCore.GameModule.Game
 {
@@ -415,22 +416,16 @@ namespace PixanKit.LaunchCore.GameModule.Game
 
         private void SetLibrary()
         {
-            foreach (JToken token in (gameJSONData["libraries"] ?? new JObject()))
+            var array = gameJSONData.GetOrDefault(JSON.Format.ToJArray, "libraries", []);
+            foreach (JToken token in array)
             {
-                LibraryBase.Parse(token is JObject data ? data : [], libraries);
+                LibraryBase.Parse(token.ConvertTo(JSON.Format.ToJObject, []), libraries);
             }
             Logger.Info($"Libraries Added. Number:{libraries.Count}");
         }
 
         private static JObject ReadJObj(string path)
-        {
-            JObject jData;
-            {
-                string tmpcontent = File.ReadAllText(path);
-                jData = JObject.Parse(tmpcontent);
-            }
-            return jData;
-        }
+            => JSON.ReadFromFile(path);
 
         private void SetVersion()
         {
@@ -476,19 +471,14 @@ namespace PixanKit.LaunchCore.GameModule.Game
 
         private JArray GetJVMArgArray()
         {
-            string tmp = "[{\"rules\": [{\"action\": \"allow\",\"os\": {\"name\": \"osx\"}}],\"value\": [\"-XstartOnFirstThread\"]},{\"rules\": [{\"action\": \"allow\",\"os\": {\"name\": \"windows\"}}],\"value\": \"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump\"},{\"rules\": [{\"action\": \"allow\",\"os\": {\"arch\": \"x86\"}}],\"value\": \"-Xss1M\"},\"-Djava.library.path=${natives_directory}\"" +
+            string defaultJson = 
+                "[{\"rules\": [{\"action\": \"allow\",\"os\": {\"name\": \"osx\"}}],\"value\": [\"-XstartOnFirstThread\"]},{\"rules\": [{\"action\": \"allow\",\"os\": {\"name\": \"windows\"}}],\"value\": \"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump\"},{\"rules\": [{\"action\": \"allow\",\"os\": {\"arch\": \"x86\"}}],\"value\": \"-Xss1M\"},\"-Djava.library.path=${natives_directory}\"" +
                 ",\"-Dminecraft.launcher.brand=${launcher_name}\",\"-Dminecraft.launcher.version=${launcher_version}\",\"-cp\",\"${classpath}\"]";
-            JArray? jvmargArray;
-            if (gameJSONData["arguments"] != null && (gameJSONData["arguments"] ?? new JObject())["jvm"] != null)
-            {
-                jvmargArray = gameJSONData["arguments"]?["jvm"] as JArray;
-            }
+            if (gameJSONData.TryGetValue(JSON.Format.ToJArray, 
+                "arguments/jvm", out JArray? array))
+                return array ?? [];
             else
-            {
-                jvmargArray = JArray.Parse(tmp);
-            }
-            if (jvmargArray == null) throw new();
-            return jvmargArray;
+                return JArray.Parse(defaultJson);
         }
 
         private static string ParseArg(JToken token)
@@ -499,13 +489,11 @@ namespace PixanKit.LaunchCore.GameModule.Game
                 arg = token.ToString();
                 if (arg.Contains(' ')) arg = "\"" + arg + "\"";
             }
-            else if (LibraryBase.SystemSupport(token))
+            else if (LibraryBase.SystemSupport((JObject)token))
             {
                 if (token["value"]?.Type == JTokenType.String) 
                     return (token["value"] ?? "").ToString();
-                //arg = string.Join(" ", (JArray)token["value"] ?? []);
-                arg = string.Join(" ", 
-                    token["value"] is JArray array ? array : Array.Empty<JToken>());
+                arg = string.Join(" ", token.ConvertTo(JSON.Format.ToJArray, []));
             }
             return arg;
         }

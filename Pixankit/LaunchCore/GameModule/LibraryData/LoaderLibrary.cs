@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,18 +18,18 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// </summary>
         /// <param name="folder">The directory where the library is located.</param>
         /// <param name="libraryJData">The JSON data representing the library.</param>
-        public LoaderLibrary(string folder, JToken libraryJData) : base(libraryJData, folder)
+        public LoaderLibrary(string folder, JObject libraryJData): 
+            base(libraryJData, folder)
         {
             libraryType = LibraryType.Mod;
-            if (libraryJData["url"] != null) _url = libraryJData["url"]?.ToString() ?? 
-                    throw new();
+            _url = libraryJData.GetValue(JSON.Format.ToString, "url");
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoaderLibrary"/> class with library JSON data.
         /// </summary>
         /// <param name="libraryJData">The JSON data representing the library.</param>
-        public LoaderLibrary(JToken libraryJData) : this("", libraryJData) { }
+        public LoaderLibrary(JObject libraryJData) : this("", libraryJData) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoaderLibrary"/> class for internal use.

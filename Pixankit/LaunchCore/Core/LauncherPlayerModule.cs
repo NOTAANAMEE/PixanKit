@@ -34,8 +34,9 @@ namespace PixanKit.LaunchCore.Core
         /// <exception cref="ArgumentNullException">Thrown when the provided player is null.</exception>
         public string PlayerInLine(string arg, PlayerBase? player)
         {
-            if (player == null) throw new ArgumentNullException("");
-            return player.InlinePlayer(arg);
+            return player == null ? 
+                throw new ArgumentNullException("") : 
+                player.InlinePlayer(arg);
         }
 
         /// <summary>

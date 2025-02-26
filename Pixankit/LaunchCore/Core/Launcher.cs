@@ -80,7 +80,7 @@ namespace PixanKit.LaunchCore.Core
 
         private void InitJavaModule()
         {
-            List<JavaRuntime> javaRuntimes = new();
+            List<JavaRuntime> javaRuntimes = [];
             foreach (JToken jData in Files.RuntimeJData["children"] ?? new JObject())
             {
                 javaRuntimes.Add(new JavaRuntime((JObject)jData));

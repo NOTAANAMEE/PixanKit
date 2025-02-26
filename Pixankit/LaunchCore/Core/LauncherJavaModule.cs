@@ -17,10 +17,10 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         public JavaRuntime[] JavaRuntimes
         {
-            get => _javaRuntimes.ToArray();
+            get => [.. _javaRuntimes];
         }
 
-        List<JavaRuntime> _javaRuntimes = new List<JavaRuntime>();
+        List<JavaRuntime> _javaRuntimes = [];
 
         /// <summary>
         /// Adds a Java runtime to the launcher.

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +13,8 @@ namespace PixanKit.LaunchCore.JavaModule.Java
         /// <inheritdoc/>
         public void LoadFromJSON(JObject obj)
         {
-            _javaFolder = obj["path"]?.ToString() ?? "";
-            _version = (ushort)(obj["version"]?.ToObject<ushort>() ?? 0);
+            _javaFolder = obj.GetOrDefault(JSON.Format.ToString, "path", "");
+            _version = obj.GetOrDefault((a) => (ushort)a, "version", (ushort)0);
         }
 
         /// <summary>

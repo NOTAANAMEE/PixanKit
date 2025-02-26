@@ -49,7 +49,7 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
 
             byte[] skinData = File.ReadAllBytes(skinPath);
 
-            MultipartFormDataContent content = new MultipartFormDataContent
+            MultipartFormDataContent content = new()
             {
                 { new StringContent((slim)? "slim":"classic"), "variant" },
                 { new ByteArrayContent(File.ReadAllBytes(skinPath)), "file", Path.GetFileName(skinPath) }

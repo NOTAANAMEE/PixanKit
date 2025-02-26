@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.GameModule.Exceptions;
+using PixanKit.LaunchCore.Json;
 using PixanKit.LaunchCore.SystemInf;
 
 namespace PixanKit.LaunchCore.GameModule.LibraryData
@@ -16,7 +17,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
     public abstract class LibraryBase
     {
         #region StaticFields
-        static Dictionary<string, LibraryBase> libraries = new();
+        static Dictionary<string, LibraryBase> libraries = [];
 
         /// <summary>
         /// Parses the library according to the JSON data
@@ -107,13 +108,14 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <param name="jData"></param>
         /// <param name="libraryPath">The Library Folder Path</param>
         /// <exception cref="SystemNotSupportedException"></exception>
-        public LibraryBase(JToken jData, string libraryPath)
+        public LibraryBase(JObject jData, string libraryPath)
         {
             //test System
             var os = GetAllowedSystem(jData);
             //Output Error
-            if (!os.Contains(SysInfo.OSName)) throw new SystemNotSupportedException(string.Join(',', os), SysInfo.OSName);
-            _name = (jData["name"]?? "").ToString();
+            if (!os.Contains(SysInfo.OSName)) 
+                throw new SystemNotSupportedException(string.Join(',', os), SysInfo.OSName);
+            _name = jData.GetOrDefault(JSON.Format.ToString, "name", "");
         }
 
         /// <summary>
@@ -128,7 +130,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// </summary>
         /// <param name="libraryToken"></param>
         /// <returns></returns>
-        public static bool SystemSupport(JToken libraryToken)
+        public static bool SystemSupport(JObject libraryToken)
             => GetAllowedSystem(libraryToken).Contains(SysInfo.OSName);
 
         /// <summary>
@@ -147,29 +149,37 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         ///"name":"org:slf4j:slf4j-api:2.0.9"
         ///},</c></param>
         /// <returns></returns>
-        public static string[] GetAllowedSystem(JToken jData)
+        public static string[] GetAllowedSystem(JObject jData)
         {
+            // 默认允许所有操作系统
             if (jData["rules"] == null) return ["osx", "linux", "windows"];
-            List<string> OSSet = new();
-            foreach (JToken ruleData in jData["rules"] ?? new JArray())
-            {
-                if (ruleData["action"]?.ToString() == "allow")
-                {
-                    if (ruleData["os"] == null) OSSet = ["osx", "linux", "windows"];
-                    else if (ruleData["os"]?["name"] != null) 
-                        OSSet.Add(ruleData["os"]?["name"]?.ToString() ?? "");
 
-                    if (ruleData["os"] == null || ruleData["os"]?["arch"] == null) 
-                        continue;
-                    if (ruleData["os"]?["arch"]?.ToString() == SysInfo.CPUArch) 
-                        continue;
-                    return [];
-                }
-                else
+            HashSet<string> OSSet = ["osx", "linux", "windows"];
+
+            foreach (JToken ruleData in jData.GetOrDefault(JSON.Format.ToJArray, "rules", []))
+            {
+                JObject jObj = ruleData.ConvertTo(JSON.Format.ToJObject, []);
+
+                string action = jObj.GetOrDefault(JSON.Format.ToString, "action", "");
+                var osData = jObj.GetOrDefault(JSON.Format.ToJObject, "os", []);
+                var osName = jObj.GetOrDefault(JSON.Format.ToString, "os/name", null);
+                var osArch = jObj.GetOrDefault(JSON.Format.ToString, "os/arch", null);
+
+                switch (action)
                 {
-                    OSSet.Remove(ruleData["os"]?.ToString() ?? "");
+                case "allow":
+                    if (osData == null) OSSet = [ "osx", "linux", "windows" ];
+                    else if (osName != null) OSSet.Add(osName);
+
+                    if (osArch != null && osArch != SysInfo.CPUArch) return [];
+                    break;
+
+                case "disallow":
+                    if (osName != null) OSSet.Remove(osName);
+                    break;
                 }
             }
+
             return [.. OSSet];
         }
 
@@ -209,7 +219,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
     }
 
     /// <summary>
-    /// It contains 
+    /// Several library types
     /// </summary>
     public enum LibraryType
     {
@@ -222,7 +232,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// </summary>
         Native,
         /// <summary>
-        /// Mod Loader Generated. Need To Do Nothing With It
+        /// Mod Loader Generated. Just download
         /// </summary>
         Mod
     }

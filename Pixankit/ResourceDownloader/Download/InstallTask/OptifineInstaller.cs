@@ -62,11 +62,11 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             Owner = folder;
             version = mcversion;
             OptifineVersion = optifineversion;
-            Init(optifineversion);
+            Init();
         }
 
 
-        private void Init(JObject optifineversion)
+        private void Init()
         {
             string file = Localize.PathLocalize($"{Files.CacheDir}/Installer/optifine.jar");
             InitProgressTask.Function += GetURL;

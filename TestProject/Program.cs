@@ -10,14 +10,9 @@ namespace TestProject
 {
     internal class Program
     {
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
             ModModule.Init();
-            _ = new Launcher();
-            ModModule modModule = new();
-            await Task.WhenAll(modModule.InitTasks);
-            Console.WriteLine(modModule.ModdedGames.Values.First().GetDependencies());
-            modModule.SaveFile();
         }
 
     }

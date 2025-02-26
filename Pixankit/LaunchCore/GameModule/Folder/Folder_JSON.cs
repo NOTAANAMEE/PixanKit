@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +13,9 @@ namespace PixanKit.LaunchCore.GameModule
         /// <inheritdoc/>
         public void LoadFromJSON(JObject obj)
         {
-            _folderpath = obj["path"]?.ToString() ?? "";
-            Alias = obj["alias"]?.ToString() ?? "";
+            _folderpath = obj.GetOrDefault(JSON.Format.ToString, "path", "");
+            Alias = obj.GetOrDefault(JSON.Format.ToString, "alias", ""); ;
         }
-
 
         /// <inheritdoc/>
         public JObject ToJSON()

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Json;
 
 namespace PixanKit.LaunchCore.GameModule.Game
 {
@@ -32,8 +33,9 @@ namespace PixanKit.LaunchCore.GameModule.Game
         public OriginalGame(string path) : base(path) 
         {
             _gameType = GameType.Vanilla;
-            assetsID = ((gameJSONData["assetIndex"] ?? new JObject())["id"] ?? "").ToString();
-            javaVersion = (short)(int)(gameJSONData["minimumLauncherVersion"] ?? 0);
+            assetsID = gameJSONData.GetOrDefault(JSON.Format.ToString, "assetIndex/id", "");
+            javaVersion = gameJSONData.GetOrDefault<short>(
+                (a) => (short)a, "minimumLauncherVersion", 0);
         }
     }
 }

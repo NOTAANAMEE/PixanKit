@@ -22,7 +22,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// Initializes a new instance of the <see cref="NativeLibrary"/> class with the specified JSON data.
         /// </summary>
         /// <param name="libraryJData">The JSON data representing the native library.</param>
-        public NativeLibrary(JToken libraryJData) : base()
+        public NativeLibrary(JObject libraryJData) : base()
         {
             libraryType = LibraryType.Native;
             JToken? current = libraryJData["downloads"]?["classifiers"]?

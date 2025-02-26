@@ -7,10 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Reflection;
 using PixanKit.LaunchCore.SystemInf;
-using PixanKit.LaunchCore.Log;
-using System.Reflection.Metadata.Ecma335;
 
 namespace PixanKit.LaunchCore.Extention
 {
@@ -53,8 +50,11 @@ namespace PixanKit.LaunchCore.Extention
                 jobj = JObject.Parse(File.ReadAllText(jsonPath));
 
 
-            if (jobj["mainClass"]?.ToString() != "net.minecraft.client.main.Main") 
+            if (jobj["mainClass"]?.ToString() != "net.minecraft.client.main.Main")
+            {
                 return new ModdedGame(path, jobj);
+
+            }
             else return new OriginalGame(path, jobj);
         }
 
@@ -89,46 +89,12 @@ namespace PixanKit.LaunchCore.Extention
         /// <returns>6000 MB</returns>
         public static long GetMem()
         {
-            return 6000;
+            long minMemory = 2048; // 2GB
+            long maxMemory = 10240; // 10GB
+            long availableMemory = SysInfo.GetAvailableMemSize();
+            long allocatedMemory = Math.Min(maxMemory, Math.Max(minMemory, availableMemory / 2)); // 分配不超过可用内存的一半
+
+            return allocatedMemory;
         }
-
-        private static void ExtentionInit()
-        {
-
-        }
-
-       /* private static void LoadExtention(string file)
-        {
-            Logger.Info($"Loading File {file}");
-            Assembly assembly;
-            try
-            {
-                assembly = Assembly.LoadFile(file);
-            }
-            catch
-            {
-                Logger.Error($"{file} Loading Process Failed: Not .NET Program");
-                return;
-            }
-            Type? type = assembly.GetType("Init");
-            if (type == null)
-            {
-                Logger.Error($"{file} Loading Process Failed: Init Class Not Found");
-                return;
-            }
-            MethodInfo? method = type.GetMethod("InitModule");
-            if (method == null)
-            {
-                Logger.Error($"{file} Loading Process Failed: Could Not Find Method: Init.InitModule");
-                return;
-            }
-            if (!method.IsStatic)
-            {
-                Logger.Error($"{file} Loading Process Failed: Method Not Static: Init.InitModule");
-                return;
-            }
-            method.Invoke(null, null);
-            Logger.Info($"{file} Loaded Successfully");
-        }*/
     }
 }

@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualBasic;
 
 namespace PixanKit.LaunchCore.SystemInf
 {
@@ -71,5 +72,16 @@ namespace PixanKit.LaunchCore.SystemInf
         /// arm: Arm A32
         /// </summary>
         public static string CPUArch { get; private set; } = "x86_64";
+
+        /// <summary>
+        /// Gets the available memory size in megabytes.
+        /// </summary>
+        /// <returns>
+        /// A long value representing the available memory size in megabytes.
+        /// </returns>
+        public static long GetAvailableMemSize()
+        {
+            return Environment.WorkingSet / 1024 / 1024;
+        }
     }
 }

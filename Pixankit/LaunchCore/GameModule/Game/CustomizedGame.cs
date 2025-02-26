@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PixanKit.LaunchCore.GameModule.LibraryData;
 using System.Xml.Linq;
+using PixanKit.LaunchCore.Json;
 
 namespace PixanKit.LaunchCore.GameModule.Game
 {
@@ -41,17 +42,18 @@ namespace PixanKit.LaunchCore.GameModule.Game
         }
 
         /// <inheritdoc/>
-        protected override void LoadJSON(JObject gameJdata)
+        protected override void LoadJSON(JObject Jdata)
         {
-            if (!gameJdata.ContainsKey("inheritsFrom"))
+            if (!Jdata.TryGetValue(JSON.Format.ToString, "inheritsFrom", out var output))
             {
                 useBaseGeneration = true;
-                assetsID = gameJdata["assetIndex"]?["id"]?.ToString() ?? "";
-                _version = gameJdata["clientVersion"]?.ToString() ?? "";
+                assetsID = 
+                    Jdata.GetOrDefault(JSON.Format.ToString, "assetIndex/id", "");
+                _version = Jdata.GetOrDefault(JSON.Format.ToString, "clientVersion", "");
             }
             else
             {
-                _version = gameJdata["inheritsFrom"]?.ToString() ?? "";
+                _version = output ?? "";
             }
         }
 
@@ -82,7 +84,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         protected override string GetGameArguments()
         {
             if (useBaseGeneration) return ProcessedGameArgProcess(base.GetGameArguments());
-            return base.SameVersionGameArguments() + " " + base.GetGameArguments();
+            return SameVersionGameArguments() + " " + base.GetGameArguments();
         }
 
         /// <summary>

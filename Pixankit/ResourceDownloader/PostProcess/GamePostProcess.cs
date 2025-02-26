@@ -79,7 +79,7 @@ namespace PixanKit.ResourceDownloader.PostProcess
             foreach (var entry in Directory.GetFileSystemEntries(folderpath))
             {
                 string filename = Path.GetFileName(entry);
-                string newname = "";
+                string newname;
                 string newpath;
                 if (!filename.StartsWith(loaderversion)) continue;
                 newname = filename.Replace(loaderversion, name);

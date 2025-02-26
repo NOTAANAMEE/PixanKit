@@ -28,7 +28,7 @@ namespace PixanKit.LaunchCore.Core
         private JObject SaveFolderData()
         {
             Logger.Info("Game Module Closing");
-            JArray folders = new();
+            JArray folders = [];
             foreach (var folder in _folders) 
             {
                 folders.Add(folder.ToJSON());
@@ -43,7 +43,7 @@ namespace PixanKit.LaunchCore.Core
 
         private JObject SaveJavaData() 
         {
-            JArray javaRuntimes = new();
+            JArray javaRuntimes = [];
             foreach (var javaRuntime in _javaRuntimes)
             {
                 javaRuntimes.Add(javaRuntime.ToJSON());
