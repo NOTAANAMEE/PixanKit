@@ -56,7 +56,7 @@ Whether you're creating a custom launcher or automating tasks related to Minecra
 - **ResourceDownloader**
   - src：`<git pull directory>/PixanKit/ResourceDownloader`
   - files：`**/*.csproj`
-- **ModModule**
+- **ModController**
   - src：`<git pull directory>/ModController`
   - files：`**/*.csproj`
 - **LaunchCore**
