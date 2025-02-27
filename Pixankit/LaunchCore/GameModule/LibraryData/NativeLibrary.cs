@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO.Compression;
-using PixanKit.LaunchCore.SystemInf;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Log;
+﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Json;
+using PixanKit.LaunchCore.Log;
+using PixanKit.LaunchCore.SystemInf;
+using System.IO.Compression;
 
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
@@ -27,16 +21,16 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         {
             libraryType = LibraryType.Native;
             string OSKey =
-                libraryJData.GetOrDefault(JSON.Format.ToString, 
+                libraryJData.GetOrDefault(Format.ToString, 
                 $"natives/{SysInfo.OSName}", "");
 
-            JObject current = libraryJData.GetValue(JSON.Format.ToJObject, OSKey);
-            _name = current.GetValue(JSON.Format.ToString, "name");
-            _sha1 = current.GetValue(JSON.Format.ToString, "sha1");
-            _url  = current.GetValue(JSON.Format.ToString, "url");
+            JObject current = libraryJData.GetValue(Format.ToJObject, OSKey);
+            _name = current.GetValue(Format.ToString, "name");
+            _sha1 = current.GetValue(Format.ToString, "sha1");
+            _url  = current.GetValue(Format.ToString, "url");
 
             List<string> excludelist = [];
-            if (libraryJData.TryGetValue(JSON.Format.ToJArray, "extract/exclude", out var array))
+            if (libraryJData.TryGetValue(Format.ToJArray, "extract/exclude", out var array))
             {
                 foreach (JToken token in array ?? [])
                     excludelist.Add(token.ToString());

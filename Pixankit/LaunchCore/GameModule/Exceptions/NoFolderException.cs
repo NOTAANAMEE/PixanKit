@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PixanKit.LaunchCore.GameModule.Exceptions
+﻿namespace PixanKit.LaunchCore.GameModule.Exceptions
 {
     /// <summary>
     /// Represents an exception that is thrown when a Folder instance is not found.

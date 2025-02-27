@@ -1,13 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using PixanKit.LaunchCore.Json;
 using PixanKit.ModController.Mod;
 using PixanKit.ModController.Module;
-using System;
-using System.Collections.Generic;
 using System.IO.Compression;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PixanKit.ModController.ModReader
 {
@@ -48,23 +42,19 @@ namespace PixanKit.ModController.ModReader
         /// <returns>A ModFile instance which represents the mod file</returns>
         public static ModFile Parse(string filePath, ModCollection collection)
         {
-            var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-            var archive = new ZipArchive(fs);
+            var fs           = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            var archive      = new ZipArchive(fs);
             ModFile? modFile = null;
 
             foreach (var item in ModParsers)
             {
-                ZipArchiveEntry? entry = archive.GetEntry(item.Key);
+                var entry = archive.GetEntry(item.Key);
                 if (entry == null) continue;
-                modFile = item.Value(filePath, 
-                    archive,
-                    entry,
-                    collection);
+                modFile   = item.Value(filePath, archive, entry, collection);
                 break;
             }
 
-            modFile ??= ParseInv(filePath,
-                    collection);
+            modFile ??= ParseInv(filePath, collection);
             archive.Dispose();
             fs.Close();
             return modFile;
@@ -73,48 +63,46 @@ namespace PixanKit.ModController.ModReader
         private static ModFile ParseFabric(string filepath, ZipArchive archive, ZipArchiveEntry entry,
             ModCollection collection)
         {
-            var stream = entry.Open();
+            var stream      = entry.Open();
             StreamReader sr = new(stream);
-            var content = sr.ReadToEnd();
+            var content     = sr.ReadToEnd();
             return FabricModParser.ParseJson(content, filepath, collection, archive);
         }
 
         private static ModFile ParseFML(string filepath, ZipArchive archive, ZipArchiveEntry entry,
             ModCollection collection)
         {
-            var stream = entry.Open();
+            var stream      = entry.Open();
             StreamReader sr = new(stream);
-            var content = sr.ReadToEnd();
+            var content     = sr.ReadToEnd();
             return FMLModParser.ParseToml(content, filepath, collection, archive);
         }
 
         private static ModFile ParseFOV(string filepath, ZipArchive archive, ZipArchiveEntry entry,
             ModCollection collection)
         {
-            var stream = entry.Open();
+            var stream      = entry.Open();
             StreamReader sr = new(stream);
-            var content = sr.ReadToEnd();
+            var content     = sr.ReadToEnd();
             return FOVModParser.ParseJson(content, filepath, collection, archive);
         }
 
         private static ModFile ParseInv(string filepath, ModCollection collection)
         {
             string filename = Path.GetFileName(filepath);
-            ModFile modFile;
             if (collection.ModCache.ContainsKey(filename))
-                modFile = FabricModParser.LoadAllFromJSON(
-                    filepath, 
-                    collection.ModCache[filename] as JObject ?? []);
-            else modFile = new ModFile(filepath)
+                return FabricModParser.LoadAllFromJSON(
+                              filepath, 
+                              collection.ModCache[filename].ConvertTo(Format.ToJObject, []));
+            else 
+                return new ModFile(filepath)
             {
-                Dependencies = [],
-                ReleaseDate = DateTime.Now,
-                Version = "unknown",
-                MetaData = new(),
+                Dependencies   = [],
+                ReleaseDate    = DateTime.Now,
+                Version        = "unknown",
+                MetaData       = new(),
                 ValidStructure = false,
             };
-
-            return modFile;
         }
     }
 }

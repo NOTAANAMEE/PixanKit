@@ -1,12 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using PixanKit.LaunchCore.Server;
+﻿using PixanKit.LaunchCore.Server;
 using PixanKit.LaunchCore.Server.Servers.Microsoft;
 using PixanKit.LaunchCore.Server.Servers.Mojang;
 

@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PixanKit.ModController.Mod;
-using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore;
+﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.Json;
+using PixanKit.ModController.Mod;
 using PixanKit.ModController.ModReader;
 
 namespace PixanKit.ModController.Module

@@ -1,11 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PixanKit.LaunchCore.Server;
-using static System.Net.WebRequestMethods;
 
 namespace PixanKit.LaunchCore.Server.Servers.Microsoft
 {

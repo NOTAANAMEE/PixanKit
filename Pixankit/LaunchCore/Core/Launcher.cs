@@ -1,15 +1,9 @@
-﻿using PixanKit.LaunchCore.Extention;
+﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Extention;
 using PixanKit.LaunchCore.GameModule;
-using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.JavaModule.Java;
 using PixanKit.LaunchCore.Log;
 using PixanKit.LaunchCore.PlayerModule.Player;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.Core
 {

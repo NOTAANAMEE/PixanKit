@@ -1,13 +1,4 @@
-﻿using PixanKit.LaunchCore.Extention;
-using PixanKit.LaunchCore.SystemInf;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PixanKit.LaunchCore.GameModule.LibraryData;
-using System.Xml.Linq;
+﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Json;
 
 namespace PixanKit.LaunchCore.GameModule.Game
@@ -44,12 +35,12 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <inheritdoc/>
         protected override void LoadJSON(JObject Jdata)
         {
-            if (!Jdata.TryGetValue(JSON.Format.ToString, "inheritsFrom", out var output))
+            if (!Jdata.TryGetValue(Format.ToString, "inheritsFrom", out var output))
             {
                 useBaseGeneration = true;
                 assetsID = 
-                    Jdata.GetOrDefault(JSON.Format.ToString, "assetIndex/id", "");
-                _version = Jdata.GetOrDefault(JSON.Format.ToString, "clientVersion", "");
+                    Jdata.GetOrDefault(Format.ToString, "assetIndex/id", "");
+                _version = Jdata.GetOrDefault(Format.ToString, "clientVersion", "");
             }
             else
             {

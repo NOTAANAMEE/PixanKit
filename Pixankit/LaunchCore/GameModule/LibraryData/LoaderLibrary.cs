@@ -1,10 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
@@ -22,7 +17,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
             base(libraryJData, folder)
         {
             libraryType = LibraryType.Mod;
-            _url = libraryJData.GetValue(JSON.Format.ToString, "url");
+            _url = libraryJData.GetValue(Format.ToString, "url");
         }
 
         /// <summary>

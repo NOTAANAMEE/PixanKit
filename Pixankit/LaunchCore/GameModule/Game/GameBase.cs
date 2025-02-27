@@ -1,16 +1,8 @@
-﻿using PixanKit.LaunchCore.Extention;
+﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Extention;
 using PixanKit.LaunchCore.GameModule.LibraryData;
-using PixanKit.LaunchCore.Log;
-using PixanKit.LaunchCore.SystemInf;
-using PixanKit.LaunchCore.Core;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using PixanKit.LaunchCore.Json;
+using PixanKit.LaunchCore.Log;
 
 namespace PixanKit.LaunchCore.GameModule.Game
 {
@@ -416,10 +408,10 @@ namespace PixanKit.LaunchCore.GameModule.Game
 
         private void SetLibrary()
         {
-            var array = gameJSONData.GetOrDefault(JSON.Format.ToJArray, "libraries", []);
+            var array = gameJSONData.GetOrDefault(Format.ToJArray, "libraries", []);
             foreach (JToken token in array)
             {
-                LibraryBase.Parse(token.ConvertTo(JSON.Format.ToJObject, []), libraries);
+                LibraryBase.Parse(token.ConvertTo(Format.ToJObject, []), libraries);
             }
             Logger.Info($"Libraries Added. Number:{libraries.Count}");
         }
@@ -474,7 +466,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             string defaultJson = 
                 "[{\"rules\": [{\"action\": \"allow\",\"os\": {\"name\": \"osx\"}}],\"value\": [\"-XstartOnFirstThread\"]},{\"rules\": [{\"action\": \"allow\",\"os\": {\"name\": \"windows\"}}],\"value\": \"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump\"},{\"rules\": [{\"action\": \"allow\",\"os\": {\"arch\": \"x86\"}}],\"value\": \"-Xss1M\"},\"-Djava.library.path=${natives_directory}\"" +
                 ",\"-Dminecraft.launcher.brand=${launcher_name}\",\"-Dminecraft.launcher.version=${launcher_version}\",\"-cp\",\"${classpath}\"]";
-            if (gameJSONData.TryGetValue(JSON.Format.ToJArray, 
+            if (gameJSONData.TryGetValue(Format.ToJArray, 
                 "arguments/jvm", out JArray? array))
                 return array ?? [];
             else
@@ -491,11 +483,11 @@ namespace PixanKit.LaunchCore.GameModule.Game
             }
             else if (LibraryBase.SystemSupport((JObject)token))
             {
-                var value = token.ConvertTo(JSON.Format.ToJObject, [])
+                var value = token.ConvertTo(Format.ToJObject, [])
                     .GetFromPathCheck("value");
                 if (value.Type == JTokenType.String) 
                     return value.ToString();
-                arg = string.Join(" ", value.ConvertTo(JSON.Format.ToJArray, []));
+                arg = string.Join(" ", value.ConvertTo(Format.ToJArray, []));
             }
             return arg;
         }

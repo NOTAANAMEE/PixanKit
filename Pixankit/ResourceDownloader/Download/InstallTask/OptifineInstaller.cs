@@ -1,25 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PixanKit.LaunchCore.GameModule;
-using PixanKit.LaunchCore.GameModule.Game;
-using PixanKit.ResourceDownloader.Tasks;
-using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Server;
-using PixanKit.ResourceDownloader.Download.ModLoaders;
-using PixanKit.ResourceDownloader.Tasks.FuncTask;
-using PixanKit.ResourceDownloader.SystemInf;
-using PixanKit.LaunchCore.Extention;
+﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Core;
+using PixanKit.LaunchCore.Extention;
+using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.JavaModule;
-using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
-using PixanKit.ResourceDownloader.Download.DownloadTask;
-using PixanKit.LaunchCore.Server.Servers.ModLoader;
-using PixanKit.ResourceDownloader.Download.InstallTask;
-using PixanKit.ResourceDownloader.PostProcess;
 using PixanKit.LaunchCore.JavaModule.Java;
+using PixanKit.LaunchCore.Server;
+using PixanKit.ResourceDownloader.Download.DownloadTask;
+using PixanKit.ResourceDownloader.PostProcess;
+using PixanKit.ResourceDownloader.SystemInf;
+using PixanKit.ResourceDownloader.Tasks.FuncTask;
+using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {

@@ -1,11 +1,5 @@
 ﻿using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.JavaModule.Java;
-using PixanKit.LaunchCore.SystemInf;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.JavaModule
 {

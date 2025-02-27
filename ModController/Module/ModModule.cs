@@ -1,20 +1,13 @@
-﻿using PixanKit.ModController.Mod;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Core;
 using PixanKit.LaunchCore.Extention;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.Json;
-using PixanKit.ModController.Interfaces;
-using PixanKit.ModController.ModReader;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using PixanKit.LaunchCore.Log;
+using PixanKit.ModController.Interfaces;
+using PixanKit.ModController.Mod;
+using PixanKit.ModController.ModReader;
 
 namespace PixanKit.ModController.Module
 {

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PixanKit.ResourceDownloader.Tasks.MultiProgressTask
+﻿namespace PixanKit.ResourceDownloader.Tasks.MultiProgressTask
 {
     /// <summary>
     /// Represents a progress task that executes all its sub-tasks asynchronously and concurrently.

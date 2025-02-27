@@ -1,10 +1,5 @@
 ﻿using PixanKit.LaunchCore.Log;
 using PixanKit.LaunchCore.PlayerModule.Player;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.Core
 {

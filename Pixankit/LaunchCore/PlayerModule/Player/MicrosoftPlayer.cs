@@ -1,14 +1,7 @@
-﻿using PixanKit.LaunchCore.Extention;
-using PixanKit.LaunchCore.PlayerModule.MojangAPI;
-using PixanKit.LaunchCore.SystemInf;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Extention;
 using PixanKit.LaunchCore.Json;
+using PixanKit.LaunchCore.PlayerModule.MojangAPI;
 
 namespace PixanKit.LaunchCore.PlayerModule.Player
 {
@@ -55,13 +48,13 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         public MicrosoftPlayer(JObject jData):base(jData)
         {
             _latestLoginTime = 
-                jData.GetValue(JSON.Format.ToDateTime, "logintime");
+                jData.GetValue(Format.ToDateTime, "logintime");
             _skinURL = 
-                jData.GetValue(JSON.Format.ToString, "sinurl");
+                jData.GetValue(Format.ToString, "sinurl");
             _capeURL = 
-                jData.GetValue(JSON.Format.ToString, "capeurl");
+                jData.GetValue(Format.ToString, "capeurl");
             refreshtoken =
-                jData.GetValue(JSON.Format.ToString, "refreshtoken");
+                jData.GetValue(Format.ToString, "refreshtoken");
             _type = PlayerType.microsoft;
         }
 

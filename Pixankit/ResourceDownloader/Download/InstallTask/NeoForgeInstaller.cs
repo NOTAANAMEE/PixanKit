@@ -1,21 +1,13 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Core;
 using PixanKit.LaunchCore.Extention;
-using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.JavaModule;
 using PixanKit.LaunchCore.Server;
-using PixanKit.ResourceDownloader.Tasks.FuncTask;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
-using PixanKit.LaunchCore.Server.Servers.ModLoader;
-using PixanKit.ResourceDownloader.Download.InstallTask;
 using PixanKit.ResourceDownloader.PostProcess;
+using PixanKit.ResourceDownloader.Tasks.FuncTask;
+using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
