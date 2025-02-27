@@ -55,13 +55,13 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         public MicrosoftPlayer(JObject jData):base(jData)
         {
             _latestLoginTime = 
-                jData.GetValue(JSON.Format.ToDateTime, "logintime");
+                jData.GetValue(Format.ToDateTime, "logintime");
             _skinURL = 
-                jData.GetValue(JSON.Format.ToString, "sinurl");
+                jData.GetValue(Format.ToString, "sinurl");
             _capeURL = 
-                jData.GetValue(JSON.Format.ToString, "capeurl");
+                jData.GetValue(Format.ToString, "capeurl");
             refreshtoken =
-                jData.GetValue(JSON.Format.ToString, "refreshtoken");
+                jData.GetValue(Format.ToString, "refreshtoken");
             _type = PlayerType.microsoft;
         }
 

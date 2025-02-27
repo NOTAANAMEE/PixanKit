@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Json;
 using PixanKit.ModController.Mod;
 using PixanKit.ModController.Module;
 using System;
@@ -16,6 +17,7 @@ namespace PixanKit.ModController.ModReader
     /// </summary>
     public static class FOVModParser
     {
+        #region Logic
         /// <summary>
         /// This method parses the json config of the Forge mod file and read the data to
         /// generate <see cref="ModFile"/> instance.
@@ -31,52 +33,50 @@ namespace PixanKit.ModController.ModReader
             if (ModModule.Instance == null) 
                 throw new InvalidOperationException();
 
-            JArray modArray = JArray.Parse(jsonContent);
+            var modArray = JArray.Parse(jsonContent);
             if (modArray.Count == 0)
                 throw new Exception("Invalid JSON: No mod data found");
 
-            JObject modEntry = (JObject)modArray[0];
-
-            var modID = GetID(modEntry);
+            var modEntry = (JObject)modArray[0];
+            var modID    = GetID(modEntry);
 
             LoadModFile(modCollection, modID,
                 modEntry, archive,
-                out List<string> dependenciesList,
+                out List<string> deplist,
                 out string version, out DateTime releaseDate);
 
             ModMetaData metaData;
             lock(ModModule.Instance.MetaDataLocker) 
                 metaData = LoadMetaData(modID, modEntry, archive);
 
-            var modFile = new ModFile(filepath)
+            var modFile  = new ModFile(filepath)
             {
-                Owner = modCollection,
-                Version = version,
-                Dependencies = dependenciesList,
-                ReleaseDate = releaseDate
+                Owner        = modCollection,
+                Version      = version,
+                Dependencies = deplist,
+                ReleaseDate  = releaseDate
             };
             metaData.Register(modFile);
             return modFile;
         }
 
         private static string GetID(JObject modEntry)
-            => modEntry["modid"]?.ToString() ?? throw new Exception("Missing modId");
+            => modEntry.GetValue(Format.ToString, "modid");
 
         private static ModMetaData LoadMetaData(string modID, JObject modEntry, ZipArchive archive)
         {
             if (ModModule.Instance == null) throw new InvalidOperationException();
+
             if (!ModModule.Instance.ModDatas.TryGetValue(modID, out ModMetaData? metaData))
             {
                 metaData = new ModMetaData
                 {
-                    ModID = modID,
-                    Description = modEntry["description"]?.ToString() ?? "",
-                    Authors =
-                    modEntry["authors"]?.Select(a => a.ToString()).ToArray() ?? [],
-                    ImageCache =
-                    FMLModParser.
-                    LoadIcon(archive, modEntry["logoFile"]?.ToString() ?? "", modID),
-                    Name = modEntry["displayName"]?.ToString() ?? ""
+                    ModID       = modID,
+                    Description = modEntry.GetDescription(),
+                    Authors     = modEntry.GetAuthors(),
+                    ImageCache  = FMLModParser.
+                        LoadIcon(archive, modEntry.GetIcon(), modID),
+                    Name        = modEntry.GetName()
                 };
                 ModModule.Instance?.AddMetaData(metaData);
             }
@@ -85,32 +85,46 @@ namespace PixanKit.ModController.ModReader
 
         private static void LoadModFile(ModCollection modCollection, string modID,
             JObject modEntry, ZipArchive archive,
-            out List<string> dependenciesList, out string version, out DateTime releaseDate
+            out List<string> depList, out string version, out DateTime releaseDate
             )
         {
-            JObject? modData;
-            ZipArchiveEntry? archiveEntry = archive.GetEntry("META-INF/MANIFEST.MF");
-            dependenciesList = [];
-            version = "";
-            releaseDate = archiveEntry?.LastWriteTime.UtcDateTime
-                ?? DateTime.UtcNow;
+            var entry   = archive.GetEntry("META-INF/MANIFEST.MF");
+            releaseDate = entry?.LastWriteTime.UtcDateTime ?? DateTime.UtcNow;
+            modCollection.ModCache.TryGetValue(Format.ToJObject, modID, out var modData);
 
-            if ((modData = modCollection.ModCache[modID] as JObject) != null)
+            if (modData == null)
             {
-                version = modData["version"]?.ToString() ?? version;
-                string? releaseDatestr = modData["release_date"]?.ToString();
-                if (releaseDatestr != null)
-                    releaseDate = DateTime.Parse(releaseDatestr);
-
-                if (modData["depends"] is JArray dependsArray)
-                    dependenciesList.AddRange(dependsArray.ToObject<List<string>>() ?? []);
+                version = modEntry.GetVersion();
+                depList = modEntry.GetDataDeps();
                 return;
             }
-
-            version = modEntry["version"]?.ToString() ?? version;
-
-            dependenciesList = modEntry["requiredMods"]
-                ?.Select(a => a.ToString()).ToList() ?? dependenciesList;
+            FabricModParser.ReadFromCache(modData, releaseDate,
+                out depList, out version, out releaseDate);
         }
+        #endregion
+
+        #region JSONReader
+        private static string GetDescription(this JObject modEntry)
+            => modEntry.GetOrDefault(Format.ToString, "description", "");
+
+        private static string[] GetAuthors(this JObject modEntry)
+            => modEntry["authors"]?.Select(a => a.ToString()).ToArray() ?? [];
+
+        private static string GetName(this JObject modEntry)
+            => modEntry.GetOrDefault(Format.ToString, "name", "");
+
+        private static string GetVersion(this JObject modCache)
+            => modCache.GetOrDefault(Format.ToString, "version", "");
+
+        private static string GetIcon(this JObject modEntry)
+            => modEntry.GetOrDefault(Format.ToString, "logoFile", "");
+
+        private static List<string> GetCacheDeps(this JObject modCache)
+            => modCache.GetOrDefault(Format.ToJArray, "depends", []).ToList(Format.ToString);
+
+        private static List<string> GetDataDeps(this JObject modData)
+            => modData.GetOrDefault(Format.ToJArray, "requiredMods", []).ToList(Format.ToString);
+        #endregion
+
     }
 }

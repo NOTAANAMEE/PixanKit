@@ -33,7 +33,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         public OriginalGame(string path) : base(path) 
         {
             _gameType = GameType.Vanilla;
-            assetsID = gameJSONData.GetOrDefault(JSON.Format.ToString, "assetIndex/id", "");
+            assetsID = gameJSONData.GetOrDefault(Format.ToString, "assetIndex/id", "");
             javaVersion = gameJSONData.GetOrDefault<short>(
                 (a) => (short)a, "minimumLauncherVersion", 0);
         }

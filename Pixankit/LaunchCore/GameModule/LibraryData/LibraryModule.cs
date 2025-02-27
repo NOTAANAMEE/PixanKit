@@ -122,7 +122,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
             //Output Error
             if (!os.Contains(SysInfo.OSName)) 
                 throw new SystemNotSupportedException(string.Join(',', os), SysInfo.OSName);
-            _name = jData.GetOrDefault(JSON.Format.ToString, "name", "");
+            _name = jData.GetOrDefault(Format.ToString, "name", "");
         }
 
         /// <summary>
@@ -163,14 +163,14 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
 
             HashSet<string> OSSet = ["osx", "linux", "windows"];
 
-            foreach (JToken ruleData in jData.GetOrDefault(JSON.Format.ToJArray, "rules", []))
+            foreach (JToken ruleData in jData.GetOrDefault(Format.ToJArray, "rules", []))
             {
-                JObject jObj = ruleData.ConvertTo(JSON.Format.ToJObject, []);
+                JObject jObj = ruleData.ConvertTo(Format.ToJObject, []);
 
-                string action = jObj.GetOrDefault(JSON.Format.ToString, "action", "");
-                var osData = jObj.GetOrDefault(JSON.Format.ToJObject, "os", []);
-                var osName = jObj.GetOrDefault(JSON.Format.ToString, "os/name", null);
-                var osArch = jObj.GetOrDefault(JSON.Format.ToString, "os/arch", null);
+                string action = jObj.GetOrDefault(Format.ToString, "action", "");
+                var osData = jObj.GetOrDefault(Format.ToJObject, "os", []);
+                var osName = jObj.GetOrDefault(Format.ToString, "os/name", null);
+                var osArch = jObj.GetOrDefault(Format.ToString, "os/arch", null);
 
                 switch (action)
                 {

@@ -44,12 +44,12 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <inheritdoc/>
         protected override void LoadJSON(JObject Jdata)
         {
-            if (!Jdata.TryGetValue(JSON.Format.ToString, "inheritsFrom", out var output))
+            if (!Jdata.TryGetValue(Format.ToString, "inheritsFrom", out var output))
             {
                 useBaseGeneration = true;
                 assetsID = 
-                    Jdata.GetOrDefault(JSON.Format.ToString, "assetIndex/id", "");
-                _version = Jdata.GetOrDefault(JSON.Format.ToString, "clientVersion", "");
+                    Jdata.GetOrDefault(Format.ToString, "assetIndex/id", "");
+                _version = Jdata.GetOrDefault(Format.ToString, "clientVersion", "");
             }
             else
             {

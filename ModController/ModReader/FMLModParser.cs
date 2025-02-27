@@ -8,10 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Tomlyn.Model;
 using Tomlyn;
-using System.Dynamic;
-using System.Security.Cryptography;
 using System.IO.Compression;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using PixanKit.LaunchCore.Json;
 
 namespace PixanKit.ModController.ModReader
 {
@@ -22,6 +20,7 @@ namespace PixanKit.ModController.ModReader
     {
         static readonly object IconLocker = new ();
 
+        #region Logic
         /// <summary>
         /// This method parses the toml config of the Forge mod file and read the data to
         /// generate <see cref="ModFile"/> instance.
@@ -34,36 +33,31 @@ namespace PixanKit.ModController.ModReader
         /// <exception cref="Exception">toml config is not valid</exception>
         public static ModFile ParseToml(string tomlContent, string filepath, ModCollection modCollection, ZipArchive archive)
         {
-            var table = Toml.ToModel(tomlContent) ??
+            var table    = Toml.ToModel(tomlContent) ??
                 throw new Exception("Failed to parse TOML");
-
-            var mods = table["mods"] as TomlTableArray ??
-                throw new Exception("Invalid TOML: No mods found");
-
+            var mods     = table.GetValue<TomlTableArray>("mods");
             _ = ModModule.Instance ??
                 throw new InvalidOperationException("ModModule has not being inited");
 
             var modEntry = mods[0];
-
-            var modID = GetID(modEntry);
+            var modID    = GetID(modEntry);
 
             LoadModFile(modCollection, modID, 
                 table, modEntry, archive,
-                out List<string> dependenciesList, 
+                out List<string> depList, 
                 out string version, out DateTime releaseDate);
 
             ModMetaData metaData;
-
             
             lock(ModModule.Instance.MetaDataLocker)
                 metaData = LoadMetaData(modID, modEntry, archive);
 
-            var modFile = new ModFile(filepath)
+            var modFile  = new ModFile(filepath)
             {
-                Owner = modCollection,
-                Version = version,
-                Dependencies = dependenciesList,
-                ReleaseDate = releaseDate
+                Owner        = modCollection,
+                Version      = version,
+                Dependencies = depList,
+                ReleaseDate  = releaseDate
             };
             metaData.Register(modFile);
             return modFile;
@@ -77,16 +71,14 @@ namespace PixanKit.ModController.ModReader
             if (ModModule.Instance == null) throw new InvalidOperationException();
             if (!ModModule.Instance.ModDatas.TryGetValue(modID, out ModMetaData? metaData))
             {
-                string logofile = "";
-                if (modEntry.ContainsKey("logoFile"))
-                    logofile = modEntry["logoFile"]?.ToString() ?? "";
+                string logofile = modEntry.GetIcon();
                 metaData = new ModMetaData
                 {
-                    ModID = modID,
-                    Description = modEntry["description"]?.ToString() ?? "",
-                    Authors = [modEntry["authors"]?.ToString() ?? ""],
-                    ImageCache = LoadIcon(archive, logofile, modID),
-                    Name = modEntry["displayName"]?.ToString() ?? ""
+                    ModID       = modID,
+                    Description = modEntry.GetOrDefault("description", ""),
+                    Authors     = [modEntry.GetOrDefault("authors", "")],
+                    ImageCache  = LoadIcon(archive, logofile, modID),
+                    Name        = modEntry.GetOrDefault("displayName", "")
                 };
                 ModModule.Instance?.AddMetaData(metaData);
             }
@@ -96,42 +88,25 @@ namespace PixanKit.ModController.ModReader
 
         private static void LoadModFile(ModCollection modCollection, string modID,
             TomlTable table, TomlTable modEntry, ZipArchive archive,
-            out List<string> dependenciesList, out string version, out DateTime releaseDate
+            out List<string> depList, out string version, out DateTime releaseDate
             )
         {
-            JObject? modData;
-            ZipArchiveEntry? archiveEntry = archive.GetEntry("META-INF/MANIFEST.MF");
-            dependenciesList = [];
-            version = "";
-            releaseDate = archiveEntry?.LastWriteTime.UtcDateTime
-                ?? DateTime.UtcNow;
+            var entry   = archive.GetEntry("META-INF/MANIFEST.MF");
+            releaseDate = entry?.LastWriteTime.UtcDateTime ?? DateTime.UtcNow;
+            modCollection.ModCache.TryGetValue(Format.ToJObject, modID, out var modData);
 
-            if ((modData = modCollection.ModCache[modID] as JObject) != null)
+            if (modData == null)
             {
-                version = modData["version"]?.ToString() ?? version;
-                releaseDate = modData.Value<DateTime?>("release_date") ?? releaseDate;
-
-                if (modData["depends"] is JArray dependsArray)
-                    dependenciesList.AddRange(dependsArray.ToObject<List<string>>() ?? []);
+                version = modEntry.GetVersion();
+                if (version == "${file.jarVersion}" && entry is not null)
+                    version = GetVersionFromManifest(entry);
+                depList = modEntry.GetDeps(modID);
+                depList = [.. depList.Except(GetDependenciesUnderJarJar(archive))];
                 return;
             }
 
-            version = modEntry["version"].ToString() ?? version;
-
-            if (version == "${file.jarVersion}" && archiveEntry is not null)
-                version = GetVersionFromManifest(archiveEntry);
-
-            if (!table.ContainsKey("dependencies." + modID)) return;
-            if (table["dependencies." + modID] is not TomlArray dependencies) return;
-
-            foreach (var dep in dependencies.Cast<TomlTable>())
-            {
-                if (dep.TryGetValue("modId", out var modIdObj) && modIdObj is string depModId)
-                {
-                    dependenciesList.Add(depModId);
-                }
-            }
-            dependenciesList = dependenciesList.Except(GetDependenciesUnderJarJar(archive)).ToList();
+            FabricModParser.ReadFromCache(modData, releaseDate,
+                    out depList, out version, out releaseDate);
         }
 
         /// <summary>
@@ -141,19 +116,19 @@ namespace PixanKit.ModController.ModReader
         /// <returns></returns>
         internal static string GetVersionFromManifest(ZipArchiveEntry manifestEntry) 
         {
-            var filestream = manifestEntry.Open();
+            var filestream  = manifestEntry.Open();
             StreamReader sr = new(filestream);
             while (!sr.EndOfStream) 
             {
                 var line = sr.ReadLine() ?? "";
-                const string impVersionkey = "Implementation-Version: ",
-                             speVersionkey = "Specification-Version: ";
+                const string impVerkey = "Implementation-Version: ",
+                             speVerkey = "Specification-Version: ";
 
-                if (line.StartsWith(impVersionkey))
-                    return line[impVersionkey.Length..].Trim();
+                if (line.StartsWith(impVerkey))
+                    return line[impVerkey.Length..].Trim();
 
-                if (line.StartsWith(speVersionkey))
-                    return line[speVersionkey.Length..].Trim();
+                if (line.StartsWith(speVerkey))
+                    return line[speVerkey.Length..].Trim();
             }
             return "Unkonwn";
         }
@@ -168,13 +143,8 @@ namespace PixanKit.ModController.ModReader
             List<string> ret = [];
             foreach (var entry in archive.Entries) 
             {
-                if (entry.FullName.EndsWith('/')
-                    || !entry.FullName.StartsWith("META-INF/jarjar/"))
-                    continue;
-                try
-                {
-                    ret.Add(GetEachJarID(entry));
-                }
+                if (CheckFile(entry.FullName)) continue;
+                try { ret.Add(GetEachJarID(entry)); }
                 catch { }
             }
             return ret;
@@ -188,18 +158,18 @@ namespace PixanKit.ModController.ModReader
         /// <exception cref="Exception"></exception>
         private static string GetEachJarID(ZipArchiveEntry archiveEntry)
         {
-            var filestream = archiveEntry.Open();
-            var archive = new ZipArchive(filestream);
-            var entry = archive.GetEntry("META-INF/mods.toml") 
-                ?? throw new Exception("Not Invalid Mod");
-            var entrystream = entry.Open();
+            var filestream   = archiveEntry.Open();
+            var archive      = new ZipArchive(filestream);
+            var entry        = archive.GetEntry("META-INF/mods.toml") ?? 
+                               throw new Exception("Not Invalid Mod");
+            var entrystream  = entry.Open();
             var streamreader = new StreamReader(entrystream);
-            var tomlContent = streamreader.ReadToEnd();
-            var table = Toml.ToModel(tomlContent) ??
-                throw new Exception("Failed to parse TOML");
-            var mods = table["mods"] as TomlTableArray ??
-                throw new Exception("Invalid TOML: No mods found");
-            var modEntry = mods[0];
+            var tomlContent  = streamreader.ReadToEnd();
+            var table        = Toml.ToModel(tomlContent) ??
+                               throw new Exception("Failed to parse TOML");
+            var mods         = table["mods"] as TomlTableArray ??
+                               throw new Exception("Invalid TOML: No mods found");
+            var modEntry     = mods[0];
             return GetID(modEntry);
         }
 
@@ -209,9 +179,9 @@ namespace PixanKit.ModController.ModReader
             if (iconPath.StartsWith("http")) return iconPath;
             var entry = archive.GetEntry(iconPath);
             if (entry == null) return iconPath;
-            string path = $"{ModModule.IconCachePath}/{modID}" +
+            var path  = $"{ModModule.IconCachePath}/{modID}" +
                 $"{Path.GetExtension(entry.FullName)}";
-            //Directory.CreateDirectory(ModModule.IconCachePath);
+
             lock (IconLocker)
             {
                 if (File.Exists(path)) File.Delete(path);
@@ -220,5 +190,39 @@ namespace PixanKit.ModController.ModReader
 
             return path;
         }
+        #endregion
+
+        #region Check
+        private static bool CheckFile(string path)
+            => path.StartsWith("META-INF/jarjar/") && !path.EndsWith('/');
+        #endregion
+
+        #region TOMLReader
+        private static string GetVersion(this TomlTable table)
+            => table["version"].ToString() ?? "";
+
+        private static List<string> GetDeps(this TomlTable table, string modID)
+        {
+            var depList = new List<string>();
+            if (!table.ContainsKey("dependencies." + modID)) return depList;
+            if (table["dependencies." + modID] is not TomlArray dependencies) 
+                return depList;
+
+            foreach (var dep in dependencies.Cast<TomlTable>())
+            {
+                if (dep.TryGetValue("modId", out var modIdObj) && modIdObj is string depModId)
+                {
+                    depList.Add(depModId);
+                }
+            }
+            return depList;
+        }
+
+        private static string GetIcon(this TomlTable table)
+            => table.GetOrDefault("logoFile", "");
+
+        private static string GetDescription(this TomlTable table)
+            => table.GetOrDefault("description", "");
+        #endregion
     }
 }

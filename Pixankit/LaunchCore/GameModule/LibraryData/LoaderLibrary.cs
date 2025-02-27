@@ -22,7 +22,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
             base(libraryJData, folder)
         {
             libraryType = LibraryType.Mod;
-            _url = libraryJData.GetValue(JSON.Format.ToString, "url");
+            _url = libraryJData.GetValue(Format.ToString, "url");
         }
 
         /// <summary>
