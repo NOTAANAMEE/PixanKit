@@ -109,8 +109,7 @@ namespace PixanKit.LaunchCore.Json
             output = default;
             var tok = GetFromPath(obj, Path);
             if (tok == null) return false;
-            try { output = format(tok); }
-            catch { return false; }
+            try { output = format(tok); } catch { return false; }
             return true;
         }
 
@@ -125,10 +124,8 @@ namespace PixanKit.LaunchCore.Json
         /// <exception cref="InvalidOperationException">Thrown if the path is not found in the JObject.</exception>
         public static T GetValue<T>(this JObject obj, Func<JToken, T> format, string Path)
         {
-            var tok = GetFromPath(obj, Path);
-
-            return format(tok ?? throw new InvalidOperationException("" +
-                "JSON Path Not Found!"));
+            var tok = GetFromPathCheck(obj, Path);
+            return format(tok);
         }
 
         /// <summary>
@@ -142,9 +139,11 @@ namespace PixanKit.LaunchCore.Json
         /// <returns>The formatted value or the default value.</returns>
         public static T GetOrDefault<T>(this JObject obj, Func<JToken, T> format, string Path, T defaultVal)
         {
+            T ret;
             var tok = GetFromPath(obj, Path);
             if (tok == null) return defaultVal;
-            return format(tok);
+            try { ret = format(tok);  } catch { return defaultVal; }
+            return ret;
         }
 
         /// <summary>
@@ -178,6 +177,29 @@ namespace PixanKit.LaunchCore.Json
             return token;
         }
 
+        /// <summary>
+        /// Retrieves a <see cref="JToken"/> from the specified JSON path. 
+        /// Throws an exception if the token does not exist.
+        /// </summary>
+        /// <param name="obj">The <see cref="JObject"/> to search within.</param>
+        /// <param name="Path">The JSON path to the desired token.</param>
+        /// <returns>The retrieved <see cref="JToken"/>.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the token does not exist at the specified path.</exception>
+        public static JToken GetFromPathCheck(this JObject obj, string Path)
+        {
+            return obj.GetFromPath(Path) ?? 
+                throw new InvalidOperationException("Token does not exist");
+        }
+
+        /// <summary>
+        /// Converts a <see cref="JToken"/> to the specified type. 
+        /// Returns a default value if the token is null.
+        /// </summary>
+        /// <typeparam name="T">The target type.</typeparam>
+        /// <param name="token">The <see cref="JToken"/> to convert, which can be null.</param>
+        /// <param name="format">A conversion function that transforms the <see cref="JToken"/> into the target type.</param>
+        /// <param name="defaultVal">The default value to return if the token is null.</param>
+        /// <returns>The converted value, or the default value if the token is null.</returns>
         public static T ConvertTo<T>(this JToken? token, Func<JToken, T> format, T defaultVal)
         {
             if (token == null) return defaultVal;
@@ -191,7 +213,7 @@ namespace PixanKit.LaunchCore.Json
         public static class Format
         {
             /// <summary>
-            /// Convert the JToken to string
+            /// Converts the JToken to string
             /// </summary>
             /// <param name="tok">The token that needed to convert</param>
             /// <returns>the result of convert</returns>
@@ -199,38 +221,68 @@ namespace PixanKit.LaunchCore.Json
                 => tok.ToString();
 
             /// <summary>
-            /// 
+            /// Converts a <see cref="JToken"/> to an <see cref="int"/>.
             /// </summary>
-            /// <param name="tok"></param>
-            /// <returns></returns>
-            /// <exception cref="InvalidOperationException"></exception>
+            /// <param name="tok">The <see cref="JToken"/> to convert.</param>
+            /// <returns>The integer value of the token.</returns>
+            /// <exception cref="InvalidOperationException">Thrown if the token is not of type <see cref="JTokenType.Integer"/>.</exception>
             public static int ToInt32(JToken tok)
             {
                 if (tok.Type == JTokenType.Integer) return (int)tok;
                 throw new InvalidOperationException("Token is not an Integer");
             }
 
+            /// <summary>
+            /// Converts a <see cref="JToken"/> to a <see cref="DateTime"/>.
+            /// </summary>
+            /// <param name="tok">The <see cref="JToken"/> to convert.</param>
+            /// <returns>The <see cref="DateTime"/> value of the token.</returns>
+            /// <exception cref="FormatException">Thrown if the token cannot be parsed as a valid date-time string.</exception>
             public static DateTime ToDateTime(JToken tok)
                 => DateTime.Parse(tok.ToString());
 
+            /// <summary>
+            /// Converts a <see cref="JToken"/> to a <see cref="bool"/>.
+            /// </summary>
+            /// <param name="tok">The <see cref="JToken"/> to convert.</param>
+            /// <returns>The boolean value of the token.</returns>
+            /// <exception cref="InvalidOperationException">Thrown if the token is not of type <see cref="JTokenType.Boolean"/>.</exception>
             public static bool ToBool(JToken tok)
             {
                 if(tok.Type == JTokenType.Boolean) return (bool)tok;
                 throw new InvalidOperationException("Token is not a bool");
             }
 
+            /// <summary>
+            /// Converts a <see cref="JToken"/> to a <see cref="double"/>.
+            /// </summary>
+            /// <param name="tok">The <see cref="JToken"/> to convert.</param>
+            /// <returns>The double value of the token.</returns>
+            /// <exception cref="InvalidOperationException">Thrown if the token is not of type <see cref="JTokenType.Float"/>.</exception>
             public static double ToDouble(JToken tok)
             {
                 if (tok.Type == JTokenType.Float) return (double)tok;
                 throw new InvalidOperationException("Token is not a double");
             }
 
+            /// <summary>
+            /// Converts a <see cref="JToken"/> to a <see cref="JObject"/>.
+            /// </summary>
+            /// <param name="tok">The <see cref="JToken"/> to convert.</param>
+            /// <returns>The <see cref="JObject"/> representation of the token.</returns>
+            /// <exception cref="InvalidOperationException">Thrown if the token is not of type <see cref="JTokenType.Object"/>.</exception>
             public static JObject ToJObject(JToken tok)
             {
                 if (tok.Type == JTokenType.Object)return (JObject)tok;
                 throw new InvalidOperationException("Token is not an object");
             }
 
+            /// <summary>
+            /// Converts a <see cref="JToken"/> to a <see cref="JArray"/>.
+            /// </summary>
+            /// <param name="tok">The <see cref="JToken"/> to convert.</param>
+            /// <returns>The <see cref="JArray"/> representation of the token.</returns>
+            /// <exception cref="InvalidOperationException">Thrown if the token is not of type <see cref="JTokenType.Array"/>.</exception>
             public static JArray ToJArray(JToken tok)
             {
                 if (tok.Type == JTokenType.Array) return (JArray)tok;

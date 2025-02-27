@@ -463,8 +463,8 @@ namespace PixanKit.LaunchCore.GameModule.Game
             if (jvmargArray == null) return;
             foreach (JToken token in jvmargArray)
             {
-                string arg;
-                if ((arg = ParseArg(token)) == "") continue;
+                string arg = ParseArg(token);
+                if (arg == "") continue;
                 javaArguments += $"{arg} ";
             }
         }
@@ -491,9 +491,11 @@ namespace PixanKit.LaunchCore.GameModule.Game
             }
             else if (LibraryBase.SystemSupport((JObject)token))
             {
-                if (token["value"]?.Type == JTokenType.String) 
-                    return (token["value"] ?? "").ToString();
-                arg = string.Join(" ", token.ConvertTo(JSON.Format.ToJArray, []));
+                var value = token.ConvertTo(JSON.Format.ToJObject, [])
+                    .GetFromPathCheck("value");
+                if (value.Type == JTokenType.String) 
+                    return value.ToString();
+                arg = string.Join(" ", value.ConvertTo(JSON.Format.ToJArray, []));
             }
             return arg;
         }

@@ -8,6 +8,7 @@ using PixanKit.LaunchCore.SystemInf;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Log;
+using PixanKit.LaunchCore.Json;
 
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
@@ -25,15 +26,19 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         public NativeLibrary(JObject libraryJData) : base()
         {
             libraryType = LibraryType.Native;
-            JToken? current = libraryJData["downloads"]?["classifiers"]?
-                [libraryJData["natives"]?[SysInfo.OSName]?.ToString() ?? ""];
-            _name = current?["path"]?.ToString() ?? "";
-            _sha1 = current?["sha1"]?.ToString() ?? "";
-            _url = current?["url"]?.ToString() ?? "";
+            string OSKey =
+                libraryJData.GetOrDefault(JSON.Format.ToString, 
+                $"natives/{SysInfo.OSName}", "");
+
+            JObject current = libraryJData.GetValue(JSON.Format.ToJObject, OSKey);
+            _name = current.GetValue(JSON.Format.ToString, "name");
+            _sha1 = current.GetValue(JSON.Format.ToString, "sha1");
+            _url  = current.GetValue(JSON.Format.ToString, "url");
+
             List<string> excludelist = [];
-            if (libraryJData["extract"] != null && libraryJData["extract"]?["exclude"] != null)
+            if (libraryJData.TryGetValue(JSON.Format.ToJArray, "extract/exclude", out var array))
             {
-                foreach (JToken token in libraryJData["extract"]?["exclude"] ?? new JArray())
+                foreach (JToken token in array ?? [])
                     excludelist.Add(token.ToString());
             }
             Exclude = [..excludelist];

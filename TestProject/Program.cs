@@ -12,7 +12,8 @@ namespace TestProject
     {
         static void Main(string[] args)
         {
-            ModModule.Init();
+            Files.Load();
+            Launcher launcher = new();
         }
 
     }

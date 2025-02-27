@@ -27,17 +27,24 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         public static void Parse(JObject jData, List<LibraryBase> gamelibraries)
         {
             if (!SystemSupport(jData)) return;
-            if (libraries.TryGetValue(GetName(jData), out LibraryBase? ret)) 
+
+            if (libraries.TryGetValue(GetName(jData), out LibraryBase? ret))
+            {
                 gamelibraries.Add(ret);
-            switch (GetLibraryType(jData))
+                return;
+            }
+            LibraryType type = GetLibraryType(jData);
+            JObject? nativesData = jData["natives"] as JObject;
+            JObject? downloadsData = jData["downloads"] as JObject;
+            switch (type)
             {
                 case LibraryType.Vanilla:
                     gamelibraries.Add(new OriginalLibrary(jData));
                     break;
                 case LibraryType.Native:
-                    if (jData["natives"]?[SysInfo.OSName] == null) break;
+                    if (nativesData?[SysInfo.OSName] == null) return;
                     gamelibraries.Add(new NativeLibrary(jData));
-                    if ((jData["downloads"] as JObject ?? []).Count > 1)
+                    if (downloadsData != null && downloadsData.Count > 1)
                         gamelibraries.Add(new OriginalLibrary(jData));
                     break;
                 case LibraryType.Mod:
