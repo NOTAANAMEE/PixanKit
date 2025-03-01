@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PixanKit.LaunchCore.SystemInf
+﻿namespace PixanKit.LaunchCore.SystemInf
 {
     internal static class Localize
     {
@@ -31,13 +25,11 @@ namespace PixanKit.LaunchCore.SystemInf
 
         public static string CPLocalize(string cparg)
         {
-            switch (SysInfo.OSName) 
+            return SysInfo.OSName switch
             {
-                case "windows":
-                    return cparg.Replace("${classpath_separator}", ";");
-                default:
-                    return cparg;
-            }
+                "windows" => cparg.Replace("${classpath_separator}", ";"),
+                _ => cparg,
+            };
         }
 
         public static string LocalParser = "${classpath_separator}";

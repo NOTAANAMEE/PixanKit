@@ -1,13 +1,6 @@
-﻿using PixanKit.LaunchCore.GameModule;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.AccessControl;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.GameModule.Game;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 using PixanKit.LaunchCore.Json;
 
 namespace PixanKit.ResourceDownloader.PostProcess
@@ -79,7 +72,7 @@ namespace PixanKit.ResourceDownloader.PostProcess
             foreach (var entry in Directory.GetFileSystemEntries(folderpath))
             {
                 string filename = Path.GetFileName(entry);
-                string newname = "";
+                string newname;
                 string newpath;
                 if (!filename.StartsWith(loaderversion)) continue;
                 newname = filename.Replace(loaderversion, name);

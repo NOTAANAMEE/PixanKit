@@ -1,12 +1,6 @@
-﻿using PixanKit.LaunchCore.Server.Servers.Microsoft;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Server.Servers.Microsoft;
 using System.Net.Http.Headers;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.Server.Servers.Mojang
 {

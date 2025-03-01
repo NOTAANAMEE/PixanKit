@@ -1,11 +1,5 @@
 ﻿using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.JavaModule.Java;
-using PixanKit.LaunchCore.SystemInf;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.JavaModule
 {
@@ -38,7 +32,7 @@ namespace PixanKit.LaunchCore.JavaModule
         /// <returns>Returns A JavaRuntime If Exisits. Else Return null</returns>
         public static JavaRuntime? Closest(JavaRuntime[] runtimes, GameBase game)
         {
-            List<JavaRuntime> runtimes_ = runtimes.ToList();
+            List<JavaRuntime> runtimes_ = [..runtimes];
             runtimes_.Sort((x, y) =>
             {
                 return x.Version - y.Version;
@@ -51,24 +45,34 @@ namespace PixanKit.LaunchCore.JavaModule
         }
 
         /// <summary>
-        /// Choose The Newest Runtime
+        /// This function will choose the latest JavaRuntime
+        /// according to its major version
         /// </summary>
-        /// <param name="runtimes">Java Runtime Collection</param>
-        /// <param name="game">Game Needed To Launch</param>
-        /// <returns>Returns A JavaRuntime If Exisits. Else Return null</returns>
+        /// <param name="runtimes">A collection of Java runtimes</param>
+        /// <param name="game">The game that is needed to launch</param>
+        /// <returns>
+        /// The JavaRuntime instance which is in the collection and 
+        /// matches the requirement.<br/>
+        /// If no JavaRuntime fits, it will return <c>null</c>
+        /// </returns>
         public static JavaRuntime? Newest(JavaRuntime[] runtimes, GameBase game)
         {
             return Newest(runtimes);
         }
 
         /// <summary>
-        /// Choose The Newest
+        /// This function will choose the latest JavaRuntime
+        /// according to its major version
         /// </summary>
-        /// <param name="runtimes">Java Runtime Array</param>
-        /// <returns>Newest Java Runtime</returns>
+        /// <param name="runtimes">A collection of Java runtimes</param>
+        /// <returns>
+        /// The JavaRuntime instance which is in the collection and 
+        /// matches the requirement.<br/>
+        /// If no JavaRuntime fits, it will return <c>null</c>
+        /// </returns>
         public static JavaRuntime? Newest(JavaRuntime[] runtimes)
         {
-            List<JavaRuntime> runtimes_ = runtimes.ToList();
+            List<JavaRuntime> runtimes_ = [..runtimes];
             runtimes_.Sort((x, y) =>
             {
                 return x.Version - y.Version;

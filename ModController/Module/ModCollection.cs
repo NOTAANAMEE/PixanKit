@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PixanKit.ModController.Mod;
-using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore;
+﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.Json;
+using PixanKit.LaunchCore.Log;
+using PixanKit.ModController.Mod;
 using PixanKit.ModController.ModReader;
 
 namespace PixanKit.ModController.Module
@@ -49,8 +43,14 @@ namespace PixanKit.ModController.Module
             LoadFromJSON(cache);
             foreach (var mod in Directory.GetFiles(Owner.ModDir))
             {
+                try { 
                 var modfile = ModParser.Parse(mod, this);
-                ModFiles.TryAdd(modfile.MetaData?.ModID ?? "", modfile);
+                ModFiles.TryAdd(modfile.MetaData?.ModID ?? "", modfile); }
+                catch(Exception e) 
+                { 
+                    Logger.Error("ModController", $"Error while parsing {mod}: {e.Message}"); 
+                    Logger.Error("ModController", e.StackTrace ?? "");
+                }
             }
             ModCache = [];
         }

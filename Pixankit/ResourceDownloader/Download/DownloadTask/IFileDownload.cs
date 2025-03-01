@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PixanKit.ResourceDownloader.Download.DownloadTask
+﻿namespace PixanKit.ResourceDownloader.Download.DownloadTask
 {
     /// <summary>
     /// The interface defines the methods that help track the progress of the downloading task

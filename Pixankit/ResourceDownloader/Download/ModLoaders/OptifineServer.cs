@@ -1,12 +1,7 @@
 ﻿using HtmlAgilityPack;
 using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PixanKit.ResourceDownloader.Download.ModLoaders
 {
@@ -58,7 +53,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 if (token.IsCancellationRequested) return null;
                 var content = await response.Content.ReadAsStringAsync(token);
                 if (token.IsCancellationRequested) return null;
-                var versions = new List<string>();
+                //var versions = new List<string>();
                 HtmlDocument document = new();
                 document.LoadHtml(content);
                 File.WriteAllText("a.html", content);

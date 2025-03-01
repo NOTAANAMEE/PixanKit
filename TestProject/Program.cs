@@ -1,8 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Core;
+﻿using PixanKit.LaunchCore.Core;
 using PixanKit.LaunchCore.Extention;
-using PixanKit.LaunchCore.GameModule.Game;
-using PixanKit.LaunchCore.PlayerModule.Player;
 using PixanKit.ModController;
 using PixanKit.ModController.Module;
 
@@ -10,14 +7,14 @@ namespace TestProject
 {
     internal class Program
     {
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
+            Files.Load();
+            ModModule.DefaultFile();
             ModModule.Init();
-            _ = new Launcher();
-            ModModule modModule = new();
-            await Task.WhenAll(modModule.InitTasks);
-            Console.WriteLine(modModule.ModdedGames.Values.First().GetDependencies());
-            modModule.SaveFile();
+            Launcher launcher = new();
+            ModModule _ = new();
+            //await Task.WhenAll(ModModule.Instance.InitTasks);
         }
 
     }

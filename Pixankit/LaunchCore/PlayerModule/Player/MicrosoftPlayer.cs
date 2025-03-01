@@ -1,13 +1,7 @@
-﻿using PixanKit.LaunchCore.Extention;
+﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Extention;
+using PixanKit.LaunchCore.Json;
 using PixanKit.LaunchCore.PlayerModule.MojangAPI;
-using PixanKit.LaunchCore.SystemInf;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.PlayerModule.Player
 {
@@ -53,16 +47,15 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// <param name="jData">The JSON data representing the player.</param>
         public MicrosoftPlayer(JObject jData):base(jData)
         {
-            _latestLoginTime = DateTime.Parse(jData["logintime"]?.ToString() ?? "");
-            _skinURL = jData["skinurl"]?.ToString() ?? "";
-            _capeURL = jData["capeurl"]?.ToString() ?? "";
-            refreshtoken = jData["refreshtoken"]?.ToString() ?? "";
+            _latestLoginTime = 
+                jData.GetValue(Format.ToDateTime, "logintime");
+            _skinURL = 
+                jData.GetValue(Format.ToString, "sinurl");
+            _capeURL = 
+                jData.GetValue(Format.ToString, "capeurl");
+            refreshtoken =
+                jData.GetValue(Format.ToString, "refreshtoken");
             _type = PlayerType.microsoft;
-            if (DateTime.Now - _latestLoginTime >= TimeSpan.FromDays(1))
-            {
-                _ = ReLogin();
-                _latestLoginTime = DateTime.Now;
-            }
         }
 
         /// <summary>
@@ -141,7 +134,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         public override JObject ToJSON()
         {
             JObject jobj = base.ToJSON();
-            jobj.Add("logintime", _latestLoginTime.ToString());
+            jobj.Add("logintime", _latestLoginTime);
             jobj.Add("skinurl", _skinURL);
             jobj.Add("capeurl", _capeURL);
             jobj.Add("refreshtoken", refreshtoken);

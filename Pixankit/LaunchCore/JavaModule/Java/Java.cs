@@ -1,12 +1,6 @@
-﻿using PixanKit.LaunchCore.SystemInf;
+﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 
 namespace PixanKit.LaunchCore.JavaModule.Java

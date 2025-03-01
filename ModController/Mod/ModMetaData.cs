@@ -1,12 +1,5 @@
-﻿using PixanKit.ModController.Module;
-using PixanKit.ModController.Interfaces;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PixanKit.LaunchCore.GameModule.LibraryData;
+﻿using Newtonsoft.Json.Linq;
+using PixanKit.ModController.Module;
 
 namespace PixanKit.ModController.Mod
 {

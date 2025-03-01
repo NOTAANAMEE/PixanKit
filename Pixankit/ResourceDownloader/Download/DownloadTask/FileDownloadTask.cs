@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PixanKit.ResourceDownloader.SystemInf;
-using PixanKit.ResourceDownloader.Tasks;
-using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
-using PixanKit.ResourceDownloader.Download.DownloadTask;
+﻿using PixanKit.ResourceDownloader.Tasks;
 using PixanKit.ResourceDownloader.Tasks.FuncTask;
+using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 
 namespace PixanKit.ResourceDownloader.Download.DownloadTask
 {

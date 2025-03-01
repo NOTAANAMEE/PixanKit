@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PixanKit.LaunchCore.SystemInf;
+﻿using PixanKit.LaunchCore.SystemInf;
 
 namespace PixanKit.ResourceDownloader.SystemInf
 {
@@ -21,13 +16,11 @@ namespace PixanKit.ResourceDownloader.SystemInf
         public static string PathLocalize(string path)
         {
             if (SysInfo.OSName == "windows") path = path.Replace("~", UserPath);
-            switch (SysInfo.OSName)
+            return SysInfo.OSName switch
             {
-                case "windows":
-                    return path.Replace("/", "\\");
-                default:
-                    return path;
-            }
+                "windows" => path.Replace("/", "\\"),
+                _ => path,
+            };
         }
 
         public static string GetLocalDirectory(string path)

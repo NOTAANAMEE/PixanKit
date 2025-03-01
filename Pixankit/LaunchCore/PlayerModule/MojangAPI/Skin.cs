@@ -1,16 +1,7 @@
-﻿using PixanKit.LaunchCore.PlayerModule.Player;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net.Http;
+﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.PlayerModule.Player;
 using System.Net.Http.Headers;
-using System.Drawing;
-using System.Numerics;
-using Newtonsoft.Json.Linq;
-using System.Buffers.Text;
-using System.ComponentModel;
+using System.Text;
 
 namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
 {
@@ -49,7 +40,7 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
 
             byte[] skinData = File.ReadAllBytes(skinPath);
 
-            MultipartFormDataContent content = new MultipartFormDataContent
+            MultipartFormDataContent content = new()
             {
                 { new StringContent((slim)? "slim":"classic"), "variant" },
                 { new ByteArrayContent(File.ReadAllBytes(skinPath)), "file", Path.GetFileName(skinPath) }

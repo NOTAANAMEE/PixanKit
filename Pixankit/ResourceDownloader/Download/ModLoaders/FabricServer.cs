@@ -1,15 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Log;
-using PixanKit.LaunchCore.Server;
-using PixanKit.LaunchCore.Server.Servers.ModLoader;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using PixanKit;
 using PixanKit.LaunchCore.Exceptions;
+using PixanKit.LaunchCore.Server.Servers.ModLoader;
+using System.Runtime.CompilerServices;
 
 namespace PixanKit.ResourceDownloader.Download.ModLoaders
 {

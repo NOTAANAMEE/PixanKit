@@ -1,12 +1,7 @@
-﻿using PixanKit.LaunchCore.GameModule.Game;
+﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.JavaModule;
 using PixanKit.LaunchCore.JavaModule.Java;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.Core
 {
@@ -17,10 +12,10 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         public JavaRuntime[] JavaRuntimes
         {
-            get => _javaRuntimes.ToArray();
+            get => [.. _javaRuntimes];
         }
 
-        List<JavaRuntime> _javaRuntimes = new List<JavaRuntime>();
+        List<JavaRuntime> _javaRuntimes = [];
 
         /// <summary>
         /// Adds a Java runtime to the launcher.

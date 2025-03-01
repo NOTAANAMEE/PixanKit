@@ -1,11 +1,4 @@
-﻿using PixanKit.ResourceDownloader.Tasks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PixanKit.ResourceDownloader.Tasks.FuncTask
+﻿namespace PixanKit.ResourceDownloader.Tasks.FuncTask
 {
     /// <summary>
     /// Represents a progress task that executes a user-defined function and tracks its progress.

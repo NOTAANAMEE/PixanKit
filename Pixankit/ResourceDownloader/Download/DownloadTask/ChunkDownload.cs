@@ -1,13 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Log;
+﻿using PixanKit.LaunchCore.Log;
 using PixanKit.ResourceDownloader.Tasks.FuncTask;
-using PixanKit.ResourceDownloader.Download.DownloadTask;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PixanKit.ResourceDownloader.Download.DownloadTask
 {

@@ -1,14 +1,7 @@
 ﻿using HtmlAgilityPack;
 using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Json;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using static PixanKit.ResourceDownloader.Download.ModLoaders.QuiltServer;
 
 namespace PixanKit.ResourceDownloader.Download.ModLoaders
 {

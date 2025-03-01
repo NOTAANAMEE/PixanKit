@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
@@ -20,7 +12,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// </summary>
         /// <param name="folder">The directory where the library is located.</param>
         /// <param name="libraryJData">The JSON data representing the library.</param>
-        public OriginalLibrary(string folder, JToken libraryJData) : base(libraryJData, folder)
+        public OriginalLibrary(string folder, JObject libraryJData) : base(libraryJData, folder)
         {
             libraryType = LibraryType.Vanilla;
             _url = libraryJData["downloads"]?["artifact"]?["url"]?.ToString() ?? "";
@@ -31,7 +23,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// Initializes a new instance of the <see cref="OriginalLibrary"/> class with library JSON data.
         /// </summary>
         /// <param name="libraryJData">The JSON data representing the library.</param>
-        public OriginalLibrary(JToken libraryJData) : this("", libraryJData) { }
+        public OriginalLibrary(JObject libraryJData) : this("", libraryJData) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OriginalLibrary"/> class for internal use.

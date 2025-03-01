@@ -1,11 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using PixanKit.ModController.Mod;
-using PixanKit.ModController.ModReader;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PixanKit.ModController.Module
 {

@@ -2,13 +2,7 @@
 using PixanKit.LaunchCore.GameModule.LibraryData;
 using PixanKit.LaunchCore.Log;
 using PixanKit.LaunchCore.SystemInf;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.GameModule.Game
 {

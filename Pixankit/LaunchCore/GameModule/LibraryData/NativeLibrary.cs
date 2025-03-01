@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO.Compression;
-using PixanKit.LaunchCore.SystemInf;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Json;
 using PixanKit.LaunchCore.Log;
+using PixanKit.LaunchCore.SystemInf;
+using System.IO.Compression;
 
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
@@ -22,18 +17,22 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// Initializes a new instance of the <see cref="NativeLibrary"/> class with the specified JSON data.
         /// </summary>
         /// <param name="libraryJData">The JSON data representing the native library.</param>
-        public NativeLibrary(JToken libraryJData) : base()
+        public NativeLibrary(JObject libraryJData) : base()
         {
             libraryType = LibraryType.Native;
-            JToken? current = libraryJData["downloads"]?["classifiers"]?
-                [libraryJData["natives"]?[SysInfo.OSName]?.ToString() ?? ""];
-            _name = current?["path"]?.ToString() ?? "";
-            _sha1 = current?["sha1"]?.ToString() ?? "";
-            _url = current?["url"]?.ToString() ?? "";
+            string OSKey =
+                libraryJData.GetOrDefault(Format.ToString, 
+                $"natives/{SysInfo.OSName}", "");
+
+            JObject current = libraryJData.GetValue(Format.ToJObject, OSKey);
+            _name = current.GetValue(Format.ToString, "name");
+            _sha1 = current.GetValue(Format.ToString, "sha1");
+            _url  = current.GetValue(Format.ToString, "url");
+
             List<string> excludelist = [];
-            if (libraryJData["extract"] != null && libraryJData["extract"]?["exclude"] != null)
+            if (libraryJData.TryGetValue(Format.ToJArray, "extract/exclude", out var array))
             {
-                foreach (JToken token in libraryJData["extract"]?["exclude"] ?? new JArray())
+                foreach (JToken token in array ?? [])
                     excludelist.Add(token.ToString());
             }
             Exclude = [..excludelist];

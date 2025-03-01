@@ -1,9 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PixanKit.LaunchCore.Json;
 
 namespace PixanKit.ModController.Module
 {
@@ -21,7 +17,7 @@ namespace PixanKit.ModController.Module
             JObject moddedGamedata = [];
             foreach (var item in ModdedGames)
                 moddedGamedata.Add(
-                    item.Key.GameFolderPath,
+                    JSON.PathToKey(item.Key.GameFolderPath),
                     item.Value.ToJSON());
 
             JArray modMetadata = [];

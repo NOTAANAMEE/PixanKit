@@ -1,10 +1,5 @@
 ﻿using PixanKit.LaunchCore.Log;
 using PixanKit.LaunchCore.PlayerModule.Player;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.Core
 {
@@ -34,8 +29,9 @@ namespace PixanKit.LaunchCore.Core
         /// <exception cref="ArgumentNullException">Thrown when the provided player is null.</exception>
         public string PlayerInLine(string arg, PlayerBase? player)
         {
-            if (player == null) throw new ArgumentNullException("");
-            return player.InlinePlayer(arg);
+            return player == null ? 
+                throw new ArgumentNullException("") : 
+                player.InlinePlayer(arg);
         }
 
         /// <summary>

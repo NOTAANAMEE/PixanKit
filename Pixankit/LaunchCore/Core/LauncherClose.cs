@@ -1,11 +1,5 @@
-﻿using PixanKit.LaunchCore.Extention;
-using PixanKit.LaunchCore.GameModule.Game;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Extention;
 using PixanKit.LaunchCore.Log;
 
 namespace PixanKit.LaunchCore.Core
@@ -28,7 +22,7 @@ namespace PixanKit.LaunchCore.Core
         private JObject SaveFolderData()
         {
             Logger.Info("Game Module Closing");
-            JArray folders = new();
+            JArray folders = [];
             foreach (var folder in _folders) 
             {
                 folders.Add(folder.ToJSON());
@@ -43,7 +37,7 @@ namespace PixanKit.LaunchCore.Core
 
         private JObject SaveJavaData() 
         {
-            JArray javaRuntimes = new();
+            JArray javaRuntimes = [];
             foreach (var javaRuntime in _javaRuntimes)
             {
                 javaRuntimes.Add(javaRuntime.ToJSON());

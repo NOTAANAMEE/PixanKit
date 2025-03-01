@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PixanKit.LaunchCore.Core
+﻿namespace PixanKit.LaunchCore.Core
 {
     /// <summary>
     /// Represents the result of a Minecraft process.

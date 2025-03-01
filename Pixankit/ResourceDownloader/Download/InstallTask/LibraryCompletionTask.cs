@@ -1,13 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.GameModule.Game;
+﻿using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.GameModule.LibraryData;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
-using PixanKit.ResourceDownloader;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using PixanKit.ResourceDownloader.SystemInf;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
