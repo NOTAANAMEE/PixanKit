@@ -8,6 +8,7 @@ using PixanKit.LaunchCore.Log;
 using PixanKit.ModController.Interfaces;
 using PixanKit.ModController.Mod;
 using PixanKit.ModController.ModReader;
+using System.Collections.Concurrent;
 
 namespace PixanKit.ModController.Module
 {
@@ -21,7 +22,7 @@ namespace PixanKit.ModController.Module
         /// </summary>
         public static void Init()
         {
-            Launcher.LauncherInit += (a) => { _ = new ModModule(); };
+            //Launcher.LauncherInit += (a) => { _ = new ModModule(); };
             Launcher.GameAdd += (a) => { Instance?.AddJudgeGame(a); };
             Launcher.GameRemove += (a) => 
             { if (a.GetType() == typeof(ModdedGame))
@@ -70,7 +71,7 @@ namespace PixanKit.ModController.Module
         /// <summary>
         /// A dictionary containing metadata for mods.
         /// </summary>
-        public Dictionary<string, ModMetaData> ModDatas = [];
+        public ConcurrentDictionary<string, ModMetaData> ModDatas = [];
 
         /// <summary>
         /// A list of the tasks. Use Task.WhenAll() to wait.
@@ -102,7 +103,11 @@ namespace PixanKit.ModController.Module
             {
                 foreach (var game in folder.Games)
                 {
-                    InitTasks.Add(Task.Run(() => { AddJudgeGame(game); }));
+                    if (game.GameType == GameType.Modded)
+                    {
+                        AddJudgeGame(game);
+                        Logger.Info("ModController", $"Modded Game Added: {game.Name}");
+                    }
                 }
             }
             ModCache = [];
@@ -125,7 +130,16 @@ namespace PixanKit.ModController.Module
             var obj = new JObject()
             {
                 { "games", new JObject() },
-                { "metadata", new JArray() }
+                { "metadata", new JArray(){
+                    new JObject()
+                    {
+                        { "id", "unknown" },
+                        { "name", "unknown" },
+                        { "icon", "unknown" },
+                        { "description", "unknown" },
+                        { "author", new JArray() }
+                    } }
+                }
             };
             FileStream fs = new(SettingsPath, FileMode.Create);
             StreamWriter sw = new(fs);
@@ -159,7 +173,8 @@ namespace PixanKit.ModController.Module
         /// <param name="data">The metadata to add.</param>
         public void AddMetaData(ModMetaData data)
         {
-            ModDatas.Add(data.ModID, data); 
+            if(!ModDatas.TryAdd(data.ModID, data))
+                throw new Exception("Unsuccess"); 
         }
 
         /// <summary>
@@ -169,11 +184,11 @@ namespace PixanKit.ModController.Module
         public void AddCollection(ModdedGame game)
         {
             lock (Locker)
-            {
-                if (!ModdedGames.ContainsKey(game))
+            if (!ModdedGames.ContainsKey(game))
                 ModdedGames.Add(game, new ModCollection(
-                    ModCache[game.GameFolderPath] as JObject ?? [], game));
-            }
+                    ModCache.GetOrDefault(Format.ToJObject, 
+                    JSON.PathToKey(game.GameFolderPath), [])
+                    , game));
         }
 
         /// <summary>
@@ -210,10 +225,9 @@ namespace PixanKit.ModController.Module
             var removingId = ModDatas
                 .Where(pair => pair.Value.ReferenceTime == 0)
                 .Select(pair => pair.Key).ToArray();//LINQ
-            foreach (var item in removingId) ModDatas.Remove(item);
+            foreach (var item in removingId) ModDatas.Remove(item, out _);
         }
         
-
         /// <summary>
         /// Save the cache to the file.
         /// </summary>

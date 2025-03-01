@@ -92,6 +92,7 @@ namespace PixanKit.ModController.ModReader
             string filename = Path.GetFileName(filepath);
             if (collection.ModCache.ContainsKey(filename))
                 return FabricModParser.LoadAllFromJSON(
+                              collection,
                               filepath, 
                               collection.ModCache[filename].ConvertTo(Format.ToJObject, []));
             else 

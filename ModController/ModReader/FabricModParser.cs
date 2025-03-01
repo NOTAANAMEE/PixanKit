@@ -25,6 +25,9 @@ namespace PixanKit.ModController.ModReader
         /// <exception cref="Exception">json config is not valid</exception>
         public static ModFile ParseJson(string jsonContent, string filepath, ModCollection modCollection, ZipArchive archive)
         {
+            if (ModModule.Instance == null)
+                throw new InvalidOperationException("Init ModModule first!");
+
             var modEntry = JObject.Parse(jsonContent);
             var modID    = GetID(modEntry);
 
@@ -33,11 +36,7 @@ namespace PixanKit.ModController.ModReader
                 out List<string> dependenciesList,
                 out string version, out DateTime releaseDate);
 
-            ModMetaData metaData;
-            if (ModModule.Instance == null) 
-                throw new InvalidOperationException("Init ModModule first!");
-            lock (ModModule.Instance.MetaDataLocker)
-                metaData = LoadMetaData(modID, modEntry, archive);
+            ModMetaData metaData = LoadMetaData(modID, modEntry, archive);
 
             var modFile = new ModFile(filepath)
             {
@@ -101,10 +100,11 @@ namespace PixanKit.ModController.ModReader
             if (ModModule.Instance == null)
                 throw new InvalidOperationException("ModModule Not Inited Yet");
 
-            return ModModule.Instance.ModDatas[GetID(modEntry)];
+            ModModule.Instance.ModDatas.TryGetValue(GetID(modEntry), out var output);
+            return output ?? ModModule.Instance.ModDatas["unknown"];
         }
 
-        internal static ModFile LoadAllFromJSON(string filepath, JObject modEntry) 
+        internal static ModFile LoadAllFromJSON(ModCollection collection, string filepath, JObject modEntry) 
         {
             var metadata       = GetFromModEntry(modEntry);
             var depList        = modEntry.GetCacheDeps();
@@ -115,6 +115,7 @@ namespace PixanKit.ModController.ModReader
                 Version        = version, 
                 ReleaseDate    = releaseDate,
                 ValidStructure = false,
+                Owner          = collection
             };
             metadata.Register(modFile);
             return modFile;            

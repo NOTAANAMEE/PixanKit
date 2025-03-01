@@ -212,88 +212,12 @@ namespace PixanKit.LaunchCore.Json
             => [.. array.Select(format)];
 
         /// <summary>
-        /// This class provides some functions that converts JToken
-        /// to other classes
+        /// Converts a path to a key by replacing slashes with colons.
         /// </summary>
-        public static class Format
-        {
-            /// <summary>
-            /// Converts the JToken to string
-            /// </summary>
-            /// <param name="tok">The token that needed to convert</param>
-            /// <returns>the result of convert</returns>
-            public static string ToString(JToken tok)
-                => tok.ToString();
-
-            /// <summary>
-            /// Converts a <see cref="JToken"/> to an <see cref="int"/>.
-            /// </summary>
-            /// <param name="tok">The <see cref="JToken"/> to convert.</param>
-            /// <returns>The integer value of the token.</returns>
-            /// <exception cref="InvalidOperationException">Thrown if the token is not of type <see cref="JTokenType.Integer"/>.</exception>
-            public static int ToInt32(JToken tok)
-            {
-                if (tok.Type == JTokenType.Integer) return (int)tok;
-                throw new InvalidOperationException("Token is not an Integer");
-            }
-
-            /// <summary>
-            /// Converts a <see cref="JToken"/> to a <see cref="DateTime"/>.
-            /// </summary>
-            /// <param name="tok">The <see cref="JToken"/> to convert.</param>
-            /// <returns>The <see cref="DateTime"/> value of the token.</returns>
-            /// <exception cref="FormatException">Thrown if the token cannot be parsed as a valid date-time string.</exception>
-            public static DateTime ToDateTime(JToken tok)
-                => DateTime.Parse(tok.ToString());
-
-            /// <summary>
-            /// Converts a <see cref="JToken"/> to a <see cref="bool"/>.
-            /// </summary>
-            /// <param name="tok">The <see cref="JToken"/> to convert.</param>
-            /// <returns>The boolean value of the token.</returns>
-            /// <exception cref="InvalidOperationException">Thrown if the token is not of type <see cref="JTokenType.Boolean"/>.</exception>
-            public static bool ToBool(JToken tok)
-            {
-                if(tok.Type == JTokenType.Boolean) return (bool)tok;
-                throw new InvalidOperationException("Token is not a bool");
-            }
-
-            /// <summary>
-            /// Converts a <see cref="JToken"/> to a <see cref="double"/>.
-            /// </summary>
-            /// <param name="tok">The <see cref="JToken"/> to convert.</param>
-            /// <returns>The double value of the token.</returns>
-            /// <exception cref="InvalidOperationException">Thrown if the token is not of type <see cref="JTokenType.Float"/>.</exception>
-            public static double ToDouble(JToken tok)
-            {
-                if (tok.Type == JTokenType.Float) return (double)tok;
-                throw new InvalidOperationException("Token is not a double");
-            }
-
-            /// <summary>
-            /// Converts a <see cref="JToken"/> to a <see cref="JObject"/>.
-            /// </summary>
-            /// <param name="tok">The <see cref="JToken"/> to convert.</param>
-            /// <returns>The <see cref="JObject"/> representation of the token.</returns>
-            /// <exception cref="InvalidOperationException">Thrown if the token is not of type <see cref="JTokenType.Object"/>.</exception>
-            public static JObject ToJObject(JToken tok)
-            {
-                if (tok.Type == JTokenType.Object)return (JObject)tok;
-                throw new InvalidOperationException("Token is not an object");
-            }
-
-            /// <summary>
-            /// Converts a <see cref="JToken"/> to a <see cref="JArray"/>.
-            /// </summary>
-            /// <param name="tok">The <see cref="JToken"/> to convert.</param>
-            /// <returns>The <see cref="JArray"/> representation of the token.</returns>
-            /// <exception cref="InvalidOperationException">Thrown if the token is not of type <see cref="JTokenType.Array"/>.</exception>
-            public static JArray ToJArray(JToken tok)
-            {
-                if (tok.Type == JTokenType.Array) return (JArray)tok;
-                throw new InvalidOperationException("Token is not an array");
-            }
-        }
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string PathToKey(string path)
+            => path.Replace("/", ":").Replace("\\", ":");
     }
 
     /// <summary>

@@ -39,9 +39,7 @@ namespace PixanKit.ModController.ModReader
                 out List<string> deplist,
                 out string version, out DateTime releaseDate);
 
-            ModMetaData metaData;
-            lock(ModModule.Instance.MetaDataLocker) 
-                metaData = LoadMetaData(modID, modEntry, archive);
+            ModMetaData metaData = LoadMetaData(modID, modEntry, archive);
 
             var modFile  = new ModFile(filepath)
             {

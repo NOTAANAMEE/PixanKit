@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,26 +37,26 @@ namespace PixanKit.ModController
             return value;
         }
 
-        public static T GetValue<T>(this TomlTable table, string key)
+        public static T GetValue<T>(this TomlTable table, string path)
         {
-            var val = table[key];
+            var val = table.GetPath(path);
             if (val == null || val.GetType() != typeof(T))
                 throw new InvalidOperationException("Not valid");
             return (T)val;
         }
 
-        public static T GetOrDefault<T>(this TomlTable table, string key, T defaultVal)
+        public static T GetOrDefault<T>(this TomlTable table, string path, T defaultVal)
         {
-            var val = table[key];
+            var val = table.GetPath(path);
             if (val == null || val.GetType() != typeof(T))
                 return defaultVal;
             return (T)val;
         }
 
-        public static bool TryGet<T>(this TomlTable table, string key, out T? output)
+        public static bool TryGet<T>(this TomlTable table, string path, out T? output)
         {
             output = default;
-            var val = table[key];
+            var val = table.GetPath(path);
             if (val == null || val.GetType() != typeof(T))
                 return false;
             output = (T)val;

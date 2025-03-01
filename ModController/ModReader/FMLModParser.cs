@@ -27,11 +27,12 @@ namespace PixanKit.ModController.ModReader
         /// <exception cref="Exception">toml config is not valid</exception>
         public static ModFile ParseToml(string tomlContent, string filepath, ModCollection modCollection, ZipArchive archive)
         {
+            _ = ModModule.Instance ??
+                throw new InvalidOperationException("ModModule has not being inited");
+
             var table    = Toml.ToModel(tomlContent) ??
                 throw new Exception("Failed to parse TOML");
             var mods     = table.GetValue<TomlTableArray>("mods");
-            _ = ModModule.Instance ??
-                throw new InvalidOperationException("ModModule has not being inited");
 
             var modEntry = mods[0];
             var modID    = GetID(modEntry);
@@ -41,10 +42,7 @@ namespace PixanKit.ModController.ModReader
                 out List<string> depList, 
                 out string version, out DateTime releaseDate);
 
-            ModMetaData metaData;
-            
-            lock(ModModule.Instance.MetaDataLocker)
-                metaData = LoadMetaData(modID, modEntry, archive);
+            ModMetaData metaData = LoadMetaData(modID, modEntry, archive);
 
             var modFile  = new ModFile(filepath)
             {
@@ -137,7 +135,7 @@ namespace PixanKit.ModController.ModReader
             List<string> ret = [];
             foreach (var entry in archive.Entries) 
             {
-                if (CheckFile(entry.FullName)) continue;
+                if (!CheckFile(entry.FullName)) continue;
                 try { ret.Add(GetEachJarID(entry)); }
                 catch { }
             }
