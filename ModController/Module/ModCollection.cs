@@ -101,7 +101,5 @@ namespace PixanKit.ModController.Module
             if (file.MetaData == null) throw new Exception("WTF");
             ModFiles.Add(file.MetaData.ModID, file);
         }
-
-        
     }
 }

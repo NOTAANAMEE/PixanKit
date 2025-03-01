@@ -480,6 +480,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             {
                 arg = token.ToString();
                 if (arg.Contains(' ')) arg = "\"" + arg + "\"";
+                //" " is needed while space exists
             }
             else if (LibraryBase.SystemSupport((JObject)token))
             {

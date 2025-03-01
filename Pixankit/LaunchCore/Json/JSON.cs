@@ -101,7 +101,7 @@ namespace PixanKit.LaunchCore.Json
         /// <returns>True if the value was found and formatted successfully, otherwise false.</returns>
         public static bool TryGetValue<T>(this JObject obj, Func<JToken, T> format, string Path, out T? output)
         {
-            output = default;
+            output  = default;
             var tok = GetFromPath(obj, Path);
             if (tok == null) return false;
             try { output = format(tok); } catch { return false; }
@@ -151,7 +151,7 @@ namespace PixanKit.LaunchCore.Json
         {
             JToken? token = obj;
             string[] keys = Path.Split('/');
-            int ind = 0;
+            int ind       = 0;
             while (ind < keys.Length)
             {
                 string key = keys[ind++];
@@ -159,10 +159,10 @@ namespace PixanKit.LaunchCore.Json
                 switch (token.Type)
                 {
                     case JTokenType.Object:
-                        token = obj[key];
+                        token = token[key];
                         break;
                     case JTokenType.Array:
-                        token = obj[int.Parse(key)];
+                        token = token[int.Parse(key)];
                         break;
                     default:
                         return null;

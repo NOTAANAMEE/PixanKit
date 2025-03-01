@@ -161,7 +161,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
             // 默认允许所有操作系统
             if (jData["rules"] == null) return ["osx", "linux", "windows"];
 
-            HashSet<string> OSSet = ["osx", "linux", "windows"];
+            HashSet<string> OSSet = [];
 
             foreach (JToken ruleData in jData.GetOrDefault(Format.ToJArray, "rules", []))
             {

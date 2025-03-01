@@ -15,6 +15,9 @@ namespace TestProject
             Launcher launcher = new();
             ModModule _ = new();
             //await Task.WhenAll(ModModule.Instance.InitTasks);
+            var a = launcher.Launch();
+            a.Start();
+            a.WaitForExit();
         }
 
     }

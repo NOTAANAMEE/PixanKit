@@ -16,7 +16,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         public OriginalGame(string path, JObject jData): base(path, jData)
         {
             _gameType = GameType.Vanilla;
-            assetsID = ((jData["assetIndex"] ?? new JObject())["id"]?? "").ToString();
+            assetsID = jData.GetOrDefault(Format.ToString, "assetIndex/id", "");
             javaVersion = (short)(int)(jData["minimumLauncherVersion"]?? 0);
         }
 

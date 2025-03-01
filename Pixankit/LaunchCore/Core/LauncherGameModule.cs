@@ -4,6 +4,7 @@ using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.GameModule.Exceptions;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.JavaModule.Java;
+using PixanKit.LaunchCore.Json;
 using PixanKit.LaunchCore.Log;
 using System.Diagnostics;
 
@@ -32,65 +33,21 @@ namespace PixanKit.LaunchCore.Core
         /// <param name="game"></param>
         /// <returns></returns>
         /// <exception cref="NullReferenceException"></exception>
-        public ProcessResult Launch(GameBase game)
+        public LaunchSession Launch(GameBase game)
         {
-            string cmd = InlineCommand(game);
-
-
-            JavaRuntime? java = ChooseRuntime(game) ?? throw new NullReferenceException();
+            string cmd       = InlineCommand(game);
             Logger.Info("Game Arg Generated Successfully. Stored in a.bat");
-            FileStream fs = new("./a.bat", FileMode.Create);
-            StreamWriter sw = new(fs);
+
+            JavaRuntime java = ChooseRuntime(game) ?? throw new NullReferenceException();
+            /*FileStream fs    = new("./a.bat", FileMode.Create);
+            StreamWriter sw  = new(fs);
             sw.Write("\"" + java.JavaEXE + "\" " + cmd);
             sw.Close();
-            fs.Close();
-
+            fs.Close();*/
 
             game.Decompress().Wait();
-            string runningdir = 
-                string.Concat(AppDomain.CurrentDomain.BaseDirectory, 
-                Files.ConfigDir);
 
-            ProcessStartInfo info = new()
-            {
-                CreateNoWindow = true,
-                FileName = java.JavaEXE,
-                Arguments = cmd,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                WorkingDirectory = runningdir
-            };
-            Logger.Info("Game Launched");
-            Process? p = Process.Start(info);
-            if (p == null) return new ProcessResult();
-            MemoryStream ms = new();
-            sw = new(ms);
-            while (!p.HasExited)
-            {
-                sw.Write(p.StandardOutput.ReadToEnd());
-            }
-            sw.Write(p.StandardOutput.ReadToEnd());
-
-
-            //DateTime now = DateTime.Now;
-            Logger.Info($"Game Exited with code {p.ExitCode}");
-            if (p.ExitCode != 0) Logger.Warn("Error happened to the game!");
-            ms.Position = 0;
-
-
-            Dictionary<long, string> files;
-            try
-            {
-                files = GetTimestampAndFilePath(game.CrashReportDirPath);
-            }
-            catch {  }
-            return new ProcessResult()
-            {
-                ReturnCode = p.ExitCode,
-                LogGZPath = "",//GetTimestampAndFilePath(runningdir + "/logs").Last().Value,
-                OutputStream = ms,
-                CrashFilePath = "",
-            };
+            return new LaunchSession(game, java, cmd);
         }
 
         /// <summary>
@@ -98,7 +55,7 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NullReferenceException"></exception>
-        public ProcessResult Launch()
+        public LaunchSession Launch()
         {
             if (TargetGame == null) throw new NullReferenceException();
             return Launch(TargetGame);
@@ -235,8 +192,10 @@ namespace PixanKit.LaunchCore.Core
         public GameBase? FindGame(string path)
         {
             string folderpath = path.Remove(path.LastIndexOf("/versions/"));
-            string? name = Path.GetDirectoryName(path) ?? throw new ArgumentException(path);
-            var res = FindFolder(folderpath);
+            string name       = Path.GetDirectoryName(path) 
+                ?? throw new ArgumentException(path);
+            var res           = FindFolder(folderpath);
+
             if (res == null) return null;
             return res.FindGame(name);
         }
@@ -249,7 +208,8 @@ namespace PixanKit.LaunchCore.Core
         public string GenerateCommand(GameBase game)
         {
             string cmd = game.GetLaunchArgument();
-            cmd = cmd.Replace("${arguments}", (Settings["arguments"] ?? new JObject()).ToString());
+            cmd = cmd.Replace("${arguments}", 
+                Settings.GetOrDefault(Format.ToString, "arguments", ""));
 
             return cmd;
         }
@@ -277,7 +237,7 @@ namespace PixanKit.LaunchCore.Core
         private static Dictionary<long, string> GetTimestampAndFilePath(string dir)
         {
             string[] files = Directory.GetFiles(dir);
-            Dictionary<long, string> keyValuePairs = new();
+            Dictionary<long, string> keyValuePairs = [];
             foreach (string file in files) 
             {
                 long time = File.GetCreationTime(file).Ticks;

@@ -36,8 +36,8 @@ namespace PixanKit.LaunchCore.Core
             InitGameModule();
             InitPlayerModule();
             InitJavaModule();
-            Logger.Info("Launcher Inited Successfully");
             InitSettings();
+            Logger.Info("Launcher Inited Successfully");
             LauncherInit?.Invoke(this);
         }
 

@@ -22,12 +22,14 @@ namespace PixanKit.ModController.Module
         /// </summary>
         public static void Init()
         {
+            //This method registers the events when game changes.
             //Launcher.LauncherInit += (a) => { _ = new ModModule(); };
             Launcher.GameAdd += (a) => { Instance?.AddJudgeGame(a); };
             Launcher.GameRemove += (a) => 
             { if (a.GetType() == typeof(ModdedGame))
                   Instance?.ModdedGames.Remove(a as ModdedGame ?? 
                   throw new Exception("Impossible exception")); };
+            //Remove game. Check whether game in the dictionary.
         }
 
         /// <summary>
@@ -96,21 +98,22 @@ namespace PixanKit.ModController.Module
         /// </summary>
         public ModModule() 
         {
-            Instance = this;
-            if (Launcher.Instance == null) return;
+            //Initialize
+            Instance = this;//Single-Instance
+            if (Launcher.Instance == null) return;//Need to wait until Launcher inits
             lock (MetaDataLocker) ReadFile();
             foreach (var folder in Launcher.Instance.Folders)
             {
                 foreach (var game in folder.Games)
-                {
+                {//For each game do...
                     if (game.GameType == GameType.Modded)
                     {
-                        AddJudgeGame(game);
+                        AddJudgeGame(game);//Add game and log
                         Logger.Info("ModController", $"Modded Game Added: {game.Name}");
                     }
                 }
             }
-            ModCache = [];
+            ModCache = [];//Clear the cache to release memory
         }
 
         /// <summary>

@@ -13,9 +13,9 @@ namespace PixanKit.LaunchCore.Core
         public void Close()
         {
             Logger.Info("Launcher Closing");
-            Files.FolderJData = SaveFolderData();
+            Files.FolderJData  = SaveFolderData();
             Files.RuntimeJData = SaveJavaData();
-            Files.PlayerJData = SavePlayerData();
+            Files.PlayerJData  = SavePlayerData();
             Logger.Info("Launcher Closed. Call Files.Save() To Save Or Handle It Yourself");
         }
 

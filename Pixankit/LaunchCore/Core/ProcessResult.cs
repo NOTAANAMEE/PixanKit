@@ -31,9 +31,14 @@
         public Stream OutputStream;
 
         /// <summary>
+        /// Gets or sets the output stream of the Minecraft process.
+        /// </summary>
+        public Stream ErrorStream;
+
+        /// <summary>
         /// Closes the output stream associated with the Minecraft process.
         /// </summary>
-        public void Close()
+        public readonly void Close()
         {
             OutputStream.Close();
         }
