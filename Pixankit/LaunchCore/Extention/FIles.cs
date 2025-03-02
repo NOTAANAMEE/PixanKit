@@ -136,7 +136,10 @@ namespace PixanKit.LaunchCore.Extention
         }
 
         /// <summary>
-        /// Save JSON To Default Path
+        /// Save JSON to default path.<br/>
+        /// This method is intended for simple save operations only 
+        /// and is not suitable for encrypted storage or other complex operations.
+        /// It is recommended to use encrypted storage when saving Player data.
         /// </summary>
         public static void Save()
         {
@@ -202,7 +205,7 @@ namespace PixanKit.LaunchCore.Extention
         public static JObject SettingJData = new()
         {
             { "java", "closest" },
-            { "arguments", "-XX:+UseG1GC -XX:-UseAdaptiveSizePolicy -XX:-OmitStackTraceInFastThrow -Dfml.ignoreInvalidMinecraftCertificates=True -Dfml.ignorePatchDiscrepancies=True -Dlog4j2.formatMsgNoLookups=true" },
+            { "arguments", "-XX:+UseG1GC -XX:-UseAdaptiveSizePolicy -XX:-OmitStackTraceInFastThrow -Dlog4j2.formatMsgNoLookups=true" },
             { "runningfolder", "self" }
         };
     }

@@ -45,7 +45,7 @@ namespace PixanKit.LaunchCore.Json
         /// </summary>
         /// <param name="target">the target JSON data</param>
         /// <param name="needtomerge">the JSON data that needs to merge to the target</param>
-        public static void MergeJObject(JObject target, JObject needtomerge)
+        public static void MergeJObject(this JObject target, JObject needtomerge)
         {
             foreach (var item in needtomerge)
             {
@@ -59,7 +59,7 @@ namespace PixanKit.LaunchCore.Json
             }
         }
 
-        private static void MergeEachJObject(JObject target, JToken needtomerge, string key)
+        private static void MergeEachJObject(this JObject target, JToken needtomerge, string key)
         {
             if (target == null) return;
             switch (target[key]?.Type)
@@ -84,7 +84,7 @@ namespace PixanKit.LaunchCore.Json
         /// </summary>
         /// <param name="target">The target JArray</param>
         /// <param name="needtomerge">The array that needs to append</param>
-        public static void MergeJArray(JArray target, JArray needtomerge)
+        public static void MergeJArray(this JArray target, JArray needtomerge)
         {
             foreach (var item in needtomerge)
                 if (!target.Contains(item)) target.Add(item);

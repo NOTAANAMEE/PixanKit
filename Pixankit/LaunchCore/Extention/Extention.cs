@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.GameModule.Game;
+using PixanKit.LaunchCore.Json;
 using PixanKit.LaunchCore.PlayerModule.Player;
 using PixanKit.LaunchCore.SystemInf;
 
@@ -39,15 +40,15 @@ namespace PixanKit.LaunchCore.Extention
         /// <returns>Game Inited</returns>
         public static GameBase DefaultGameInitor(string path)
         {
-            string jsonPath = path + "/" + Path.GetFileName(path) + ".json";
-            JObject jobj;
-                jobj = JObject.Parse(File.ReadAllText(jsonPath));
+            string jsonPath = $"{path}/{Path.GetFileName(path)}.json";
+            JObject jobj    = JObject.Parse(File.ReadAllText(jsonPath));
 
 
             if (jobj["mainClass"]?.ToString() != "net.minecraft.client.main.Main")
             {
+                if (JudgeOptifine(jobj))
+                    return new CustomizedGame(path, jobj);
                 return new ModdedGame(path, jobj);
-
             }
             else return new OriginalGame(path, jobj);
         }
@@ -89,6 +90,16 @@ namespace PixanKit.LaunchCore.Extention
             long allocatedMemory = Math.Min(maxMemory, Math.Max(minMemory, availableMemory / 2)); // 分配不超过可用内存的一半
 
             return allocatedMemory;
+        }
+
+        private static bool JudgeOptifine(JObject obj)
+        {
+            string mainclass = obj.GetOrDefault(Format.ToString, "mainClass", "");
+            if (mainclass != "net.minecraft.launchwrapper.Launch") return false;
+            string args = GameBase.GetGameArguments(obj);
+            bool forge = args.Contains("fml");
+            bool optifine = args.Contains("optifine");
+            return !forge && optifine;
         }
     }
 }

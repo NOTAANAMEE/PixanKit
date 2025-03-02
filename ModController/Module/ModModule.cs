@@ -23,7 +23,7 @@ namespace PixanKit.ModController.Module
         public static void Init()
         {
             //This method registers the events when game changes.
-            //Launcher.LauncherInit += (a) => { _ = new ModModule(); };
+            Launcher.LauncherInit += (a) => { _ = new ModModule(); };
             Launcher.GameAdd += (a) => { Instance?.AddJudgeGame(a); };
             Launcher.GameRemove += (a) => 
             { if (a.GetType() == typeof(ModdedGame))

@@ -47,21 +47,13 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// <param name="jData">The JSON data representing the player.</param>
         public MicrosoftPlayer(JObject jData):base(jData)
         {
-            _latestLoginTime = 
-                jData.GetValue(Format.ToDateTime, "logintime");
-            _skinURL = 
-                jData.GetValue(Format.ToString, "sinurl");
-            _capeURL = 
-                jData.GetValue(Format.ToString, "capeurl");
-            refreshtoken =
-                jData.GetValue(Format.ToString, "refreshtoken");
             _type = PlayerType.microsoft;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MicrosoftPlayer"/> class for internal use.
         /// </summary>
-        protected MicrosoftPlayer() { }
+        protected MicrosoftPlayer() { _type = PlayerType.microsoft; }
 
         /// <summary>
         /// Logs in a player using a login code.
@@ -119,12 +111,26 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         public async Task RefreshSkinCache()
         {
             HttpClient client = new();
-            var response = await client.GetStreamAsync(this._skinURL);
+            var response = await client.GetStreamAsync(_skinURL);
             FileStream fs = new(
                 SkinCachePath, FileMode.Create);
             response.CopyTo(fs);
             fs.Close();
             response.Dispose();
+        }
+
+        /// <inheritdoc/>
+        public override void LoadFromJSON(JObject jData)
+        {
+            base.LoadFromJSON(jData);
+            _latestLoginTime =
+                jData.GetValue(Format.ToDateTime, "logintime");
+            _skinURL =
+                jData.GetValue(Format.ToString, "skinurl");
+            _capeURL =
+                jData.GetValue(Format.ToString, "capeurl");
+            refreshtoken =
+                jData.GetValue(Format.ToString, "refreshtoken");
         }
 
         /// <summary>

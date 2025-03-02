@@ -10,10 +10,10 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         public PlayerBase[] Players
         {
-            get => _players.ToArray();
+            get => [.._players];
         }
 
-        private List<PlayerBase> _players = new();
+        private List<PlayerBase> _players = [];
 
         /// <summary>
         /// Gets or sets the default player used for launching.
@@ -30,7 +30,7 @@ namespace PixanKit.LaunchCore.Core
         public string PlayerInLine(string arg, PlayerBase? player)
         {
             return player == null ? 
-                throw new ArgumentNullException("") : 
+                throw new ArgumentNullException("Player Should Not Be Null") : 
                 player.InlinePlayer(arg);
         }
 

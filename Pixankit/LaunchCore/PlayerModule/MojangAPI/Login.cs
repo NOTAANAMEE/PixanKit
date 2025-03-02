@@ -5,8 +5,18 @@ using PixanKit.LaunchCore.Server.Servers.Mojang;
 namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
 {
     /// <summary>
-    /// Standard Mojang Login Process
+    /// This class implements the Microsoft OAuth authorization code login functionality.
     /// </summary>
+    /// <remarks>
+    /// Microsoft has changed the login verification method. You need to register an application on Azure and obtain a Client ID.<br/>
+    /// Before performing the login operation, you must provide your Client ID and Redirect URL.<br/>
+    /// Since the developer does not have the time and resources to apply for a Client ID
+    /// and request application approval from Mojang, this class has not been tested.
+    /// We sincerely ask developers to help with testing.<br/>
+    /// The good news is that before Mojang changes the 
+    /// <see href="https://help.minecraft.net/hc/en-us/articles/16254801392141">application approval process</see>,
+    /// this class should work as expected.<br/>
+    /// </remarks>
     public static class MojangLogin
     {
         private static MSLoginServer _msserver { get => ServerList.MicrosoftLoginServer; }

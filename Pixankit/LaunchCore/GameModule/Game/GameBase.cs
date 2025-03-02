@@ -433,20 +433,28 @@ namespace PixanKit.LaunchCore.GameModule.Game
         #region ArgsParser
         internal virtual void SetGameArgs()
         {
-            if (gameJSONData.ContainsKey("minecraftArguments"))
+            gameArguments = GetGameArguments(gameJSONData);
+        }
+
+        internal static string GetGameArguments(JObject obj)
+        {
+            var gameArguments = "";
+            if (obj.TryGetValue(Format.ToString, "minecraftArguments", out var gargs))
             {
-                gameArguments = gameJSONData["minecraftArguments"]?.ToString() ?? "";
-                return;
+                gameArguments = "" + gargs;
+                return gameArguments;
             }
-            foreach (JToken token in gameJSONData["arguments"]?["game"] ?? new JArray())
+            foreach (JToken token in
+                obj.GetOrDefault(Format.ToJArray, "arguments/game", []))
             {
                 if (token.Type != JTokenType.String)
                 {
-                    optionalArgs.Add(OptionalArgs.Parse(token as JObject ?? []));
+                    obj.Add(OptionalArgs.Parse(token as JObject ?? []));
                     continue;
                 }
                 gameArguments += token.ToString() + " ";
             }
+            return gameArguments;
         }
 
         internal virtual void SetJVMArgs()
