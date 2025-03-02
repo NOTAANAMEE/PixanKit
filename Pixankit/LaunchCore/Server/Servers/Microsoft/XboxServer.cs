@@ -57,6 +57,12 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
         /// Dispose The Client
         /// </summary>
         public void Dispose()
-            => Client?.Dispose();
+            => Client.Dispose();
+
+        /// <summary>
+        /// Finalizer
+        /// </summary>
+        ~XboxServer()
+            => Dispose();
     }
 }

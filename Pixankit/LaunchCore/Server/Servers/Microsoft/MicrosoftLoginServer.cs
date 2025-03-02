@@ -94,7 +94,13 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
         /// Dispose
         /// </summary>
         public void Dispose()
-            => Client?.Dispose();
+            => Client.Dispose();
+
+        /// <summary>
+        /// Finalizer
+        /// </summary>
+        ~MSLoginServer()
+            => Dispose();
     }
 
 }
