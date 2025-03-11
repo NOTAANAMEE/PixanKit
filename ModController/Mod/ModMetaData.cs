@@ -81,7 +81,8 @@ namespace PixanKit.ModController.Mod
         public async Task GetUpdate(CancellationToken token)
         {
             if (ModModule.Instance?.ModVersionGetter == null)
-                throw new InvalidOperationException();
+                throw new InvalidOperationException(
+                    "Please implement IModVersionGetter before using this method");
             var jarray = await ModModule.Instance.ModVersionGetter.
                 GetVersionsAsync(ModID, token);
             ReadUpdate(jarray);
