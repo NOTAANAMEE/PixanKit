@@ -10,7 +10,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     public class QuiltServer: ModLoaderServer
     {
         /// <summary>
-        /// Initor. Dont touch it
+        /// Initor. Don't touch it
         /// </summary>
         [ModuleInitializer]
         public static void Init()
@@ -32,7 +32,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         /// </summary>
         public class OfficialQuiltMirror : ModLoaderMirror
         {
-            HttpClient client = new();
+            readonly HttpClient client = new();
 
             /// <summary>
             /// 
@@ -60,9 +60,9 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
                 var response = await client.GetAsync("https://meta.quiltmc.org/v3/versions/loader", token);
-                if (token.IsCancellationRequested) return new JArray();
+                if (token.IsCancellationRequested) return [];
                 var content = await response.Content.ReadAsStringAsync(token);
-                if (token.IsCancellationRequested) return new JArray();
+                if (token.IsCancellationRequested) return [];
                 return JArray.Parse(content);
             }
 

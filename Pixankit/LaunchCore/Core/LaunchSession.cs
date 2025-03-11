@@ -16,6 +16,9 @@ namespace PixanKit.LaunchCore.Core
     /// </summary>
     public class LaunchSession
     {
+        /// <summary>
+        /// Gets the path to the log directory. Java process will run under <see cref="Files.CacheDir"/>.
+        /// </summary>
         public static string LogPath { get => Files.CacheDir + "/logs"; }
 
         /// <summary>
@@ -41,7 +44,7 @@ namespace PixanKit.LaunchCore.Core
         /// <summary>
         /// Stores the process start information.
         /// </summary>
-        private ProcessStartInfo StartInfo;
+        private readonly ProcessStartInfo StartInfo;
 
         DateTime time = DateTime.Now;
 

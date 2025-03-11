@@ -88,11 +88,6 @@ namespace PixanKit.ModController.Module
         readonly object Locker = new();
 
         /// <summary>
-        /// The locker that locks <see cref="ModDatas"/>
-        /// </summary>
-        public readonly object MetaDataLocker = new();
-
-        /// <summary>
         /// Initializes a new instance of the ModModule class.
         /// Reads existing mod data and sets up collections for the launcher's games.
         /// </summary>
@@ -101,15 +96,23 @@ namespace PixanKit.ModController.Module
             //Initialize
             Instance = this;//Single-Instance
             if (Launcher.Instance == null) return;//Need to wait until Launcher inits
-            lock (MetaDataLocker) ReadFile();
+            Logger.Info("PixanKit.ModController.Module", "Mod module starts to init");
+            //lock (MetaDataLocker) 
+            ReadFile();
+            Logger.Info("PixanKit.ModController.Module", 
+                "Module finished reading file." +
+                "Pending to init mods");
             foreach (var folder in Launcher.Instance.Folders)
             {
                 foreach (var game in folder.Games)
                 {//For each game do...
                     if (game.GameType == GameType.Modded)
                     {
+                        Logger.Info("PixanKit.ModController.Module",
+                            $"Modded Game Adding: {game.Name}");
                         AddJudgeGame(game);//Add game and log
-                        Logger.Info("ModController", $"Modded Game Added: {game.Name}");
+                        Logger.Info("PixanKit.ModController.Module", 
+                            $"Modded Game Added: {game.Name}");
                     }
                 }
             }
@@ -211,8 +214,7 @@ namespace PixanKit.ModController.Module
             try
             {
                 if (game.GetType() == typeof(ModdedGame))
-                    AddCollection(game as ModdedGame ??
-                        throw new Exception("Impossible exception"));
+                    AddCollection((ModdedGame)game);
             }
             catch (DirectoryNotFoundException)
             {

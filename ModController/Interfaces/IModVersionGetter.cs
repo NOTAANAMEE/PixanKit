@@ -3,15 +3,16 @@
 namespace PixanKit.ModController.Interfaces
 {
     /// <summary>
-    /// I have no idea whether I should keep this?
+    /// This interface is used to get the version list of mods
     /// </summary>
     public interface IModVersionGetter
     {
         /// <summary>
-        /// Really?
+        /// Gets the list of versions of the mod.
         /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        public Task<JArray> GetVersionsAsync(CancellationToken token);
+        /// <param name="modID">The ID of the mod</param>
+        /// <param name="token">Cancel or not</param>
+        /// <returns>The array of files.</returns>
+        public Task<JArray> GetVersionsAsync(string modID, CancellationToken token);
     }
 }

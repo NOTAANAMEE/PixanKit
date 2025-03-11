@@ -1,4 +1,5 @@
 ﻿using PixanKit.LaunchCore.Json;
+using PixanKit.LaunchCore.Log;
 using PixanKit.ModController.Mod;
 using PixanKit.ModController.Module;
 using System.IO.Compression;
@@ -89,6 +90,8 @@ namespace PixanKit.ModController.ModReader
 
         private static ModFile ParseInv(string filepath, ModCollection collection)
         {
+            Logger.Warn("PianKit.ModController", $"No parser found for {filepath}." +
+                $"ModFile will be loaded as default");
             string filename = Path.GetFileName(filepath);
             if (collection.ModCache.ContainsKey(filename))
                 return FabricModParser.LoadAllFromJSON(
