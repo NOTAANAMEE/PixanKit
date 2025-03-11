@@ -48,8 +48,8 @@ namespace PixanKit.ModController.Module
                 ModFiles.TryAdd(modfile.MetaData?.ModID ?? "", modfile); }
                 catch(Exception e) 
                 { 
-                    Logger.Error("ModController", $"Error while parsing {mod}: {e.Message}"); 
-                    Logger.Error("ModController", e.StackTrace ?? "");
+                    Logger.Error("PixanKit.ModController", $"Error while parsing {mod}: {e.Message}"); 
+                    Logger.Error("PixanKit.ModController", e.StackTrace ?? "");
                 }
             }
             ModCache = [];

@@ -68,7 +68,7 @@ namespace PixanKit.ResourceDownloader.Tasks
         /// <summary>
         /// The subtasks of the current task.
         /// </summary>
-        protected List<Task> _tasks = new();
+        protected List<Task> _tasks = [];
 
         /// <summary>
         /// The status of the current task.
@@ -156,6 +156,7 @@ namespace PixanKit.ResourceDownloader.Tasks
                 Logger.Warn("PixanKit.ResourceDownloader", ex.ToString());
                 Logger.Warn("PixanKit.ResourceDownloader", ex.StackTrace ?? "");
             }
+            ReportProgress(1);
             _status = ProgressStatus.Finished;
         }
 

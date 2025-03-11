@@ -11,18 +11,6 @@
                 UserPath = UserPath[0..UserPath.LastIndexOf('\\')];
         }
 
-        /*public static string PathLocalize(string path)
-        {
-            if (SysInfo.OSName == "windows") path = path.Replace("~", UserPath);
-            switch (SysInfo.OSName)
-            {
-                case "windows":
-                    return path.Replace("/", "\\");
-                default:
-                    return path;
-            }
-        }*/
-
         public static string CPLocalize(string cparg)
         {
             return SysInfo.OSName switch
@@ -33,10 +21,5 @@
         }
 
         public static string LocalParser = "${classpath_separator}";
-
-        /*public static string DeLocalize(string path)
-        {
-            return path.Replace('\\', '/');
-        }*/
     }
 }

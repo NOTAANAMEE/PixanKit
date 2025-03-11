@@ -83,7 +83,7 @@ namespace PixanKit.ModController.Mod
             if (ModModule.Instance?.ModVersionGetter == null)
                 throw new InvalidOperationException();
             var jarray = await ModModule.Instance.ModVersionGetter.
-                GetVersionsAsync(token);
+                GetVersionsAsync(ModID, token);
             ReadUpdate(jarray);
         }
 
