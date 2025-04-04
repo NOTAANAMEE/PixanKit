@@ -68,6 +68,11 @@ namespace PixanKit.LaunchCore.GameModule
             get => _games.Count;
         }
 
+        public Action<GameBase>? GameAdded;
+
+        public Action<GameBase>? GameRemoved;
+
+
         /// <summary>
         /// Provides the first Minecraft in the folder
         /// </summary>
@@ -278,6 +283,7 @@ namespace PixanKit.LaunchCore.GameModule
             _games.Add(game);
             game.SetOwner(this);
             Launcher.GameAdd?.Invoke(game);
+            GameAdded?.Invoke(game);
         }
 
         internal void InternalRemoveGame(GameBase game)
@@ -285,6 +291,7 @@ namespace PixanKit.LaunchCore.GameModule
             _games.Remove(game);
             Directory.Delete(game.GameFolderPath);
             Launcher.GameRemove?.Invoke(game);
+            GameRemoved?.Invoke(game);
         }
     }
 }

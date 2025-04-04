@@ -82,8 +82,9 @@ namespace PixanKit.LaunchCore.Core
 
         private void ResetTargetPlayer()
         {
-            if (TargetPlayer != null || _players.Count == 0) return;
-            TargetPlayer = _players.First();
+            if (TargetPlayer == null && _players.Count != 0) 
+                TargetPlayer = _players.First();
+            TargetPlayerChange?.Invoke(TargetPlayer);
         }
     }
 }

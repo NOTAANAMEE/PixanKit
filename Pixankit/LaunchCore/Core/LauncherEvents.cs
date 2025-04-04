@@ -80,6 +80,8 @@ namespace PixanKit.LaunchCore.Core
         /// Occurs when a player's profile is changed.
         /// </summary>
         public static Action<PlayerBase>? ProfileChange;
+
+        public static Action<PlayerBase?>? TargetPlayerChange;
         #endregion
     }
 }

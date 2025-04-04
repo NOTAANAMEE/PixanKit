@@ -43,5 +43,14 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         {
             _type = PlayerType.offline;
         }
+
+        /// <summary>
+        /// Sets the name of the offline player.
+        /// </summary>
+        /// <param name="name"></param>
+        public void SetName(string name)
+        {
+            _name = name;
+        }
     }
 }
