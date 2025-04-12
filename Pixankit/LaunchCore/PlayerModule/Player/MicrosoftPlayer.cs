@@ -8,7 +8,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
     /// <summary>
     /// Represents a Microsoft account player in the Minecraft environment.
     /// </summary>
-    public class MicrosoftPlayer:PlayerBase
+    public class MicrosoftPlayer : PlayerBase
     {
         /// <summary>
         /// Gets the latest login time. Re-login is required after 1 day.
@@ -45,7 +45,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// Initializes a new instance of the <see cref="MicrosoftPlayer"/> class using JSON data.
         /// </summary>
         /// <param name="jData">The JSON data representing the player.</param>
-        public MicrosoftPlayer(JObject jData):base(jData)
+        public MicrosoftPlayer(JObject jData) : base(jData)
         {
             _type = PlayerType.microsoft;
         }
@@ -85,7 +85,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// Re-logs in the player using the refresh token.
         /// </summary>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task ReLogin() 
+        public async Task ReLogin()
         {
             TimeSpan span = DateTime.Now - LatestLoginTime;
             if (span.Days >= 1)

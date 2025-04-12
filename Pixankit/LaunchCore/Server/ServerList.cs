@@ -45,5 +45,5 @@ namespace PixanKit.LaunchCore.Server
         public static Dictionary<string, ModLoaderServer> ModLoaderServers = [];
     }
 
-    
+
 }

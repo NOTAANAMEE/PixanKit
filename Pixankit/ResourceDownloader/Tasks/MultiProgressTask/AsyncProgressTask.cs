@@ -18,11 +18,11 @@
         /// </exception>
         public override void Start()
         {
-            if (_status == ProgressStatus.Inited) 
-            foreach (var item in ProgressTasks) 
-            { 
-                item.Start();
-            }
+            if (_status == ProgressStatus.Inited)
+                foreach (var item in ProgressTasks)
+                {
+                    item.Start();
+                }
             base.Start();
         }
     }

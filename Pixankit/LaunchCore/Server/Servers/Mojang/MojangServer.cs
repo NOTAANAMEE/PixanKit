@@ -53,8 +53,8 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
 
             JObject jresponse = JObject.Parse(ret);
             if (jresponse.ContainsKey("error")) throw new InvalidOperationException("Player Does Not Have Minecraft");
-            return new PlayerInf(jresponse["id"]?.ToString() ?? "", 
-                jresponse["name"]?.ToString() ?? "", 
+            return new PlayerInf(jresponse["id"]?.ToString() ?? "",
+                jresponse["name"]?.ToString() ?? "",
                 jresponse["skins"]?[0]?["url"]?.ToString() ?? "");
         }
 

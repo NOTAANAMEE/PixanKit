@@ -7,7 +7,7 @@ namespace PixanKit.LaunchCore.Exceptions
     /// </summary>
     /// <param name="game"></param>
     /// <param name="type"></param>
-    public class GameConvertException(GameBase game, GameType type):
+    public class GameConvertException(GameBase game, GameType type) :
         Exception($"Expects game {game.Name} to be {type}. Actual type:{game.GameType}")
     {
     }

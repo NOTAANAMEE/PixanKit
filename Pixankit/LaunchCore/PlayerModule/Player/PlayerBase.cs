@@ -7,7 +7,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
     /// <summary>
     /// Represents a base class for a player in the Minecraft environment.
     /// </summary>
-    public partial class PlayerBase:IToJSON
+    public partial class PlayerBase : IToJSON
     {
         /// <summary>
         /// Gets the player's name. Necessary for launch.
@@ -120,7 +120,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// <returns><c>true</c> if the players are equal; otherwise, <c>false</c>.</returns>
         public static bool operator ==(PlayerBase? player1, PlayerBase? player2)
         {
-            if (player1 is null)return player2 is null;
+            if (player1 is null) return player2 is null;
             else if (player2 is null) return false;
             return SamePlayer(player1, player2);
         }
@@ -163,7 +163,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
     /// <summary>
     /// Player Login Type
     /// </summary>
-    public enum PlayerType 
+    public enum PlayerType
     {
         /// <summary>
         /// Microsoft Login

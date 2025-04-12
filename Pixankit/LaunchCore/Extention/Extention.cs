@@ -41,7 +41,7 @@ namespace PixanKit.LaunchCore.Extention
         public static GameBase DefaultGameInitor(string path)
         {
             string jsonPath = $"{path}/{Path.GetFileName(path)}.json";
-            JObject jobj    = JObject.Parse(File.ReadAllText(jsonPath));
+            JObject jobj = JObject.Parse(File.ReadAllText(jsonPath));
 
 
             if (jobj["mainClass"]?.ToString() != "net.minecraft.client.main.Main")
@@ -67,7 +67,7 @@ namespace PixanKit.LaunchCore.Extention
         /// 
         /// }</code></param>
         /// <returns></returns>
-        public static PlayerBase? DefaultPlayerInitor(JObject? jData) 
+        public static PlayerBase? DefaultPlayerInitor(JObject? jData)
         {
             if (jData == null) return null;
             return (jData["type"]?.ToString()) switch

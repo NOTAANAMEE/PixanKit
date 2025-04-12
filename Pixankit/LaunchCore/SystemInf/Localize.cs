@@ -7,7 +7,7 @@
         static Localize()
         {
             UserPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            if (SysInfo.OSName == "windows") 
+            if (SysInfo.OSName == "windows")
                 UserPath = UserPath[0..UserPath.LastIndexOf('\\')];
         }
 

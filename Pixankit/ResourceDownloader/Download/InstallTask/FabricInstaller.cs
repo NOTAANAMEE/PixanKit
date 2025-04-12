@@ -68,7 +68,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         private void AddDownloadTask()
         {
             DownloadTask = new();
-            FileDownloadTask download = new ("", installerpath);
+            FileDownloadTask download = new("", installerpath);
             InitTask.OnFinish += (a) =>
             {
                 download.SetURL(url);
@@ -82,9 +82,9 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void AddCommandTask()
         {
-            if (Launcher.Instance == null) 
+            if (Launcher.Instance == null)
                 throw new InvalidOperationException("Launcher hasn't inited yet");
-            var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes)??
+            var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes) ??
                 throw new InvalidOperationException("No java found");
             CommandTask = new(java.JavaEXE, $"-jar \"{installerpath}\" client " +
                 $"-dir \"{Owner.FolderPath}\" -mcversion {version} -loader {fabricversion["version"]} " +

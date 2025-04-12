@@ -20,12 +20,12 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
         /// </summary>
         /// <param name="player"></param>
         /// <returns></returns>
-        public static async Task Delete(MicrosoftPlayer player) 
+        public static async Task Delete(MicrosoftPlayer player)
         {
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", player.AccessToken);
             await client.DeleteAsync($"https://api.mojang.com/user/profile/{player.UID}/skin");
         }
-        
+
         /// <summary>
         /// Upload the skin
         /// </summary>
@@ -33,7 +33,7 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
         /// <param name="skinPath"></param>
         /// <param name="slim"></param>
         /// <returns></returns>
-        public static async Task Upload(MicrosoftPlayer player, string skinPath, bool slim) 
+        public static async Task Upload(MicrosoftPlayer player, string skinPath, bool slim)
         {
             if (skinPath == "") return;
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", player.AccessToken);

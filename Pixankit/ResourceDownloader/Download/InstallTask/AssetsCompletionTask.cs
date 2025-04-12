@@ -12,7 +12,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// Represents a task for completing Minecraft game assets, including downloading the asset index
     /// and the associated asset files.
     /// </summary>
-    public class AssetsCompletionTask:SequenceProgressTask
+    public class AssetsCompletionTask : SequenceProgressTask
     {
         GameBase? _game;
 
@@ -43,7 +43,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         private void Init(JObject jdata)
         {
             FileDownloadTask task;
-            
+
             string url = jdata["assetIndex"]?["url"]?.ToString() ?? "";
             string index = jdata["assetIndex"]?["id"]?.ToString() ?? "";
 
@@ -57,7 +57,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             else TaskFinish();
             Add(task2 = new MultiFileDownloadTask());
         }
-        
+
         private void TaskFinish()
         {
             List<string> urls = [], paths = [];
@@ -77,7 +77,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                     urls.Add(ServerList.MinecraftAssetsServer.GetAssetsUrl(hash));
                     paths.Add(path);
                 }
-                catch(Exception ex) 
+                catch (Exception ex)
                 { Logger.Warn("PixanKit.ResourceDownloader", ex.Message); }
 
             }

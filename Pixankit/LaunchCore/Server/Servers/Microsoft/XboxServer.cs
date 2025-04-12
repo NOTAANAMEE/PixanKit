@@ -48,8 +48,8 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
             var response = await Client.PostAsync("/user/authenticate", content);
             ret = await response.Content.ReadAsStringAsync();
             JObject jresponse = JObject.Parse(ret);
-            return new 
-                (jresponse["Token"]?.ToString() ?? "", 
+            return new
+                (jresponse["Token"]?.ToString() ?? "",
                 jresponse["DisplayClaims"]?["xui"]?[0]?["uhs"]?.ToString() ?? "");
         }
 

@@ -8,17 +8,17 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// <summary>
     /// Optifine Server
     /// </summary>
-    public class OptifineServer: ModLoaderServer
+    public class OptifineServer : ModLoaderServer
     {
         /// <summary>
         /// Initor. Dont touch it
         /// </summary>
         [ModuleInitializer]
-        public static void Init() 
+        public static void Init()
         {
             _ = new OptifineServer();
         }
-            
+
 
         /// <summary>
         /// Initor
@@ -76,7 +76,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
 
             private static int GetStartIndex(HtmlNodeCollection collection, string mcversion)
             {
-                for (var i = 0; i < collection.Count; i++) 
+                for (var i = 0; i < collection.Count; i++)
                 {
                     var node = collection[i];
                     if (node.Name == "h2" && node.InnerText == $"Minecraft {mcversion}")
@@ -112,7 +112,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 int index = GetStartIndex(nodes, mcversion);
                 if (index == -1 || token.IsCancellationRequested) return array;
 
-                for (var i = index + 1; i < nodes.Count; i++) 
+                for (var i = index + 1; i < nodes.Count; i++)
                 {
                     if (nodes[i].Name != "tr") break;
                     array.Add(Parse(nodes[i]));

@@ -10,7 +10,7 @@ namespace PixanKit.LaunchCore.GameModule
     /// <summary>
     /// Folder Class<br/> An Abstraction For A .minecraft Folder
     /// </summary>
-    public partial class Folder:IToJSON
+    public partial class Folder : IToJSON
     {
         internal static List<Folder> Folders = [];
 
@@ -125,7 +125,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// "path":"C:/Users/Admin/AppData/Roaming/.minecraft",<br/>
         /// "alias":"New Folder"<br/>
         /// }</c></param>
-        public Folder(JObject jData) 
+        public Folder(JObject jData)
         {
             LoadFromJSON(jData);
             AddSelf();
@@ -157,7 +157,7 @@ namespace PixanKit.LaunchCore.GameModule
 
         private void AddSelf()
         {
-            foreach (var folder in Folders) 
+            foreach (var folder in Folders)
             {
                 if (folder.FolderPath == _folderpath)
                     return;
@@ -169,20 +169,21 @@ namespace PixanKit.LaunchCore.GameModule
         {
             _games.Clear();
             string[] dirs = Directory.GetDirectories(VersionDirPath);
-            foreach (string dir in dirs) 
+            foreach (string dir in dirs)
             {
                 GameBase game;
-                try {
+                try
+                {
                     game = Initors.GameInitor(dir) ?? throw new Exception();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Logger.Error(ex.Message);
                     Logger.Error("\n" + ex.StackTrace);
                     Logger.Error($"{dir} Is Not A Minecraft Game");
                     continue;
                 }
-                 
+
                 if (game != null)
                 {
                     _games.Add(game);
@@ -208,7 +209,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// This method removes the game.
         /// </summary>
         /// <param name="game">The <c>GameBase</c> That You Need To Remove</param>
-        public void RemoveGame(GameBase game) 
+        public void RemoveGame(GameBase game)
         {
             if (Owner != null) Owner.RemoveGame(game);
             else InternalRemoveGame(game);
@@ -219,7 +220,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// </summary>
         /// <param name="game">The <c>GameBase</c> You Want To Check</param>
         /// <returns></returns>
-        public bool Contains(GameBase game) 
+        public bool Contains(GameBase game)
             => _games.Contains(game);
 
         /// <summary>
@@ -229,7 +230,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// <returns>If Exists, Return The Game. Else, Return <c>null</c></returns>
         public GameBase? FindGame(string name)
         {
-            foreach(GameBase game in _games)
+            foreach (GameBase game in _games)
             {
                 if (game.Name == name) return game;
             }
@@ -242,9 +243,9 @@ namespace PixanKit.LaunchCore.GameModule
         /// <param name="version">The Version. Like <c>"1.14"</c></param>
         /// <param name="type">Type Of The Game. Like <c>GameType.Vanilla</c></param>
         /// <returns>Return The GameBase If Exists</returns>
-        public GameBase? FindVersion(string version, GameType type) 
+        public GameBase? FindVersion(string version, GameType type)
         {
-            foreach (GameBase game in _games) 
+            foreach (GameBase game in _games)
             {
                 if (game.Version == version && game.GameType == type) return game;
             }

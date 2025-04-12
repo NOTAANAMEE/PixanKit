@@ -1,13 +1,7 @@
 ﻿using PixanKit.LaunchCore.Extention;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.JavaModule.Java;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 
 namespace PixanKit.LaunchCore.Core
 {
@@ -56,16 +50,16 @@ namespace PixanKit.LaunchCore.Core
         /// <param name="args">The command-line arguments for the process.</param>
         public LaunchSession(GameBase game, JavaRuntime java, string args)
         {
-            Game      = game;
-            Runtime   = java;
+            Game = game;
+            Runtime = java;
             Arguments = args;
             StartInfo = new()
             {
-                FileName         = java.JavawEXE,
-                Arguments        = args,
+                FileName = java.JavawEXE,
+                Arguments = args,
                 WorkingDirectory =
                     string.Concat(AppDomain.CurrentDomain.BaseDirectory, Files.CacheDir),
-                CreateNoWindow   = true,
+                CreateNoWindow = true,
             };
         }
 

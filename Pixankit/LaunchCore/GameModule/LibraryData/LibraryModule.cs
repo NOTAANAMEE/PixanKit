@@ -120,7 +120,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
             //test System
             var os = GetAllowedSystem(jData);
             //Output Error
-            if (!os.Contains(SysInfo.OSName)) 
+            if (!os.Contains(SysInfo.OSName))
                 throw new SystemNotSupportedException(string.Join(',', os), SysInfo.OSName);
             _name = jData.GetOrDefault(Format.ToString, "name", "");
         }
@@ -174,16 +174,16 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
 
                 switch (action)
                 {
-                case "allow":
-                    if (osData == null) OSSet = [ "osx", "linux", "windows" ];
-                    else if (osName != null) OSSet.Add(osName);
+                    case "allow":
+                        if (osData == null) OSSet = ["osx", "linux", "windows"];
+                        else if (osName != null) OSSet.Add(osName);
 
-                    if (osArch != null && osArch != SysInfo.CPUArch) return [];
-                    break;
+                        if (osArch != null && osArch != SysInfo.CPUArch) return [];
+                        break;
 
-                case "disallow":
-                    if (osName != null) OSSet.Remove(osName);
-                    break;
+                    case "disallow":
+                        if (osName != null) OSSet.Remove(osName);
+                        break;
                 }
             }
 
@@ -221,7 +221,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         }
 
         private static string GetName(JObject jData)
-            => (jData["name"]?? "").ToString();
+            => (jData["name"] ?? "").ToString();
         #endregion
     }
 

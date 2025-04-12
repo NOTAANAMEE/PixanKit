@@ -30,7 +30,7 @@ namespace PixanKit.LaunchCore.Json
         /// </summary>
         /// <param name="file">the exact path of the file</param>
         /// <param name="obj">the JObject JSON data</param>
-        public static void SaveFile(string file, JObject obj) 
+        public static void SaveFile(string file, JObject obj)
         {
             StreamWriter sw = new(file);
             JsonTextWriter writer = new(sw);
@@ -66,11 +66,11 @@ namespace PixanKit.LaunchCore.Json
             {
                 case JTokenType.Object:
                     MergeJObject(
-                        target[key] is JObject jobject? jobject : [], (JObject)needtomerge);
+                        target[key] is JObject jobject ? jobject : [], (JObject)needtomerge);
                     break;
                 case JTokenType.Array:
                     MergeJArray(
-                        target[key] is JArray array? array : [], (JArray)needtomerge);
+                        target[key] is JArray array ? array : [], (JArray)needtomerge);
                     break;
                 default:
                     target[key] = needtomerge;
@@ -101,7 +101,7 @@ namespace PixanKit.LaunchCore.Json
         /// <returns>True if the value was found and formatted successfully, otherwise false.</returns>
         public static bool TryGetValue<T>(this JObject obj, Func<JToken, T> format, string Path, out T? output)
         {
-            output  = default;
+            output = default;
             var tok = GetFromPath(obj, Path);
             if (tok == null) return false;
             try { output = format(tok); } catch { return false; }
@@ -137,7 +137,7 @@ namespace PixanKit.LaunchCore.Json
             T ret;
             var tok = GetFromPath(obj, Path);
             if (tok == null) return defaultVal;
-            try { ret = format(tok);  } catch { return defaultVal; }
+            try { ret = format(tok); } catch { return defaultVal; }
             return ret;
         }
 
@@ -151,7 +151,7 @@ namespace PixanKit.LaunchCore.Json
         {
             JToken? token = obj;
             string[] keys = Path.Split('/');
-            int ind       = 0;
+            int ind = 0;
             while (ind < keys.Length)
             {
                 string key = keys[ind++];
@@ -182,7 +182,7 @@ namespace PixanKit.LaunchCore.Json
         /// <exception cref="InvalidOperationException">Thrown if the token does not exist at the specified path.</exception>
         public static JToken GetFromPathCheck(this JObject obj, string Path)
         {
-            return obj.GetFromPath(Path) ?? 
+            return obj.GetFromPath(Path) ??
                 throw new InvalidOperationException("Token does not exist");
         }
 

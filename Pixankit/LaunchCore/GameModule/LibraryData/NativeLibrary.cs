@@ -21,13 +21,13 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         {
             libraryType = LibraryType.Native;
             string OSKey =
-                libraryJData.GetOrDefault(Format.ToString, 
+                libraryJData.GetOrDefault(Format.ToString,
                 $"natives/{SysInfo.OSName}", "");
 
             JObject current = libraryJData.GetValue(Format.ToJObject, OSKey);
             _name = current.GetValue(Format.ToString, "name");
             _sha1 = current.GetValue(Format.ToString, "sha1");
-            _url  = current.GetValue(Format.ToString, "url");
+            _url = current.GetValue(Format.ToString, "url");
 
             List<string> excludelist = [];
             if (libraryJData.TryGetValue(Format.ToJArray, "extract/exclude", out var array))
@@ -35,7 +35,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
                 foreach (JToken token in array ?? [])
                     excludelist.Add(token.ToString());
             }
-            Exclude = [..excludelist];
+            Exclude = [.. excludelist];
         }
 
         /// <summary>

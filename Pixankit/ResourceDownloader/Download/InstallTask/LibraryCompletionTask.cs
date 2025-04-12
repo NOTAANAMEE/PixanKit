@@ -8,7 +8,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// <summary>
     /// Represents a task for completing the download of necessary libraries for a Minecraft game instance.
     /// </summary>
-    public class LibraryCompletionTask:MultiFileDownloadTask
+    public class LibraryCompletionTask : MultiFileDownloadTask
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LibraryCompletionTask"/> class.

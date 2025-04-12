@@ -8,7 +8,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// <summary>
     /// Represents a NeoForge mod loader server.
     /// </summary>
-    public class NeoForgeServer: ModLoaderServer
+    public class NeoForgeServer : ModLoaderServer
     {
         /// <summary>
         /// Initor. Dont touch it
@@ -22,7 +22,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         /// <summary>
         /// Initor
         /// </summary>
-        public NeoForgeServer(): base("neoforge")
+        public NeoForgeServer() : base("neoforge")
         {
             Mirrors.Add(new OfficialNeoforgeServer());
             UpdateIndex();
@@ -144,7 +144,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 if (mcversion == "1.20.1") return true;//The First Supported Minecraft Of NeoForge
                 if (!mcversion.Contains('.')) return false; //No Snapshot Builds
                 var builds = await GetBuild(token);
-                return FindBuildsStart(builds, GetPatch(mcversion), 0, builds.Count - 1) 
+                return FindBuildsStart(builds, GetPatch(mcversion), 0, builds.Count - 1)
                     != -1;
             }
 

@@ -62,13 +62,13 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
             string responseContent = await response.Content.ReadAsStringAsync();
             JObject jresponse = JObject.Parse(responseContent);
             return new MSAuthorize(
-                jresponse["access_token"]?.ToString() ?? "", 
+                jresponse["access_token"]?.ToString() ?? "",
                 jresponse["refresh_token"]?.ToString() ?? "");
         }
 
         internal async Task<MSAuthorize> ReAuthorize(string code)
         {
-            if (ClientID == "" || RedirectURL == "") 
+            if (ClientID == "" || RedirectURL == "")
                 throw new InvalidOperationException(
                     "According To New EULA Of Minecraft, Please Complete ClientID and RedirectURL");
             Dictionary<string, string> data = new()
@@ -86,7 +86,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
             string responseContent = await response.Content.ReadAsStringAsync();
             JObject jresponse = JObject.Parse(responseContent);
             return new MSAuthorize(
-                jresponse["access_token"]?.ToString() ?? "", 
+                jresponse["access_token"]?.ToString() ?? "",
                 jresponse["refresh_token"]?.ToString() ?? "");
         }
 

@@ -5,7 +5,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
     /// <summary>
     /// Minecraft Game With Mod Loader
     /// </summary>
-    public class ModdedGame: CustomizedGame
+    public class ModdedGame : CustomizedGame
     {
         /// <summary>
         /// The Mod path. For instance: C:\Users\Admin\AppData\.minecraft\versions\1.12.2-Forge\mods
@@ -25,9 +25,9 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </summary>
         /// <param name="path"><inheritdoc/></param>
         /// <param name="jData"><inheritdoc/></param>
-        public ModdedGame(string path, JObject jData):base(path, jData) 
-        { 
-            _gameType = GameType.Modded; 
+        public ModdedGame(string path, JObject jData) : base(path, jData)
+        {
+            _gameType = GameType.Modded;
         }
 
         /// <summary>

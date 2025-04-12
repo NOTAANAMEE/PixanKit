@@ -32,15 +32,15 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         readonly string path;
 
         FuncProgressTask<int> InitTask = new();
-        
+
         FileDownloadTask? jsondownload;
-        
+
         readonly AsyncProgressTask asyncTask = new();
-        
+
         LibraryCompletionTask? libraryTask;
-        
+
         FileDownloadTask? jarTask;
-        
+
         AssetsCompletionTask? assetsTask;
 
 

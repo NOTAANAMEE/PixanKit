@@ -8,7 +8,7 @@ namespace PixanKit.LaunchCore.JavaModule.Java
     /// <summary>
     /// The JavaRuntime Class To Choose suitable Java runtime
     /// </summary>
-    public partial class JavaRuntime:IToJSON
+    public partial class JavaRuntime : IToJSON
     {
         /// <summary>
         /// From Java 8 to Java 11 or later
@@ -37,17 +37,17 @@ namespace PixanKit.LaunchCore.JavaModule.Java
         /// <summary>
         /// The path of java.exe
         /// </summary>
-        public string JavaEXE 
-        { 
-            get => BinaryFolder + "/java.exe"; 
+        public string JavaEXE
+        {
+            get => BinaryFolder + "/java.exe";
         }
 
         /// <summary>
         /// The path of javaw.exe
         /// </summary>
-        public string JavawEXE 
-        { 
-            get => BinaryFolder + "/javaw.exe"; 
+        public string JavawEXE
+        {
+            get => BinaryFolder + "/javaw.exe";
         }
 
         private string _javaFolder = "";
@@ -58,7 +58,7 @@ namespace PixanKit.LaunchCore.JavaModule.Java
         /// Init a JavaRuntime instance. It will automatically run Java and get the version
         /// </summary>
         /// <param name="javafolder">C:\Program Files\Java\JDK-21\</param>
-        public JavaRuntime(string javafolder) 
+        public JavaRuntime(string javafolder)
         {
             _javaFolder = javafolder;
             GetVersion();

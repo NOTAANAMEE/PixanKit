@@ -39,7 +39,7 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
         /// <returns>
         /// <see cref="MSLoginServer.MSAuthorize"/>
         /// </returns>
-        public static async Task<MSLoginServer.MSAuthorize> GetMSToken(string code) 
+        public static async Task<MSLoginServer.MSAuthorize> GetMSToken(string code)
             => await _msserver.Authorize(code);
 
         /// <summary>

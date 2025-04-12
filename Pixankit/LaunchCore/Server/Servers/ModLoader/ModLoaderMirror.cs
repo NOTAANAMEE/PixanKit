@@ -5,7 +5,7 @@ namespace PixanKit.LaunchCore.Server.Servers.ModLoader
     /// <summary>
     /// Represents an abstract base class for a mod loader mirror server.
     /// </summary>
-    public abstract class ModLoaderMirror:MirrorServer
+    public abstract class ModLoaderMirror : MirrorServer
     {
         #region CancellableMethod
         /// <summary>

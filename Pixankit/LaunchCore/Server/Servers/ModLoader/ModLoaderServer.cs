@@ -5,15 +5,15 @@ namespace PixanKit.LaunchCore.Server.Servers.ModLoader
     /// <summary>
     /// Server Layer For Mod Loader Installer
     /// </summary>
-    public abstract class ModLoaderServer:ResourceServer
+    public abstract class ModLoaderServer : ResourceServer
     {
-        
+
 
         /// <summary>
         /// Current Server
         /// </summary>
-        public new ModLoaderMirror Current 
-        { 
+        public new ModLoaderMirror Current
+        {
             get => (base.Current ?? this.Mirrors[0]) as ModLoaderMirror ?? throw new Exception();
             set => base.Current = value;
         }

@@ -122,7 +122,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 var content = await response.Content.ReadAsStringAsync(token);
                 if (token.IsCancellationRequested) return "";
                 JObject jobj = JObject.Parse(content);
-                string url = jobj["installer"]?[0]?["url"]?.ToString()??
+                string url = jobj["installer"]?[0]?["url"]?.ToString() ??
                     throw new JSONKeyException(jobj, "/installer/0/url", "loader version");
                 return Replace(url);
             }

@@ -24,7 +24,7 @@ namespace PixanKit.ModController.ModReader
         /// <exception cref="Exception">json config is not valid</exception>
         public static ModFile ParseJson(string jsonContent, string filepath, ModCollection modCollection, ZipArchive archive)
         {
-            if (ModModule.Instance == null) 
+            if (ModModule.Instance == null)
                 throw new InvalidOperationException();
 
             var modArray = JArray.Parse(jsonContent);
@@ -32,7 +32,7 @@ namespace PixanKit.ModController.ModReader
                 throw new Exception("Invalid JSON: No mod data found");
 
             var modEntry = (JObject)modArray[0];
-            var modID    = GetID(modEntry);
+            var modID = GetID(modEntry);
 
             LoadModFile(modCollection, modID,
                 modEntry, archive,
@@ -41,12 +41,12 @@ namespace PixanKit.ModController.ModReader
 
             ModMetaData metaData = LoadMetaData(modID, modEntry, archive);
 
-            var modFile  = new ModFile(filepath)
+            var modFile = new ModFile(filepath)
             {
-                Owner        = modCollection,
-                Version      = version,
+                Owner = modCollection,
+                Version = version,
                 Dependencies = deplist,
-                ReleaseDate  = releaseDate
+                ReleaseDate = releaseDate
             };
             metaData.Register(modFile);
             return modFile;
@@ -63,12 +63,12 @@ namespace PixanKit.ModController.ModReader
             {
                 metaData = new ModMetaData
                 {
-                    ModID       = modID,
+                    ModID = modID,
                     Description = modEntry.GetDescription(),
-                    Authors     = modEntry.GetAuthors(),
-                    ImageCache  = FMLModParser.
+                    Authors = modEntry.GetAuthors(),
+                    ImageCache = FMLModParser.
                         LoadIcon(archive, modEntry.GetIcon(), modID),
-                    Name        = modEntry.GetName()
+                    Name = modEntry.GetName()
                 };
                 ModModule.Instance?.AddMetaData(metaData);
             }
@@ -80,7 +80,7 @@ namespace PixanKit.ModController.ModReader
             out List<string> depList, out string version, out DateTime releaseDate
             )
         {
-            var entry   = archive.GetEntry("META-INF/MANIFEST.MF");
+            var entry = archive.GetEntry("META-INF/MANIFEST.MF");
             releaseDate = entry?.LastWriteTime.UtcDateTime ?? DateTime.UtcNow;
             modCollection.ModCache.TryGetValue(Format.ToJObject, modID, out var modData);
 

@@ -40,7 +40,7 @@ namespace PixanKit.LaunchCore.Core
         /// Removes a Java runtime from the launcher.
         /// </summary>
         /// <param name="runtime">A valid <see cref="JavaRuntime"/> instance that is already added to the launcher.</param>
-        public void RemoveJavaRuntime(JavaRuntime runtime) 
+        public void RemoveJavaRuntime(JavaRuntime runtime)
         {
             _javaRuntimes.Remove(runtime);
         }

@@ -146,7 +146,8 @@ namespace PixanKit.LaunchCore.GameModule.Game
             {
                 if (library.LibraryType != LibraryType.Native) continue;
                 await Task.Run(
-                    () => {
+                    () =>
+                    {
                         (library as NativeLibrary ?? new NativeLibrary())
                         .Extract(LibrariesDirPath, NativeDirPath);
                     }
@@ -200,7 +201,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
 
         private static string GetOptionalArgs(JObject jData, OptionalArgs arg)
         {
-            foreach (var rule in arg.rules) 
+            foreach (var rule in arg.rules)
             {
                 if (!JudgeArg(jData, rule)) return "";
             }

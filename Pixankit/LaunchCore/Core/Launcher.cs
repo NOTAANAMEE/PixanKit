@@ -52,7 +52,7 @@ namespace PixanKit.LaunchCore.Core
                 FolderAdd?.Invoke(tmp);
             }
             _folders = folders;
-            string tmpstr = (Files.FolderJData["target"]?? "").ToString();
+            string tmpstr = (Files.FolderJData["target"] ?? "").ToString();
             if (tmpstr != "") TargetGame = FindGame(tmpstr);
             UpdateTargetGame();
         }

@@ -74,7 +74,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void AddCommandTask()
         {
-            var java = JavaChooser.Newest(Launcher.Instance?.JavaRuntimes ?? []) ?? 
+            var java = JavaChooser.Newest(Launcher.Instance?.JavaRuntimes ?? []) ??
                 throw new Exception("No Java");
             string workingdir = Path.GetDirectoryName(Owner.FolderPath) ?? "./";
             CommandTask = new(java.JavaEXE, $"-jar \"{Path.GetFullPath(installerpath)}\" " +
@@ -83,7 +83,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             ProgressTasks.Add(CommandTask);
             CommandTask.OnFinish += (a) =>
             {
-                GamePostProcess.Move(Owner, 
+                GamePostProcess.Move(Owner,
                     $"quilt-loader-{quiltversion["version"]}-{version}", Name);
             };
         }

@@ -29,7 +29,7 @@ namespace PixanKit.ModController.ModReader
                 throw new InvalidOperationException("Init ModModule first!");
 
             var modEntry = JObject.Parse(jsonContent);
-            var modID    = GetID(modEntry);
+            var modID = GetID(modEntry);
 
             LoadModFile(modCollection, modID,
                 modEntry, archive,
@@ -40,10 +40,10 @@ namespace PixanKit.ModController.ModReader
 
             var modFile = new ModFile(filepath)
             {
-                Owner        = modCollection,
-                Version      = version,
+                Owner = modCollection,
+                Version = version,
                 Dependencies = dependenciesList,
-                ReleaseDate  = releaseDate
+                ReleaseDate = releaseDate
             };
             metaData.Register(modFile);
             return modFile;
@@ -54,22 +54,22 @@ namespace PixanKit.ModController.ModReader
 
         private static ModMetaData LoadMetaData(string modID, JObject modEntry, ZipArchive archive)
         {
-            if (ModModule.Instance == null) 
+            if (ModModule.Instance == null)
                 throw new InvalidOperationException("Exception");
 
-            var idInCache = ModModule.Instance.ModDatas.TryGetValue(modID, 
+            var idInCache = ModModule.Instance.ModDatas.TryGetValue(modID,
                 out ModMetaData? metaData);
 
-            if (idInCache) return metaData ?? 
+            if (idInCache) return metaData ??
                     throw new Exception("Exception avoid null warning");
 
             metaData = new ModMetaData()
             {
-                ModID       = modID,
+                ModID = modID,
                 Description = modEntry.GetDescription(),
-                Authors     = modEntry.GetAuthors(),
-                Name        = modEntry.GetName(),
-                ImageCache  = FMLModParser.LoadIcon(archive, modEntry.GetIcon(), modID),
+                Authors = modEntry.GetAuthors(),
+                Name = modEntry.GetName(),
+                ImageCache = FMLModParser.LoadIcon(archive, modEntry.GetIcon(), modID),
             };
             ModModule.Instance.AddMetaData(metaData);
 
@@ -81,7 +81,7 @@ namespace PixanKit.ModController.ModReader
             out List<string> depList, out string version, out DateTime releaseDate
             )
         {
-            var entry   = archive.GetEntry("META-INF/MANIFEST.MF");
+            var entry = archive.GetEntry("META-INF/MANIFEST.MF");
             releaseDate = entry?.LastWriteTime.UtcDateTime ?? DateTime.UtcNow;
             modCollection.ModCache.TryGetValue(Format.ToJObject, modID, out var modData);
 
@@ -104,39 +104,40 @@ namespace PixanKit.ModController.ModReader
             return output ?? ModModule.Instance.ModDatas["unknown"];
         }
 
-        internal static ModFile LoadAllFromJSON(ModCollection collection, string filepath, JObject modEntry) 
+        internal static ModFile LoadAllFromJSON(ModCollection collection, string filepath, JObject modEntry)
         {
-            var metadata       = GetFromModEntry(modEntry);
-            var depList        = modEntry.GetCacheDeps();
-            var version        = modEntry.GetVersion();
-            var releaseDate    = modEntry.GetValue(Format.ToDateTime,"release_date");
-            var modFile        = new ModFile(filepath) { 
-                Dependencies   = depList, 
-                Version        = version, 
-                ReleaseDate    = releaseDate,
+            var metadata = GetFromModEntry(modEntry);
+            var depList = modEntry.GetCacheDeps();
+            var version = modEntry.GetVersion();
+            var releaseDate = modEntry.GetValue(Format.ToDateTime, "release_date");
+            var modFile = new ModFile(filepath)
+            {
+                Dependencies = depList,
+                Version = version,
+                ReleaseDate = releaseDate,
                 ValidStructure = false,
-                Owner          = collection
+                Owner = collection
             };
             metadata.Register(modFile);
-            return modFile;            
+            return modFile;
         }
 
-        internal static ModMetaData ParseModMetaDataFromJSON(JObject modEntry) 
+        internal static ModMetaData ParseModMetaDataFromJSON(JObject modEntry)
         {
             return new ModMetaData()
             {
-                ModID       = GetID(modEntry),
+                ModID = GetID(modEntry),
                 Description = modEntry.GetDescription(),
-                Authors     = modEntry.GetAuthors(),
-                ImageCache  = modEntry.GetOrDefault(Format.ToString, "icon", ""),
-                Name        = modEntry.GetName(),
+                Authors = modEntry.GetAuthors(),
+                ImageCache = modEntry.GetOrDefault(Format.ToString, "icon", ""),
+                Name = modEntry.GetName(),
             };
         }
 
-        internal static void ReadFromCache(this JObject modData, DateTime releaseDate, 
+        internal static void ReadFromCache(this JObject modData, DateTime releaseDate,
             out List<string> depList, out string ver, out DateTime rlsDate)
         {
-            ver     = modData.GetVersion();
+            ver = modData.GetVersion();
             rlsDate = modData.GetOrDefault(Format.ToDateTime,
                       "release_date", releaseDate);
             depList = modData.GetCacheDeps();

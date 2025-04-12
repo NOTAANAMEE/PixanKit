@@ -6,7 +6,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
     /// <summary>
     /// Represents a task for downloading multiple files concurrently using multiple threads.
     /// </summary>
-    public class MultiFileDownloadTask: AsyncProgressTask, IFileDownload
+    public class MultiFileDownloadTask : AsyncProgressTask, IFileDownload
     {
         /// <summary>
         /// The default number of threads to use for downloading.
@@ -31,7 +31,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         List<FileDownloadTask> files = [];
 
         /// <inheritdoc/>
-        public long Size 
+        public long Size
         {
             get
             {
@@ -41,31 +41,31 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
                     ret += task.Size;
                 }
                 return ret;
-            } 
+            }
         }
 
         /// <inheritdoc/>
-        public long DownloadedBytes 
+        public long DownloadedBytes
         {
             get
             {
                 long ret = 0;
                 foreach (var task in files)
                 {
-                    ret += task .DownloadedBytes;
+                    ret += task.DownloadedBytes;
                 }
                 return ret;
             }
         }
 
         /// <inheritdoc/>
-        public int TotalFiles 
+        public int TotalFiles
         {
             get => paths.Length;
         }
 
         /// <inheritdoc/>
-        public int DownloadedFiles 
+        public int DownloadedFiles
         {
             get
             {
@@ -102,7 +102,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// </exception>
         public MultiFileDownloadTask(string[] url, string[] path, int threanum)
         {
-            if (url.Length != path.Length) 
+            if (url.Length != path.Length)
                 throw new InvalidOperationException("url Should Contain Same Amount Of path");
             this.threadnum = threanum;
             urls = url;
@@ -135,7 +135,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
 
             List<SequenceProgressTask> tasks = [];
 
-            for (int i = 0; i < urls.Length; i++) 
+            for (int i = 0; i < urls.Length; i++)
             {
                 FileDownloadTask? task;
 

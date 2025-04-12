@@ -16,7 +16,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// <summary>
     /// Represents a task for installing Optifine, a Minecraft optimization mod.
     /// </summary>
-    public class OptifineInstaller: SequenceProgressTask
+    public class OptifineInstaller : SequenceProgressTask
     {
         readonly string version = "";
 
@@ -46,7 +46,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// <param name="name">The name of the Minecraft instance. The JAR file will be located at <c>folder\name\name.jar</c>.</param>
         /// <param name="mcversion">The Minecraft version for which Optifine is being installed.</param>
         /// <param name="optifineversion">A JSON object containing the Optifine version details.</param>
-        public OptifineInstaller(Folder folder, string name, string mcversion, JObject optifineversion) 
+        public OptifineInstaller(Folder folder, string name, string mcversion, JObject optifineversion)
         {
             Name = name;
             Owner = folder;
@@ -87,7 +87,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             if (Launcher.Instance == null) throw new InvalidOperationException("Init Launcher first");
             java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes);
             if (java == null) throw new Exception("No java found");
-            
+
             string dir =
                 $"{version}-{(OptifineVersion["version"] ?? "").ToString().Replace(" ", "_")}";
 

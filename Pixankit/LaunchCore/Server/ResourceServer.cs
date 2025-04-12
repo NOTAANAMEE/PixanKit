@@ -32,7 +32,7 @@ namespace PixanKit.LaunchCore.Server
                     if (pingtime > 0)
                         dict.Add(new(pingtime, item));
                 }
-                catch 
+                catch
                 {
                     Current = Mirrors[0];
                     return;
@@ -97,8 +97,8 @@ namespace PixanKit.LaunchCore.Server
         private static string GetHost(string OriginalUrl)
         {
 
-                Uri uri = new(OriginalUrl);
-                return uri.Host;
+            Uri uri = new(OriginalUrl);
+            return uri.Host;
 
         }
     }

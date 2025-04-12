@@ -8,7 +8,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// <summary>
     /// Represents a Forge mod loader server.
     /// </summary>
-    public class ForgeServer: ModLoaderServer
+    public class ForgeServer : ModLoaderServer
     {
         /// <summary>
         /// Initor. Do not touch it

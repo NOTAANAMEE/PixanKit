@@ -13,9 +13,9 @@ namespace PixanKit.LaunchCore.Core
         public void Close()
         {
             Logger.Info("Launcher Closing");
-            Files.FolderJData  = SaveFolderData();
+            Files.FolderJData = SaveFolderData();
             Files.RuntimeJData = SaveJavaData();
-            Files.PlayerJData  = SavePlayerData();
+            Files.PlayerJData = SavePlayerData();
             Logger.Info("Launcher Closed. Call Files.Save() To Save Or Handle It Yourself");
         }
 
@@ -23,7 +23,7 @@ namespace PixanKit.LaunchCore.Core
         {
             Logger.Info("Game Module Closing");
             JArray folders = [];
-            foreach (var folder in _folders) 
+            foreach (var folder in _folders)
             {
                 folders.Add(folder.ToJSON());
                 folder.Close();
@@ -35,7 +35,7 @@ namespace PixanKit.LaunchCore.Core
             };
         }
 
-        private JObject SaveJavaData() 
+        private JObject SaveJavaData()
         {
             JArray javaRuntimes = [];
             foreach (var javaRuntime in _javaRuntimes)
@@ -44,7 +44,7 @@ namespace PixanKit.LaunchCore.Core
             }
             return new JObject()
             {
-                { "children", javaRuntimes}, 
+                { "children", javaRuntimes},
             };
         }
 

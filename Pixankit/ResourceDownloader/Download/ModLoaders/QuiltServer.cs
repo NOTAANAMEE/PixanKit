@@ -7,7 +7,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// <summary>
     /// Represents a Quilt mod loader server.
     /// </summary>
-    public class QuiltServer: ModLoaderServer
+    public class QuiltServer : ModLoaderServer
     {
         /// <summary>
         /// Initor. Don't touch it
@@ -21,7 +21,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         /// <summary>
         /// Initializes a new instance of the <see cref="QuiltServer"/> class.
         /// </summary>
-        public QuiltServer() : base("quilt") 
+        public QuiltServer() : base("quilt")
         {
             Mirrors.Add(new OfficialQuiltMirror());
             UpdateIndex();
@@ -49,7 +49,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 var content = await response.Content.ReadAsStringAsync(token);
                 var array = JArray.Parse(content);
 
-                foreach (var item in array) 
+                foreach (var item in array)
                 {
                     if (mcversion == item["version"]?.ToString()) return true;
                 }

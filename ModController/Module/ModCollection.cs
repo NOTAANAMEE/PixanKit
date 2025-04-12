@@ -11,7 +11,7 @@ namespace PixanKit.ModController.Module
     /// Represents a mod collection. This class helps control the mod under
     /// the mod directory.
     /// </summary>
-    public partial class ModCollection: IToJSON
+    public partial class ModCollection : IToJSON
     {
         /// <summary>
         /// The modded game of the mods
@@ -43,12 +43,14 @@ namespace PixanKit.ModController.Module
             LoadFromJSON(cache);
             foreach (var mod in Directory.GetFiles(Owner.ModDir))
             {
-                try { 
-                var modfile = ModParser.Parse(mod, this);
-                ModFiles.TryAdd(modfile.MetaData?.ModID ?? "", modfile); }
-                catch(Exception e) 
-                { 
-                    Logger.Error("PixanKit.ModController", $"Error while parsing {mod}: {e.Message}"); 
+                try
+                {
+                    var modfile = ModParser.Parse(mod, this);
+                    ModFiles.TryAdd(modfile.MetaData?.ModID ?? "", modfile);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error("PixanKit.ModController", $"Error while parsing {mod}: {e.Message}");
                     Logger.Error("PixanKit.ModController", e.StackTrace ?? "");
                 }
             }
@@ -61,7 +63,7 @@ namespace PixanKit.ModController.Module
         /// The cache will be automatically set as <c>new JObject()</c>
         /// </summary>
         /// <param name="game"><see cref="Owner"/> of the collection</param>
-        public ModCollection(ModdedGame game):this([], game) { }
+        public ModCollection(ModdedGame game) : this([], game) { }
 
         /// <summary>
         /// This method gets mandatory dependencies that are needed for existing mods

@@ -10,7 +10,7 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         public PlayerBase[] Players
         {
-            get => [.._players];
+            get => [.. _players];
         }
 
         private List<PlayerBase> _players = [];
@@ -29,8 +29,8 @@ namespace PixanKit.LaunchCore.Core
         /// <exception cref="ArgumentNullException">Thrown when the provided player is null.</exception>
         public string PlayerInLine(string arg, PlayerBase? player)
         {
-            return player == null ? 
-                throw new ArgumentNullException("Player Should Not Be Null") : 
+            return player == null ?
+                throw new ArgumentNullException("Player Should Not Be Null") :
                 player.InlinePlayer(arg);
         }
 
@@ -40,7 +40,7 @@ namespace PixanKit.LaunchCore.Core
         /// <param name="arg">The base command string.</param>
         /// <returns>The command string with the default player's information inlined.</returns>
         public string PlayerInLine(string arg)
-            =>PlayerInLine(arg, TargetPlayer);
+            => PlayerInLine(arg, TargetPlayer);
 
         /// <summary>
         /// Adds a new player to the launcher.
@@ -49,9 +49,9 @@ namespace PixanKit.LaunchCore.Core
         /// <exception cref="ArgumentException">Thrown if a player with the same UID already exists.</exception>
         public void AddPlayer(PlayerBase player)
         {
-            foreach (var p in Players) 
+            foreach (var p in Players)
             {
-                if (p == player) 
+                if (p == player)
                     throw new ArgumentException("Player Has Added");
             }
             _players.Add(player);
@@ -82,7 +82,7 @@ namespace PixanKit.LaunchCore.Core
 
         private void ResetTargetPlayer()
         {
-            if (TargetPlayer == null && _players.Count != 0) 
+            if (TargetPlayer == null && _players.Count != 0)
                 TargetPlayer = _players.First();
             TargetPlayerChange?.Invoke(TargetPlayer);
         }

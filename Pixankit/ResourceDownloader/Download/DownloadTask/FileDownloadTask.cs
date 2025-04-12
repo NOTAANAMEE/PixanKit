@@ -7,7 +7,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
     /// <summary>
     /// Represents a task for downloading a file from a given URL using multiple threads.
     /// </summary>
-    public class FileDownloadTask:SequenceProgressTask, IFileDownload
+    public class FileDownloadTask : SequenceProgressTask, IFileDownload
     {
         /// <summary>
         /// The default number of threads to use for downloading.
@@ -15,13 +15,13 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         public static int ThreadNum = 64;
 
         /// <inheritdoc/>
-        public long Size 
+        public long Size
         {
             get => size;
         }
 
         /// <inheritdoc/>
-        public long DownloadedBytes 
+        public long DownloadedBytes
         {
             get
             {
@@ -38,7 +38,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         public int TotalFiles { get => 1; }
 
         /// <inheritdoc/>
-        public int DownloadedFiles { get => (Status == ProgressStatus.Finished)? 1 : 0; }
+        public int DownloadedFiles { get => (Status == ProgressStatus.Finished) ? 1 : 0; }
 
         private string _url = "";
 
@@ -63,8 +63,8 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// </summary>
         /// <param name="url">The URL of the file to download.</param>
         /// <param name="path">The path where the file will be saved.</param>
-        public FileDownloadTask(string url, string path):this(url, path, ThreadNum)
-        {    }
+        public FileDownloadTask(string url, string path) : this(url, path, ThreadNum)
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileDownloadTask"/> class 
@@ -103,7 +103,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         {
             HttpClient client = new();
             long length, baselength, mod, startcounter = 0;
-            var response = await client.GetAsync(_url, 
+            var response = await client.GetAsync(_url,
                 HttpCompletionOption.ResponseHeadersRead, token);
             response.EnsureSuccessStatusCode();
             length = response.Content.Headers.ContentLength ?? 0;
@@ -138,7 +138,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             _url = url;
         }
 
-        
+
 
         private void CancelRun(ProgressTask t)
         {

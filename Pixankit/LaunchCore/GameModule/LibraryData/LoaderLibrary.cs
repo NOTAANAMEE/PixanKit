@@ -13,7 +13,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// </summary>
         /// <param name="folder">The directory where the library is located.</param>
         /// <param name="libraryJData">The JSON data representing the library.</param>
-        public LoaderLibrary(string folder, JObject libraryJData): 
+        public LoaderLibrary(string folder, JObject libraryJData) :
             base(libraryJData, folder)
         {
             libraryType = LibraryType.Mod;

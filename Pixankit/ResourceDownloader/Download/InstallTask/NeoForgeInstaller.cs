@@ -76,9 +76,9 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void AddCommandTask()
         {
-            if (Launcher.Instance == null) 
+            if (Launcher.Instance == null)
                 throw new InvalidOperationException("Launcher hasn't inited yet");
-            var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes)??
+            var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes) ??
                 throw new InvalidOperationException("No available java found");
             CommandTask = new(java.JavaEXE, $"-jar \"{installerpath}\" --installClient " +
                 $"\"{Owner.FolderPath}\"");

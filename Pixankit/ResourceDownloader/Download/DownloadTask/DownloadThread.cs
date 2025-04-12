@@ -6,7 +6,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
     /// <summary>
     /// 
     /// </summary>
-    public class DownloadThread: FuncProgressTask<int>
+    public class DownloadThread : FuncProgressTask<int>
     {
         /// <inheritdoc/>
         public long Size { get => _end - _start + 1; }
@@ -41,7 +41,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// <param name="start">The starting byte position of the chunk.</param>
         /// <param name="end">The ending byte position of the chunk.</param>
         /// <param name="lockobj"></param>
-        public DownloadThread(string url, Stream stream, long start, long end, object lockobj):
+        public DownloadThread(string url, Stream stream, long start, long end, object lockobj) :
             this(stream, lockobj)
         {
             SetURL(url, start, end);

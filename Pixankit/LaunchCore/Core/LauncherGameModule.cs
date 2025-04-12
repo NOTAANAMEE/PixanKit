@@ -1,12 +1,10 @@
-﻿using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Extention;
+﻿using PixanKit.LaunchCore.Extention;
 using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.GameModule.Exceptions;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.JavaModule.Java;
 using PixanKit.LaunchCore.Json;
 using PixanKit.LaunchCore.Log;
-using System.Diagnostics;
 
 namespace PixanKit.LaunchCore.Core
 {
@@ -35,7 +33,7 @@ namespace PixanKit.LaunchCore.Core
         /// <exception cref="NullReferenceException"></exception>
         public LaunchSession Launch(GameBase game)
         {
-            string cmd       = InlineCommand(game);
+            string cmd = InlineCommand(game);
             Logger.Info("Game Arg Generated Successfully. Stored in a.bat");
 
             JavaRuntime java = ChooseRuntime(game) ?? throw new NullReferenceException();
@@ -93,7 +91,7 @@ namespace PixanKit.LaunchCore.Core
         /// <returns></returns>
         public bool Contains(Folder? folder)
         {
-            if(folder == null) return false;
+            if (folder == null) return false;
             return _folders.Contains(folder);
         }
 
@@ -104,7 +102,7 @@ namespace PixanKit.LaunchCore.Core
         /// <exception cref="InvalidOperationException"> Do not add a folder which is added</exception>
         public void AddFolder(Folder folder)
         {
-            foreach(Folder f in _folders)
+            foreach (Folder f in _folders)
             {
                 if (f.FolderPath == folder.FolderPath) throw new InvalidOperationException("Folder has added before");
             }
@@ -119,7 +117,7 @@ namespace PixanKit.LaunchCore.Core
         /// Remove the folder.
         /// </summary>
         /// <param name="folder"></param>
-        public void RemoveFolder(Folder folder) 
+        public void RemoveFolder(Folder folder)
         {
             if (!_folders.Contains(folder)) return;
             _folders.Remove(folder);
@@ -144,7 +142,7 @@ namespace PixanKit.LaunchCore.Core
         /// <returns></returns>
         public Folder? FindFolder(string path)
         {
-            foreach(Folder folder in _folders)
+            foreach (Folder folder in _folders)
             {
                 if (folder.FolderPath == path) return folder;
             }
@@ -158,7 +156,7 @@ namespace PixanKit.LaunchCore.Core
         /// <exception cref="NoFolderException"></exception>
         public void AddGame(GameBase game)
         {
-            foreach(Folder f in _folders)
+            foreach (Folder f in _folders)
             {
                 if (game.GameFolderPath.StartsWith(f.FolderPath))
                 {
@@ -192,9 +190,9 @@ namespace PixanKit.LaunchCore.Core
         public GameBase? FindGame(string path)
         {
             string folderpath = path.Remove(path.LastIndexOf("/versions/"));
-            string name       = Path.GetDirectoryName(path) 
+            string name = Path.GetDirectoryName(path)
                 ?? throw new ArgumentException(path);
-            var res           = FindFolder(folderpath);
+            var res = FindFolder(folderpath);
 
             if (res == null) return null;
             return res.FindGame(name);
@@ -208,7 +206,7 @@ namespace PixanKit.LaunchCore.Core
         public string GenerateCommand(GameBase game)
         {
             string cmd = game.GetLaunchArgument();
-            cmd = cmd.Replace("${arguments}", 
+            cmd = cmd.Replace("${arguments}",
                 Settings.GetOrDefault(Format.ToString, "arguments", ""));
 
             return cmd;
@@ -227,18 +225,18 @@ namespace PixanKit.LaunchCore.Core
 
         private void FirstGame()
         {
-            foreach (var folder in _folders) if(folder.Count > 0)
-            {
-                TargetGame = folder.First;
-                return;
-            }
+            foreach (var folder in _folders) if (folder.Count > 0)
+                {
+                    TargetGame = folder.First;
+                    return;
+                }
         }
 
         private static Dictionary<long, string> GetTimestampAndFilePath(string dir)
         {
             string[] files = Directory.GetFiles(dir);
             Dictionary<long, string> keyValuePairs = [];
-            foreach (string file in files) 
+            foreach (string file in files)
             {
                 long time = File.GetCreationTime(file).Ticks;
                 keyValuePairs.Add(time, file);

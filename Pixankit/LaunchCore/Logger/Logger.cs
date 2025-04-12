@@ -30,7 +30,7 @@
         /// </summary>
         /// <param name="from">The Package Name</param>
         /// <param name="message">The Message</param>
-        public static void Warn(string from, string message) 
+        public static void Warn(string from, string message)
         {
             Record(from, "Warn", message);
         }
@@ -40,7 +40,7 @@
         /// </summary>
         /// <param name="from">The Package Name</param>
         /// <param name="message">The Message</param>
-        public static void Error(string from, string message) 
+        public static void Error(string from, string message)
         {
             Record(from, "Error", message);
         }

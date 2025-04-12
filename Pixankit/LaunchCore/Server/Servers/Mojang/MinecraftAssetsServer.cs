@@ -5,12 +5,12 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
     /// <summary>
     /// Assets Server Abstraction Download Assets From The Server
     /// </summary>
-    public class MinecraftAssetsServer:ResourceServer
+    public class MinecraftAssetsServer : ResourceServer
     {
         /// <summary>
         /// Initor With 1 Default Official Server
         /// </summary>
-        public MinecraftAssetsServer() 
+        public MinecraftAssetsServer()
         {
             Mirrors = new List<MirrorServer>
             { new("", "https://resources.download.minecraft.net") };
@@ -37,7 +37,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         {
             string hash = jData.First?["hash"]?.ToString() ?? throw new Exception();
             return Current?.Replace(
-                $"https://resources.download.minecraft.net/{hash[0..2]}/{hash}")??
+                $"https://resources.download.minecraft.net/{hash[0..2]}/{hash}") ??
                 throw new Exception();
         }
 
