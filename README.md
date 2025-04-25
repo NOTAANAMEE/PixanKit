@@ -1,15 +1,23 @@
+![PixanKit Logo](https://img.shields.io/badge/Minecraft-.NET%208-blueviolet)
+> A lightweight, modular .NET 8 library for building Minecraft launchers with ease.
+
 # PixanKit
 
-PixanKit is a `.NET 8`-based library designed to simplify the development of custom Minecraft Launchers. The library is structured into three separate C# projects:
+PixanKit is a modular, .NET 8-based toolkit crafted to streamline the development of custom Minecraft launchers and automation tools. The library is structured into three separate C# projects:
 
--   **LaunchCore**: The core library that handles player, game, and JRE (Java Runtime Environment) management.
--   **ResourceDownloader**: A set of specialized task classes for managing interactions with resource servers. This project depends on `LaunchCore`.
--   **ModModule**: A dedicated library for mod management, also relying on `LaunchCore`.
+### 🧱 LaunchCore
+- Core library handling player accounts, game versions, and Java runtime selection.
+
+### 🌐 ResourceDownloader
+- Modular download task system supporting progress tracking and flexible implementation.
+
+### 🧩 ModModule
+- Plug-and-play mod installer and manager with support for Forge/Fabric mod loaders.
 
 Whether you're creating a custom launcher or automating tasks related to Minecraft, PixanKit offers a modular solution tailored to your needs.
 
-# Features
-### LaunchCore
+# ✨ Features
+### 🧱 LaunchCore
 
 -   Player management:
     -   Offline and Microsoft account support.
@@ -20,17 +28,17 @@ Whether you're creating a custom launcher or automating tasks related to Minecra
 -   Runtime management:
     -   Automatically detect and manage suitable JRE/JDK versions.
 
-### ResourceDownloader
+### 🌐 ResourceDownloader
 
 -   Task-based resource server interactions.
 -   Flexible and customizable downloader implementations.
 
-### ModController
+### 🧩 ModController
 
 -   Simplified mod installation and management.
 -   Dependency handling for mod loaders like Forge or Fabric.
 
-# How to use?
+# 🚀 Getting Started
 ### Option 1: Add as Git Submodule
 
 1.  Add PixanKit to your project:
@@ -47,7 +55,9 @@ Whether you're creating a custom launcher or automating tasks related to Minecra
 5.  Open your own project
 6.  Right-click the solution -> `Add` -> `Existing Project` -> Browse and choose the .dll files
 
-# Documentation?
+# 📝 Documentation Generation with DocFX
+Generate a full API reference site using DocFX.
+
 ### DocFX instruction
 1. Go to bash or cmd and run `dotnet tool install -g docfx`
 2. Install Node.js
@@ -64,17 +74,16 @@ Whether you're creating a custom launcher or automating tasks related to Minecra
   - files：`**/*.csproj`
 5.  Run `docfx docfx.json --serve` and visit `localhost:8080` in your web browser
 
-## Something else?
+## 💡 Notes
+This project is a continuous work-in-progress. While some designs or naming conventions may evolve, your feedback and contributions are always appreciated!
 
-Well, due to the author's limited programming ability, certain designs, code and documentation might be cumbersome, especially in the context-dependent code. Properties naming may not be uniform. I hope you can be more tolerant and help improve it.
-
-# Contribution
+# 🤝 Contributing
 Contributions are welcome!
 
-# License
+# 📄 License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. Feel free to use it!
 
-# Acknowledgments
+# 🙌 Acknowledgments
 - [Newtonsoft.Json](https://www.newtonsoft.com/json) - JSON framework for .NET
 - [Tomlyn](https://github.com/xoofx/Tomlyn) - TOML parser and writer for .NET
 - [HtmlAgilityPack](https://html-agility-pack.net/) - HTML parser for .NET
