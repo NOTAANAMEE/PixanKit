@@ -81,7 +81,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         {
             //Console.WriteLine("Task 0 Finished");
 
-            JObject mcjData = JObject.Parse(
+            var mcjData = JObject.Parse(
                 File.ReadAllText(Localize.PathLocalize($"{path}/{name}.json")));
             _game = new OriginalGame(path, mcjData);
             if (_game == null) throw new Exception();

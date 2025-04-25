@@ -69,7 +69,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         {
             get
             {
-                int ret = 0;
+                var ret = 0;
                 foreach (var task in files)
                 {
                     ret += task.DownloadedFiles;
@@ -131,11 +131,11 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// </exception>
         protected void Init()
         {
-            int count = 0;
+            var count = 0;
 
             List<SequenceProgressTask> tasks = [];
 
-            for (int i = 0; i < urls.Length; i++)
+            for (var i = 0; i < urls.Length; i++)
             {
                 FileDownloadTask? task;
 

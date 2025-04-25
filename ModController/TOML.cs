@@ -6,7 +6,7 @@ namespace PixanKit.ModController
     {
         public static object? GetPath(this TomlTable table, string path)
         {
-            string[] keys = path.Split('/');
+            var keys = path.Split('/');
             object value = table;
             foreach (var key in keys)
             {

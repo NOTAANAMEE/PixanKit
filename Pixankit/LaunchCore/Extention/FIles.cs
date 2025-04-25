@@ -118,7 +118,7 @@ namespace PixanKit.LaunchCore.Extention
         {
             FileStream fs = new(path, FileMode.Open);
             SHA1 sha1 = SHA1.Create();
-            var ret = sha1.ComputeHash(fs);
+            byte[] ret = sha1.ComputeHash(fs);
             fs.Close();
             return BitConverter.ToString(ret).Replace("-", "");
         }

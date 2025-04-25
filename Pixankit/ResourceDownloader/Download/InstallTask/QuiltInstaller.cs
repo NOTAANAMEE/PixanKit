@@ -76,7 +76,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         {
             var java = JavaChooser.Newest(Launcher.Instance?.JavaRuntimes ?? []) ??
                 throw new Exception("No Java");
-            string workingdir = Path.GetDirectoryName(Owner.FolderPath) ?? "./";
+            var workingdir = Path.GetDirectoryName(Owner.FolderPath) ?? "./";
             CommandTask = new(java.JavaEXE, $"-jar \"{Path.GetFullPath(installerpath)}\" " +
                 $"install client " +
                 $"{version} {quiltversion["version"]} \"--install-dir=./.minecraft\"", workingdir);

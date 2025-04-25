@@ -72,7 +72,7 @@ namespace PixanKit.ModController.Module
         public List<string> GetDependencies()
         {
             List<string> dependencies = [];
-            foreach (ModFile modFile in ModFiles.Values)
+            foreach (var modFile in ModFiles.Values)
                 modFile.GetDependencies(dependencies);
             return dependencies;
         }
@@ -99,7 +99,7 @@ namespace PixanKit.ModController.Module
         public void Register(string path)
         {
             if (!path.StartsWith(Owner.ModDir)) return;
-            ModFile file = ModParser.Parse(path, this);
+            var file = ModParser.Parse(path, this);
             if (file.MetaData == null) throw new Exception("WTF");
             ModFiles.Add(file.MetaData.ModID, file);
         }

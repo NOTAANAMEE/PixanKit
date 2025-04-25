@@ -58,7 +58,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 document.LoadHtml(content);
                 File.WriteAllText("a.html", content);
                 if (token.IsCancellationRequested) return null;
-                string xpath = "/html/body/table/tr[2]/td/span//tr | " +
+                var xpath = "/html/body/table/tr[2]/td/span//tr | " +
                                "/html/body/table/tr[2]/td/span//h2";//WTF no tbody
                 return document.DocumentNode.SelectNodes(xpath);
             }
@@ -93,7 +93,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <returns><inheritdoc/></returns>
             public override async Task<bool> CheckBuild(string mcversion, CancellationToken token)
             {
-                HtmlNodeCollection? nodes = await GetNodes(token);
+                var nodes = await GetNodes(token);
                 return nodes != null && GetStartIndex(nodes, mcversion) != -1;
             }
 
@@ -105,11 +105,11 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <returns><inheritdoc/></returns>
             public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
-                HtmlNodeCollection? nodes = await GetNodes(token);
+                var nodes = await GetNodes(token);
                 JArray array = [];
                 if (nodes == null) return array;
                 if (token.IsCancellationRequested) return array;
-                int index = GetStartIndex(nodes, mcversion);
+                var index = GetStartIndex(nodes, mcversion);
                 if (index == -1 || token.IsCancellationRequested) return array;
 
                 for (var i = index + 1; i < nodes.Count; i++)

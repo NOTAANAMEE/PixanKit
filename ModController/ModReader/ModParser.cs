@@ -43,8 +43,8 @@ namespace PixanKit.ModController.ModReader
         /// <returns>A ModFile instance which represents the mod file</returns>
         public static ModFile Parse(string filePath, ModCollection collection)
         {
-            var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-            var archive = new ZipArchive(fs);
+            FileStream fs = new(filePath, FileMode.Open, FileAccess.Read);
+            ZipArchive archive = new(fs);
             ModFile? modFile = null;
 
             foreach (var item in ModParsers)
@@ -92,7 +92,7 @@ namespace PixanKit.ModController.ModReader
         {
             Logger.Warn("PianKit.ModController", $"No parser found for {filepath}." +
                 $"ModFile will be loaded as default");
-            string filename = Path.GetFileName(filepath);
+            var filename = Path.GetFileName(filepath);
             if (collection.ModCache.ContainsKey(filename))
                 return FabricModParser.LoadAllFromJSON(
                               collection,

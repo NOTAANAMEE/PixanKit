@@ -12,8 +12,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// </summary>
         public MinecraftAssetsServer()
         {
-            Mirrors = new List<MirrorServer>
-            { new("", "https://resources.download.minecraft.net") };
+            Mirrors = [new("", "https://resources.download.minecraft.net")];
             Current = Mirrors[0];
         }
 

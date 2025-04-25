@@ -93,7 +93,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             Add(InitTask);
             Add(DownloadTask);
             InitTask.Function += InitRun;
-            for (int i = 0; i < threadnum; i++)
+            for (var i = 0; i < threadnum; i++)
             {
                 DownloadTask.Add(new DownloadThread(_stream, _filelock));
             }
@@ -115,7 +115,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             foreach (var thread in DownloadTask.ProgressTasks)
             {
                 if (token.IsCancellationRequested) throw new TaskCanceledException();
-                long end = startcounter + baselength + ((--mod >= 0) ? 1 : 0);
+                var end = startcounter + baselength + ((--mod >= 0) ? 1 : 0);
                 thread.SetURL(_url, startcounter, end - 1);
                 startcounter = end;
             }

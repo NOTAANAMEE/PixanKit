@@ -58,7 +58,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void Init()
         {
-            string file = Localize.PathLocalize($"{Files.CacheDir}/Installer/optifine.jar");
+            var file = Localize.PathLocalize($"{Files.CacheDir}/Installer/optifine.jar");
             InitProgressTask.Function += GetURL;
             Add(InitProgressTask);
             AddDownloadTask();
@@ -88,7 +88,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes);
             if (java == null) throw new Exception("No java found");
 
-            string dir =
+            var dir =
                 $"{version}-{(OptifineVersion["version"] ?? "").ToString().Replace(" ", "_")}";
 
             CommandTask = new(java.JavaEXE, "-cp " +

@@ -46,7 +46,7 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
                 { new ByteArrayContent(File.ReadAllBytes(skinPath)), "file", Path.GetFileName(skinPath) }
             };
 
-            var response = await client.PostAsync(
+            HttpResponseMessage response = await client.PostAsync(
                 $"https://api.minecraftservices.com/minecraft/profile/skins", content);
         }
 
@@ -57,7 +57,7 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
         /// <returns></returns>
         public static async Task<string> GetCapeURL(MicrosoftPlayer player)
         {
-            var response = await client.GetStringAsync($"https://sessionserver.mojang.com/session/minecraft/profile/{player.UID}");
+            string response = await client.GetStringAsync($"https://sessionserver.mojang.com/session/minecraft/profile/{player.UID}");
             JObject jData = JObject.Parse(response);
             string base64code = jData["properties"]?[0]?["value"]?.ToString() ?? "";
             jData = JObject.Parse(Base64Decode(base64code));
@@ -66,8 +66,8 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
 
         private static string Base64Decode(string encodedString)
         {
-            var bytes = Convert.FromBase64String(encodedString);
-            var decodedString = Encoding.UTF8.GetString(bytes);
+            byte[] bytes = Convert.FromBase64String(encodedString);
+            string decodedString = Encoding.UTF8.GetString(bytes);
             return decodedString;
         }
     }

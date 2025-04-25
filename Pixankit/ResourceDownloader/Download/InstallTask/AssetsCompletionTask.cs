@@ -44,8 +44,8 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         {
             FileDownloadTask task;
 
-            string url = jdata["assetIndex"]?["url"]?.ToString() ?? "";
-            string index = jdata["assetIndex"]?["id"]?.ToString() ?? "";
+            var url = jdata["assetIndex"]?["url"]?.ToString() ?? "";
+            var index = jdata["assetIndex"]?["id"]?.ToString() ?? "";
 
             indexpath = $"{_game?.AssetsDirPath}/indexes/{index}.json";
 
@@ -62,16 +62,16 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         {
             List<string> urls = [], paths = [];
 
-            JObject jobj = JObject.Parse(File.ReadAllText(
+            var jobj = JObject.Parse(File.ReadAllText(
                     Localize.PathLocalize(indexpath)
                     ));
             foreach (var asset in jobj["objects"] ?? new JArray())
             {
                 try
                 {
-                    string hash = asset.First?["hash"]?.ToString() ?? "";
-                    string rpath = $"{hash[0..2]}/{hash}";
-                    string path = $"{_game?.AssetsDirPath}/objects/{rpath}";
+                    var hash = asset.First?["hash"]?.ToString() ?? "";
+                    var rpath = $"{hash[0..2]}/{hash}";
+                    var path = $"{_game?.AssetsDirPath}/objects/{rpath}";
                     //Console.WriteLine(++count);
                     if (File.Exists(Localize.PathLocalize(path))) continue;
                     urls.Add(ServerList.MinecraftAssetsServer.GetAssetsUrl(hash));

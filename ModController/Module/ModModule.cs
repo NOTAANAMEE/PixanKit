@@ -23,11 +23,11 @@ namespace PixanKit.ModController.Module
         public static void Init()
         {
             //This method registers the events when game changes.
-            Launcher.LauncherInit += (a) => { _ = new ModModule(); };
-            Launcher.GameAdd += (a) => { Instance?.AddJudgeGame(a); };
-            Launcher.GameRemove += (a) =>
+            Launcher.OnLauncherInitialized  += (a) => { _ = new ModModule(); };
+            GameManager.OnGameAdded         += (_, a) => { Instance?.AddJudgeGame(a); };
+            GameManager.OnGameRemoved       += (_, a) =>
             {
-                if (a.GetType() == typeof(ModdedGame))
+                if (a is ModdedGame)
                     Instance?.ModdedGames.Remove(a as ModdedGame ??
                     throw new Exception("Impossible exception"));
             };
@@ -104,7 +104,7 @@ namespace PixanKit.ModController.Module
             Logger.Info("PixanKit.ModController.Module",
                 "Module finished reading file." +
                 "Pending to init mods");
-            foreach (var folder in Launcher.Instance.Folders)
+            foreach (var folder in GameManager.Instance.Folders)
             {
                 foreach (var game in folder.Games)
                 {//For each game do...
@@ -135,7 +135,7 @@ namespace PixanKit.ModController.Module
         /// </summary>
         public static void DefaultFile()
         {
-            var obj = new JObject()
+            JObject obj = new()
             {
                 { "games", new JObject() },
                 { "metadata", new JArray(){
@@ -240,7 +240,7 @@ namespace PixanKit.ModController.Module
         /// </summary>
         public void SaveFile()
         {
-            JObject obj = ToJSON();
+            var obj = ToJSON();
             FileStream fs = new(SettingsPath, FileMode.Create);
             StreamWriter sw = new(fs);
             sw.Write(obj.ToString());

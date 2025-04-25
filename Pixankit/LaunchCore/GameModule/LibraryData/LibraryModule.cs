@@ -118,7 +118,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         public LibraryBase(JObject jData, string libraryPath)
         {
             //test System
-            var os = GetAllowedSystem(jData);
+            string[] os = GetAllowedSystem(jData);
             //Output Error
             if (!os.Contains(SysInfo.OSName))
                 throw new SystemNotSupportedException(string.Join(',', os), SysInfo.OSName);
@@ -168,9 +168,9 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
                 JObject jObj = ruleData.ConvertTo(Format.ToJObject, []);
 
                 string action = jObj.GetOrDefault(Format.ToString, "action", "");
-                var osData = jObj.GetOrDefault(Format.ToJObject, "os", []);
-                var osName = jObj.GetOrDefault(Format.ToString, "os/name", null);
-                var osArch = jObj.GetOrDefault(Format.ToString, "os/arch", null);
+                JObject osData = jObj.GetOrDefault(Format.ToJObject, "os", []);
+                string? osName = jObj.GetOrDefault(Format.ToString, "os/name", null);
+                string? osArch = jObj.GetOrDefault(Format.ToString, "os/arch", null);
 
                 switch (action)
                 {

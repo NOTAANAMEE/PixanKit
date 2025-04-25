@@ -109,7 +109,7 @@ namespace PixanKit.LaunchCore.Core
         {
             if (Process?.HasExited ?? true) return new();
             string path = "";
-            foreach (var dir in Directory.GetDirectories(Files.CacheDir + "/logs"))
+            foreach (string dir in Directory.GetDirectories(Files.CacheDir + "/logs"))
             {
                 if (Directory.GetCreationTime(dir) == time)
                 {

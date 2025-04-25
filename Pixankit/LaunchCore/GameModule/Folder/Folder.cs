@@ -12,8 +12,7 @@ namespace PixanKit.LaunchCore.GameModule
     /// </summary>
     public partial class Folder : IToJSON
     {
-        internal static List<Folder> Folders = [];
-
+        #region Properties
         /// <summary>
         /// The path of the folder. Like C:/Users/admin/AppData/Roaming/.minecraft
         /// </summary>
@@ -67,12 +66,9 @@ namespace PixanKit.LaunchCore.GameModule
         {
             get => _games.Count;
         }
+        #endregion
 
-        public Action<GameBase>? GameAdded;
-
-        public Action<GameBase>? GameRemoved;
-
-
+        #region Fields
         /// <summary>
         /// Provides the first Minecraft in the folder
         /// </summary>
@@ -92,17 +88,14 @@ namespace PixanKit.LaunchCore.GameModule
         /// <summary>
         /// The <c>Launcher</c> That The <c>Folder</c> Belongs To
         /// </summary>
-        public Launcher? Owner
-        {
-            get => _owner;
-        }
+        public static Launcher Owner => Launcher.Instance;
 
-        private List<GameBase> _games = [];
+        private readonly List<GameBase> _games = [];
 
         private string _folderpath = "";
+        #endregion
 
-        private Launcher? _owner;
-
+        #region Methods
         /// <summary>
         /// Init The <c>Folder</c> With The Path.
         /// </summary>
@@ -111,7 +104,6 @@ namespace PixanKit.LaunchCore.GameModule
         public Folder(string path)
         {
             _folderpath = path;
-            AddSelf();
             InitGames();
         }
 
@@ -128,41 +120,7 @@ namespace PixanKit.LaunchCore.GameModule
         public Folder(JObject jData)
         {
             LoadFromJSON(jData);
-            AddSelf();
             InitGames();
-        }
-
-        /// <summary>
-        /// Set The Owner <c>Launcher</c> Of The <c>Folder</c>
-        /// </summary>
-        /// <param name="launcher">The Owner <c>Launcher</c></param>
-        public void SetOwner(Launcher launcher)
-        {
-            _owner = launcher;
-        }
-
-        /// <summary>
-        /// Get the specific folder in the memory
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static Folder? FindFolder(string path)
-        {
-            foreach (var folder in Folders)
-            {
-                if (path.StartsWith(folder.FolderPath)) return folder;
-            }
-            return null;
-        }
-
-        private void AddSelf()
-        {
-            foreach (var folder in Folders)
-            {
-                if (folder.FolderPath == _folderpath)
-                    return;
-            }
-            Folders.Add(this);
         }
 
         private void InitGames()
@@ -187,32 +145,23 @@ namespace PixanKit.LaunchCore.GameModule
                 if (game != null)
                 {
                     _games.Add(game);
-                    game.SetOwner(this);
                     Logger.Info($"Folder {FolderPath} Add Game {game.GameJarFilePath}");
-                    Launcher.GameLoad?.Invoke(game);
+                    GameManager.OnGameLoaded?.Invoke(game);
                 }
             }
             Logger.Info($"Folder {FolderPath} Added");
         }
 
-        /// <summary>
-        /// This method adds the game
-        /// </summary>
-        /// <param name="game">The <c>GameBase</c> That You Need To Add</param>
-        public void AddGame(GameBase game)
+        internal void AddGame(GameBase game)
         {
-            if (Owner != null) Owner.AddGame(game);
-            else InternalAddGame(game);
+            _games.Add(game);
+            OnGameChanged?.Invoke();
         }
 
-        /// <summary>
-        /// This method removes the game.
-        /// </summary>
-        /// <param name="game">The <c>GameBase</c> That You Need To Remove</param>
-        public void RemoveGame(GameBase game)
+        internal void RemoveGame(GameBase game)
         {
-            if (Owner != null) Owner.RemoveGame(game);
-            else InternalRemoveGame(game);
+            _games.Remove(game);
+            OnGameChanged?.Invoke();
         }
 
         /// <summary>
@@ -261,12 +210,8 @@ namespace PixanKit.LaunchCore.GameModule
             foreach (string dir in dirs)
             {
                 foreach (GameBase game in _games) if (game.Name == dir) continue;
-                var tmp = Initors.GameInitor(dir);
-                if (tmp != null)
-                {
-                    _games.Add(tmp);
-                    tmp.SetOwner(this);
-                }
+                GameBase? tmp = Initors.GameInitor(dir);
+                if (tmp != null) AddGame(tmp);
             }
         }
 
@@ -277,22 +222,13 @@ namespace PixanKit.LaunchCore.GameModule
         {
             foreach (GameBase game in _games) { game.Close(); }
         }
+        #endregion
 
-        internal void InternalAddGame(GameBase game)
-        {
-            if (Contains(game)) return;
-            _games.Add(game);
-            game.SetOwner(this);
-            Launcher.GameAdd?.Invoke(game);
-            GameAdded?.Invoke(game);
-        }
-
-        internal void InternalRemoveGame(GameBase game)
-        {
-            _games.Remove(game);
-            Directory.Delete(game.GameFolderPath);
-            Launcher.GameRemove?.Invoke(game);
-            GameRemoved?.Invoke(game);
-        }
+        #region Events
+        /// <summary>
+        /// Event Triggered When A Game Is Added/Removed
+        /// </summary>
+        public Action? OnGameChanged;
+        #endregion
     }
 }

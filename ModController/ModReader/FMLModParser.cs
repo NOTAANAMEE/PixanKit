@@ -39,12 +39,12 @@ namespace PixanKit.ModController.ModReader
 
             LoadModFile(modCollection, modID,
                 table, modEntry, archive,
-                out List<string> depList,
-                out string version, out DateTime releaseDate);
+                out var depList,
+                out var version, out var releaseDate);
 
-            ModMetaData metaData = LoadMetaData(modID, modEntry, archive);
+            var metaData = LoadMetaData(modID, modEntry, archive);
 
-            var modFile = new ModFile(filepath)
+            ModFile modFile = new(filepath)
             {
                 Owner = modCollection,
                 Version = version,
@@ -61,9 +61,9 @@ namespace PixanKit.ModController.ModReader
         private static ModMetaData LoadMetaData(string modID, TomlTable modEntry, ZipArchive archive)
         {
             if (ModModule.Instance == null) throw new InvalidOperationException();
-            if (!ModModule.Instance.ModDatas.TryGetValue(modID, out ModMetaData? metaData))
+            if (!ModModule.Instance.ModDatas.TryGetValue(modID, out var metaData))
             {
-                string logofile = modEntry.GetIcon();
+                var logofile = modEntry.GetIcon();
                 metaData = new ModMetaData
                 {
                     ModID = modID,
@@ -151,11 +151,11 @@ namespace PixanKit.ModController.ModReader
         private static string GetEachJarID(ZipArchiveEntry archiveEntry)
         {
             var filestream = archiveEntry.Open();
-            var archive = new ZipArchive(filestream);
+            ZipArchive archive = new(filestream);
             var entry = archive.GetEntry("META-INF/mods.toml") ??
                                throw new Exception("Not Invalid Mod");
             var entrystream = entry.Open();
-            var streamreader = new StreamReader(entrystream);
+            StreamReader streamreader = new(entrystream);
             var tomlContent = streamreader.ReadToEnd();
             var table = Toml.ToModel(tomlContent) ??
                                throw new Exception("Failed to parse TOML");
@@ -195,7 +195,7 @@ namespace PixanKit.ModController.ModReader
 
         private static List<string> GetDeps(this TomlTable table, string modID)
         {
-            var depList = new List<string>();
+            List<string> depList = [];
             if (!table.ContainsKey("dependencies." + modID)) return depList;
             if (table["dependencies." + modID] is not TomlArray dependencies)
                 return depList;

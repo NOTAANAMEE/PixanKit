@@ -30,7 +30,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
             _url = current.GetValue(Format.ToString, "url");
 
             List<string> excludelist = [];
-            if (libraryJData.TryGetValue(Format.ToJArray, "extract/exclude", out var array))
+            if (libraryJData.TryGetValue(Format.ToJArray, "extract/exclude", out JArray? array))
             {
                 foreach (JToken token in array ?? [])
                     excludelist.Add(token.ToString());

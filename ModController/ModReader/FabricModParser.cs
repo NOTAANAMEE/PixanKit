@@ -33,12 +33,12 @@ namespace PixanKit.ModController.ModReader
 
             LoadModFile(modCollection, modID,
                 modEntry, archive,
-                out List<string> dependenciesList,
-                out string version, out DateTime releaseDate);
+                out var dependenciesList,
+                out var version, out var releaseDate);
 
-            ModMetaData metaData = LoadMetaData(modID, modEntry, archive);
+            var metaData = LoadMetaData(modID, modEntry, archive);
 
-            var modFile = new ModFile(filepath)
+            ModFile modFile = new(filepath)
             {
                 Owner = modCollection,
                 Version = version,
@@ -58,7 +58,7 @@ namespace PixanKit.ModController.ModReader
                 throw new InvalidOperationException("Exception");
 
             var idInCache = ModModule.Instance.ModDatas.TryGetValue(modID,
-                out ModMetaData? metaData);
+                out var metaData);
 
             if (idInCache) return metaData ??
                     throw new Exception("Exception avoid null warning");
@@ -110,7 +110,7 @@ namespace PixanKit.ModController.ModReader
             var depList = modEntry.GetCacheDeps();
             var version = modEntry.GetVersion();
             var releaseDate = modEntry.GetValue(Format.ToDateTime, "release_date");
-            var modFile = new ModFile(filepath)
+            ModFile modFile = new(filepath)
             {
                 Dependencies = depList,
                 Version = version,
@@ -166,7 +166,7 @@ namespace PixanKit.ModController.ModReader
         private static List<string> GetDataDeps(this JObject modData)
         {
             List<string> deps = [];
-            JObject arr = modData.GetOrDefault(Format.ToJObject, "depends", []);
+            var arr = modData.GetOrDefault(Format.ToJObject, "depends", []);
             foreach (var pair in arr)
                 deps.Add(pair.Key);
             return deps;

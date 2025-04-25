@@ -47,7 +47,7 @@ namespace PixanKit.LaunchCore.Json
         /// <param name="needtomerge">the JSON data that needs to merge to the target</param>
         public static void MergeJObject(this JObject target, JObject needtomerge)
         {
-            foreach (var item in needtomerge)
+            foreach (KeyValuePair<string, JToken?> item in needtomerge)
             {
                 if (target[item.Key] == null)
                 {
@@ -86,7 +86,7 @@ namespace PixanKit.LaunchCore.Json
         /// <param name="needtomerge">The array that needs to append</param>
         public static void MergeJArray(this JArray target, JArray needtomerge)
         {
-            foreach (var item in needtomerge)
+            foreach (JToken item in needtomerge)
                 if (!target.Contains(item)) target.Add(item);
         }
 
@@ -102,7 +102,7 @@ namespace PixanKit.LaunchCore.Json
         public static bool TryGetValue<T>(this JObject obj, Func<JToken, T> format, string Path, out T? output)
         {
             output = default;
-            var tok = GetFromPath(obj, Path);
+            JToken? tok = GetFromPath(obj, Path);
             if (tok == null) return false;
             try { output = format(tok); } catch { return false; }
             return true;
@@ -119,7 +119,7 @@ namespace PixanKit.LaunchCore.Json
         /// <exception cref="InvalidOperationException">Thrown if the path is not found in the JObject.</exception>
         public static T GetValue<T>(this JObject obj, Func<JToken, T> format, string Path)
         {
-            var tok = GetFromPathCheck(obj, Path);
+            JToken tok = GetFromPathCheck(obj, Path);
             return format(tok);
         }
 
@@ -135,7 +135,7 @@ namespace PixanKit.LaunchCore.Json
         public static T GetOrDefault<T>(this JObject obj, Func<JToken, T> format, string Path, T defaultVal)
         {
             T ret;
-            var tok = GetFromPath(obj, Path);
+            JToken? tok = GetFromPath(obj, Path);
             if (tok == null) return defaultVal;
             try { ret = format(tok); } catch { return defaultVal; }
             return ret;

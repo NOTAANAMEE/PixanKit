@@ -36,12 +36,12 @@ namespace PixanKit.ModController.ModReader
 
             LoadModFile(modCollection, modID,
                 modEntry, archive,
-                out List<string> deplist,
-                out string version, out DateTime releaseDate);
+                out var deplist,
+                out var version, out var releaseDate);
 
-            ModMetaData metaData = LoadMetaData(modID, modEntry, archive);
+            var metaData = LoadMetaData(modID, modEntry, archive);
 
-            var modFile = new ModFile(filepath)
+            ModFile modFile = new(filepath)
             {
                 Owner = modCollection,
                 Version = version,
@@ -59,7 +59,7 @@ namespace PixanKit.ModController.ModReader
         {
             if (ModModule.Instance == null) throw new InvalidOperationException();
 
-            if (!ModModule.Instance.ModDatas.TryGetValue(modID, out ModMetaData? metaData))
+            if (!ModModule.Instance.ModDatas.TryGetValue(modID, out var metaData))
             {
                 metaData = new ModMetaData
                 {

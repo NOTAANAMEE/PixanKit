@@ -35,7 +35,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <inheritdoc/>
         protected override void LoadJSON(JObject Jdata)
         {
-            if (!Jdata.TryGetValue(Format.ToString, "inheritsFrom", out var output))
+            if (!Jdata.TryGetValue(Format.ToString, "inheritsFrom", out string? output))
             {
                 useBaseGeneration = true;
                 assetsID =
@@ -51,21 +51,11 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="folder"><inheritdoc/></param>
-        public override void SetOwner(Folder folder)
-        {
-            base.SetOwner(folder);
-            if (useBaseGeneration) return;
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
         /// <returns><inheritdoc/></returns>
         protected override string GetCPArgs()
         {
             if (useBaseGeneration) return base.GetCPArgs();
-            return base.SameVersionCPArgs() + base.GetCPArgs();
+            return SameVersionCPArgs() + base.GetCPArgs();
         }
 
         /// <summary>

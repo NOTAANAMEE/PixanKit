@@ -44,7 +44,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <returns>The JArray that contains every version</returns>
         public JArray GetVersions()
         {
-            var task = GetVersions(new CancellationToken());
+            Task<JArray> task = GetVersions(new CancellationToken());
             task.Wait();
             return task.Result;
         }
@@ -166,7 +166,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         private async Task GetArrayFromNetwork(CancellationToken token)
         {
             HttpClient client = new();
-            var ret = await client.GetAsync(
+            HttpResponseMessage ret = await client.GetAsync(
                 Replace("https://piston-meta.mojang.com/mc/game/version_manifest.json"), token);
             string tmp = await ret.Content.ReadAsStringAsync(token);
             JObject jObj = JObject.Parse(tmp);

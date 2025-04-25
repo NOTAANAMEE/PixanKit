@@ -11,7 +11,7 @@ namespace PixanKit.LaunchCore.Server
         /// <summary>
         /// The list of available mirror servers.
         /// </summary>
-        public List<MirrorServer> Mirrors = new();
+        public List<MirrorServer> Mirrors = [];
 
         /// <summary>
         /// Current Mirror Server
@@ -24,7 +24,7 @@ namespace PixanKit.LaunchCore.Server
         public void UpdateIndex()
         {
             List<KeyValuePair<long, MirrorServer>> dict = [];
-            foreach (var item in Mirrors)
+            foreach (MirrorServer item in Mirrors)
             {
                 try
                 {
@@ -69,7 +69,7 @@ namespace PixanKit.LaunchCore.Server
         public static long GetPing(string url)
         {
             Ping ping = new();
-            var reply = ping.Send(GetHost(url));
+            PingReply reply = ping.Send(GetHost(url));
             if (reply.Status == IPStatus.Success) return reply.RoundtripTime;
             else return -1;
         }

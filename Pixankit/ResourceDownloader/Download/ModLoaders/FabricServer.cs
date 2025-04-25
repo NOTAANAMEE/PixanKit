@@ -72,7 +72,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
 
             private Task<bool> CheckReleaseBuild(string mcversion)
             {
-                string[] version = mcversion.Split('.');
+                var version = mcversion.Split('.');
                 return Task.FromResult(int.Parse(version[1]) >= 14);
             }
 
@@ -99,7 +99,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 if (token.IsCancellationRequested) return [];
                 var content = await response.Content.ReadAsStringAsync(token);
                 if (token.IsCancellationRequested) return [];
-                JObject jobj = JObject.Parse(content);
+                var jobj = JObject.Parse(content);
                 return jobj["loader"] as JArray ?? [];
             }
 
@@ -121,8 +121,8 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 if (token.IsCancellationRequested) return "";
                 var content = await response.Content.ReadAsStringAsync(token);
                 if (token.IsCancellationRequested) return "";
-                JObject jobj = JObject.Parse(content);
-                string url = jobj["installer"]?[0]?["url"]?.ToString() ??
+                var jobj = JObject.Parse(content);
+                var url = jobj["installer"]?[0]?["url"]?.ToString() ??
                     throw new JSONKeyException(jobj, "/installer/0/url", "loader version");
                 return Replace(url);
             }

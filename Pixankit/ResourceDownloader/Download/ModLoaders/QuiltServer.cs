@@ -69,10 +69,10 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <inheritdoc/>
             public override async Task<string> GetURL(JObject modloaderinf, CancellationToken token)
             {
-                string url = "https://meta.quiltmc.org/v3/versions/installer";
+                var url = "https://meta.quiltmc.org/v3/versions/installer";
                 var response = await client.GetAsync(url, token);
                 var content = await response.Content.ReadAsStringAsync(token);
-                JArray array = JArray.Parse(content);
+                var array = JArray.Parse(content);
                 return array[0]?["url"]?.ToString() ?? "";
             }
         }

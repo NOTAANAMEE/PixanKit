@@ -44,7 +44,7 @@ namespace PixanKit.ResourceDownloader.SystemInf
 
         public static void CheckDir(string path)
         {
-            string dir = Path.GetDirectoryName(path) ?? "./";
+            var dir = Path.GetDirectoryName(path) ?? "./";
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
         }
     }
