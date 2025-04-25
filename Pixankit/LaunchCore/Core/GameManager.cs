@@ -7,11 +7,20 @@ using PixanKit.LaunchCore.Extention;
 
 namespace PixanKit.LaunchCore.Core
 {
+    /// <summary>
+    /// Manages game folders and game instances for the launcher.
+    /// </summary>
     public class GameManager
     {
         #region Singleton
+        /// <summary>
+        /// Provides a singleton instance of the <see cref="GameManager"/> class.
+        /// </summary>
         private static Lazy<GameManager> _instance = new(() => new GameManager());
 
+        /// <summary>
+        /// Gets the singleton instance of the <see cref="GameManager"/> class.
+        /// </summary>
         public static GameManager Instance => _instance.Value;
         #endregion
 
@@ -30,12 +39,18 @@ namespace PixanKit.LaunchCore.Core
         #endregion
 
         #region Init
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GameManager"/> class.
+        /// </summary>
         private GameManager()
         {
             InitGameModule();
             Logger.Info("Game Module Inited Successfully");
         }
 
+        /// <summary>
+        /// Initializes the game module by loading folder data from a JSON file.
+        /// </summary>
         private void InitGameModule()
         {
             List<Folder> folders = [];
@@ -53,10 +68,10 @@ namespace PixanKit.LaunchCore.Core
 
         #region Methods
         /// <summary>
-        /// Checks whether the game is one of the games that exists in any foldr
+        /// Checks whether the specified game exists in any folder.
         /// </summary>
-        /// <param name="game"></param>
-        /// <returns></returns>
+        /// <param name="game">The game to check.</param>
+        /// <returns><c>true</c> if the game exists; otherwise, <c>false</c>.</returns>
         public bool Contains(GameBase? game)
         {
             if (game == null) return false;
@@ -64,10 +79,10 @@ namespace PixanKit.LaunchCore.Core
         }
 
         /// <summary>
-        /// Checks whether the folder is in the folder collection
+        /// Checks whether the specified folder exists in the folder collection.
         /// </summary>
-        /// <param name="folder"></param>
-        /// <returns></returns>
+        /// <param name="folder">The folder to check.</param>
+        /// <returns><c>true</c> if the folder exists; otherwise, <c>false</c>.</returns>
         public bool Contains(Folder? folder)
         {
             if (folder == null) return false;
@@ -75,10 +90,10 @@ namespace PixanKit.LaunchCore.Core
         }
 
         /// <summary>
-        /// Add a folder to the Launcher
+        /// Adds a folder to the launcher.
         /// </summary>
-        /// <param name="folder"></param>
-        /// <exception cref="InvalidOperationException"> Do not add a folder which is added</exception>
+        /// <param name="folder">The folder to add.</param>
+        /// <exception cref="InvalidOperationException">Thrown if the folder has already been added.</exception>
         public void AddFolder(Folder folder)
         {
             foreach (Folder f in _folders)
@@ -91,9 +106,9 @@ namespace PixanKit.LaunchCore.Core
         }
 
         /// <summary>
-        /// Remove the folder.
+        /// Removes the specified folder from the launcher.
         /// </summary>
-        /// <param name="folder"></param>
+        /// <param name="folder">The folder to remove.</param>
         public void RemoveFolder(Folder folder)
         {
             if (!_folders.Contains(folder)) return;
@@ -103,9 +118,9 @@ namespace PixanKit.LaunchCore.Core
         }
 
         /// <summary>
-        /// Remove the foder with specific path
+        /// Removes the folder with the specified path.
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="path">The path of the folder to remove.</param>
         public void RemoveFolder(string path)
         {
             Folder? f = FindFolder(path);
@@ -113,10 +128,10 @@ namespace PixanKit.LaunchCore.Core
         }
 
         /// <summary>
-        /// Returns the folder with specific path
+        /// Finds the folder with the specified path.
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
+        /// <param name="path">The path of the folder to find.</param>
+        /// <returns>The folder if found; otherwise, <c>null</c>.</returns>
         public Folder? FindFolder(string path)
         {
             foreach (Folder folder in _folders)
@@ -127,10 +142,10 @@ namespace PixanKit.LaunchCore.Core
         }
 
         /// <summary>
-        /// Add the game to the folder. This method will automatically judge the folder.
+        /// Adds a game to its corresponding folder.
         /// </summary>
-        /// <param name="game"></param>
-        /// <exception cref="NoFolderException"></exception>
+        /// <param name="game">The game to add.</param>
+        /// <exception cref="NoFolderException">Thrown if the folder for the game cannot be found.</exception>
         public void AddGame(GameBase game)
         {
             game.Owner.AddGame(game);
@@ -139,9 +154,9 @@ namespace PixanKit.LaunchCore.Core
         }
 
         /// <summary>
-        /// Remove the game from the folder. This method will automatically judge the folder.
+        /// Removes a game from its corresponding folder.
         /// </summary>
-        /// <param name="game"></param>
+        /// <param name="game">The game to remove.</param>
         public void RemoveGame(GameBase game)
         {
             if (game.Owner == null) return;
@@ -152,11 +167,11 @@ namespace PixanKit.LaunchCore.Core
         }
 
         /// <summary>
-        /// Get The Game From Its Path
+        /// Finds a game by its path.
         /// </summary>
-        /// <param name="path">The Dir Of The Game</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <param name="path">The path of the game directory.</param>
+        /// <returns>The game if found; otherwise, <c>null</c>.</returns>
+        /// <exception cref="ArgumentException">Thrown if the path is invalid.</exception>
         public GameBase? FindGame(string path)
         {
             string folderpath = path[..path.LastIndexOf("/versions/")];
@@ -168,6 +183,9 @@ namespace PixanKit.LaunchCore.Core
             return res.FindGame(name);
         }
 
+        /// <summary>
+        /// Updates the target game to ensure it is valid.
+        /// </summary>
         private void UpdateTargetGame()
         {
             if (TargetGame is null) FirstGame();
@@ -178,6 +196,9 @@ namespace PixanKit.LaunchCore.Core
             else FirstGame();
         }
 
+        /// <summary>
+        /// Sets the target game to the first available game in the folder collection.
+        /// </summary>
         private void FirstGame()
         {
             foreach (Folder folder in _folders) if (folder.Count > 0)
@@ -187,6 +208,10 @@ namespace PixanKit.LaunchCore.Core
                 }
         }
 
+        /// <summary>
+        /// Saves the folder data to a JSON object.
+        /// </summary>
+        /// <returns>A <see cref="JObject"/> containing the folder data.</returns>
         internal JObject SaveFolderData()
         {
             Logger.Info("Game Manager Closing");
@@ -210,8 +235,14 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         public static Action<GameBase>? OnGameLoaded;
 
+        /// <summary>
+        /// Occurs when a new game is added to a folder.
+        /// </summary>
         public static Action<Folder, GameBase>? OnGameAdded;
 
+        /// <summary>
+        /// Occurs when a game is removed from a folder.
+        /// </summary>
         public static Action<Folder, GameBase>? OnGameRemoved;
 
         /// <summary>
