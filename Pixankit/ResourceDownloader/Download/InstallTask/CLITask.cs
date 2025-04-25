@@ -51,7 +51,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                 WorkingDirectory = workingdirectory
             };
             process = new Process()
-            { 
+            {
                 StartInfo = StartInfo
             };
         }

@@ -30,7 +30,7 @@ namespace PixanKit.LaunchCore.Json
         /// </summary>
         /// <param name="file">the exact path of the file</param>
         /// <param name="obj">the JObject JSON data</param>
-        public static void SaveFile(string file, JObject obj) 
+        public static void SaveFile(string file, JObject obj)
         {
             StreamWriter sw = new(file);
             JsonTextWriter writer = new(sw);
@@ -47,7 +47,7 @@ namespace PixanKit.LaunchCore.Json
         /// <param name="needtomerge">the JSON data that needs to merge to the target</param>
         public static void MergeJObject(this JObject target, JObject needtomerge)
         {
-            foreach (var item in needtomerge)
+            foreach (KeyValuePair<string, JToken?> item in needtomerge)
             {
                 if (target[item.Key] == null)
                 {
@@ -66,11 +66,11 @@ namespace PixanKit.LaunchCore.Json
             {
                 case JTokenType.Object:
                     MergeJObject(
-                        target[key] is JObject jobject? jobject : [], (JObject)needtomerge);
+                        target[key] is JObject jobject ? jobject : [], (JObject)needtomerge);
                     break;
                 case JTokenType.Array:
                     MergeJArray(
-                        target[key] is JArray array? array : [], (JArray)needtomerge);
+                        target[key] is JArray array ? array : [], (JArray)needtomerge);
                     break;
                 default:
                     target[key] = needtomerge;
@@ -86,7 +86,7 @@ namespace PixanKit.LaunchCore.Json
         /// <param name="needtomerge">The array that needs to append</param>
         public static void MergeJArray(this JArray target, JArray needtomerge)
         {
-            foreach (var item in needtomerge)
+            foreach (JToken item in needtomerge)
                 if (!target.Contains(item)) target.Add(item);
         }
 
@@ -101,8 +101,8 @@ namespace PixanKit.LaunchCore.Json
         /// <returns>True if the value was found and formatted successfully, otherwise false.</returns>
         public static bool TryGetValue<T>(this JObject obj, Func<JToken, T> format, string Path, out T? output)
         {
-            output  = default;
-            var tok = GetFromPath(obj, Path);
+            output = default;
+            JToken? tok = GetFromPath(obj, Path);
             if (tok == null) return false;
             try { output = format(tok); } catch { return false; }
             return true;
@@ -119,7 +119,7 @@ namespace PixanKit.LaunchCore.Json
         /// <exception cref="InvalidOperationException">Thrown if the path is not found in the JObject.</exception>
         public static T GetValue<T>(this JObject obj, Func<JToken, T> format, string Path)
         {
-            var tok = GetFromPathCheck(obj, Path);
+            JToken tok = GetFromPathCheck(obj, Path);
             return format(tok);
         }
 
@@ -135,9 +135,9 @@ namespace PixanKit.LaunchCore.Json
         public static T GetOrDefault<T>(this JObject obj, Func<JToken, T> format, string Path, T defaultVal)
         {
             T ret;
-            var tok = GetFromPath(obj, Path);
+            JToken? tok = GetFromPath(obj, Path);
             if (tok == null) return defaultVal;
-            try { ret = format(tok);  } catch { return defaultVal; }
+            try { ret = format(tok); } catch { return defaultVal; }
             return ret;
         }
 
@@ -151,7 +151,7 @@ namespace PixanKit.LaunchCore.Json
         {
             JToken? token = obj;
             string[] keys = Path.Split('/');
-            int ind       = 0;
+            int ind = 0;
             while (ind < keys.Length)
             {
                 string key = keys[ind++];
@@ -182,7 +182,7 @@ namespace PixanKit.LaunchCore.Json
         /// <exception cref="InvalidOperationException">Thrown if the token does not exist at the specified path.</exception>
         public static JToken GetFromPathCheck(this JObject obj, string Path)
         {
-            return obj.GetFromPath(Path) ?? 
+            return obj.GetFromPath(Path) ??
                 throw new InvalidOperationException("Token does not exist");
         }
 

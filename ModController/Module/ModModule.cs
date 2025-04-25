@@ -15,7 +15,7 @@ namespace PixanKit.ModController.Module
     /// <summary>
     /// Represents the module responsible for managing mods within the launcher.
     /// </summary>
-    public partial class ModModule: IToJSON
+    public partial class ModModule : IToJSON
     {
         /// <summary>
         /// Initializes the ModModule class and sets up event handlers for the launcher.
@@ -23,12 +23,14 @@ namespace PixanKit.ModController.Module
         public static void Init()
         {
             //This method registers the events when game changes.
-            Launcher.LauncherInit += (a) => { _ = new ModModule(); };
-            Launcher.GameAdd += (a) => { Instance?.AddJudgeGame(a); };
-            Launcher.GameRemove += (a) => 
-            { if (a.GetType() == typeof(ModdedGame))
-                  Instance?.ModdedGames.Remove(a as ModdedGame ?? 
-                  throw new Exception("Impossible exception")); };
+            Launcher.OnLauncherInitialized  += (a) => { _ = new ModModule(); };
+            GameManager.OnGameAdded         += (_, a) => { Instance?.AddJudgeGame(a); };
+            GameManager.OnGameRemoved       += (_, a) =>
+            {
+                if (a is ModdedGame)
+                    Instance?.ModdedGames.Remove(a as ModdedGame ??
+                    throw new Exception("Impossible exception"));
+            };
             //Remove game. Check whether game in the dictionary.
         }
 
@@ -91,7 +93,7 @@ namespace PixanKit.ModController.Module
         /// Initializes a new instance of the ModModule class.
         /// Reads existing mod data and sets up collections for the launcher's games.
         /// </summary>
-        public ModModule() 
+        public ModModule()
         {
             //Initialize
             Instance = this;//Single-Instance
@@ -99,10 +101,10 @@ namespace PixanKit.ModController.Module
             Logger.Info("PixanKit.ModController.Module", "Mod module starts to init");
             //lock (MetaDataLocker) 
             ReadFile();
-            Logger.Info("PixanKit.ModController.Module", 
+            Logger.Info("PixanKit.ModController.Module",
                 "Module finished reading file." +
                 "Pending to init mods");
-            foreach (var folder in Launcher.Instance.Folders)
+            foreach (var folder in GameManager.Instance.Folders)
             {
                 foreach (var game in folder.Games)
                 {//For each game do...
@@ -111,7 +113,7 @@ namespace PixanKit.ModController.Module
                         Logger.Info("PixanKit.ModController.Module",
                             $"Modded Game Adding: {game.Name}");
                         AddJudgeGame(game);//Add game and log
-                        Logger.Info("PixanKit.ModController.Module", 
+                        Logger.Info("PixanKit.ModController.Module",
                             $"Modded Game Added: {game.Name}");
                     }
                 }
@@ -133,7 +135,7 @@ namespace PixanKit.ModController.Module
         /// </summary>
         public static void DefaultFile()
         {
-            var obj = new JObject()
+            JObject obj = new()
             {
                 { "games", new JObject() },
                 { "metadata", new JArray(){
@@ -179,8 +181,8 @@ namespace PixanKit.ModController.Module
         /// <param name="data">The metadata to add.</param>
         public void AddMetaData(ModMetaData data)
         {
-            if(!ModDatas.TryAdd(data.ModID, data))
-                throw new Exception("Unsuccess"); 
+            if (!ModDatas.TryAdd(data.ModID, data))
+                throw new Exception("Unsuccess");
         }
 
         /// <summary>
@@ -190,11 +192,11 @@ namespace PixanKit.ModController.Module
         public void AddCollection(ModdedGame game)
         {
             lock (Locker)
-            if (!ModdedGames.ContainsKey(game))
-                ModdedGames.Add(game, new ModCollection(
-                    ModCache.GetOrDefault(Format.ToJObject, 
-                    JSON.PathToKey(game.GameFolderPath), [])
-                    , game));
+                if (!ModdedGames.ContainsKey(game))
+                    ModdedGames.Add(game, new ModCollection(
+                        ModCache.GetOrDefault(Format.ToJObject,
+                        JSON.PathToKey(game.GameFolderPath), [])
+                        , game));
         }
 
         /// <summary>
@@ -232,13 +234,13 @@ namespace PixanKit.ModController.Module
                 .Select(pair => pair.Key).ToArray();//LINQ
             foreach (var item in removingId) ModDatas.Remove(item, out _);
         }
-        
+
         /// <summary>
         /// Save the cache to the file.
         /// </summary>
         public void SaveFile()
         {
-            JObject obj = ToJSON();
+            var obj = ToJSON();
             FileStream fs = new(SettingsPath, FileMode.Create);
             StreamWriter sw = new(fs);
             sw.Write(obj.ToString());

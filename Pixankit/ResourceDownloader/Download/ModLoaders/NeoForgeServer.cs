@@ -8,7 +8,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// <summary>
     /// Represents a NeoForge mod loader server.
     /// </summary>
-    public class NeoForgeServer: ModLoaderServer
+    public class NeoForgeServer : ModLoaderServer
     {
         /// <summary>
         /// Initor. Dont touch it
@@ -22,7 +22,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         /// <summary>
         /// Initor
         /// </summary>
-        public NeoForgeServer(): base("neoforge")
+        public NeoForgeServer() : base("neoforge")
         {
             Mirrors.Add(new OfficialNeoforgeServer());
             UpdateIndex();
@@ -50,13 +50,13 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 //Get Later Versions
                 var response = await client.GetAsync(
                     "https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/neoforge", token);
-                if (token.IsCancellationRequested) return new();
+                if (token.IsCancellationRequested) return [];
                 var content = await response.Content.ReadAsStringAsync(token);
-                if (token.IsCancellationRequested) return new();
+                if (token.IsCancellationRequested) return [];
                 var array = (JObject.Parse(content)["versions"] as JArray ??
                     []).ToObject<List<string>>()//Parse The Content To List<string>
                     ?? throw new Exception("Impossible exception");//This Exception Will Not Be Thrown
-                if (token.IsCancellationRequested) return new();
+                if (token.IsCancellationRequested) return [];
 
                 return array;
             }
@@ -90,13 +90,13 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             {
                 if (array == null || array.Count == 0) return -1;
                 if (lft > rgh) return -1;
-                int current = (lft + rgh) / 2;
+                var current = (lft + rgh) / 2;
 
-                string currentbuild = array[current];
-                string currentbuildmcver = currentbuild[..currentbuild.LastIndexOf('.')];
+                var currentbuild = array[current];
+                var currentbuildmcver = currentbuild[..currentbuild.LastIndexOf('.')];
 
-                string beforebuild = array[current - 1];
-                string beforebuildmcver = beforebuild[..beforebuild.LastIndexOf('.')];
+                var beforebuild = array[current - 1];
+                var beforebuildmcver = beforebuild[..beforebuild.LastIndexOf('.')];
 
                 Logger.Info("PixanKit.ResourceDownloader", $"Checking: {currentbuildmcver}, Target: {mcpatch}");
 
@@ -144,14 +144,14 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 if (mcversion == "1.20.1") return true;//The First Supported Minecraft Of NeoForge
                 if (!mcversion.Contains('.')) return false; //No Snapshot Builds
                 var builds = await GetBuild(token);
-                return FindBuildsStart(builds, GetPatch(mcversion), 0, builds.Count - 1) 
+                return FindBuildsStart(builds, GetPatch(mcversion), 0, builds.Count - 1)
                     != -1;
             }
 
             /// <inheritdoc/>
             public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
-                string patch = GetPatch(mcversion);
+                var patch = GetPatch(mcversion);
                 List<string> builds;
                 if (mcversion == "1.20.1")
                 {

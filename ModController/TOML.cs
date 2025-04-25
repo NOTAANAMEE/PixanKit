@@ -1,24 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Schema;
-using Tomlyn.Model;
+﻿using Tomlyn.Model;
 
 namespace PixanKit.ModController
 {
     static class TOML
     {
-        public static object? GetPath(this TomlTable table, string path) 
+        public static object? GetPath(this TomlTable table, string path)
         {
-            string[] keys = path.Split('/');
+            var keys = path.Split('/');
             object value = table;
-            foreach (var key in keys) 
+            foreach (var key in keys)
             {
                 if (key == "") continue;
-                switch (value) 
+                switch (value)
                 {
                     case TomlTable tomltable:
                         if (!tomltable.ContainsKey(key)) return null;

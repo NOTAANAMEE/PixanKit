@@ -43,7 +43,7 @@ namespace PixanKit.ResourceDownloader.Tasks
         /// The Task corresponding to the current task,
         /// will wait for the task to be completed or cancelled
         /// </summary>
-        public Task MainTask { get => TaskStopped.Task;}
+        public Task MainTask { get => TaskStopped.Task; }
 
         /// <summary>
         /// The status of the current task
@@ -94,7 +94,7 @@ namespace PixanKit.ResourceDownloader.Tasks
         /// </exception>
         public virtual void Start()
         {
-            if (_status != ProgressStatus.Inited) 
+            if (_status != ProgressStatus.Inited)
                 throw new InvalidOperationException("Do Not Start Twice");
             _status = ProgressStatus.Running;
             _ = Running();
@@ -105,9 +105,9 @@ namespace PixanKit.ResourceDownloader.Tasks
         /// </summary>
         /// <exception cref="InvalidOperationException">
         /// If the task has been canceled, an InvalidOperationException will be thrown</exception>
-        public virtual void Cancel() 
+        public virtual void Cancel()
         {
-            if (CancellationToken.IsCancellationRequested) 
+            if (CancellationToken.IsCancellationRequested)
                 throw new InvalidOperationException("Do Not Cancel Twice");
             CancellationToken.Cancel();
             OnCancel?.Invoke(this);
@@ -152,7 +152,8 @@ namespace PixanKit.ResourceDownloader.Tasks
             {
                 OnFinish?.Invoke(this);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Logger.Warn("PixanKit.ResourceDownloader", ex.ToString());
                 Logger.Warn("PixanKit.ResourceDownloader", ex.StackTrace ?? "");
             }
@@ -164,7 +165,7 @@ namespace PixanKit.ResourceDownloader.Tasks
         /// Reports the progress of the current task.
         /// </summary>
         /// <param name="progress">current progress value (double)</param>
-        protected virtual void ReportProgress(double progress) 
+        protected virtual void ReportProgress(double progress)
         {
             lock (_progresslock)
             {

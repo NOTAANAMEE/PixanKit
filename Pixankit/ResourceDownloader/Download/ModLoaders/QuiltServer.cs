@@ -7,7 +7,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// <summary>
     /// Represents a Quilt mod loader server.
     /// </summary>
-    public class QuiltServer: ModLoaderServer
+    public class QuiltServer : ModLoaderServer
     {
         /// <summary>
         /// Initor. Don't touch it
@@ -21,7 +21,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         /// <summary>
         /// Initializes a new instance of the <see cref="QuiltServer"/> class.
         /// </summary>
-        public QuiltServer() : base("quilt") 
+        public QuiltServer() : base("quilt")
         {
             Mirrors.Add(new OfficialQuiltMirror());
             UpdateIndex();
@@ -49,7 +49,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
                 var content = await response.Content.ReadAsStringAsync(token);
                 var array = JArray.Parse(content);
 
-                foreach (var item in array) 
+                foreach (var item in array)
                 {
                     if (mcversion == item["version"]?.ToString()) return true;
                 }
@@ -69,10 +69,10 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <inheritdoc/>
             public override async Task<string> GetURL(JObject modloaderinf, CancellationToken token)
             {
-                string url = "https://meta.quiltmc.org/v3/versions/installer";
+                var url = "https://meta.quiltmc.org/v3/versions/installer";
                 var response = await client.GetAsync(url, token);
                 var content = await response.Content.ReadAsStringAsync(token);
-                JArray array = JArray.Parse(content);
+                var array = JArray.Parse(content);
                 return array[0]?["url"]?.ToString() ?? "";
             }
         }

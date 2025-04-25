@@ -29,7 +29,7 @@
     /// <summary>
     /// Represents a sequence of progress tasks that are executed one after another.
     /// </summary>
-    public class SequenceProgressTask<T> : MultiProgressTask<T> where T: ProgressTask
+    public class SequenceProgressTask<T> : MultiProgressTask<T> where T : ProgressTask
     {
         /// <summary>
         /// Executes all progress tasks in the sequence one by one.

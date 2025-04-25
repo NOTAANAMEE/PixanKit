@@ -94,11 +94,11 @@ namespace PixanKit.ModController.Mod
         /// <param name="versions">The JSON data containing mod versions retrieved from a remote API.</param>
         private void ReadUpdate(JArray versions)
         {
-            var tmpdata = new Dictionary<string, List<ModFile>>(ModFiles);
+            Dictionary<string, List<ModFile>> tmpdata = new(ModFiles);
             NewestVersions = [];
             foreach (var modversion in versions)
             {
-                string mcversion = modversion["game_versions"]?[0]?.ToString() ?? "";
+                var mcversion = modversion["game_versions"]?[0]?.ToString() ?? "";
                 if (tmpdata.ContainsKey(mcversion))
                 {
                     NewestVersions.Add(mcversion, modversion["version_number"]?.ToString() ?? "");

@@ -98,8 +98,8 @@ namespace PixanKit.LaunchCore.Extention
         {
             string result = MyRegex().Replace(value, match =>
             {
-                string key = match.Groups[1].Value; 
-                return PathDict.TryGetValue(key, out string? value) ? value : match.Value; 
+                string key = match.Groups[1].Value;
+                return PathDict.TryGetValue(key, out string? value) ? value : match.Value;
             });
             return result;
         }

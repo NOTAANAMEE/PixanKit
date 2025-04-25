@@ -4,7 +4,7 @@
     /// Represents a progress task that executes a user-defined function and tracks its progress.
     /// </summary>
     /// <typeparam name="T">The type of the result returned by the function.</typeparam>
-    public class FuncProgressTask<T>: ProgressTask
+    public class FuncProgressTask<T> : ProgressTask
     {
         /// <summary>
         /// Gets or sets the user-defined asynchronous function to execute.
@@ -36,13 +36,13 @@
         {
             try
             {
-                if (Function != null) 
+                if (Function != null)
                     Return = await Function.Invoke(ReportProgress, CancellationToken.Token);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 if (ex is not TaskCanceledException)
-                ReportException(ex);
+                    ReportException(ex);
             }
             await base.Running();
         }

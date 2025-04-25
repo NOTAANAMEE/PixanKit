@@ -84,9 +84,9 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void Task1Finish(ProgressTask task)
         {
-            JObject mcjData = JObject.Parse(
+            var mcjData = JObject.Parse(
                 File.ReadAllText(Localize.PathLocalize($"{path}/{name}.json")));
-            jardownload?.SetURL(mcjData["downloads"]?["client"]?["url"]?.ToString()??
+            jardownload?.SetURL(mcjData["downloads"]?["client"]?["url"]?.ToString() ??
                 throw new JSONKeyException(mcjData, "downloads/client/url", "Version JSON document"));
         }
     }

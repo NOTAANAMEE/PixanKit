@@ -72,20 +72,20 @@ namespace PixanKit.LaunchCore.Extention
         /// <summary>
         /// Directory For Launcher Configuration Files.
         /// </summary>
-        public static string ConfigDir 
+        public static string ConfigDir
         { get => Paths.Get("ConfigDir"); set => Paths.TrySet("ConfigDir", value); }
 
         /// <summary>
         /// Dir For Cache
         /// </summary>
-        public static string CacheDir 
+        public static string CacheDir
         { get => Paths.Get("CacheDir"); set => Paths.TrySet("CacheDir", value); }
 
         /// <summary>
         /// The native setting for every game. 
         /// For example:C:\Users\admin\AppData\Roaming\.minecraft\versions\1.20.4\settings.json
         /// </summary>
-        public static string SettingsPath 
+        public static string SettingsPath
         { get => Paths.Get("SettingsPath"); set => Paths.TrySet("SettingsPath", value); }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace PixanKit.LaunchCore.Extention
         /// <summary>
         /// Dir For Skin Cache
         /// </summary>
-        public static string SkinCacheDir 
+        public static string SkinCacheDir
         { get => Paths.Get("SkinCacheDir"); set => Paths.TrySet("SkinCacheDir", value); }
 
 
@@ -118,7 +118,7 @@ namespace PixanKit.LaunchCore.Extention
         {
             FileStream fs = new(path, FileMode.Open);
             SHA1 sha1 = SHA1.Create();
-            var ret = sha1.ComputeHash(fs);
+            byte[] ret = sha1.ComputeHash(fs);
             fs.Close();
             return BitConverter.ToString(ret).Replace("-", "");
         }
@@ -168,7 +168,7 @@ namespace PixanKit.LaunchCore.Extention
         /// <summary>
         /// Load Data From Default Path
         /// </summary>
-        public static void Load() 
+        public static void Load()
         {
             FileStream folderFS = new($"{ConfigDir}/Folders.json", FileMode.Open),
                        playerFS = new($"{ConfigDir}/Players.json", FileMode.Open),

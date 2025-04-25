@@ -11,10 +11,13 @@ namespace PixanKit.LaunchCore.Extention
     /// </summary>
     public static class Initors
     {
+        public static IGameInitor GameInitorInstance = new DefaultGameInitor();
+
         /// <summary>
         /// Custom Game Initor
         /// </summary>
-        public static Func<string, GameBase?> GameInitor;
+        public static GameBase GameInitor(string path)
+            => GameInitorInstance.InitGame(path);
 
         /// <summary>
         /// Custom Player Initor
@@ -28,30 +31,10 @@ namespace PixanKit.LaunchCore.Extention
 
         static Initors()
         {
-            GameInitor += DefaultGameInitor;
             PlayerInitor += DefaultPlayerInitor;
             GetMemory += GetMem;
         }
 
-        /// <summary>
-        /// Default Game Initor
-        /// </summary>
-        /// <param name="path">The Path Of The Game</param>
-        /// <returns>Game Inited</returns>
-        public static GameBase DefaultGameInitor(string path)
-        {
-            string jsonPath = $"{path}/{Path.GetFileName(path)}.json";
-            JObject jobj    = JObject.Parse(File.ReadAllText(jsonPath));
-
-
-            if (jobj["mainClass"]?.ToString() != "net.minecraft.client.main.Main")
-            {
-                if (JudgeOptifine(jobj))
-                    return new CustomizedGame(path, jobj);
-                return new ModdedGame(path, jobj);
-            }
-            else return new OriginalGame(path, jobj);
-        }
 
         /// <summary>
         /// Default Player Initor
@@ -67,7 +50,7 @@ namespace PixanKit.LaunchCore.Extention
         /// 
         /// }</code></param>
         /// <returns></returns>
-        public static PlayerBase? DefaultPlayerInitor(JObject? jData) 
+        public static PlayerBase? DefaultPlayerInitor(JObject? jData)
         {
             if (jData == null) return null;
             return (jData["type"]?.ToString()) switch
@@ -87,12 +70,30 @@ namespace PixanKit.LaunchCore.Extention
             long minMemory = 2048; // 2GB
             long maxMemory = 10240; // 10GB
             long availableMemory = SysInfo.GetAvailableMemSize();
-            long allocatedMemory = Math.Min(maxMemory, Math.Max(minMemory, availableMemory / 2)); // 分配不超过可用内存的一半
+            long allocatedMemory = Math.Min(maxMemory, Math.Max(minMemory, availableMemory / 2));
 
             return allocatedMemory;
         }
+    }
 
-        private static bool JudgeOptifine(JObject obj)
+    internal class DefaultGameInitor: IGameInitor
+    {
+        public GameBase InitGame(string path)
+        {
+            string jsonPath = $"{path}/{Path.GetFileName(path)}.json";
+            JObject jobj = JObject.Parse(File.ReadAllText(jsonPath));
+
+
+            if (jobj["mainClass"]?.ToString() != "net.minecraft.client.main.Main")
+            {
+                if (JudgeOptifine(jobj))
+                    return new CustomizedGame(path, jobj);
+                return new ModdedGame(path, jobj);
+            }
+            else return new OriginalGame(path, jobj);
+        }
+
+        private bool JudgeOptifine(JObject obj)
         {
             string mainclass = obj.GetOrDefault(Format.ToString, "mainClass", "");
             if (mainclass != "net.minecraft.launchwrapper.Launch") return false;

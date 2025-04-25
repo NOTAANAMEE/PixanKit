@@ -9,7 +9,7 @@ namespace PixanKit.ResourceDownloader.SystemInf
         static Localize()
         {
             UserPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            if (SysInfo.OSName == "windows") 
+            if (SysInfo.OSName == "windows")
                 UserPath = UserPath[0..UserPath.LastIndexOf('\\')];
         }
 
@@ -44,7 +44,7 @@ namespace PixanKit.ResourceDownloader.SystemInf
 
         public static void CheckDir(string path)
         {
-            string dir = Path.GetDirectoryName(path) ?? "./";
+            var dir = Path.GetDirectoryName(path) ?? "./";
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
         }
     }

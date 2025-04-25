@@ -8,7 +8,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
     /// <summary>
     /// Represents a Forge mod loader server.
     /// </summary>
-    public class ForgeServer: ModLoaderServer
+    public class ForgeServer : ModLoaderServer
     {
         /// <summary>
         /// Initor. Do not touch it
@@ -77,17 +77,17 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             {
                 var response = await client.GetAsync(
                     $"https://files.minecraftforge.net/net/minecraftforge/forge/index_{mcversion}.html", token);
-                if (token.IsCancellationRequested) return new JArray();
+                if (token.IsCancellationRequested) return [];
                 var content = await response.Content.ReadAsStreamAsync(token);
-                if (token.IsCancellationRequested) return new JArray();
+                if (token.IsCancellationRequested) return [];
                 HtmlDocument document = new();
                 document.Load(content);
                 var nodes = document.DocumentNode.SelectNodes(
                     "/html/body/main/div[2]/div[2]/div[2]/table/tbody/tr");
-                JArray array = new();
+                JArray array = [];
                 foreach (var node in nodes)
                 {
-                    if (token.IsCancellationRequested) return new JArray();
+                    if (token.IsCancellationRequested) return [];
                     array.Add(Parse(node));
                 }
                 return array;
@@ -95,10 +95,10 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
 
             private static JObject Parse(HtmlNode node)
             {
-                string name = node.SelectSingleNode("td[1]").InnerText;
-                string url = node.SelectSingleNode("td[3]/ul/li[2]/a[2]").Attributes["href"].Value;
-                string release = node.SelectSingleNode("td[2]").Attributes["title"].Value;
-                string source = "official";
+                var name = node.SelectSingleNode("td[1]").InnerText;
+                var url = node.SelectSingleNode("td[3]/ul/li[2]/a[2]").Attributes["href"].Value;
+                var release = node.SelectSingleNode("td[2]").Attributes["title"].Value;
+                var source = "official";
                 return new()
                 {
                     { "version", name.Trim() },

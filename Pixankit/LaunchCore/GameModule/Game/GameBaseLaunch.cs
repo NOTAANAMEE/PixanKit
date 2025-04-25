@@ -66,7 +66,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
         protected string SameVersionGameArguments()
         {
-            var target = Owner?.FindVersion(_version, GameType.Vanilla);
+            GameBase? target = Owner?.FindVersion(_version, GameType.Vanilla);
             if (target == null)
             {
                 Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
@@ -88,7 +88,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
         protected string SameVersionAssetsID()
         {
-            var target = Owner?.FindVersion(_version, GameType.Vanilla);
+            GameBase? target = Owner?.FindVersion(_version, GameType.Vanilla);
             if (target == null)
             {
                 Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
@@ -124,7 +124,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
         protected string SameVersionCPArgs()
         {
-            var target = Owner?.FindVersion(_version, GameType.Vanilla);
+            GameBase? target = Owner?.FindVersion(_version, GameType.Vanilla);
             if (target == null)
             {
                 Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
@@ -146,7 +146,8 @@ namespace PixanKit.LaunchCore.GameModule.Game
             {
                 if (library.LibraryType != LibraryType.Native) continue;
                 await Task.Run(
-                    () => {
+                    () =>
+                    {
                         (library as NativeLibrary ?? new NativeLibrary())
                         .Extract(LibrariesDirPath, NativeDirPath);
                     }
@@ -162,8 +163,8 @@ namespace PixanKit.LaunchCore.GameModule.Game
             switch (runningfolder)
             {
                 case "overall":
-                    if (Owner == null || Owner.Owner == null) throw new Exception("Can't use overall");
-                    Settings["runningfolder"] = Owner.Owner.Settings["runningfolder"];
+                    if (Owner == null || Folder.Owner == null) throw new Exception("Can't use overall");
+                    Settings["runningfolder"] = Folder.Owner.Settings["runningfolder"];
                     ret = GetRunningFolder();
                     Settings["runningfolder"] = JToken.FromObject("overall");
                     break;
@@ -188,8 +189,8 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <returns>The arguments. Add them after the command</returns>
         public string GetOptionalArgs(JObject jData)
         {
-            var ret = "";
-            foreach (var arg in optionalArgs)
+            string ret = "";
+            foreach (OptionalArgs arg in optionalArgs)
             {
                 string argument = GetOptionalArgs(jData, arg);
                 if (argument == "") continue;
@@ -200,7 +201,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
 
         private static string GetOptionalArgs(JObject jData, OptionalArgs arg)
         {
-            foreach (var rule in arg.rules) 
+            foreach (string rule in arg.rules)
             {
                 if (!JudgeArg(jData, rule)) return "";
             }
@@ -210,8 +211,8 @@ namespace PixanKit.LaunchCore.GameModule.Game
         private static bool JudgeArg(JObject jData, string rule)
         {
             Regex reg = MyRegex();
-            var matches = reg.Matches(rule);
-            var match = matches.FirstOrDefault();
+            MatchCollection matches = reg.Matches(rule);
+            Match? match = matches.FirstOrDefault();
 
             string key = match?.Groups["Name"].Value ?? "";
             bool sign = match?.Groups["Sign"].Value == "=!";

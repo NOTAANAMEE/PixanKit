@@ -43,7 +43,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
             HttpContent content = new StringContent(data);
             content.Headers.Add("Content_type", "application/json");
             content.Headers.Add("Accept_type", "application/json");
-            var response = await Client.PostAsync("https://xsts.auth.xboxlive.com/xsts/authorize", content);
+            HttpResponseMessage response = await Client.PostAsync("https://xsts.auth.xboxlive.com/xsts/authorize", content);
             ret = await response.Content.ReadAsStringAsync();
             JObject jresponse = JObject.Parse(ret);
             return new XSTSVerification(jresponse["Token"]?.ToString() ?? "",

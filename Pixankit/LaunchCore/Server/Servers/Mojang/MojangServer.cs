@@ -38,7 +38,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
             content.Headers.Clear();
             content.Headers.Add("Content-Type", "application/json");
             //content.Headers.Add("User-Agent", "");
-            var response = await Client.PostAsync("/authentication/login_with_xbox", content);
+            HttpResponseMessage response = await Client.PostAsync("/authentication/login_with_xbox", content);
             ret = await response.Content.ReadAsStringAsync();
             JObject jresponse = JObject.Parse(ret);
             return jresponse["access_token"]?.ToString() ?? "";
@@ -48,13 +48,13 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         {
             string ret;
             Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            var response = await Client.GetAsync($"/minecraft/profile");
+            HttpResponseMessage response = await Client.GetAsync($"/minecraft/profile");
             ret = await response.Content.ReadAsStringAsync();
 
             JObject jresponse = JObject.Parse(ret);
             if (jresponse.ContainsKey("error")) throw new InvalidOperationException("Player Does Not Have Minecraft");
-            return new PlayerInf(jresponse["id"]?.ToString() ?? "", 
-                jresponse["name"]?.ToString() ?? "", 
+            return new PlayerInf(jresponse["id"]?.ToString() ?? "",
+                jresponse["name"]?.ToString() ?? "",
                 jresponse["skins"]?[0]?["url"]?.ToString() ?? "");
         }
 

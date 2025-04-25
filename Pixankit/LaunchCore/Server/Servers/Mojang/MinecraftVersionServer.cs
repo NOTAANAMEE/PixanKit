@@ -6,7 +6,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
     /// <summary>
     /// Mirror Servers For Minecraft Version Resources
     /// </summary>
-    public class MinecraftVersionServer: ResourceServer
+    public class MinecraftVersionServer : ResourceServer
     {
         private Cache? cache;
 
@@ -15,9 +15,10 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <summary>
         /// Init A MinecraftVersionServer
         /// </summary>
-        public MinecraftVersionServer() {
+        public MinecraftVersionServer()
+        {
             Mirrors = [new("", "https://piston-meta.mojang.com")];
-            Current = Mirrors[0]; 
+            Current = Mirrors[0];
         }
 
         /// <summary>
@@ -43,7 +44,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <returns>The JArray that contains every version</returns>
         public JArray GetVersions()
         {
-            var task =  GetVersions(new CancellationToken());
+            Task<JArray> task = GetVersions(new CancellationToken());
             task.Wait();
             return task.Result;
         }
@@ -69,11 +70,11 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// </summary>
         /// <param name="jArray">The return from GetVersions</param>
         /// <returns>JObject from the JArray returned by GetVersions</returns>
-        public JObject? GetLatestRelease(JArray jArray) 
+        public JObject? GetLatestRelease(JArray jArray)
         {
             foreach (JToken token in jArray)
             {
-                if (token["type"]?.ToString() == "release") 
+                if (token["type"]?.ToString() == "release")
                     return token as JObject;
             }
             return null;
@@ -84,7 +85,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// </summary>
         /// <param name="jArray">The return from GetVersions</param>
         /// <returns>JObject from the JArray returned by GetVersions</returns>
-        public JObject? GetLatestSnapshot(JArray jArray) 
+        public JObject? GetLatestSnapshot(JArray jArray)
         {
             foreach (JToken token in jArray)
             {
@@ -122,11 +123,11 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <param name="jObject">The JObject from the Array returned by GetVersions
         /// </param>
         /// <returns>The URL for Json</returns>
-        public string GetJsonUrl(JObject jObject) 
+        public string GetJsonUrl(JObject jObject)
         {
-            return Replace(jObject["url"]?.ToString() ?? 
+            return Replace(jObject["url"]?.ToString() ??
                 throw new JSONKeyException(jObject, "url",
-                "Minecraft JSON Document")); 
+                "Minecraft JSON Document"));
         }
 
         /// <summary>
@@ -138,8 +139,8 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <exception cref="NotImplementedException"></exception>
         public string GetMinecraftJarUrl(JObject jObject)
         {
-            return Replace(jObject["downloads"]?["client"]?["url"]?.ToString() ?? 
-                throw new JSONKeyException(jObject,"downloads/client/url", 
+            return Replace(jObject["downloads"]?["client"]?["url"]?.ToString() ??
+                throw new JSONKeyException(jObject, "downloads/client/url",
                 "Minecraft JSON Document"));
         }
 
@@ -150,7 +151,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <returns>The URL</returns>
         public string GetAssetsJsonUrl(JObject jObject)
         {
-            return Replace(jObject["assetIndex"]?["url"]?.ToString()??
+            return Replace(jObject["assetIndex"]?["url"]?.ToString() ??
                 throw new JSONKeyException(jObject, "/assetIndex/url", "Version JSON document"));
         }
 
@@ -165,7 +166,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         private async Task GetArrayFromNetwork(CancellationToken token)
         {
             HttpClient client = new();
-            var ret = await client.GetAsync(
+            HttpResponseMessage ret = await client.GetAsync(
                 Replace("https://piston-meta.mojang.com/mc/game/version_manifest.json"), token);
             string tmp = await ret.Content.ReadAsStringAsync(token);
             JObject jObj = JObject.Parse(tmp);

@@ -45,11 +45,11 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
             HttpContent content = new StringContent(jsonData);
             content.Headers.Clear();
             content.Headers.Add("Content-Type", "application/json");
-            var response = await Client.PostAsync("/user/authenticate", content);
+            HttpResponseMessage response = await Client.PostAsync("/user/authenticate", content);
             ret = await response.Content.ReadAsStringAsync();
             JObject jresponse = JObject.Parse(ret);
-            return new 
-                (jresponse["Token"]?.ToString() ?? "", 
+            return new
+                (jresponse["Token"]?.ToString() ?? "",
                 jresponse["DisplayClaims"]?["xui"]?[0]?["uhs"]?.ToString() ?? "");
         }
 

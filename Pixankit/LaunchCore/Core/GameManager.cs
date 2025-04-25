@@ -1,24 +1,25 @@
-﻿using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Extention;
-using PixanKit.LaunchCore.GameModule;
-using PixanKit.LaunchCore.GameModule.Exceptions;
+﻿using PixanKit.LaunchCore.GameModule.Exceptions;
 using PixanKit.LaunchCore.GameModule.Game;
-using PixanKit.LaunchCore.JavaModule.Java;
-using PixanKit.LaunchCore.Json;
+using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.Log;
-using System.Diagnostics;
+using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Extention;
 
 namespace PixanKit.LaunchCore.Core
 {
-    public partial class Launcher
+    public class GameManager
     {
+        #region Singleton
+        private static Lazy<GameManager> _instance = new(() => new GameManager());
+
+        public static GameManager Instance => _instance.Value;
+        #endregion
+
+        #region Properties
         /// <summary>
         /// Gets the collection of folders managed by the launcher.
         /// </summary>
-        public Folder[] Folders
-        {
-            get => [.. _folders];
-        }
+        public IReadOnlyList<Folder> Folders => _folders.AsReadOnly();
 
         /// <summary>
         /// Gets or sets the default game to be launched.
@@ -26,55 +27,31 @@ namespace PixanKit.LaunchCore.Core
         public GameBase? TargetGame { get; set; }
 
         private List<Folder> _folders = [];
+        #endregion
 
-        /// <summary>
-        /// Launch the game
-        /// </summary>
-        /// <param name="game"></param>
-        /// <returns></returns>
-        /// <exception cref="NullReferenceException"></exception>
-        public LaunchSession Launch(GameBase game)
+        #region Init
+        private GameManager()
         {
-            string cmd       = InlineCommand(game);
-            Logger.Info("Game Arg Generated Successfully. Stored in a.bat");
-
-            JavaRuntime java = ChooseRuntime(game) ?? throw new NullReferenceException();
-            /*FileStream fs    = new("./a.bat", FileMode.Create);
-            StreamWriter sw  = new(fs);
-            sw.Write("\"" + java.JavaEXE + "\" " + cmd);
-            sw.Close();
-            fs.Close();*/
-
-            game.Decompress().Wait();
-
-            return new LaunchSession(game, java, cmd);
+            InitGameModule();
+            Logger.Info("Game Module Inited Successfully");
         }
 
-        /// <summary>
-        /// Launch the default game
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NullReferenceException"></exception>
-        public LaunchSession Launch()
+        private void InitGameModule()
         {
-            if (TargetGame == null) throw new NullReferenceException();
-            return Launch(TargetGame);
+            List<Folder> folders = [];
+            foreach (JToken jData in Files.FolderJData["children"] ?? new JObject())
+            {
+                Folder tmp = new((JObject)jData);
+                folders.Add(tmp);
+            }
+            _folders = folders;
+            string tmpstr = (Files.FolderJData["target"] ?? "").ToString();
+            if (tmpstr != "") TargetGame = FindGame(tmpstr);
+            UpdateTargetGame();
         }
+        #endregion
 
-        private string InlineCommand(GameBase game)
-        {
-            game.LaunchCheck();
-            long timeStamp = DateTime.Now.Ticks;
-            string cmd = GenerateCommand(game);
-
-            cmd = PlayerInLine(cmd);
-            string pth = Path.GetDirectoryName(game.GameRootFolderPath) ?? "./";
-            cmd = $"-Xmx{Initors.GetMemory()}m " + cmd;
-            cmd = cmd.Replace("${launcher_name}", LauncherName);
-            cmd = cmd.Replace("${launcher_version}", VersionName);
-            return cmd;
-        }
-
+        #region Methods
         /// <summary>
         /// Checks whether the game is one of the games that exists in any foldr
         /// </summary>
@@ -93,7 +70,7 @@ namespace PixanKit.LaunchCore.Core
         /// <returns></returns>
         public bool Contains(Folder? folder)
         {
-            if(folder == null) return false;
+            if (folder == null) return false;
             return _folders.Contains(folder);
         }
 
@@ -104,13 +81,11 @@ namespace PixanKit.LaunchCore.Core
         /// <exception cref="InvalidOperationException"> Do not add a folder which is added</exception>
         public void AddFolder(Folder folder)
         {
-            foreach(Folder f in _folders)
+            foreach (Folder f in _folders)
             {
                 if (f.FolderPath == folder.FolderPath) throw new InvalidOperationException("Folder has added before");
             }
             _folders.Add(folder);
-            folder.SetOwner(this);
-            FolderAdd?.Invoke(folder);
             UpdateTargetGame();
             Logger.Info($"Folder {folder.FolderPath} Added");
         }
@@ -119,12 +94,12 @@ namespace PixanKit.LaunchCore.Core
         /// Remove the folder.
         /// </summary>
         /// <param name="folder"></param>
-        public void RemoveFolder(Folder folder) 
+        public void RemoveFolder(Folder folder)
         {
             if (!_folders.Contains(folder)) return;
             _folders.Remove(folder);
-            FolderRemove?.Invoke(folder);
             UpdateTargetGame();
+            OnFolderRemoved?.Invoke(folder);
         }
 
         /// <summary>
@@ -144,7 +119,7 @@ namespace PixanKit.LaunchCore.Core
         /// <returns></returns>
         public Folder? FindFolder(string path)
         {
-            foreach(Folder folder in _folders)
+            foreach (Folder folder in _folders)
             {
                 if (folder.FolderPath == path) return folder;
             }
@@ -158,17 +133,9 @@ namespace PixanKit.LaunchCore.Core
         /// <exception cref="NoFolderException"></exception>
         public void AddGame(GameBase game)
         {
-            foreach(Folder f in _folders)
-            {
-                if (game.GameFolderPath.StartsWith(f.FolderPath))
-                {
-                    f.InternalAddGame(game);
-                    GameAdd?.Invoke(game);
-                    UpdateTargetGame();
-                    return;
-                }
-            }
-            throw new NoFolderException("Folder Not Found");
+            game.Owner.AddGame(game);
+            OnGameAdded?.Invoke(game.Owner, game);
+            UpdateTargetGame();
         }
 
         /// <summary>
@@ -178,8 +145,9 @@ namespace PixanKit.LaunchCore.Core
         public void RemoveGame(GameBase game)
         {
             if (game.Owner == null) return;
-            game.Owner.InternalRemoveGame(game);
-
+            game.Owner.RemoveGame(game);
+            OnGameRemoved?.Invoke(game.Owner, game);
+            if (TargetGame == game) TargetGame = null;
             UpdateTargetGame();
         }
 
@@ -191,27 +159,13 @@ namespace PixanKit.LaunchCore.Core
         /// <exception cref="ArgumentException"></exception>
         public GameBase? FindGame(string path)
         {
-            string folderpath = path.Remove(path.LastIndexOf("/versions/"));
-            string name       = Path.GetDirectoryName(path) 
+            string folderpath = path[..path.LastIndexOf("/versions/")];
+            string name = Path.GetDirectoryName(path)
                 ?? throw new ArgumentException(path);
-            var res           = FindFolder(folderpath);
+            Folder? res = FindFolder(folderpath);
 
             if (res == null) return null;
             return res.FindGame(name);
-        }
-
-        /// <summary>
-        /// Generate The Launch Command
-        /// </summary>
-        /// <param name="game">target gae</param>
-        /// <returns>command</returns>
-        public string GenerateCommand(GameBase game)
-        {
-            string cmd = game.GetLaunchArgument();
-            cmd = cmd.Replace("${arguments}", 
-                Settings.GetOrDefault(Format.ToString, "arguments", ""));
-
-            return cmd;
         }
 
         private void UpdateTargetGame()
@@ -222,28 +176,58 @@ namespace PixanKit.LaunchCore.Core
             else if (TargetGame.Owner.Contains(TargetGame)) return;
             else if (TargetGame.Owner.Count > 0) TargetGame = TargetGame.Owner.First;
             else FirstGame();
-            TargetGameChange?.Invoke(TargetGame);
         }
 
         private void FirstGame()
         {
-            foreach (var folder in _folders) if(folder.Count > 0)
-            {
-                TargetGame = folder.First;
-                return;
-            }
+            foreach (Folder folder in _folders) if (folder.Count > 0)
+                {
+                    TargetGame = folder.First;
+                    return;
+                }
         }
 
-        private static Dictionary<long, string> GetTimestampAndFilePath(string dir)
+        internal JObject SaveFolderData()
         {
-            string[] files = Directory.GetFiles(dir);
-            Dictionary<long, string> keyValuePairs = [];
-            foreach (string file in files) 
+            Logger.Info("Game Manager Closing");
+            JArray folders = [];
+            foreach (var folder in _folders)
             {
-                long time = File.GetCreationTime(file).Ticks;
-                keyValuePairs.Add(time, file);
+                folders.Add(folder.ToJSON());
+                folder.Close();
             }
-            return keyValuePairs;
+            return new JObject()
+            {
+                { "children", folders},
+                { "target", TargetGame?.GameJarFilePath?? "" }
+            };
         }
+        #endregion
+
+        #region Events
+        /// <summary>
+        /// Occurs when a game is loaded from a file.
+        /// </summary>
+        public static Action<GameBase>? OnGameLoaded;
+
+        public static Action<Folder, GameBase>? OnGameAdded;
+
+        public static Action<Folder, GameBase>? OnGameRemoved;
+
+        /// <summary>
+        /// Occurs when the default game is changed.
+        /// </summary>
+        public static Action<GameBase?>? OnTargetGameChanged;
+
+        /// <summary>
+        /// Occurs when a new folder is added.
+        /// </summary>
+        public static Action<Folder>? OnFolderAdded;
+
+        /// <summary>
+        /// Occurs when a folder is removed.
+        /// </summary>
+        public static Action<Folder>? OnFolderRemoved;
+        #endregion
     }
 }

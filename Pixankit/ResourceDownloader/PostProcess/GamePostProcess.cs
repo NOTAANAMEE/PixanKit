@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using PixanKit.LaunchCore.Core;
+using PixanKit.LaunchCore.Extention;
 using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.Json;
@@ -43,13 +44,14 @@ namespace PixanKit.ResourceDownloader.PostProcess
                 Directory.Delete($"{versiondir}/{version}");
                 return;
             }
-            if (!processjson) owner.AddGame(new OriginalGame($"{versiondir}/{name}"));
+            var game = Initors.GameInitor($"{versiondir}/{name}");
+            if (!processjson && game is not null) GameManager.Instance.AddGame(game);
         }
 
         private void ProcessJSON()
         {
-            JObject target = JSON.ReadFromFile($"{versiondir}/{version}/{version}.json");
-            JObject merge = JSON.ReadFromFile($"{versiondir}/{name}/{name}.json");
+            var target = JSON.ReadFromFile($"{versiondir}/{version}/{version}.json");
+            var merge = JSON.ReadFromFile($"{versiondir}/{name}/{name}.json");
 
             JSON.MergeJObject(target, merge);
             JSON.SaveFile(name, target);
@@ -66,12 +68,12 @@ namespace PixanKit.ResourceDownloader.PostProcess
         /// <returns>the new directory of the game</returns>
         public static string Move(Folder folder, string loaderversion, string name)
         {
-            string folderpath = $"{folder.VersionDirPath}/{name}";
-            string folderpath_old = $"{folder.VersionDirPath}/{loaderversion}";
+            var folderpath = $"{folder.VersionDirPath}/{name}";
+            var folderpath_old = $"{folder.VersionDirPath}/{loaderversion}";
             Directory.Move(folderpath_old, folderpath);
             foreach (var entry in Directory.GetFileSystemEntries(folderpath))
             {
-                string filename = Path.GetFileName(entry);
+                var filename = Path.GetFileName(entry);
                 string newname;
                 string newpath;
                 if (!filename.StartsWith(loaderversion)) continue;

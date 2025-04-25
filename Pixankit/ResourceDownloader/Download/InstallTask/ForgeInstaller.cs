@@ -14,7 +14,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// <summary>
     /// Represents a task for installing the Forge mod loader for Minecraft.
     /// </summary>
-    public class ForgeInstaller:SequenceProgressTask
+    public class ForgeInstaller : SequenceProgressTask
     {
 
         Folder Owner;

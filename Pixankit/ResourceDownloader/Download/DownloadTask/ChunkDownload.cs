@@ -46,7 +46,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// <param name="url">The URL of the file to download.</param>
         /// <param name="start">The starting byte position of the chunk.</param>
         /// <param name="end">The ending byte position of the chunk.</param>
-        public FileChunkDownloadTask(string url, long start, long end): base()
+        public FileChunkDownloadTask(string url, long start, long end) : base()
         {
             _url = url;
             _start = start;
@@ -60,7 +60,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// </summary>
         /// <param name="url">The URL of the file to download.</param>
         /// <param name="start">The starting byte position of the chunk.</param>
-        public FileChunkDownloadTask(string url, long start): base()
+        public FileChunkDownloadTask(string url, long start) : base()
         {
             _url = url;
             _start = start;
@@ -77,11 +77,11 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             client.DefaultRequestHeaders.Range = new System.Net.Http.Headers.RangeHeaderValue(_start, _end);
             try
             {
-                response = await client.GetAsync(_url,  HttpCompletionOption.ResponseHeadersRead, CancellationToken.Token);
+                response = await client.GetAsync(_url, HttpCompletionOption.ResponseHeadersRead, CancellationToken.Token);
                 response.EnsureSuccessStatusCode();
                 await LoopRead(response.Content, ret, progress);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 response?.Dispose();
                 Logger.Warn("PixanKit.ResourceDownloader", ex.Message);
@@ -91,12 +91,12 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             return ret;
         }
 
-        private async Task LoopRead(HttpContent content, Stream ret, Action<double> progress) 
+        private async Task LoopRead(HttpContent content, Stream ret, Action<double> progress)
         {
             int bytesRead;
             var stream = await content.ReadAsStreamAsync();
             var buffer = new byte[8192];
-            while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, CancellationToken.Token)) > 0 
+            while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, CancellationToken.Token)) > 0
                 && !CancellationToken.IsCancellationRequested)
             {
                 ret.Write(buffer, 0, bytesRead);

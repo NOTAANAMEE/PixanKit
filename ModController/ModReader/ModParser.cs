@@ -15,8 +15,8 @@ namespace PixanKit.ModController.ModReader
     /// <param name="collection">The <see cref="ModCollection"/> that the
     /// file belongs to</param>
     /// <returns>Returns the <see cref="ModFile"/> instance represents the file</returns>
-    public delegate ModFile ModParserFunc(string filepath, 
-        ZipArchive archive, 
+    public delegate ModFile ModParserFunc(string filepath,
+        ZipArchive archive,
         ZipArchiveEntry entry,
         ModCollection collection);
 
@@ -43,15 +43,15 @@ namespace PixanKit.ModController.ModReader
         /// <returns>A ModFile instance which represents the mod file</returns>
         public static ModFile Parse(string filePath, ModCollection collection)
         {
-            var fs           = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-            var archive      = new ZipArchive(fs);
+            FileStream fs = new(filePath, FileMode.Open, FileAccess.Read);
+            ZipArchive archive = new(fs);
             ModFile? modFile = null;
 
             foreach (var item in ModParsers)
             {
                 var entry = archive.GetEntry(item.Key);
                 if (entry == null) continue;
-                modFile   = item.Value(filePath, archive, entry, collection);
+                modFile = item.Value(filePath, archive, entry, collection);
                 break;
             }
 
@@ -64,27 +64,27 @@ namespace PixanKit.ModController.ModReader
         private static ModFile ParseFabric(string filepath, ZipArchive archive, ZipArchiveEntry entry,
             ModCollection collection)
         {
-            var stream      = entry.Open();
+            var stream = entry.Open();
             StreamReader sr = new(stream);
-            var content     = sr.ReadToEnd();
+            var content = sr.ReadToEnd();
             return FabricModParser.ParseJson(content, filepath, collection, archive);
         }
 
         private static ModFile ParseFML(string filepath, ZipArchive archive, ZipArchiveEntry entry,
             ModCollection collection)
         {
-            var stream      = entry.Open();
+            var stream = entry.Open();
             StreamReader sr = new(stream);
-            var content     = sr.ReadToEnd();
+            var content = sr.ReadToEnd();
             return FMLModParser.ParseToml(content, filepath, collection, archive);
         }
 
         private static ModFile ParseFOV(string filepath, ZipArchive archive, ZipArchiveEntry entry,
             ModCollection collection)
         {
-            var stream      = entry.Open();
+            var stream = entry.Open();
             StreamReader sr = new(stream);
-            var content     = sr.ReadToEnd();
+            var content = sr.ReadToEnd();
             return FOVModParser.ParseJson(content, filepath, collection, archive);
         }
 
@@ -92,21 +92,21 @@ namespace PixanKit.ModController.ModReader
         {
             Logger.Warn("PianKit.ModController", $"No parser found for {filepath}." +
                 $"ModFile will be loaded as default");
-            string filename = Path.GetFileName(filepath);
+            var filename = Path.GetFileName(filepath);
             if (collection.ModCache.ContainsKey(filename))
                 return FabricModParser.LoadAllFromJSON(
                               collection,
-                              filepath, 
+                              filepath,
                               collection.ModCache[filename].ConvertTo(Format.ToJObject, []));
-            else 
+            else
                 return new ModFile(filepath)
-            {
-                Dependencies   = [],
-                ReleaseDate    = DateTime.Now,
-                Version        = "unknown",
-                MetaData       = new(),
-                ValidStructure = false,
-            };
+                {
+                    Dependencies = [],
+                    ReleaseDate = DateTime.Now,
+                    Version = "unknown",
+                    MetaData = new(),
+                    ValidStructure = false,
+                };
         }
     }
 }

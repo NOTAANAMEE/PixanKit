@@ -6,7 +6,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
     /// <summary>
     /// Modified Game. Game With ModLoader/ Optifine
     /// </summary>
-    public class CustomizedGame: GameBase
+    public class CustomizedGame : GameBase
     {
         /// <summary>
         /// Whether It Is useBaseGeneration Created
@@ -27,7 +27,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// Init A Modified Game With Its Path
         /// </summary>
         /// <param name="path"></param>
-        public CustomizedGame(string path):base(path, true)
+        public CustomizedGame(string path) : base(path, true)
         {
             _gameType = GameType.Customized;
         }
@@ -35,10 +35,10 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <inheritdoc/>
         protected override void LoadJSON(JObject Jdata)
         {
-            if (!Jdata.TryGetValue(Format.ToString, "inheritsFrom", out var output))
+            if (!Jdata.TryGetValue(Format.ToString, "inheritsFrom", out string? output))
             {
                 useBaseGeneration = true;
-                assetsID = 
+                assetsID =
                     Jdata.GetOrDefault(Format.ToString, "assetIndex/id", "");
                 _version = Jdata.GetOrDefault(Format.ToString, "clientVersion", "");
             }
@@ -51,21 +51,11 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="folder"><inheritdoc/></param>
-        public override void SetOwner(Folder folder)
-        {
-            base.SetOwner(folder);
-            if (useBaseGeneration) return;
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
         /// <returns><inheritdoc/></returns>
         protected override string GetCPArgs()
         {
             if (useBaseGeneration) return base.GetCPArgs();
-            return base.SameVersionCPArgs() + base.GetCPArgs();
+            return SameVersionCPArgs() + base.GetCPArgs();
         }
 
         /// <summary>

@@ -13,63 +13,37 @@ namespace PixanKit.LaunchCore.Core
     /// </summary>
     public partial class Launcher
     {
+        private static readonly Lazy<Launcher> _instance = new(() => new Launcher());
+
         /// <summary>
         /// Gets the single instance of the <see cref="Launcher"/> class.
         /// </summary>
-        public static Launcher? Instance = null;
+        public static Launcher Instance => _instance.Value;
 
         /// <summary>
         /// Occurs when a new launcher instance is initialized.
         /// </summary>
-        public static Action<Launcher>? LauncherInit;
+        public static Action<Launcher>? OnLauncherInitialized;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Launcher"/> class.
         /// This constructor initializes game, player, and Java modules, and loads settings.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown if an instance of the launcher already exists.</exception>        
-        public Launcher()
+        public Launcher InitLauncher()
         {
-            if (Instance != null) throw new InvalidOperationException("Launcher is a single instance class");
-            Instance = this;
+             return _instance.Value;
+        }
+
+        private Launcher()
+        {
             Logger.Info("Start Initing");
-            InitGameModule();
-            InitPlayerModule();
+            _ = GameManager.Instance;
+            _ = PlayerManager.Instance;
             InitJavaModule();
             InitSettings();
             Logger.Info("Launcher Inited Successfully");
-            LauncherInit?.Invoke(this);
-        }
-
-        private void InitGameModule()
-        {
-            List<Folder> folders = [];
-            foreach (JToken jData in Files.FolderJData["children"] ?? new JObject())
-            {
-                var tmp = new Folder((JObject)jData);
-                tmp.SetOwner(this);
-                folders.Add(tmp);
-                FolderAdd?.Invoke(tmp);
-            }
-            _folders = folders;
-            string tmpstr = (Files.FolderJData["target"]?? "").ToString();
-            if (tmpstr != "") TargetGame = FindGame(tmpstr);
-            UpdateTargetGame();
-        }
-
-        private void InitPlayerModule()
-        {
-            List<PlayerBase> players = [];
-            foreach (JToken jData in Files.PlayerJData["children"] ?? new JArray())
-            {
-                PlayerBase ret = Initors.PlayerInitor((JObject)jData) ?? throw new NullReferenceException();
-                players.Add(ret);
-                PlayerLoad?.Invoke(ret);
-            }
-            _players = players;
-            string targetID = Files.PlayerJData["target"]?.ToString() ?? "";
-            if (targetID != "") TargetPlayer = FindPlayer(targetID);
-            ResetTargetPlayer();
+            OnLauncherInitialized?.Invoke(this);
         }
 
         private void InitJavaModule()

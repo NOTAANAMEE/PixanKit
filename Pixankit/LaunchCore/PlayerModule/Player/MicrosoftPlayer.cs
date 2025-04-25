@@ -8,7 +8,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
     /// <summary>
     /// Represents a Microsoft account player in the Minecraft environment.
     /// </summary>
-    public class MicrosoftPlayer:PlayerBase
+    public class MicrosoftPlayer : PlayerBase
     {
         /// <summary>
         /// Gets the latest login time. Re-login is required after 1 day.
@@ -45,7 +45,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// Initializes a new instance of the <see cref="MicrosoftPlayer"/> class using JSON data.
         /// </summary>
         /// <param name="jData">The JSON data representing the player.</param>
-        public MicrosoftPlayer(JObject jData):base(jData)
+        public MicrosoftPlayer(JObject jData) : base(jData)
         {
             _type = PlayerType.microsoft;
         }
@@ -62,11 +62,11 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// <returns>A task representing the asynchronous operation, with a <see cref="MicrosoftPlayer"/> as the result.</returns>
         public static async Task<MicrosoftPlayer> Login(string loginCode)
         {
-            var ret1 = await MojangLogin.GetMSToken(loginCode);
-            var ret2 = await MojangLogin.XBoxAuthorize(ret1.MSaccessToken);
-            var ret3 = await MojangLogin.XSTSVerification(ret2.Xboxtoken);
-            var ret4 = await MojangLogin.MinecraftAccessToken(ret3);
-            var ret5 = await MojangLogin.MinecraftUid(ret4);
+            Server.Servers.Microsoft.MSLoginServer.MSAuthorize ret1 = await MojangLogin.GetMSToken(loginCode);
+            Server.Servers.Microsoft.XboxServer.XboxAuthorize ret2 = await MojangLogin.XBoxAuthorize(ret1.MSaccessToken);
+            Server.Servers.Microsoft.XSTSServer.XSTSVerification ret3 = await MojangLogin.XSTSVerification(ret2.Xboxtoken);
+            string ret4 = await MojangLogin.MinecraftAccessToken(ret3);
+            Server.Servers.Mojang.MojangLoginServer.PlayerInf ret5 = await MojangLogin.MinecraftUid(ret4);
             MicrosoftPlayer player = new()
             {
                 _name = ret5.Name,
@@ -85,18 +85,18 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// Re-logs in the player using the refresh token.
         /// </summary>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task ReLogin() 
+        public async Task ReLogin()
         {
             TimeSpan span = DateTime.Now - LatestLoginTime;
             if (span.Days >= 1)
             {
-                var ret1 = await MojangLogin.RefreshMSToken(refreshtoken);
-                var ret2 = await MojangLogin.XBoxAuthorize(ret1.MSaccessToken);
-                var ret3 = await MojangLogin.XSTSVerification(ret2.Xboxtoken);
+                Server.Servers.Microsoft.MSLoginServer.MSAuthorize ret1 = await MojangLogin.RefreshMSToken(refreshtoken);
+                Server.Servers.Microsoft.XboxServer.XboxAuthorize ret2 = await MojangLogin.XBoxAuthorize(ret1.MSaccessToken);
+                Server.Servers.Microsoft.XSTSServer.XSTSVerification ret3 = await MojangLogin.XSTSVerification(ret2.Xboxtoken);
                 _accesstoken = await MojangLogin.MinecraftAccessToken(ret3);
                 refreshtoken = ret1.MSrefreshToken;
             }
-            var ret5 = await MojangLogin.MinecraftUid(_accesstoken);
+            Server.Servers.Mojang.MojangLoginServer.PlayerInf ret5 = await MojangLogin.MinecraftUid(_accesstoken);
             _name = ret5.Name;
             _uid = ret5.Uid;
             if (_skinURL == ret5.SkinUrl && File.Exists(SkinCachePath)) return;
@@ -111,7 +111,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         public async Task RefreshSkinCache()
         {
             HttpClient client = new();
-            var response = await client.GetStreamAsync(_skinURL);
+            Stream response = await client.GetStreamAsync(_skinURL);
             FileStream fs = new(
                 SkinCachePath, FileMode.Create);
             response.CopyTo(fs);

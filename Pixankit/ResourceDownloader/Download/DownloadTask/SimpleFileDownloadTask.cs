@@ -56,7 +56,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             HttpClient client = new();
             var bytes = new byte[8192];
             int bytesRead;
-            
+
             try
             {
                 using var response = await client.GetAsync(_url, HttpCompletionOption.ResponseHeadersRead, token);

@@ -12,7 +12,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// Represents a task for completing Minecraft game assets, including downloading the asset index
     /// and the associated asset files.
     /// </summary>
-    public class AssetsCompletionTask:SequenceProgressTask
+    public class AssetsCompletionTask : SequenceProgressTask
     {
         GameBase? _game;
 
@@ -43,9 +43,9 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         private void Init(JObject jdata)
         {
             FileDownloadTask task;
-            
-            string url = jdata["assetIndex"]?["url"]?.ToString() ?? "";
-            string index = jdata["assetIndex"]?["id"]?.ToString() ?? "";
+
+            var url = jdata["assetIndex"]?["url"]?.ToString() ?? "";
+            var index = jdata["assetIndex"]?["id"]?.ToString() ?? "";
 
             indexpath = $"{_game?.AssetsDirPath}/indexes/{index}.json";
 
@@ -57,27 +57,27 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             else TaskFinish();
             Add(task2 = new MultiFileDownloadTask());
         }
-        
+
         private void TaskFinish()
         {
             List<string> urls = [], paths = [];
 
-            JObject jobj = JObject.Parse(File.ReadAllText(
+            var jobj = JObject.Parse(File.ReadAllText(
                     Localize.PathLocalize(indexpath)
                     ));
             foreach (var asset in jobj["objects"] ?? new JArray())
             {
                 try
                 {
-                    string hash = asset.First?["hash"]?.ToString() ?? "";
-                    string rpath = $"{hash[0..2]}/{hash}";
-                    string path = $"{_game?.AssetsDirPath}/objects/{rpath}";
+                    var hash = asset.First?["hash"]?.ToString() ?? "";
+                    var rpath = $"{hash[0..2]}/{hash}";
+                    var path = $"{_game?.AssetsDirPath}/objects/{rpath}";
                     //Console.WriteLine(++count);
                     if (File.Exists(Localize.PathLocalize(path))) continue;
                     urls.Add(ServerList.MinecraftAssetsServer.GetAssetsUrl(hash));
                     paths.Add(path);
                 }
-                catch(Exception ex) 
+                catch (Exception ex)
                 { Logger.Warn("PixanKit.ResourceDownloader", ex.Message); }
 
             }
