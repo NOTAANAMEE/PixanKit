@@ -1,5 +1,8 @@
-![PixanKit Logo](https://img.shields.io/badge/Minecraft-.NET%208-blueviolet)
-> A lightweight, modular .NET 8 library for building Minecraft launchers with ease.
+![PixanKit Logo](https://img.shields.io/badge/C%23-.NET%208-blueviolet)
+![LICENSE](https://img.shields.io/badge/License-MIT-blue)
+![No Contributions Yet](https://img.shields.io/badge/Contributions-None%20yet-lightgrey)
+![Stand With Ukraine](https://img.shields.io/badge/Stand%20With-Ukraine-0057B7?logo=united-nations&logoColor=white)
+> A modular .NET 8 library for building Minecraft launchers.
 
 # PixanKit
 
@@ -72,7 +75,8 @@ Generate a full API reference site using DocFX.
 - **LaunchCore**
   - src：`<git pull directory>/Pixankit/LaunchCore`
   - files：`**/*.csproj`
-5.  Run `docfx docfx.json --serve` and visit `localhost:8080` in your web browser
+  
+5. Finally, Run `docfx docfx.json --serve` and visit `localhost:8080` in your web browser
 
 ## 💡 Notes
 This project is a continuous work-in-progress. While some designs or naming conventions may evolve, your feedback and contributions are always appreciated!
