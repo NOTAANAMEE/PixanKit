@@ -9,8 +9,6 @@ namespace PixanKit.LaunchCore.Extention
 {
     public interface IGameInitor
     {
-        public IGameInitor Instance { get; }
-
         public GameBase InitGame(string path);
     }
 }

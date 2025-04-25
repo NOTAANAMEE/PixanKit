@@ -322,9 +322,6 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </remarks>
         protected GameBase(string path) : this(path, true)
         {
-            _gameFolderPath = path;
-            folder = GameManager.Instance.FindFolder(GameRootFolderPath) ?? 
-                throw new NoFolderException();
             Init();
         }
 
@@ -361,6 +358,9 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </remarks>
         protected GameBase(string path, bool initFromFile)
         {
+            _gameFolderPath = path;
+            folder = GameManager.Instance.FindFolder(GameRootFolderPath) ??
+                throw new NoFolderException();
             if (initFromFile)
             {
                 gameJSONData = ReadJObj($"{path}/{Name}.json");

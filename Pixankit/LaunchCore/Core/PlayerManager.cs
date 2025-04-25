@@ -13,7 +13,7 @@ namespace PixanKit.LaunchCore.Core
     public class PlayerManager
     {
         #region Singleton
-        private static Lazy<PlayerManager> _instance = new(() => new());
+        private static readonly Lazy<PlayerManager> _instance = new(() => new());
 
         public static PlayerManager Instance => _instance.Value;
         #endregion
