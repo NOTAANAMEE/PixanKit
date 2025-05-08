@@ -19,13 +19,13 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
     /// </remarks>
     public static class MojangLogin
     {
-        private static MSLoginServer _msserver { get => ServerList.MicrosoftLoginServer; }
+        private static MSLoginServer Msserver => ServerList.MicrosoftLoginServer;
 
-        private static XboxServer _xboxserver { get => ServerList.XboxLoginServer; }
+        private static XboxServer Xboxserver => ServerList.XboxLoginServer;
 
-        private static XSTSServer _xstsserver { get => ServerList.XSTSServer; }
+        private static XSTSServer Xstsserver => ServerList.XSTSServer; 
 
-        private static MojangLoginServer _loginserver { get => ServerList.MojangLoginServer; }
+        private static MojangLoginServer _loginserver => ServerList.MojangLoginServer;
 
         /// <summary>
         /// Verify Microsoft Account From The Code
@@ -40,7 +40,7 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
         /// <see cref="MSLoginServer.MSAuthorize"/>
         /// </returns>
         public static async Task<MSLoginServer.MSAuthorize> GetMSToken(string code)
-            => await _msserver.Authorize(code);
+            => await Msserver.Authorize(code);
 
         /// <summary>
         /// Refresh MS Token
@@ -51,7 +51,7 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
         /// <returns>
         /// <see cref="MSLoginServer.MSAuthorize"/></returns>
         public static async Task<MSLoginServer.MSAuthorize> RefreshMSToken(string refreshtoken)
-            => await _msserver.ReAuthorize(refreshtoken);
+            => await Msserver.ReAuthorize(refreshtoken);
 
         /// <summary>
         /// Get XBOX Authorize
@@ -61,7 +61,7 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
         /// <returns>
         /// <see cref="XboxServer.XboxAuthorize"/></returns>
         public static async Task<XboxServer.XboxAuthorize> XBoxAuthorize(string MSaccessToken)
-            => await _xboxserver.Authorize(MSaccessToken);
+            => await Xboxserver.Authorize(MSaccessToken);
 
         /// <summary>
         /// XSTS Verification Process
@@ -69,7 +69,7 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
         /// <param name="XboxToken"><see cref="XboxServer.XboxAuthorize.Xboxtoken"/></param>
         /// <returns><see cref="XSTSServer.XSTSVerification"/></returns>
         public static async Task<XSTSServer.XSTSVerification> XSTSVerification(string XboxToken)
-            => await _xstsserver.XSTSVerify(XboxToken);
+            => await Xstsserver.XSTSVerify(XboxToken);
 
         /// <summary>
         /// Get The Minecraft AccessToken
