@@ -359,7 +359,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         protected GameBase(string path, bool initFromFile)
         {
             _gameFolderPath = path;
-            folder = GameManager.Instance.FindFolder(GameRootFolderPath) ??
+            folder = Launcher.Instance.GameManager.FindFolder(GameRootFolderPath) ??
                 throw new NoFolderException();
             if (initFromFile)
             {

@@ -85,7 +85,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         {
             JavaRuntime? java;
             if (Launcher.Instance == null) throw new InvalidOperationException("Init Launcher first");
-            java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes);
+            java = JavaChooser.Newest(Launcher.Instance.JavaManager.JavaRuntimes);
             if (java == null) throw new Exception("No java found");
 
             var dir =

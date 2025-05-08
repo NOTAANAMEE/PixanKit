@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Extention;
 using PixanKit.LaunchCore.Log;
 using PixanKit.LaunchCore.PlayerModule.Player;
@@ -10,14 +10,11 @@ using System.Threading.Tasks;
 
 namespace PixanKit.LaunchCore.Core
 {
+    /// <summary>
+    /// Manages player profiles for the launcher, including adding, removing, and retrieving players.
+    /// </summary>
     public class PlayerManager
     {
-        #region Singleton
-        private static readonly Lazy<PlayerManager> _instance = new(() => new());
-
-        public static PlayerManager Instance => _instance.Value;
-        #endregion
-
         #region Properties
         /// <summary>
         /// Gets the collection of players added to the launcher.
@@ -36,12 +33,18 @@ namespace PixanKit.LaunchCore.Core
         #endregion
 
         #region Initor
-        private PlayerManager()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PlayerManager"/> class.
+        /// </summary>
+        internal PlayerManager()
         {
             // Initialize the player manager
             InitPlayerModule();
         }
 
+        /// <summary>
+        /// Initializes the player module by loading player data from a JSON file.
+        /// </summary>
         private void InitPlayerModule()
         {
             List<PlayerBase> players = [];
@@ -102,6 +105,9 @@ namespace PixanKit.LaunchCore.Core
             return null;
         }
 
+        /// <summary>
+        /// Resets the target player to the first player in the list if no target player is set.
+        /// </summary>
         private void ResetTargetPlayer()
         {
             if (TargetPlayer == null && _players.Count != 0)
@@ -109,6 +115,10 @@ namespace PixanKit.LaunchCore.Core
             OnTargetPlayerChanged?.Invoke(TargetPlayer);
         }
 
+        /// <summary>
+        /// Saves the current player data to a JSON object.
+        /// </summary>
+        /// <returns>A <see cref="JObject"/> containing the player data.</returns>
         internal JObject Save()
         {
             JArray players = [];
@@ -145,6 +155,9 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         public static Action<PlayerBase>? OnProfileChanged;
 
+        /// <summary>
+        /// Occurs when the target player is changed.
+        /// </summary>
         public static Action<PlayerBase?>? OnTargetPlayerChanged;
         #endregion
     }

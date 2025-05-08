@@ -9,8 +9,7 @@ namespace PixanKit.LaunchCore.SystemInf
     /// </summary>
     public static class SysInfo
     {
-        [ModuleInitializer]
-        internal static void Init()
+        static SysInfo()
         {
             SetOS();
             SetArch();

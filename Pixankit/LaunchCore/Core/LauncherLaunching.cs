@@ -19,10 +19,16 @@ namespace PixanKit.LaunchCore.Core
         /// <exception cref="NullReferenceException"></exception>
         public LaunchSession Launch(GameBase game)
         {
-            string cmd = InlineCommand(game);
-            Logger.Info("Game Arg Generated Successfully. Stored in a.bat");
+            return Launch(game, PlayerManager.TargetPlayer ??
+                throw new NullReferenceException("Target player not found"));
+        }
 
-            JavaRuntime java = ChooseRuntime(game) ?? throw new NullReferenceException();
+        public LaunchSession Launch(GameBase game,PlayerBase player)
+        {
+            string cmd = InlineCommand(game, player);
+            Logger.Info("Game Arg Generated Successfully.");
+
+            JavaRuntime java = JavaManager.ChooseRuntime(game) ?? throw new NullReferenceException();
 
             game.Decompress().Wait();
 
@@ -36,17 +42,17 @@ namespace PixanKit.LaunchCore.Core
         /// <exception cref="NullReferenceException"></exception>
         public LaunchSession Launch()
         {
-            if (GameManager.Instance.TargetGame is null) throw new NullReferenceException();
-            return Launch(GameManager.Instance.TargetGame);
+            if (GameManager.TargetGame is null) throw new NullReferenceException();
+            return Launch(GameManager.TargetGame);
         }
 
-        private string InlineCommand(GameBase game)
+        private string InlineCommand(GameBase game, PlayerBase player)
         {
             game.LaunchCheck();
             long timeStamp = DateTime.Now.Ticks;
             string cmd = GenerateCommand(game);
 
-            cmd = PlayerInLine(cmd);
+            cmd = PlayerInLine(cmd, player);
             string pth = Path.GetDirectoryName(game.GameRootFolderPath) ?? "./";
             cmd = $"-Xmx{Initors.GetMemory()}m " + cmd;
             cmd = cmd.Replace("${launcher_name}", LauncherName);
@@ -83,7 +89,7 @@ namespace PixanKit.LaunchCore.Core
         /// <param name="arg">The base command string.</param>
         /// <returns>The command string with the default player's information inlined.</returns>
         public string PlayerInLine(string arg)
-            => PlayerInLine(arg, PlayerManager.Instance.TargetPlayer ??
+            => PlayerInLine(arg, PlayerManager.TargetPlayer ??
                 throw new NullReferenceException("Target player not found"));
     }
 }

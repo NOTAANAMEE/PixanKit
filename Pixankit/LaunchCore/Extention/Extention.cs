@@ -7,49 +7,65 @@ using PixanKit.LaunchCore.SystemInf;
 namespace PixanKit.LaunchCore.Extention
 {
     /// <summary>
-    /// Custom initialization method
+    /// Provides custom initialization methods for games, players, and system settings.
     /// </summary>
     public static class Initors
     {
+        /// <summary>
+        /// Gets or sets the instance of the custom game initializer.
+        /// </summary>
         public static IGameInitor GameInitorInstance = new DefaultGameInitor();
 
         /// <summary>
-        /// Custom Game Initor
+        /// Initializes a game instance using the specified path.
         /// </summary>
+        /// <param name="path">The path to the game folder. For example: <c>"C:/Games/Minecraft"</c>.</param>
+        /// <returns>An instance of <see cref="GameBase"/> representing the initialized game.</returns>
         public static GameBase GameInitor(string path)
             => GameInitorInstance.InitGame(path);
 
         /// <summary>
-        /// Custom Player Initor
+        /// A delegate for initializing a player from a JSON object.
         /// </summary>
+        /// <remarks>
+        /// This delegate allows customization of player initialization logic.
+        /// </remarks>
         public static Func<JObject, PlayerBase?> PlayerInitor;
 
         /// <summary>
-        /// Custom Get Memory
+        /// A delegate for retrieving the system's memory allocation.
         /// </summary>
+        /// <remarks>
+        /// This delegate allows customization of memory allocation logic.
+        /// </remarks>
         public static Func<long> GetMemory;
 
+        /// <summary>
+        /// Initializes static members of the <see cref="Initors"/> class.
+        /// </summary>
         static Initors()
         {
             PlayerInitor += DefaultPlayerInitor;
             GetMemory += GetMem;
         }
 
-
         /// <summary>
-        /// Default Player Initor
+        /// The default implementation for initializing a player from a JSON object.
         /// </summary>
-        /// <param name="jData">Example:
+        /// <param name="jData">A JSON object containing player data. Example:
         /// <code>
         /// {
-        /// "name":"",
-        /// "uid":"",
-        /// "type":"",
-        /// "refreshtoken":"",
-        /// "accesstoken":"",
-        /// 
-        /// }</code></param>
-        /// <returns></returns>
+        ///   "name": "PlayerName",
+        ///   "uid": "UniqueID",
+        ///   "type": "offline",
+        ///   "refreshtoken": "RefreshToken",
+        ///   "accesstoken": "AccessToken"
+        /// }
+        /// </code>
+        /// </param>
+        /// <returns>
+        /// An instance of <see cref="PlayerBase"/> if the player type is recognized; otherwise, <c>null</c>.
+        /// </returns>
         public static PlayerBase? DefaultPlayerInitor(JObject? jData)
         {
             if (jData == null) return null;
@@ -62,9 +78,12 @@ namespace PixanKit.LaunchCore.Extention
         }
 
         /// <summary>
-        /// Default Memory Setting
+        /// Retrieves the default memory allocation for the system.
         /// </summary>
-        /// <returns>6000 MB</returns>
+        /// <returns>
+        /// The allocated memory in megabytes. The value is determined based on the system's available memory,
+        /// with a minimum of 2048 MB and a maximum of 10240 MB.
+        /// </returns>
         public static long GetMem()
         {
             long minMemory = 2048; // 2GB
@@ -76,13 +95,22 @@ namespace PixanKit.LaunchCore.Extention
         }
     }
 
-    internal class DefaultGameInitor: IGameInitor
+    /// <summary>
+    /// The default implementation of the <see cref="IGameInitor"/> interface.
+    /// </summary>
+    internal class DefaultGameInitor : IGameInitor
     {
+        /// <summary>
+        /// Initializes a game instance from the specified path.
+        /// </summary>
+        /// <param name="path">The path to the game folder. For example: <c>"C:/Games/Minecraft"</c>.</param>
+        /// <returns>
+        /// An instance of <see cref="GameBase"/> representing the initialized game.
+        /// </returns>
         public GameBase InitGame(string path)
         {
             string jsonPath = $"{path}/{Path.GetFileName(path)}.json";
             JObject jobj = JObject.Parse(File.ReadAllText(jsonPath));
-
 
             if (jobj["mainClass"]?.ToString() != "net.minecraft.client.main.Main")
             {
@@ -93,6 +121,13 @@ namespace PixanKit.LaunchCore.Extention
             else return new OriginalGame(path, jobj);
         }
 
+        /// <summary>
+        /// Determines whether the game is an OptiFine-modified version.
+        /// </summary>
+        /// <param name="obj">The JSON object containing game configuration data.</param>
+        /// <returns>
+        /// <c>true</c> if the game is an OptiFine-modified version; otherwise, <c>false</c>.
+        /// </returns>
         private bool JudgeOptifine(JObject obj)
         {
             string mainclass = obj.GetOrDefault(Format.ToString, "mainClass", "");

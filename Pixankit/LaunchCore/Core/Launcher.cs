@@ -21,11 +21,6 @@ namespace PixanKit.LaunchCore.Core
         public static Launcher Instance => _instance.Value;
 
         /// <summary>
-        /// Occurs when a new launcher instance is initialized.
-        /// </summary>
-        public static Action<Launcher>? OnLauncherInitialized;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="Launcher"/> class.
         /// This constructor initializes game, player, and Java modules, and loads settings.
         /// </summary>
@@ -38,23 +33,18 @@ namespace PixanKit.LaunchCore.Core
         private Launcher()
         {
             Logger.Info("Start Initing");
-            _ = GameManager.Instance;
-            _ = PlayerManager.Instance;
-            InitJavaModule();
             InitSettings();
             Logger.Info("Launcher Inited Successfully");
             OnLauncherInitialized?.Invoke(this);
         }
 
-        private void InitJavaModule()
-        {
-            List<JavaRuntime> javaRuntimes = [];
-            foreach (JToken jData in Files.RuntimeJData["children"] ?? new JObject())
-            {
-                javaRuntimes.Add(new JavaRuntime((JObject)jData));
-            }
-            _javaRuntimes = javaRuntimes;
-        }
+        public readonly GameManager GameManager = new();
+
+        public readonly PlayerManager PlayerManager = new();
+
+        public readonly JavaManager JavaManager = new();
+
+
 
         private void InitSettings()
         {

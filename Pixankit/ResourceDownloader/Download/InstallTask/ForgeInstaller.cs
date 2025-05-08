@@ -76,7 +76,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         private void AddCommandTask()
         {
             if (Launcher.Instance == null) throw new Exception();
-            var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes) ??
+            var java = JavaChooser.Newest(Launcher.Instance.JavaManager.JavaRuntimes) ??
                 throw new Exception();
             CommandTask = new(java.JavaEXE, $"-jar \"{installerpath}\" --installClient " +
                 $"\"{Owner.FolderPath}\"");

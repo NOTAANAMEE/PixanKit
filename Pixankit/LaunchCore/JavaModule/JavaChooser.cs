@@ -14,14 +14,10 @@ namespace PixanKit.LaunchCore.JavaModule
         /// <param name="runtimes">Java Runtime Collection</param>
         /// <param name="game">Game Needed To Launch</param>
         /// <returns>Returns A JavaRuntime If Exisits. Else Return null</returns>
-        public static JavaRuntime? Specified(JavaRuntime[] runtimes, GameBase game)
-        {
-            foreach (JavaRuntime runtime in runtimes)
-            {
-                if (runtime.Version == game.MinimalJavaVersion) return runtime;
-            }
-            return null;
-        }
+        public static JavaRuntime? Specified(IEnumerable<JavaRuntime?> runtimes, GameBase game)
+            => runtimes.FirstOrDefault(
+                runtime => runtime?.Version == game.MinimalJavaVersion, 
+                null);
 
         /// <summary>
         /// Choose The Runtime That Is Close To The Version That JSON Specified.<br/>
@@ -30,19 +26,11 @@ namespace PixanKit.LaunchCore.JavaModule
         /// <param name="runtimes">Java Runtime Collection</param>
         /// <param name="game">Game Needed To Launch</param>
         /// <returns>Returns A JavaRuntime If Exisits. Else Return null</returns>
-        public static JavaRuntime? Closest(JavaRuntime[] runtimes, GameBase game)
-        {
-            List<JavaRuntime> runtimes_ = [.. runtimes];
-            runtimes_.Sort((x, y) =>
-            {
-                return x.Version - y.Version;
-            });
-            foreach (JavaRuntime runtime in runtimes_)
-            {
-                if (runtime.Version >= game.MinimalJavaVersion) return runtime;
-            }
-            return null;
-        }
+        public static JavaRuntime? Closest(IEnumerable<JavaRuntime> runtimes, GameBase game)
+            => runtimes
+                .Where(runtime => runtime.Version >= game.MinimalJavaVersion)
+                .OrderBy(runtimes => runtimes.Version)
+                .FirstOrDefault();
 
         /// <summary>
         /// This function will choose the latest JavaRuntime
@@ -55,10 +43,8 @@ namespace PixanKit.LaunchCore.JavaModule
         /// matches the requirement.<br/>
         /// If no JavaRuntime fits, it will return <c>null</c>
         /// </returns>
-        public static JavaRuntime? Newest(JavaRuntime[] runtimes, GameBase game)
-        {
-            return Newest(runtimes);
-        }
+        public static JavaRuntime? Newest(IEnumerable<JavaRuntime> runtimes, GameBase game)
+            => Newest(runtimes);
 
         /// <summary>
         /// This function will choose the latest JavaRuntime
@@ -70,15 +56,10 @@ namespace PixanKit.LaunchCore.JavaModule
         /// matches the requirement.<br/>
         /// If no JavaRuntime fits, it will return <c>null</c>
         /// </returns>
-        public static JavaRuntime? Newest(JavaRuntime[] runtimes)
-        {
-            List<JavaRuntime> runtimes_ = [.. runtimes];
-            runtimes_.Sort((x, y) =>
-            {
-                return x.Version - y.Version;
-            });
-            return runtimes_[^1];
-        }
+        public static JavaRuntime? Newest(IEnumerable<JavaRuntime> runtimes)
+            => runtimes
+                .OrderByDescending(runtime => runtime.Version)
+                .FirstOrDefault();
     }
 
 
