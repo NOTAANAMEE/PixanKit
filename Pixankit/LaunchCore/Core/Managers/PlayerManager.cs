@@ -15,18 +15,6 @@ namespace PixanKit.LaunchCore.Core
     /// </summary>
     public class PlayerManager
     {
-        #region Singleton
-        /// <summary>
-        /// Provides a singleton instance of the <see cref="PlayerManager"/> class.
-        /// </summary>
-        private static readonly Lazy<PlayerManager> _instance = new(() => new());
-
-        /// <summary>
-        /// Gets the singleton instance of the <see cref="PlayerManager"/> class.
-        /// </summary>
-        public static PlayerManager Instance => _instance.Value;
-        #endregion
-
         #region Properties
         /// <summary>
         /// Gets the collection of players added to the launcher.
@@ -48,7 +36,7 @@ namespace PixanKit.LaunchCore.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="PlayerManager"/> class.
         /// </summary>
-        private PlayerManager()
+        internal PlayerManager()
         {
             // Initialize the player manager
             InitPlayerModule();

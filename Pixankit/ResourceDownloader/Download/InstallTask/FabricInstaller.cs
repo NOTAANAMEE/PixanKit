@@ -84,7 +84,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         {
             if (Launcher.Instance == null)
                 throw new InvalidOperationException("Launcher hasn't inited yet");
-            var java = JavaChooser.Newest(Launcher.Instance.JavaRuntimes) ??
+            var java = JavaChooser.Newest(Launcher.Instance.JavaManager.JavaRuntimes) ??
                 throw new InvalidOperationException("No java found");
             CommandTask = new(java.JavaEXE, $"-jar \"{installerpath}\" client " +
                 $"-dir \"{Owner.FolderPath}\" -mcversion {version} -loader {fabricversion["version"]} " +

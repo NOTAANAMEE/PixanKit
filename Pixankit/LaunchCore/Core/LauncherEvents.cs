@@ -29,5 +29,17 @@ namespace PixanKit.LaunchCore.Core
         /// </remarks>
         public static Action<GameBase, ProcessResult>? GameExit;
         #endregion
+
+        #region ThisEvents
+        /// <summary>
+        /// Occurs when the launcher is closed.
+        /// </summary>
+        public Action? OnLauncherClosed;
+
+        /// <summary>
+        /// Occurs when a new launcher instance is initialized.
+        /// </summary>
+        public static Action<Launcher>? OnLauncherInitialized;
+        #endregion
     }
 }

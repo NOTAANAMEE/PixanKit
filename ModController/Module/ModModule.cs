@@ -34,6 +34,8 @@ namespace PixanKit.ModController.Module
             //Remove game. Check whether game in the dictionary.
         }
 
+        private static Launcher McLauncher => Launcher.Instance;
+
         /// <summary>
         /// Gets or sets the singleton instance of the ModModule.
         /// </summary>
@@ -104,7 +106,7 @@ namespace PixanKit.ModController.Module
             Logger.Info("PixanKit.ModController.Module",
                 "Module finished reading file." +
                 "Pending to init mods");
-            foreach (var folder in GameManager.Instance.Folders)
+            foreach (var folder in McLauncher.GameManager.Folders)
             {
                 foreach (var game in folder.Games)
                 {//For each game do...

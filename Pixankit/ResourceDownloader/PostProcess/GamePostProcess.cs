@@ -45,7 +45,8 @@ namespace PixanKit.ResourceDownloader.PostProcess
                 return;
             }
             var game = Initors.GameInitor($"{versiondir}/{name}");
-            if (!processjson && game is not null) GameManager.Instance.AddGame(game);
+            if (!processjson) 
+                Launcher.Instance.GameManager.AddGame(game);
         }
 
         private void ProcessJSON()

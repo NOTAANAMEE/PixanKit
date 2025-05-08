@@ -12,18 +12,6 @@ namespace PixanKit.LaunchCore.Core
     /// </summary>
     public class GameManager
     {
-        #region Singleton
-        /// <summary>
-        /// Provides a singleton instance of the <see cref="GameManager"/> class.
-        /// </summary>
-        private static Lazy<GameManager> _instance = new(() => new GameManager());
-
-        /// <summary>
-        /// Gets the singleton instance of the <see cref="GameManager"/> class.
-        /// </summary>
-        public static GameManager Instance => _instance.Value;
-        #endregion
-
         #region Properties
         /// <summary>
         /// Gets the collection of folders managed by the launcher.
@@ -42,7 +30,7 @@ namespace PixanKit.LaunchCore.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="GameManager"/> class.
         /// </summary>
-        private GameManager()
+        internal GameManager()
         {
             InitGameModule();
             Logger.Info("Game Module Inited Successfully");
@@ -212,7 +200,7 @@ namespace PixanKit.LaunchCore.Core
         /// Saves the folder data to a JSON object.
         /// </summary>
         /// <returns>A <see cref="JObject"/> containing the folder data.</returns>
-        internal JObject SaveFolderData()
+        internal JObject Save()
         {
             Logger.Info("Game Manager Closing");
             JArray folders = [];
