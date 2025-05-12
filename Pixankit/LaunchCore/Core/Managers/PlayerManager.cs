@@ -26,10 +26,19 @@ namespace PixanKit.LaunchCore.Core
 
         private List<PlayerBase> _players = [];
 
+        private PlayerBase? targetPlayer;
+
         /// <summary>
         /// Gets or sets the default player used for launching.
         /// </summary>
-        public PlayerBase? TargetPlayer { get; set; }
+        public PlayerBase? TargetPlayer 
+        { get => targetPlayer;
+            set
+            {
+                targetPlayer = value;
+                OnTargetPlayerChanged?.Invoke(targetPlayer);
+            }
+        }
         #endregion
 
         #region Initor
@@ -75,6 +84,7 @@ namespace PixanKit.LaunchCore.Core
                     throw new ArgumentException("Player Has Added");
             }
             _players.Add(player);
+            ResetTargetPlayer();
             OnPlayerAdded?.Invoke(player);
             Logger.Info($"Player {player.Name} Added");
             ResetTargetPlayer();
@@ -87,7 +97,10 @@ namespace PixanKit.LaunchCore.Core
         public void RemovePlayer(PlayerBase player)
         { 
             _players.Remove(player); 
+            if (player == targetPlayer)
+                targetPlayer = null;
             OnPlayerRemoved?.Invoke(player);
+            ResetTargetPlayer();
             Logger.Info($"Player {player.Name} Removed");
         }
 
@@ -112,7 +125,6 @@ namespace PixanKit.LaunchCore.Core
         {
             if (TargetPlayer == null && _players.Count != 0)
                 TargetPlayer = _players.First();
-            OnTargetPlayerChanged?.Invoke(TargetPlayer);
         }
 
         /// <summary>

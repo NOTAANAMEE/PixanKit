@@ -20,54 +20,22 @@ namespace PixanKit.LaunchCore.Extention
         /// <summary>
         /// Folder JSON Data  
         /// </summary>
-        public static JObject FolderJData
-        {
-            get
-            {
-                if (_folderJData == null) throw new NullReferenceException("FolderJData not inited");
-                return _folderJData;
-            }
-            set => _folderJData = value;
-        }
+        public static JObject FolderJData { get; set; } = DefaultJSON.JData;
 
         /// <summary>
         /// Runtime JSON Data
         /// </summary>
-        public static JObject RuntimeJData
-        {
-            get
-            {
-                if (_runtimeJData == null) throw new NullReferenceException();
-                return _runtimeJData;
-            }
-            set => _runtimeJData = value;
-        }
+        public static JObject RuntimeJData { get; set; } = DefaultJSON.JData;
 
         /// <summary>
         /// Player JSON Data
         /// </summary>
-        public static JObject PlayerJData
-        {
-            get
-            {
-                if (_playerJData == null) throw new NullReferenceException();
-                return _playerJData;
-            }
-            set => _playerJData = value;
-        }
+        public static JObject PlayerJData { get; set; } = DefaultJSON.JData;
 
         /// <summary>
         /// Setting JSON Data
         /// </summary>
-        public static JObject? SettingsJData
-        {
-            get
-            {
-                //if (_settingsJData == null) throw new NullReferenceException();
-                return _settingsJData;
-            }
-            set => _settingsJData = value;
-        }
+        public static JObject? SettingsJData { get; set; } = DefaultJSON.JData;
 
         /// <summary>
         /// Directory For Launcher Configuration Files.
@@ -99,15 +67,6 @@ namespace PixanKit.LaunchCore.Extention
         /// </summary>
         public static string SkinCacheDir
         { get => Paths.Get("SkinCacheDir"); set => Paths.TrySet("SkinCacheDir", value); }
-
-
-        private static JObject? _folderJData = null;
-
-        private static JObject? _runtimeJData = null;
-
-        private static JObject? _playerJData = null;
-
-        private static JObject? _settingsJData = null;
 
         /// <summary>
         /// Get SHA1 From File
@@ -183,10 +142,10 @@ namespace PixanKit.LaunchCore.Extention
                          t3 = runtimesr.ReadToEndAsync(),
                          t4 = settingsr.ReadToEndAsync();
             Task.WaitAll(t1, t2, t3, t4);
-            _folderJData = JObject.Parse(t1.Result);
-            _playerJData = JObject.Parse(t2.Result);
-            _runtimeJData = JObject.Parse(t3.Result);
-            _settingsJData = JObject.Parse(t4.Result);
+            FolderJData = JObject.Parse(t1.Result);
+            PlayerJData = JObject.Parse(t2.Result);
+            RuntimeJData = JObject.Parse(t3.Result);
+            SettingsJData = JObject.Parse(t4.Result);
             folderFS.Close();
             playerFS.Close();
             runtimeFS.Close();
