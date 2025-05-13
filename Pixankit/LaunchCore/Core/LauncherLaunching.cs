@@ -30,7 +30,7 @@ namespace PixanKit.LaunchCore.Core
 
             JavaRuntime java = JavaManager.ChooseRuntime(game) ?? throw new NullReferenceException();
 
-            game.Decompress().Wait();
+            //game.Decompress().Wait();
 
             return new LaunchSession(game, java, cmd);
         }
@@ -42,7 +42,8 @@ namespace PixanKit.LaunchCore.Core
         /// <exception cref="NullReferenceException"></exception>
         public LaunchSession Launch()
         {
-            if (GameManager.TargetGame is null) throw new NullReferenceException();
+            if (GameManager.TargetGame is null) 
+                throw new NullReferenceException();
             return Launch(GameManager.TargetGame);
         }
 

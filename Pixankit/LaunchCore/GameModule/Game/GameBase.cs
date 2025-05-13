@@ -423,7 +423,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             gameArguments = GetGameArguments(gameJSONData);
         }
 
-        internal static string GetGameArguments(JObject obj)
+        internal string GetGameArguments(JObject obj)
         {
             string gameArguments = "";
             if (obj.TryGetValue(Format.ToString, "minecraftArguments", out string? gargs))
@@ -436,9 +436,25 @@ namespace PixanKit.LaunchCore.GameModule.Game
             {
                 if (token.Type != JTokenType.String)
                 {
-                    obj.Add(OptionalArgs.Parse(token as JObject ?? []));
+                    optionalArgs.Add(OptionalArgs.Parse(token as JObject ?? []));
                     continue;
                 }
+                gameArguments += token.ToString() + " ";
+            }
+            return gameArguments;
+        }
+
+        internal static string GetGameArgumentsStatic(JObject obj)
+        {
+            string gameArguments = "";
+            if (obj.TryGetValue(Format.ToString, "minecraftArguments", out string? gargs))
+            {
+                gameArguments = "" + gargs;
+                return gameArguments;
+            }
+            foreach (JToken token in obj.GetOrDefault(Format.ToJArray, "arguments/game", []))
+            {
+                if (token.Type != JTokenType.String) continue;
                 gameArguments += token.ToString() + " ";
             }
             return gameArguments;

@@ -159,7 +159,7 @@ namespace PixanKit.LaunchCore.Json
                 switch (token.Type)
                 {
                     case JTokenType.Object:
-                        token = token[key];
+                        token = (token as JObject)[key];
                         break;
                     case JTokenType.Array:
                         token = token[int.Parse(key)];

@@ -32,25 +32,24 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         internal GameManager()
         {
-            InitGameModule();
-            Logger.Info("Game Module Inited Successfully");
+            
         }
 
         /// <summary>
         /// Initializes the game module by loading folder data from a JSON file.
         /// </summary>
-        private void InitGameModule()
+        public void InitGameModule()
         {
-            List<Folder> folders = [];
             foreach (JToken jData in Files.FolderJData["children"] ?? new JObject())
             {
                 Folder tmp = new((JObject)jData);
-                folders.Add(tmp);
+                _folders.Add(tmp);
+                tmp.InitGames();
             }
-            _folders = folders;
             string tmpstr = (Files.FolderJData["target"] ?? "").ToString();
             if (tmpstr != "") TargetGame = FindGame(tmpstr);
             UpdateTargetGame();
+            Logger.Info("Game Module Inited Successfully");
         }
         #endregion
 

@@ -57,8 +57,7 @@ namespace PixanKit.LaunchCore.Core
             {
                 FileName = java.JavawEXE,
                 Arguments = args,
-                WorkingDirectory =
-                    string.Concat(AppDomain.CurrentDomain.BaseDirectory, Files.CacheDir),
+                WorkingDirectory = Path.GetFullPath(Files.CacheDir),
                 CreateNoWindow = true,
             };
         }

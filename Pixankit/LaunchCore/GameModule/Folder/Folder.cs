@@ -103,8 +103,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// <c>"C:\\Users\\Admin\\AppData\\Roaming\\.minecrafy"</c></param>
         public Folder(string path)
         {
-            _folderpath = path;
-            InitGames();
+            _folderpath = path.Replace("\\", "/");
         }
 
         /// <summary>
@@ -120,19 +119,19 @@ namespace PixanKit.LaunchCore.GameModule
         public Folder(JObject jData)
         {
             LoadFromJSON(jData);
-            InitGames();
         }
 
-        private void InitGames()
+        internal void InitGames()
         {
             _games.Clear();
             string[] dirs = Directory.GetDirectories(VersionDirPath);
             foreach (string dir in dirs)
             {
                 GameBase game;
+                var tmpdir = dir.Replace("\\", "/");
                 try
                 {
-                    game = Initors.GameInitor(dir) ?? throw new Exception();
+                    game = Initors.GameInitor(tmpdir) ?? throw new Exception();
                 }
                 catch (Exception ex)
                 {

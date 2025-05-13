@@ -8,7 +8,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// <inheritdoc/>
         public void LoadFromJSON(JObject obj)
         {
-            _folderpath = obj.GetOrDefault(Format.ToString, "path", "");
+            _folderpath = obj.GetOrDefault(Format.ToString, "path", "").Replace("\\", "/");
             Alias = obj.GetOrDefault(Format.ToString, "alias", ""); ;
         }
 

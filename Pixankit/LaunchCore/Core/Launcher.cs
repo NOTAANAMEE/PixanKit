@@ -20,16 +20,6 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         public static Launcher Instance => _instance.Value;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Launcher"/> class.
-        /// This constructor initializes game, player, and Java modules, and loads settings.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown if an instance of the launcher already exists.</exception>        
-        public Launcher InitLauncher()
-        {
-             return _instance.Value;
-        }
-
         private Launcher()
         {
             Logger.Info("Start Initing");
@@ -45,10 +35,15 @@ namespace PixanKit.LaunchCore.Core
         public readonly JavaManager JavaManager = new();
 
 
-
         private void InitSettings()
         {
             if (Files.SettingsJData != null) Settings = Files.SettingsJData;
+        }
+
+        public void Init()
+        {
+            GameManager.InitGameModule();
+            PlayerManager.InitPlayerModule();
         }
 
         /// <summary>

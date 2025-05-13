@@ -132,7 +132,7 @@ namespace PixanKit.LaunchCore.Extention
         {
             string mainclass = obj.GetOrDefault(Format.ToString, "mainClass", "");
             if (mainclass != "net.minecraft.launchwrapper.Launch") return false;
-            string args = GameBase.GetGameArguments(obj);
+            string args = GameBase.GetGameArgumentsStatic(obj);
             bool forge = args.Contains("fml");
             bool optifine = args.Contains("optifine");
             return !forge && optifine;

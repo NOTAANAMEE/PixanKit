@@ -1,11 +1,11 @@
 ﻿{
   "children": [
     {
-      "path": "C:/Program Files/Java/JDK-21/bin",
+      "path": "C:/Program Files/Java/JDK-21",
       "version": 21
     },
     {
-      "path": "C:/Program Files/Java/jre-8/bin",
+      "path": "C:/Program Files/Java/jre-8",
       "version": 8
     }
   ]

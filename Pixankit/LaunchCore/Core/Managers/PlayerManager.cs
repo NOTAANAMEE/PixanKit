@@ -46,15 +46,12 @@ namespace PixanKit.LaunchCore.Core
         /// Initializes a new instance of the <see cref="PlayerManager"/> class.
         /// </summary>
         internal PlayerManager()
-        {
-            // Initialize the player manager
-            InitPlayerModule();
-        }
+        { }
 
         /// <summary>
         /// Initializes the player module by loading player data from a JSON file.
         /// </summary>
-        private void InitPlayerModule()
+        public void InitPlayerModule()
         {
             List<PlayerBase> players = [];
             foreach (JToken jData in Files.PlayerJData["children"] ?? new JArray())

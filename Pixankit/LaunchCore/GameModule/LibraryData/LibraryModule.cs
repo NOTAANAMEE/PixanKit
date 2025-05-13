@@ -63,7 +63,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <summary>
         /// The Absolute Path Of The Library
         /// </summary>
-        public string LibraryPath { get => "${library_directory}" + GetPath(_name); }
+        public virtual string LibraryPath { get => "${library_directory}" + GetPath(_name); }
 
         /// <summary>
         /// Download URL Of The Library
@@ -215,8 +215,8 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
             string path = "";
             string[] pathInfs = pathInf.Split(":");
             pathInfs[^1] = pathInfs[^1].Replace(".jar", "");
-            if (pathInfs.Length == 3) path = $"/{pathInfs[0].Replace('.', '/')}/{pathInfs[1]}/{pathInfs[2]}/{pathInfs[1]}-{pathInfs[2]}.jar";
-            if (pathInfs.Length == 4) path = $"/{pathInfs[0].Replace('.', '/')}/{pathInfs[1]}/{pathInfs[2]}/{pathInfs[1]}-{pathInfs[2]}-{pathInfs[3]}.jar";
+            if (pathInfs.Length == 3) path = $"{pathInfs[0].Replace('.', '/')}/{pathInfs[1]}/{pathInfs[2]}/{pathInfs[1]}-{pathInfs[2]}.jar";
+            if (pathInfs.Length == 4) path = $"{pathInfs[0].Replace('.', '/')}/{pathInfs[1]}/{pathInfs[2]}/{pathInfs[1]}-{pathInfs[2]}-{pathInfs[3]}.jar";
             return path;
         }
 

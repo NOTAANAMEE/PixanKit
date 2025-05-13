@@ -14,6 +14,11 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         private string[] Exclude = [];
 
         /// <summary>
+        /// Gets the path of the library.
+        /// </summary>
+        public override string LibraryPath => "${library_directory}" + Name;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="NativeLibrary"/> class with the specified JSON data.
         /// </summary>
         /// <param name="libraryJData">The JSON data representing the native library.</param>
@@ -24,8 +29,8 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
                 libraryJData.GetOrDefault(Format.ToString,
                 $"natives/{SysInfo.OSName}", "");
 
-            JObject current = libraryJData.GetValue(Format.ToJObject, OSKey);
-            _name = current.GetValue(Format.ToString, "name");
+            JObject current = libraryJData.GetValue(Format.ToJObject, $"downloads/classifiers/{OSKey}");
+            _name = current.GetValue(Format.ToString, "path");
             _sha1 = current.GetValue(Format.ToString, "sha1");
             _url = current.GetValue(Format.ToString, "url");
 
@@ -53,7 +58,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <param name="nativesPath">The directory to extract files to.</param>
         public void Extract(string librarypath, string nativesPath)
         {
-            FileStream fs = new(Path.Combine(librarypath, LibraryPath), FileMode.Open);
+            FileStream fs = new(LibraryPath.Replace("${library_directory}", librarypath + '/'), FileMode.Open);
             ZipArchive archive = new(fs);
             foreach (ZipArchiveEntry entry in archive.Entries)
             {
