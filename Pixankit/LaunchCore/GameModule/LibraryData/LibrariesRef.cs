@@ -30,8 +30,8 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
             {
                 LibraryHelper.AddLibrary(
                     token.ConvertTo(Format.ToJObject, []), _libraries);
-                var last = _libraries.Last();
-                if (last is NativeLibrary lib) nativeLibraries.Add(lib);
+                var last = _libraries.LastOrDefault();
+                if (last != null && last is NativeLibrary lib) nativeLibraries.Add(lib);
             }
             Logger.Logger.Info($"Libraries Added. Number:{_libraries.Count}");
         }
@@ -44,8 +44,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         public async Task Extract(string libraryPath, string nativePath)
         {
             var tasks = nativeLibraries.Select(
-                lib 
-                    => lib.ExtractAsync(libraryPath, nativePath));
+                lib => lib.ExtractAsync(libraryPath, nativePath));
             await Task.WhenAll(tasks);
         }
         
