@@ -22,9 +22,9 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
         /// <summary>
         /// The Base URL
         /// </summary>
-        public string BaseURL { get; } = "https://user.auth.xboxlive.com";
+        public string BaseUrl { get; } = "https://user.auth.xboxlive.com";
 
-        internal async Task<XboxAuthorize> Authorize(string MSaccessToken)
+        internal async Task<XboxAuthorize> Authorize(string mSaccessToken)
         {
             string jsonData, ret;
             //初始化jsonData
@@ -33,7 +33,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
                     "{\"Properties\":" +
                         "{\"AuthMethod\":\"RPS\"," +
                          "\"SiteName\":\"user.auth.xboxlive.com\"," +
-                         "\"RpsTicket\":\"" + MSaccessToken + "\"" +
+                         "\"RpsTicket\":\"" + mSaccessToken + "\"" +
                         "}," +
                      "\"RelyingParty\":\"http://auth.xboxlive.com\"," +
                      "\"TokenType\":\"JWT\"" +

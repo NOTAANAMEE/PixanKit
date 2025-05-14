@@ -1,4 +1,4 @@
-﻿namespace PixanKit.LaunchCore.Log
+﻿namespace PixanKit.LaunchCore.Logger
 {
     /// <summary>
     /// Logger Output Class

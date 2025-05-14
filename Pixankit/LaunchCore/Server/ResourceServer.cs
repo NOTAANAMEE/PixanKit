@@ -28,7 +28,7 @@ namespace PixanKit.LaunchCore.Server
             {
                 try
                 {
-                    long pingtime = GetPing(item.BaseURL);
+                    long pingtime = GetPing(item.BaseUrl);
                     if (pingtime > 0)
                         dict.Add(new(pingtime, item));
                 }
@@ -58,7 +58,7 @@ namespace PixanKit.LaunchCore.Server
         public long Ping()
         {
             if (Current == null) throw new Exception();
-            return GetPing(Current.BaseURL);
+            return GetPing(Current.BaseUrl);
         }
 
         /// <summary>
@@ -86,18 +86,18 @@ namespace PixanKit.LaunchCore.Server
         /// <summary>
         /// Replaces the Vanilla URL of a resource with the corresponding URL from the current mirror server.
         /// </summary>
-        /// <param name="OriginalUrl">The Vanilla URL of the resource.</param>
+        /// <param name="originalUrl">The Vanilla URL of the resource.</param>
         /// <returns>The URL of the resource on the current mirror server.</returns>
-        protected string Replace(string OriginalUrl)
+        protected string Replace(string originalUrl)
         {
             if (Current == null) throw new Exception();
-            return Current.Replace(OriginalUrl);
+            return Current.Replace(originalUrl);
         }
 
-        private static string GetHost(string OriginalUrl)
+        private static string GetHost(string originalUrl)
         {
 
-            Uri uri = new(OriginalUrl);
+            Uri uri = new(originalUrl);
             return uri.Host;
 
         }

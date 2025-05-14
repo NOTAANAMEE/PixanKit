@@ -1,4 +1,4 @@
-﻿using PixanKit.LaunchCore.Log;
+﻿using PixanKit.LaunchCore.Logger;
 using PixanKit.ResourceDownloader.Tasks.FuncTask;
 
 namespace PixanKit.ResourceDownloader.Download.DownloadTask
@@ -12,7 +12,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         public long Size { get => _end - _start + 1; }
 
         /// <inheritdoc/>
-        public long DownloadedBytes { get => downloadedBytes; }
+        public long DownloadedBytes { get => _downloadedBytes; }
 
         /// <inheritdoc/>
         public int TotalFiles { get => 0; }
@@ -24,7 +24,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
 
         long _end;
 
-        long downloadedBytes;
+        long _downloadedBytes;
 
         readonly Stream _stream;
 
@@ -44,7 +44,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         public DownloadThread(string url, Stream stream, long start, long end, object lockobj) :
             this(stream, lockobj)
         {
-            SetURL(url, start, end);
+            SetUrl(url, start, end);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// <param name="url"></param>
         /// <param name="start"></param>
         /// <param name="end"></param>
-        public void SetURL(string url, long start, long end)
+        public void SetUrl(string url, long start, long end)
         {
             _url = url;
             _start = start;
@@ -106,11 +106,11 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             {
                 lock (_lock)
                 {
-                    _stream.Position = _start + downloadedBytes;
+                    _stream.Position = _start + _downloadedBytes;
                     _stream.Write(buffer, 0, bytesRead);
                 }
-                downloadedBytes += bytesRead;
-                progress((double)downloadedBytes / Size);
+                _downloadedBytes += bytesRead;
+                progress((double)_downloadedBytes / Size);
             }
         }
     }

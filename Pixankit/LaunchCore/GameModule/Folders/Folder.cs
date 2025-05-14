@@ -1,49 +1,36 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Core;
-using PixanKit.LaunchCore.Extention;
+using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.Json;
-using PixanKit.LaunchCore.Log;
 
-namespace PixanKit.LaunchCore.GameModule
+namespace PixanKit.LaunchCore.GameModule.Folders
 {
     /// <summary>
     /// Folder Class<br/> An Abstraction For A .minecraft Folder
     /// </summary>
-    public partial class Folder : IToJSON
+    public partial class Folder : IToJson
     {
         #region Properties
         /// <summary>
         /// The path of the folder. Like C:/Users/admin/AppData/Roaming/.minecraft
         /// </summary>
-        public string FolderPath
-        {
-            get => _folderpath;
-        }
+        public string FolderPath => _folderPath;
 
         /// <summary>
         /// The path of the library folder. FolderPath + "/libraries"
         /// </summary>
-        public string LibraryDirPath
-        {
-            get => FolderPath + "/libraries";
-        }
+        public string LibraryDirPath => FolderPath + "/libraries/";
 
         /// <summary>
         /// The path of the Assets folder. FolderPath + "/assets"
         /// </summary>
-        public string AssetsDirPath
-        {
-            get => FolderPath + "/assets";
-        }
+        public string AssetsDirPath => FolderPath + "/assets/";
 
         /// <summary>
         /// The path of the version folder. <c>FolderPath</c> + "/versions"
         /// </summary>
-        public string VersionDirPath
-        {
-            get => FolderPath + "/versions";
-        }
+        public string VersionDirPath => FolderPath + "/versions/";
 
         /// <summary>
         /// An Alias Of The Folder<br/>
@@ -54,18 +41,12 @@ namespace PixanKit.LaunchCore.GameModule
         /// <summary>
         /// The Array Of The Minecraft Games In The <c>Folder</c>
         /// </summary>
-        public GameBase[] Games
-        {
-            get => [.. _games];
-        }
+        public GameBase[] Games => [.. _games];
 
         /// <summary>
         /// The Count Of Minecraft Games In The <c>Folder</c>
         /// </summary>
-        public int Count
-        {
-            get => _games.Count;
-        }
+        public int Count => _games.Count;
         #endregion
 
         #region Fields
@@ -92,7 +73,7 @@ namespace PixanKit.LaunchCore.GameModule
 
         private readonly List<GameBase> _games = [];
 
-        private string _folderpath = "";
+        private string _folderPath = "";
         #endregion
 
         #region Methods
@@ -103,7 +84,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// <c>"C:\\Users\\Admin\\AppData\\Roaming\\.minecrafy"</c></param>
         public Folder(string path)
         {
-            _folderpath = path.Replace("\\", "/");
+            _folderPath = path.Replace("\\", "/");
         }
 
         /// <summary>
@@ -118,7 +99,7 @@ namespace PixanKit.LaunchCore.GameModule
         /// }</c></param>
         public Folder(JObject jData)
         {
-            LoadFromJSON(jData);
+            LoadFromJson(jData);
         }
 
         internal void InitGames()
@@ -128,30 +109,27 @@ namespace PixanKit.LaunchCore.GameModule
             foreach (string dir in dirs)
             {
                 GameBase game;
-                var tmpdir = dir.Replace("\\", "/");
                 try
                 {
-                    game = Initors.GameInitor(tmpdir) ?? throw new Exception();
+                    
+                    game = 
+                        Initers.GameIniter(this, Path.GetFileName(dir) ?? "") 
+                           ?? throw new Exception();
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex.Message);
-                    Logger.Error("\n" + ex.StackTrace);
-                    Logger.Error($"{dir} Is Not A Minecraft Game");
+                    Logger.Logger.Error(ex.Message);
+                    Logger.Logger.Error("\n" + ex.StackTrace);
+                    Logger.Logger.Error($"{dir} Is Not A Minecraft Game");
                     continue;
                 }
-
-                if (game != null)
-                {
-                    _games.Add(game);
-                    Logger.Info($"Folder {FolderPath} Add Game {game.GameJarFilePath}");
-                    GameManager.OnGameLoaded?.Invoke(game);
-                }
+                _games.Add(game);
+                Logger.Logger.Info("Game Initialized");
             }
-            Logger.Info($"Folder {FolderPath} Added");
+            Logger.Logger.Info($"Folder {FolderPath} Added");
         }
 
-        internal void AddGame(GameBase game)
+        public void AddGame(GameBase game)
         {
             _games.Add(game);
             OnGameChanged?.Invoke();
@@ -208,9 +186,9 @@ namespace PixanKit.LaunchCore.GameModule
             string[] dirs = Directory.GetDirectories(VersionDirPath);
             foreach (string dir in dirs)
             {
-                foreach (GameBase game in _games) if (game.Name == dir) continue;
-                GameBase? tmp = Initors.GameInitor(dir);
-                if (tmp != null) AddGame(tmp);
+                foreach (var game in _games.Where(game => game.Name == dir)) continue;
+                AddGame(
+                    Initers.GameIniter(this, Path.GetFileName(dir) ?? ""));
             }
         }
 

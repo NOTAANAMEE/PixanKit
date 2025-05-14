@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Extention;
-using PixanKit.LaunchCore.JavaModule.Java;
-using PixanKit.LaunchCore.Log;
+﻿using PixanKit.LaunchCore.Extension;
 
 namespace PixanKit.LaunchCore.Core
 {
@@ -13,11 +10,11 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         public void Close()
         {
-            Logger.Info("Launcher Closing");
+            Logger.Logger.Info("Launcher Closing");
             Files.FolderJData  = GameManager.Save();
             Files.RuntimeJData = JavaManager.Save();
             Files.PlayerJData  = PlayerManager.Save();
-            Logger.Info("Launcher Closed. Call Files.Save() To Save Or Handle It Yourself");
+            Logger.Logger.Info("Launcher Closed. Call Files.Save() To Save Or Handle It Yourself");
             OnLauncherClosed?.Invoke();
         }
     }

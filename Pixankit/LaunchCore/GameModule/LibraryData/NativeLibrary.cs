@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Json;
-using PixanKit.LaunchCore.Log;
 using PixanKit.LaunchCore.SystemInf;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
 
 namespace PixanKit.LaunchCore.GameModule.LibraryData
@@ -11,58 +11,76 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
     /// </summary>
     public class NativeLibrary : LibraryBase
     {
-        private string[] Exclude = [];
+        #region Fields
+        private string[] _exclude = [];
 
         /// <summary>
         /// Gets the path of the library.
         /// </summary>
         public override string LibraryPath => "${library_directory}" + Name;
+        #endregion
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NativeLibrary"/> class with the specified JSON data.
-        /// </summary>
-        /// <param name="libraryJData">The JSON data representing the native library.</param>
-        public NativeLibrary(JObject libraryJData) : base()
-        {
-            libraryType = LibraryType.Native;
-            string OSKey =
-                libraryJData.GetOrDefault(Format.ToString,
-                $"natives/{SysInfo.OSName}", "");
-
-            JObject current = libraryJData.GetValue(Format.ToJObject, $"downloads/classifiers/{OSKey}");
-            _name = current.GetValue(Format.ToString, "path");
-            _sha1 = current.GetValue(Format.ToString, "sha1");
-            _url = current.GetValue(Format.ToString, "url");
-
-            List<string> excludelist = [];
-            if (libraryJData.TryGetValue(Format.ToJArray, "extract/exclude", out JArray? array))
-            {
-                foreach (JToken token in array ?? [])
-                    excludelist.Add(token.ToString());
-            }
-            Exclude = [.. excludelist];
-        }
-
+        #region Init
         /// <summary>
         /// Initializes a new instance of the <see cref="NativeLibrary"/> class for internal use without extraction.
         /// </summary>
-        protected internal NativeLibrary() : base()
+        private NativeLibrary() : base()
         {
-            libraryType = LibraryType.Native;
+            LibraryType = LibraryData.LibraryType.Native;
         }
+        #endregion
 
+        #region Factory
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="libraryJData"></param>
+        /// <param name="library"></param>
+        /// <returns></returns>
+        public static bool CreateInstance(JObject libraryJData, [NotNullWhen(true)]out LibraryBase? library)
+        {
+            library = null;
+            string osKey =
+                libraryJData.GetOrDefault(Format.ToString,
+                    $"natives/{SysInfo.OsName}", "null");
+            if (osKey == "null") return false;
+            
+            JObject current = libraryJData.GetValue(Format.ToJObject, $"downloads/classifiers/{osKey}");
+            string path = current.GetValue(Format.ToString, "path");
+            string sha1 = current.GetValue(Format.ToString, "sha1");
+            string url = current.GetValue(Format.ToString, "url");
+            
+            List<string> excludelist = [];
+            if (libraryJData.TryGetValue(Format.ToJArray, "extract/exclude", out JArray? array))
+            {
+                excludelist.AddRange(from token in array ?? [] select token.ToString());
+            }
+
+            library = new NativeLibrary()
+            {
+                Name = path,
+                Sha1 = sha1,
+                Url = url,
+                _exclude = [.. excludelist],
+                LibraryType = LibraryData.LibraryType.Native
+            };
+            return true;
+        }
+        #endregion
+        
+        #region Methods
         /// <summary>
         /// Extracts the files in the native library's JAR file to the specified directory.
         /// </summary>
-        /// <param name="librarypath">The library directory</param>
+        /// <param name="libraryPath">The library directory</param>
         /// <param name="nativesPath">The directory to extract files to.</param>
-        public void Extract(string librarypath, string nativesPath)
+        public void Extract(string libraryPath, string nativesPath)
         {
-            FileStream fs = new(LibraryPath.Replace("${library_directory}", librarypath + '/'), FileMode.Open);
+            FileStream fs = new(LibraryPath.Replace("${library_directory}", libraryPath + '/'), FileMode.Open);
             ZipArchive archive = new(fs);
             foreach (ZipArchiveEntry entry in archive.Entries)
             {
-
                 if (!NeedsDecompress(entry.FullName))
                     continue;
                 Decompress(entry, nativesPath);
@@ -77,23 +95,20 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <returns><c>true</c> if the file should be included; otherwise, <c>false</c>.</returns>
         private bool NeedsDecompress(string fullPath)
         {
-            foreach (string path in Exclude)
-            {
-                if (fullPath.StartsWith(path)) return false;
-            }
-            return true;
+            return _exclude.All(path => !fullPath.StartsWith(path));
         }
 
-        private void Decompress(ZipArchiveEntry entry, string nativesdirpath)
+        private static void Decompress(ZipArchiveEntry entry, string nativesDirPath)
         {
             if (entry.FullName.EndsWith('/')) return;
-            string fullPath = $"{nativesdirpath}/{entry.FullName}";
+            string fullPath = $"{nativesDirPath}/{entry.FullName}";
             Directory.CreateDirectory(Path.GetDirectoryName(fullPath) ?? "./");
             if (File.Exists(fullPath))
-                Logger.Info($"{fullPath} Already exists, canceled");
+                Logger.Logger.Info($"{fullPath} Already exists, canceled");
             else
                 entry.ExtractToFile(fullPath);
-            Logger.Info($"Finish decompressing {fullPath}");
+            Logger.Logger.Info($"Finish decompressing {fullPath}");
         }
+        #endregion
     }
 }

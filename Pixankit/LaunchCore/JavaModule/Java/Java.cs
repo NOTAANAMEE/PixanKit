@@ -8,7 +8,7 @@ namespace PixanKit.LaunchCore.JavaModule.Java
     /// <summary>
     /// The JavaRuntime Class To Choose suitable Java runtime
     /// </summary>
-    public partial class JavaRuntime : IToJSON
+    public partial class JavaRuntime : IToJson
     {
         /// <summary>
         /// From Java 8 to Java 11 or later
@@ -37,7 +37,7 @@ namespace PixanKit.LaunchCore.JavaModule.Java
         /// <summary>
         /// The path of java.exe
         /// </summary>
-        public string JavaEXE
+        public string JavaExe
         {
             get => BinaryFolder + "/java.exe";
         }
@@ -45,7 +45,7 @@ namespace PixanKit.LaunchCore.JavaModule.Java
         /// <summary>
         /// The path of javaw.exe
         /// </summary>
-        public string JavawEXE
+        public string JavawExe
         {
             get => BinaryFolder + "/javaw.exe";
         }
@@ -81,15 +81,15 @@ namespace PixanKit.LaunchCore.JavaModule.Java
         /// <param name="jData"></param>
         public JavaRuntime(JObject jData)
         {
-            LoadFromJSON(jData);
+            LoadFromJson(jData);
         }
 
         private void GetVersion()
         {
-            if (!File.Exists(JavaEXE)) throw new FileNotFoundException($"File Not Found. Target File:{JavaEXE}");
+            if (!File.Exists(JavaExe)) throw new FileNotFoundException($"File Not Found. Target File:{JavaExe}");
             ProcessStartInfo processStartInfo = new()
             {
-                FileName = JavaEXE,
+                FileName = JavaExe,
                 Arguments = "-version",
                 RedirectStandardError = true,
                 CreateNoWindow = true,

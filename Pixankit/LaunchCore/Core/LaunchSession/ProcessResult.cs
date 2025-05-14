@@ -1,4 +1,4 @@
-﻿namespace PixanKit.LaunchCore.Core
+﻿namespace PixanKit.LaunchCore.Core.LaunchSession
 {
     /// <summary>
     /// Represents the result of a Minecraft process.
@@ -18,7 +18,7 @@
         /// <summary>
         /// Gets or sets the path to the log file, which is a .tar.gz archive.
         /// </summary>
-        public string LogGZPath;
+        public string LogGzPath;
 
         /// <summary>
         /// Gets or sets the path to the crash file, if applicable.

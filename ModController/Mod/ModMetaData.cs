@@ -16,7 +16,7 @@ namespace PixanKit.ModController.Mod
         /// <summary>
         /// Gets or sets the unique identifier of the mod.
         /// </summary>
-        public string ModID { get; set; } = "Unkonwn";
+        public string ModId { get; set; } = "Unkonwn";
 
         /// <summary>
         /// Gets or sets the name of the mod.
@@ -36,7 +36,7 @@ namespace PixanKit.ModController.Mod
         /// <summary>
         /// The lock object for synchronizing access to <see cref="ModFiles"/>.
         /// </summary>
-        public readonly object ModFiles_Locker = new();
+        public readonly object ModFilesLocker = new();
 
         /// <summary>
         /// Gets or sets the cached path of the mod icon.
@@ -64,7 +64,7 @@ namespace PixanKit.ModController.Mod
             modFile.MetaData = this;
             mcversion = modFile.Owner?.Owner?.Version ??
                 throw new NullReferenceException();
-            lock (ModFiles_Locker)
+            lock (ModFilesLocker)
             {
                 if (!ModFiles.TryGetValue(mcversion, out var list))
                     ModFiles.Add(mcversion, [modFile]);
@@ -84,7 +84,7 @@ namespace PixanKit.ModController.Mod
                 throw new InvalidOperationException(
                     "Please implement IModVersionGetter before using this method");
             var jarray = await ModModule.Instance.ModVersionGetter.
-                GetVersionsAsync(ModID, token);
+                GetVersionsAsync(ModId, token);
             ReadUpdate(jarray);
         }
 
@@ -112,11 +112,11 @@ namespace PixanKit.ModController.Mod
         /// Converts the mod metadata to JSON format.
         /// </summary>
         /// <returns>A <see cref="JObject"/> containing the mod metadata.</returns>
-        public JObject ToJSON()
+        public JObject ToJson()
         {
             return new()
             {
-                { "id", ModID },
+                { "id", ModId },
                 { "name", Name },
                 { "description", Description },
                 { "icon", ImageCache },

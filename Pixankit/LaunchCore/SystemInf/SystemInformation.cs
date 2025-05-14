@@ -1,5 +1,4 @@
-﻿using PixanKit.LaunchCore.Log;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace PixanKit.LaunchCore.SystemInf
@@ -11,16 +10,16 @@ namespace PixanKit.LaunchCore.SystemInf
     {
         static SysInfo()
         {
-            SetOS();
+            SetOs();
             SetArch();
         }
 
-        private static void SetOS()
+        private static void SetOs()
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) OSName = "windows";
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) OSName = "linux";
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) OSName = "osx";
-            else OSName = "others";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) OsName = "windows";
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) OsName = "linux";
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) OsName = "osx";
+            else OsName = "others";
         }
 
         private static void SetArch()
@@ -28,21 +27,21 @@ namespace PixanKit.LaunchCore.SystemInf
             switch (RuntimeInformation.ProcessArchitecture)
             {
                 case Architecture.X86:
-                    CPUArch = "x86";
+                    CpuArch = "x86";
                     break;
                 case Architecture.X64:
-                    CPUArch = "x86_64";
+                    CpuArch = "x86_64";
                     break;
                 case Architecture.Arm:
-                    CPUArch = "arm";
+                    CpuArch = "arm";
                     break;
                 case Architecture.Arm64:
-                    CPUArch = "arm64";
+                    CpuArch = "arm64";
                     break;
                 default:
-                    CPUArch = "other";
-                    Logger.Warn("The Program And Minecraft might not be able to run on your PC" +
-                        ", The game might crash");
+                    CpuArch = "other";
+                    Logger.Logger.Warn("The Program And Minecraft might not be able to run on your PC" +
+                                       ", The game might crash");
                     break;
             }
         }
@@ -54,7 +53,7 @@ namespace PixanKit.LaunchCore.SystemInf
         /// osx: OSX, MacOS 11 -> Latest MacOS<br/>
         /// unix: others<br/>
         /// </summary>
-        public static string OSName { get; private set; } = "windows";
+        public static string OsName { get; private set; } = "windows";
 
         /// <summary>
         /// Represents the architecture of the cpu
@@ -64,7 +63,7 @@ namespace PixanKit.LaunchCore.SystemInf
         /// arm64: Arm64 AArch64 Arm_v8
         /// arm: Arm A32
         /// </summary>
-        public static string CPUArch { get; private set; } = "x86_64";
+        public static string CpuArch { get; private set; } = "x86_64";
 
         /// <summary>
         /// Gets the available memory size in megabytes.

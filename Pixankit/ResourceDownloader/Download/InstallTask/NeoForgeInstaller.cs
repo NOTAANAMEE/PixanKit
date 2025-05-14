@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Core;
-using PixanKit.LaunchCore.Extention;
-using PixanKit.LaunchCore.GameModule;
+using PixanKit.LaunchCore.Extension;
+using PixanKit.LaunchCore.GameModule.Folders;
 using PixanKit.LaunchCore.JavaModule;
 using PixanKit.LaunchCore.Server;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
@@ -17,23 +17,23 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     public class NeoForgeInstaller : SequenceProgressTask
     {
 
-        Folder Owner;
+        Folder _owner;
 
-        string Name;
+        string _name;
 
-        string version;
+        string _version;
 
-        JObject neoforgeversion;
+        JObject _neoforgeversion;
 
-        string installerpath { get => $"{Files.CacheDir}/Installer/neoforge.jar"; }
+        string Installerpath { get => $"{Files.CacheDir}/Installer/neoforge.jar"; }
 
-        string url = "";
+        string _url = "";
 
-        FuncProgressTask<int> InitTask = new();
+        FuncProgressTask<int> _initTask = new();
 
-        AsyncProgressTask? DownloadTask;
+        AsyncProgressTask? _downloadTask;
 
-        CLITask? CommandTask;
+        CliTask? _commandTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NeoForgeInstaller"/> class.
@@ -44,17 +44,17 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// <param name="neoforgeversion">The JSON object containing the NeoForge version details.</param>
         public NeoForgeInstaller(Folder folder, string name, string mcversion, JObject neoforgeversion)
         {
-            Owner = folder;
-            Name = name;
-            version = mcversion;
-            this.neoforgeversion = neoforgeversion;
+            _owner = folder;
+            _name = name;
+            _version = mcversion;
+            this._neoforgeversion = neoforgeversion;
             Init();
         }
 
         private void Init()
         {
-            InitTask.Function += Init;
-            Add(InitTask);
+            _initTask.Function += Init;
+            Add(_initTask);
             AddDownloadTask();
             AddCommandTask();
         }
@@ -62,16 +62,16 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
 
         private void AddDownloadTask()
         {
-            DownloadTask = new();
-            FileDownloadTask download = new("", installerpath);
-            InitTask.OnFinish += (a) =>
+            _downloadTask = new();
+            FileDownloadTask download = new("", Installerpath);
+            _initTask.OnFinish += (a) =>
             {
-                download.SetURL(url);
+                download.SetUrl(_url);
             };
-            if (Owner.FindGame(version) == null)
-                DownloadTask.Add(new VanillaMinimalInstallTask(Owner, version, version));
-            DownloadTask.Add(download);
-            Add(DownloadTask);
+            if (_owner.FindGame(_version) == null)
+                _downloadTask.Add(new VanillaMinimalInstallTask(_owner, _version, _version));
+            _downloadTask.Add(download);
+            Add(_downloadTask);
         }
 
         private void AddCommandTask()
@@ -80,19 +80,19 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                 throw new InvalidOperationException("Launcher hasn't inited yet");
             var java = JavaChooser.Newest(Launcher.Instance.JavaManager.JavaRuntimes) ??
                 throw new InvalidOperationException("No available java found");
-            CommandTask = new(java.JavaEXE, $"-jar \"{installerpath}\" --installClient " +
-                $"\"{Owner.FolderPath}\"");
-            ProgressTasks.Add(CommandTask);
-            CommandTask.OnFinish += (a) =>
+            _commandTask = new(java.JavaExe, $"-jar \"{Installerpath}\" --installClient " +
+                $"\"{_owner.FolderPath}\"");
+            ProgressTasks.Add(_commandTask);
+            _commandTask.OnFinish += (a) =>
             {
-                GamePostProcess.Move(Owner, $"neoforge-{neoforgeversion["version"]}", Name);
+                GamePostProcess.Move(_owner, $"neoforge-{_neoforgeversion["version"]}", _name);
             };
         }
 
         private async Task<int> Init(Action<double> progress, CancellationToken token)
         {
-            url = await ServerList.ModLoaderServers["neoforge"]
-                    .GetURL(neoforgeversion, token);
+            _url = await ServerList.ModLoaderServers["neoforge"]
+                    .GetUrl(_neoforgeversion, token);
             if (token.IsCancellationRequested) return 1;
             progress(1.0);
             return 0;

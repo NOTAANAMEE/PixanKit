@@ -9,7 +9,7 @@ namespace PixanKit.ModController.ModReader
     /// <summary>
     /// The config parser class for the old version(1.12.x) Forge mod files.
     /// </summary>
-    public static class FOVModParser
+    public static class FovModParser
     {
         #region Logic
         /// <summary>
@@ -32,14 +32,14 @@ namespace PixanKit.ModController.ModReader
                 throw new Exception("Invalid JSON: No mod data found");
 
             var modEntry = (JObject)modArray[0];
-            var modID = GetID(modEntry);
+            var modId = GetId(modEntry);
 
-            LoadModFile(modCollection, modID,
+            LoadModFile(modCollection, modId,
                 modEntry, archive,
                 out var deplist,
                 out var version, out var releaseDate);
 
-            var metaData = LoadMetaData(modID, modEntry, archive);
+            var metaData = LoadMetaData(modId, modEntry, archive);
 
             ModFile modFile = new(filepath)
             {
@@ -52,22 +52,22 @@ namespace PixanKit.ModController.ModReader
             return modFile;
         }
 
-        private static string GetID(JObject modEntry)
+        private static string GetId(JObject modEntry)
             => modEntry.GetValue(Format.ToString, "modid");
 
-        private static ModMetaData LoadMetaData(string modID, JObject modEntry, ZipArchive archive)
+        private static ModMetaData LoadMetaData(string modId, JObject modEntry, ZipArchive archive)
         {
             if (ModModule.Instance == null) throw new InvalidOperationException();
 
-            if (!ModModule.Instance.ModDatas.TryGetValue(modID, out var metaData))
+            if (!ModModule.Instance.ModDatas.TryGetValue(modId, out var metaData))
             {
                 metaData = new ModMetaData
                 {
-                    ModID = modID,
+                    ModId = modId,
                     Description = modEntry.GetDescription(),
                     Authors = modEntry.GetAuthors(),
-                    ImageCache = FMLModParser.
-                        LoadIcon(archive, modEntry.GetIcon(), modID),
+                    ImageCache = FmlModParser.
+                        LoadIcon(archive, modEntry.GetIcon(), modId),
                     Name = modEntry.GetName()
                 };
                 ModModule.Instance?.AddMetaData(metaData);
@@ -75,14 +75,14 @@ namespace PixanKit.ModController.ModReader
             return metaData ?? throw new Exception("Exception avoid null warning");
         }
 
-        private static void LoadModFile(ModCollection modCollection, string modID,
+        private static void LoadModFile(ModCollection modCollection, string modId,
             JObject modEntry, ZipArchive archive,
             out List<string> depList, out string version, out DateTime releaseDate
             )
         {
             var entry = archive.GetEntry("META-INF/MANIFEST.MF");
             releaseDate = entry?.LastWriteTime.UtcDateTime ?? DateTime.UtcNow;
-            modCollection.ModCache.TryGetValue(Format.ToJObject, modID, out var modData);
+            modCollection.ModCache.TryGetValue(Format.ToJObject, modId, out var modData);
 
             if (modData == null)
             {

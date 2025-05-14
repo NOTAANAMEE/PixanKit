@@ -1,23 +1,23 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Json;
 
-namespace PixanKit.LaunchCore.GameModule
+namespace PixanKit.LaunchCore.GameModule.Folders
 {
     public partial class Folder
     {
         /// <inheritdoc/>
-        public void LoadFromJSON(JObject obj)
+        public void LoadFromJson(JObject obj)
         {
-            _folderpath = obj.GetOrDefault(Format.ToString, "path", "").Replace("\\", "/");
+            _folderPath = obj.GetOrDefault(Format.ToString, "path", "").Replace("\\", "/");
             Alias = obj.GetOrDefault(Format.ToString, "alias", ""); ;
         }
 
         /// <inheritdoc/>
-        public JObject ToJSON()
+        public JObject ToJson()
         {
             return new JObject()
             {
-                { "path" , _folderpath },
+                { "path" , _folderPath },
                 { "alias" , Alias },
             };
         }

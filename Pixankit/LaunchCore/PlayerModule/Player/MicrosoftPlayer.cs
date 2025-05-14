@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Extention;
+using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.Json;
 using PixanKit.LaunchCore.PlayerModule.MojangAPI;
 
@@ -13,33 +13,30 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// <summary>
         /// Gets the latest login time. Re-login is required after 1 day.
         /// </summary>
-        public DateTime LatestLoginTime { get => _latestLoginTime; }
+        public DateTime LatestLoginTime  => _latestLoginTime;
 
         /// <summary>
         /// Gets the URL of the player's skin. Different images correspond to different URLs.
         /// </summary>
-        public string SkinURL { get => _skinURL; }
+        public string SkinUrl => _skinUrl; 
 
         /// <summary>
         /// Gets the URL of the player's cape.
         /// </summary>
-        public string CapeURL { get => _capeURL; }
+        public string CapeUrl => _capeUrl; 
 
         /// <summary>
-        /// Gets the local cache path of the skin. It automatically updates if the <see cref="SkinURL"/> changes.
+        /// Gets the local cache path of the skin. It automatically updates if the <see cref="SkinUrl"/> changes.
         /// </summary>
-        public string SkinCachePath
-        {
-            get => Files.SkinCacheDir + $"/{UID}-skin.png";
-        }
+        public string SkinCachePath => Files.SkinCacheDir + $"/{Uid}-skin.png";
 
         private DateTime _latestLoginTime;
 
-        private string _skinURL = "";
+        private string _skinUrl = "";
 
-        private string _capeURL = "";
+        private string _capeUrl = "";
 
-        private string refreshtoken = "";
+        private string _refreshtoken = "";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MicrosoftPlayer"/> class using JSON data.
@@ -47,13 +44,13 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// <param name="jData">The JSON data representing the player.</param>
         public MicrosoftPlayer(JObject jData) : base(jData)
         {
-            _type = PlayerType.microsoft;
+            Type = PlayerType.Microsoft;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MicrosoftPlayer"/> class for internal use.
         /// </summary>
-        protected MicrosoftPlayer() { _type = PlayerType.microsoft; }
+        protected MicrosoftPlayer() { Type = PlayerType.Microsoft; }
 
         /// <summary>
         /// Logs in a player using a login code.
@@ -62,22 +59,22 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// <returns>A task representing the asynchronous operation, with a <see cref="MicrosoftPlayer"/> as the result.</returns>
         public static async Task<MicrosoftPlayer> Login(string loginCode)
         {
-            Server.Servers.Microsoft.MSLoginServer.MSAuthorize ret1 = await MojangLogin.GetMSToken(loginCode);
+            Server.Servers.Microsoft.MsLoginServer.MsAuthorize ret1 = await MojangLogin.GetMsToken(loginCode);
             Server.Servers.Microsoft.XboxServer.XboxAuthorize ret2 = await MojangLogin.XBoxAuthorize(ret1.MSaccessToken);
-            Server.Servers.Microsoft.XSTSServer.XSTSVerification ret3 = await MojangLogin.XSTSVerification(ret2.Xboxtoken);
+            Server.Servers.Microsoft.XstsServer.XstsVerification ret3 = await MojangLogin.XstsVerification(ret2.Xboxtoken);
             string ret4 = await MojangLogin.MinecraftAccessToken(ret3);
             Server.Servers.Mojang.MojangLoginServer.PlayerInf ret5 = await MojangLogin.MinecraftUid(ret4);
             MicrosoftPlayer player = new()
             {
                 _name = ret5.Name,
                 _uid = ret5.Uid,
-                _skinURL = ret5.SkinUrl,
-                _accesstoken = ret4,
-                refreshtoken = ret1.MSrefreshToken,
+                _skinUrl = ret5.SkinUrl,
+                _accessToken = ret4,
+                _refreshtoken = ret1.MSrefreshToken,
                 _latestLoginTime = DateTime.Now,
-                _type = PlayerType.microsoft,
+                Type = PlayerType.Microsoft,
             };
-            player._capeURL = await MojangSkin.GetCapeURL(player);
+            player._capeUrl = await MojangSkin.GetCapeUrl(player);
             return player;
         }
 
@@ -90,17 +87,17 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
             TimeSpan span = DateTime.Now - LatestLoginTime;
             if (span.Days >= 1)
             {
-                Server.Servers.Microsoft.MSLoginServer.MSAuthorize ret1 = await MojangLogin.RefreshMSToken(refreshtoken);
+                Server.Servers.Microsoft.MsLoginServer.MsAuthorize ret1 = await MojangLogin.RefreshMsToken(_refreshtoken);
                 Server.Servers.Microsoft.XboxServer.XboxAuthorize ret2 = await MojangLogin.XBoxAuthorize(ret1.MSaccessToken);
-                Server.Servers.Microsoft.XSTSServer.XSTSVerification ret3 = await MojangLogin.XSTSVerification(ret2.Xboxtoken);
-                _accesstoken = await MojangLogin.MinecraftAccessToken(ret3);
-                refreshtoken = ret1.MSrefreshToken;
+                Server.Servers.Microsoft.XstsServer.XstsVerification ret3 = await MojangLogin.XstsVerification(ret2.Xboxtoken);
+                _accessToken = await MojangLogin.MinecraftAccessToken(ret3);
+                _refreshtoken = ret1.MSrefreshToken;
             }
-            Server.Servers.Mojang.MojangLoginServer.PlayerInf ret5 = await MojangLogin.MinecraftUid(_accesstoken);
+            Server.Servers.Mojang.MojangLoginServer.PlayerInf ret5 = await MojangLogin.MinecraftUid(_accessToken);
             _name = ret5.Name;
             _uid = ret5.Uid;
-            if (_skinURL == ret5.SkinUrl && File.Exists(SkinCachePath)) return;
-            _skinURL = ret5.SkinUrl;
+            if (_skinUrl == ret5.SkinUrl && File.Exists(SkinCachePath)) return;
+            _skinUrl = ret5.SkinUrl;
             await RefreshSkinCache();
         }
 
@@ -111,7 +108,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         public async Task RefreshSkinCache()
         {
             HttpClient client = new();
-            Stream response = await client.GetStreamAsync(_skinURL);
+            Stream response = await client.GetStreamAsync(_skinUrl);
             FileStream fs = new(
                 SkinCachePath, FileMode.Create);
             response.CopyTo(fs);
@@ -120,16 +117,16 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         }
 
         /// <inheritdoc/>
-        public override void LoadFromJSON(JObject jData)
+        public override void LoadFromJson(JObject jData)
         {
-            base.LoadFromJSON(jData);
+            base.LoadFromJson(jData);
             _latestLoginTime =
                 jData.GetValue(Format.ToDateTime, "logintime");
-            _skinURL =
+            _skinUrl =
                 jData.GetValue(Format.ToString, "skinurl");
-            _capeURL =
+            _capeUrl =
                 jData.GetValue(Format.ToString, "capeurl");
-            refreshtoken =
+            _refreshtoken =
                 jData.GetValue(Format.ToString, "refreshtoken");
         }
 
@@ -137,13 +134,13 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// Converts the player's data to a JSON object.
         /// </summary>
         /// <returns>A <see cref="JObject"/> representing the player's data.</returns>
-        public override JObject ToJSON()
+        public override JObject ToJson()
         {
-            JObject jobj = base.ToJSON();
+            JObject jobj = base.ToJson();
             jobj.Add("logintime", _latestLoginTime);
-            jobj.Add("skinurl", _skinURL);
-            jobj.Add("capeurl", _capeURL);
-            jobj.Add("refreshtoken", refreshtoken);
+            jobj.Add("skinurl", _skinUrl);
+            jobj.Add("capeurl", _capeUrl);
+            jobj.Add("refreshtoken", _refreshtoken);
             return jobj;
         }
     }

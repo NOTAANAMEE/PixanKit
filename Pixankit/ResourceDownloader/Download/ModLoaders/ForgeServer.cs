@@ -33,15 +33,15 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         /// </summary>
         public class OfficialForgeMirror : ModLoaderMirror
         {
-            HttpClient client = new();
+            HttpClient _client = new();
 
             /// <summary>
             /// Initializes a new instance of the <see cref="OfficialForgeMirror"/> class.
             /// </summary>
             public OfficialForgeMirror()
             {
-                BaseURL = "https://files.minecraftforge.net";
-                OriginalURL = "";
+                BaseUrl = "https://files.minecraftforge.net";
+                OriginalUrl = "";
             }
 
             /// <inheritdoc/>
@@ -50,7 +50,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the builds exist.</returns>
             public override async Task<bool> CheckBuild(string mcversion, CancellationToken token)
             {
-                var response = await client.GetAsync(
+                var response = await _client.GetAsync(
                     "https://files.minecraftforge.net/net/minecraftforge/forge/", token);
                 if (token.IsCancellationRequested) return false;
                 var content = await response.Content.ReadAsStringAsync(token);
@@ -75,7 +75,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// </returns>
             public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
-                var response = await client.GetAsync(
+                var response = await _client.GetAsync(
                     $"https://files.minecraftforge.net/net/minecraftforge/forge/index_{mcversion}.html", token);
                 if (token.IsCancellationRequested) return [];
                 var content = await response.Content.ReadAsStreamAsync(token);
@@ -114,7 +114,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <returns>
             /// A task that represents the asynchronous operation. The task result contains the URL of the mod loader installer.
             /// </returns>
-            public override Task<string> GetURL(JObject modloaderinf, CancellationToken token)
+            public override Task<string> GetUrl(JObject modloaderinf, CancellationToken token)
                 => Task.FromResult(Replace(modloaderinf["url"]?.ToString() ?? ""));
 
         }

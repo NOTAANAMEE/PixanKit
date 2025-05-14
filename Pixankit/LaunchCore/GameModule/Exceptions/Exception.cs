@@ -1,6 +1,4 @@
-﻿using PixanKit.LaunchCore.Log;
-
-namespace PixanKit.LaunchCore.GameModule.Exceptions
+﻿namespace PixanKit.LaunchCore.GameModule.Exceptions
 {
     /// <summary>
     /// Library/Token Does Not Support Your System
@@ -16,7 +14,7 @@ namespace PixanKit.LaunchCore.GameModule.Exceptions
         {
             SupportedSystem = aimedsystem;
             CurrentSystem = currentsystem;
-            Logger.Error(Message);
+            Logger.Logger.Error(Message);
         }
 
         /// <summary>

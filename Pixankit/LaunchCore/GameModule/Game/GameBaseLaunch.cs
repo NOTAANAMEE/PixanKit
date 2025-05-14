@@ -1,8 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using PixanKit.LaunchCore.Core;
 using PixanKit.LaunchCore.GameModule.LibraryData;
-using PixanKit.LaunchCore.Log;
 using PixanKit.LaunchCore.SystemInf;
-using System.Text.RegularExpressions;
 
 namespace PixanKit.LaunchCore.GameModule.Game
 {
@@ -17,85 +15,38 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// This method replaces placeholders like <c>${natives_directory}</c> with actual paths
         /// and applies localization. It also incorporates JVM and game-specific arguments.
         /// </remarks>
-        public virtual string GetLaunchArgument()
+        public string GetLaunchArgument()
         {
-            string arg = GetJVMArguments() + $" {className} " + GetGameArguments();
+            string arg = GetArgument();
             arg = arg.Replace("${natives_directory}", $"\"{NativeDirPath}\"");
             arg = arg.Replace("${game_directory}", $"\"{GameRunningDirPath}\"");
             arg = arg.Replace("${assets_root}", $"\"{AssetsDirPath}\"");
-            arg = arg.Replace("${assets_index_name}", GetAssetsID());
-            arg = arg.Replace("${classpath}", "\"" + GetCPArgs() + "\"");
+            arg = arg.Replace("${assets_index_name}", GetAssetsId());
+            arg = arg.Replace("${classpath}", "\"" + GetCpArgs() + "\"");
             arg = arg.Replace("${version_name}", Version);
-            arg = arg.Replace("${version_type}", releaseType);
+            arg = arg.Replace("${version_type}", ReleaseType);
             arg = arg.Replace("${library_directory}", LibrariesDirPath + "/");
-            arg = Localize.CPLocalize(arg);
-            Logger.Info($"Arguments Generated. Targeted Game:{_gameFolderPath}");
-            if (Settings == null) return arg;
+            arg = Localize.CpLocalize(arg);
+            Logger.Logger.Info($"Arguments Generated. Targeted Game:{GameFolderPath}");
             arg = (Settings["argument"] ?? 1).ToString() switch
             {
                 "overall" => "${arguments} " + arg,
-                _ => (Settings["arguments"] ?? 1).ToString() + " " + arg,
+                _ => (Settings["arguments"] ?? "") + " " + arg,
             };
             return arg;
         }
+
+        protected virtual string GetArgument()
+            => Params.JavaArgs + $" {Params.MainClass} " + Params.GameArgs;
+
+        protected virtual string GetAssetsId()
+            => Params.AssetsId;
 
         /// <summary>
         /// Checks whether the game is ready to launch.
         /// </summary>
         /// <returns><c>true</c> if the game can launch; otherwise, <c>false</c>.</returns>
         public virtual bool LaunchCheck() => true;
-
-        /// <summary>
-        /// Retrieves the Java Virtual Machine (JVM) arguments.
-        /// </summary>
-        /// <returns>A string containing the JVM arguments.</returns>
-        protected virtual string GetJVMArguments()
-            => javaArguments;
-
-        /// <summary>
-        /// Retrieves the game-specific arguments.
-        /// </summary>
-        /// <returns>A string containing the game arguments.</returns>
-        protected virtual string GetGameArguments()
-            => gameArguments;
-
-        /// <summary>
-        /// Retrieves game arguments for the same version game within the folder.
-        /// </summary>
-        /// <returns>A string containing the game arguments.</returns>
-        /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
-        protected string SameVersionGameArguments()
-        {
-            GameBase? target = Owner?.FindVersion(_version, GameType.Vanilla);
-            if (target == null)
-            {
-                Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
-            }
-            return target.GetGameArguments();
-        }
-
-        /// <summary>
-        /// Retrieves the assets ID for the game.
-        /// </summary>
-        /// <returns>A string containing the assets ID.</returns>
-        protected virtual string GetAssetsID()
-            => assetsID;
-
-        /// <summary>
-        /// Retrieves the assets ID for the same version game within the folder.
-        /// </summary>
-        /// <returns>A string containing the assets ID.</returns>
-        /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
-        protected string SameVersionAssetsID()
-        {
-            GameBase? target = Owner?.FindVersion(_version, GameType.Vanilla);
-            if (target == null)
-            {
-                Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
-            }
-            return target.GetAssetsID();
-
-        }
 
         /// <summary>
         /// Retrieves the classpath arguments for the game.
@@ -106,31 +57,18 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <remarks>
         /// The classpath includes library paths and the main game JAR path.
         /// </remarks>
-        protected virtual string GetCPArgs()
+        protected virtual string GetCpArgs()
         {
-            string classpath = "";
-            foreach (LibraryBase library in libraries)
-            {
-                classpath += library.LibraryPath + Localize.LocalParser;
-            }
+            string classpath = LibrariesRef.Libraries.Aggregate("", (current, library) => current + (library.LibraryPath + Localize.LocalParser));
             classpath += GameJarFilePath;
             return classpath;
         }
 
-        /// <summary>
-        /// Retrieves the classpath arguments for the same version game within the folder.
-        /// </summary>
-        /// <returns>A string containing the classpath arguments.</returns>
-        /// <exception cref="Exception">Thrown if the same version game cannot be found.</exception>
-        protected string SameVersionCPArgs()
+        internal static string GetCpArgs(IEnumerable<LibraryBase> libs)
         {
-            GameBase? target = Owner?.FindVersion(_version, GameType.Vanilla);
-            if (target == null)
-            {
-                Logger.Error($"Could Not Find {_version}"); throw new Exception("Could Not Find Version");
-            }
-            return target.GetCPArgs();
+            return libs.Aggregate("", (current, library) => current + (library.LibraryPath + Localize.LocalParser));
         }
+        
 
         /// <summary>
         /// Decompresses native libraries required for the game.
@@ -140,7 +78,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// It skips non-native libraries.
         /// </remarks>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public virtual async Task Decompress()
+       /* public virtual async Task Decompress()
         {
             foreach (LibraryBase library in libraries)
             {
@@ -153,77 +91,20 @@ namespace PixanKit.LaunchCore.GameModule.Game
                     }
                 );
             }
-        }
+        }*/
 
         private string GetRunningFolder()
         {
-            if (Settings == null) return "";
-            string runningfolder = (Settings["runningfolder"] ?? 1).ToString();
-            string ret;
-            switch (runningfolder)
+            string s = (Settings["runningfolder"] ?? "self").ToString();
+            if (s == "overall") s = 
+                Launcher.Instance.Settings["runningfolder"]?.ToString() 
+                                    ?? "self";
+            return s switch
             {
-                case "overall":
-                    if (Owner == null || Folder.Owner == null) throw new Exception("Can't use overall");
-                    Settings["runningfolder"] = Folder.Owner.Settings["runningfolder"];
-                    ret = GetRunningFolder();
-                    Settings["runningfolder"] = JToken.FromObject("overall");
-                    break;
-                case "self":
-                    ret = _gameFolderPath;
-                    break;
-                default:
-                    ret = runningfolder;
-                    break;
-            }
-            return ret;
+                "self" => GameFolderPath,
+                _ => s
+            };
         }
-
-        /// <summary>
-        /// GRetrieves the optional args with different rules. Add the args after the command 
-        /// as all of them are game arguments
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// </remarks>
-        /// <param name="jData">Matching conditions</param>
-        /// <returns>The arguments. Add them after the command</returns>
-        public string GetOptionalArgs(JObject jData)
-        {
-            string ret = "";
-            foreach (OptionalArgs arg in optionalArgs)
-            {
-                string argument = GetOptionalArgs(jData, arg);
-                if (argument == "") continue;
-                ret += $"{argument} ";
-            }
-            return ret;
-        }
-
-        private static string GetOptionalArgs(JObject jData, OptionalArgs arg)
-        {
-            foreach (string rule in arg.rules)
-            {
-                if (!JudgeArg(jData, rule)) return "";
-            }
-            return arg.arg;
-        }
-
-        private static bool JudgeArg(JObject jData, string rule)
-        {
-            Regex reg = MyRegex();
-            MatchCollection matches = reg.Matches(rule);
-            Match? match = matches.FirstOrDefault();
-
-            string key = match?.Groups["Name"].Value ?? "";
-            bool sign = match?.Groups["Sign"].Value == "=!";
-            string condition = match?.Groups["Condition"].Value ?? "";
-
-            if (!jData.ContainsKey(key)) return !sign;
-            return sign == (jData[key]?.ToString() == condition);
-        }
-
-        [GeneratedRegex("(?<Name>\\w+)\\s*(?<Sign>=|=!)\\s*(?<Condition>[^\\s,]+)")]
-        public static partial Regex MyRegex();
         #endregion
     }
 }

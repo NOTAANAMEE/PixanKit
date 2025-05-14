@@ -2,18 +2,18 @@
 {
     internal static class Localize
     {
-        private static string UserPath;
+        private static string _userPath;
 
         static Localize()
         {
-            UserPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            if (SysInfo.OSName == "windows")
-                UserPath = UserPath[0..UserPath.LastIndexOf('\\')];
+            _userPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            if (SysInfo.OsName == "windows")
+                _userPath = _userPath[0.._userPath.LastIndexOf('\\')];
         }
 
-        public static string CPLocalize(string cparg)
+        public static string CpLocalize(string cparg)
         {
-            return SysInfo.OSName switch
+            return SysInfo.OsName switch
             {
                 "windows" => cparg.Replace("${classpath_separator}", ";"),
                 _ => cparg,

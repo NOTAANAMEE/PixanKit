@@ -1,6 +1,6 @@
 ﻿using PixanKit.LaunchCore.Core;
-using PixanKit.LaunchCore.Extention;
-using PixanKit.LaunchCore.GameModule;
+using PixanKit.LaunchCore.Extension;
+using PixanKit.LaunchCore.GameModule.Folders;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.Json;
 
@@ -12,18 +12,18 @@ namespace PixanKit.ResourceDownloader.PostProcess
     /// <param name="folder">the folder which contains the game</param>
     /// <param name="name">the expected name of the game</param>
     /// <param name="version">the version of the game</param>
-    /// <param name="processJSON">whether process JSON document or not</param>
-    public class GamePostProcess(Folder folder, string name, string version, bool processJSON)
+    /// <param name="processJson">whether process JSON document or not</param>
+    public class GamePostProcess(Folder folder, string name, string version, bool processJson)
     {
-        readonly string name = name;
+        readonly string _name = name;
 
-        readonly string version = version;
+        readonly string _version = version;
 
-        readonly string versiondir = folder.VersionDirPath;
+        readonly string _versiondir = folder.VersionDirPath;
 
-        readonly bool processjson = processJSON;
+        readonly bool _processjson = processJson;
 
-        readonly Folder owner = folder;
+        readonly Folder _owner = folder;
 
         /// <summary>
         /// Start the process
@@ -31,33 +31,33 @@ namespace PixanKit.ResourceDownloader.PostProcess
         public void Process()
         {
             ProcessGame();
-            if (processjson) ProcessJSON();
+            if (_processjson) ProcessJson();
         }
 
         private void ProcessGame()
         {
-            File.Copy($"{versiondir}/{version}/{version}.jar",
-                $"{versiondir}/{name}/{name}.jar");
-            if (owner.FindGame(version) != null) return;
-            if (owner.FindVersion(version, GameType.Vanilla) != null)
+            File.Copy($"{_versiondir}/{_version}/{_version}.jar",
+                $"{_versiondir}/{_name}/{_name}.jar");
+            if (_owner.FindGame(_version) != null) return;
+            if (_owner.FindVersion(_version, GameType.Vanilla) != null)
             {
-                Directory.Delete($"{versiondir}/{version}");
+                Directory.Delete($"{_versiondir}/{_version}");
                 return;
             }
-            var game = Initors.GameInitor($"{versiondir}/{name}");
-            if (!processjson) 
-                Launcher.Instance.GameManager.AddGame(game);
+            //var game = Initers.GameIniter($"{_versiondir}/{_name}");
+            //if (!_processjson) 
+              //  Launcher.Instance.GameManager.AddGame(game);
         }
 
-        private void ProcessJSON()
+        private void ProcessJson()
         {
-            var target = JSON.ReadFromFile($"{versiondir}/{version}/{version}.json");
-            var merge = JSON.ReadFromFile($"{versiondir}/{name}/{name}.json");
+            var target = Json.ReadFromFile($"{_versiondir}/{_version}/{_version}.json");
+            var merge = Json.ReadFromFile($"{_versiondir}/{_name}/{_name}.json");
 
-            JSON.MergeJObject(target, merge);
-            JSON.SaveFile(name, target);
+            Json.MergeJObject(target, merge);
+            Json.SaveFile(_name, target);
 
-            Directory.Delete($"{versiondir}/{version}");
+            Directory.Delete($"{_versiondir}/{_version}");
         }
 
         /// <summary>
@@ -70,8 +70,8 @@ namespace PixanKit.ResourceDownloader.PostProcess
         public static string Move(Folder folder, string loaderversion, string name)
         {
             var folderpath = $"{folder.VersionDirPath}/{name}";
-            var folderpath_old = $"{folder.VersionDirPath}/{loaderversion}";
-            Directory.Move(folderpath_old, folderpath);
+            var folderpathOld = $"{folder.VersionDirPath}/{loaderversion}";
+            Directory.Move(folderpathOld, folderpath);
             foreach (var entry in Directory.GetFileSystemEntries(folderpath))
             {
                 var filename = Path.GetFileName(entry);

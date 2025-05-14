@@ -6,23 +6,23 @@ namespace PixanKit.ModController.Module
     public partial class ModModule
     {
         /// <inheritdoc/>
-        public void LoadFromJSON(JObject obj)
+        public void LoadFromJson(JObject obj)
         {
             OpenContent(obj);
         }
 
         /// <inheritdoc/>
-        public JObject ToJSON()
+        public JObject ToJson()
         {
             JObject moddedGamedata = [];
             foreach (var item in ModdedGames)
                 moddedGamedata.Add(
-                    JSON.PathToKey(item.Key.GameFolderPath),
-                    item.Value.ToJSON());
+                    Json.PathToKey(item.Key.GameFolderPath),
+                    item.Value.ToJson());
 
             JArray modMetadata = [];
             foreach (var item in ModDatas)
-                modMetadata.Add(item.Value.ToJSON());
+                modMetadata.Add(item.Value.ToJson());
 
             return new()
             {

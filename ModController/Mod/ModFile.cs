@@ -94,11 +94,11 @@ namespace PixanKit.ModController.Mod
         /// Save the ModFile as JSON data
         /// </summary>
         /// <returns>The JSON data</returns>
-        public JObject ToJSON()
+        public JObject ToJson()
         {
             return new()
             {
-                {"id", MetaData?.ModID ??
+                {"id", MetaData?.ModId ??
                 throw new Exception("Mod not attatched to a ModMetaData") },
                 {"release_date", ReleaseDate  },
                 {"version", Version},

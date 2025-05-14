@@ -1,21 +1,22 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Core;
-using PixanKit.LaunchCore.Extention;
+using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.Json;
-using PixanKit.LaunchCore.Log;
 using PixanKit.ModController.Interfaces;
 using PixanKit.ModController.Mod;
 using PixanKit.ModController.ModReader;
 using System.Collections.Concurrent;
+using PixanKit.LaunchCore.Core.Managers;
+using PixanKit.LaunchCore.Logger;
 
 namespace PixanKit.ModController.Module
 {
     /// <summary>
     /// Represents the module responsible for managing mods within the launcher.
     /// </summary>
-    public partial class ModModule : IToJSON
+    public partial class ModModule : IToJson
     {
         /// <summary>
         /// Initializes the ModModule class and sets up event handlers for the launcher.
@@ -72,7 +73,7 @@ namespace PixanKit.ModController.Module
         /// <summary>
         /// A cache for storing mod-related data as a JSON object.
         /// </summary>
-        private JObject ModCache = [];
+        private JObject _modCache = [];
 
         /// <summary>
         /// A dictionary containing metadata for mods.
@@ -89,7 +90,7 @@ namespace PixanKit.ModController.Module
         /// </summary>
         public Dictionary<ModdedGame, ModCollection> ModdedGames = [];
 
-        readonly object Locker = new();
+        readonly object _locker = new();
 
         /// <summary>
         /// Initializes a new instance of the ModModule class.
@@ -120,7 +121,7 @@ namespace PixanKit.ModController.Module
                     }
                 }
             }
-            ModCache = [];//Clear the cache to release memory
+            _modCache = [];//Clear the cache to release memory
         }
 
         /// <summary>
@@ -129,7 +130,7 @@ namespace PixanKit.ModController.Module
         private void ReadFile()
         {
             var jsoncontent = JObject.Parse(File.ReadAllText(SettingsPath));
-            LoadFromJSON(jsoncontent);
+            LoadFromJson(jsoncontent);
         }
 
         /// <summary>
@@ -165,12 +166,12 @@ namespace PixanKit.ModController.Module
         /// <exception cref="JsonException"></exception>
         public void OpenContent(JObject jsoncontent)
         {
-            ModCache = jsoncontent["games"] as JObject ??
+            _modCache = jsoncontent["games"] as JObject ??
                 throw new JsonException();
             foreach (var jsondata in jsoncontent["metadata"] ??
                 throw new JsonException())
             {
-                var metadata = FabricModParser.ParseModMetaDataFromJSON(
+                var metadata = FabricModParser.ParseModMetaDataFromJson(
                     jsondata as JObject ??
                     throw new JsonException());
                 AddMetaData(metadata);
@@ -183,7 +184,7 @@ namespace PixanKit.ModController.Module
         /// <param name="data">The metadata to add.</param>
         public void AddMetaData(ModMetaData data)
         {
-            if (!ModDatas.TryAdd(data.ModID, data))
+            if (!ModDatas.TryAdd(data.ModId, data))
                 throw new Exception("Unsuccess");
         }
 
@@ -193,11 +194,11 @@ namespace PixanKit.ModController.Module
         /// <param name="game">The modded game to associate with the mod collection.</param>
         public void AddCollection(ModdedGame game)
         {
-            lock (Locker)
+            lock (_locker)
                 if (!ModdedGames.ContainsKey(game))
                     ModdedGames.Add(game, new ModCollection(
-                        ModCache.GetOrDefault(Format.ToJObject,
-                        JSON.PathToKey(game.GameFolderPath), [])
+                        _modCache.GetOrDefault(Format.ToJObject,
+                        Json.PathToKey(game.GameFolderPath), [])
                         , game));
         }
 
@@ -242,7 +243,7 @@ namespace PixanKit.ModController.Module
         /// </summary>
         public void SaveFile()
         {
-            var obj = ToJSON();
+            var obj = ToJson();
             FileStream fs = new(SettingsPath, FileMode.Create);
             StreamWriter sw = new(fs);
             sw.Write(obj.ToString());

@@ -1,4 +1,4 @@
-﻿using PixanKit.LaunchCore.Log;
+﻿using PixanKit.LaunchCore.Logger;
 
 namespace PixanKit.ResourceDownloader.Tasks
 {
@@ -68,7 +68,7 @@ namespace PixanKit.ResourceDownloader.Tasks
         /// <summary>
         /// The subtasks of the current task.
         /// </summary>
-        protected List<Task> _tasks = [];
+        protected List<Task> Tasks = [];
 
         /// <summary>
         /// The status of the current task.
@@ -78,7 +78,7 @@ namespace PixanKit.ResourceDownloader.Tasks
         /// <summary>
         /// Lock object for progress reporting.
         /// </summary>
-        protected object _progresslock = new();
+        protected Lock _progressLock = new();
 
         /// <summary>
         /// Constructor, initialize the task status to ProgressStatus.Inited
@@ -136,7 +136,7 @@ namespace PixanKit.ResourceDownloader.Tasks
         /// 
         protected virtual async Task Running()
         {
-            await Task.WhenAll(_tasks);
+            await Task.WhenAll(Tasks);
 
             if (!CancellationToken.IsCancellationRequested) Finish();
             TaskStopped.SetResult();
@@ -167,7 +167,7 @@ namespace PixanKit.ResourceDownloader.Tasks
         /// <param name="progress">current progress value (double)</param>
         protected virtual void ReportProgress(double progress)
         {
-            lock (_progresslock)
+            lock (_progressLock)
             {
                 _progress = progress;
                 OnReport?.Invoke(progress);

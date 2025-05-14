@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Core;
-using PixanKit.LaunchCore.Extention;
-using PixanKit.LaunchCore.GameModule;
+using PixanKit.LaunchCore.Extension;
+using PixanKit.LaunchCore.GameModule.Folders;
 using PixanKit.LaunchCore.JavaModule;
 using PixanKit.LaunchCore.Server;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
@@ -17,23 +17,23 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     public class ForgeInstaller : SequenceProgressTask
     {
 
-        Folder Owner;
+        Folder _owner;
 
-        string Name;
+        string _name;
 
-        string version;
+        string _version;
 
-        JObject forgeversion;
+        JObject _forgeversion;
 
-        string installerpath { get => $"{Files.CacheDir}/Installer/forge.jar"; }
+        string Installerpath { get => $"{Files.CacheDir}/Installer/forge.jar"; }
 
-        string url = "";
+        string _url = "";
 
-        FuncProgressTask<int> InitTask = new();
+        FuncProgressTask<int> _initTask = new();
 
-        AsyncProgressTask? DownloadTask;
+        AsyncProgressTask? _downloadTask;
 
-        CLITask? CommandTask;
+        CliTask? _commandTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ForgeInstaller"/> class.
@@ -44,33 +44,33 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// <param name="forgeversion">The JSON object containing the Forge version details.</param>
         public ForgeInstaller(Folder folder, string name, string mcversion, JObject forgeversion)
         {
-            Owner = folder;
-            Name = name;
-            version = mcversion;
-            this.forgeversion = forgeversion;
+            _owner = folder;
+            _name = name;
+            _version = mcversion;
+            this._forgeversion = forgeversion;
             Init();
         }
 
         private void Init()
         {
-            InitTask.Function += Init;
-            Add(InitTask);
+            _initTask.Function += Init;
+            Add(_initTask);
             AddDownloadTask();
             AddCommandTask();
         }
 
         private void AddDownloadTask()
         {
-            DownloadTask = new();
-            FileDownloadTask download = new("", installerpath);
-            InitTask.OnFinish += (a) =>
+            _downloadTask = new();
+            FileDownloadTask download = new("", Installerpath);
+            _initTask.OnFinish += (a) =>
             {
-                download.SetURL(url);
+                download.SetUrl(_url);
             };
-            if (Owner.FindGame(version) == null)
-                DownloadTask.Add(new VanillaMinimalInstallTask(Owner, version, version));
-            DownloadTask.Add(download);
-            Add(DownloadTask);
+            if (_owner.FindGame(_version) == null)
+                _downloadTask.Add(new VanillaMinimalInstallTask(_owner, _version, _version));
+            _downloadTask.Add(download);
+            Add(_downloadTask);
         }
 
         private void AddCommandTask()
@@ -78,19 +78,19 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             if (Launcher.Instance == null) throw new Exception();
             var java = JavaChooser.Newest(Launcher.Instance.JavaManager.JavaRuntimes) ??
                 throw new Exception();
-            CommandTask = new(java.JavaEXE, $"-jar \"{installerpath}\" --installClient " +
-                $"\"{Owner.FolderPath}\"");
-            ProgressTasks.Add(CommandTask);
-            CommandTask.OnFinish += (a) =>
+            _commandTask = new(java.JavaExe, $"-jar \"{Installerpath}\" --installClient " +
+                $"\"{_owner.FolderPath}\"");
+            ProgressTasks.Add(_commandTask);
+            _commandTask.OnFinish += (a) =>
             {
-                GamePostProcess.Move(Owner, $"{version}-forge-{forgeversion["version"]}", Name);
+                GamePostProcess.Move(_owner, $"{_version}-forge-{_forgeversion["version"]}", _name);
             };
         }
 
         private async Task<int> Init(Action<double> progress, CancellationToken token)
         {
-            url = await ServerList.ModLoaderServers["forge"]
-                    .GetURL(forgeversion, token);
+            _url = await ServerList.ModLoaderServers["forge"]
+                    .GetUrl(_forgeversion, token);
             if (token.IsCancellationRequested) return 1;
             progress(1.0);
             return 0;

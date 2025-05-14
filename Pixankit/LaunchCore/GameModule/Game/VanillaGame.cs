@@ -1,35 +1,22 @@
-﻿using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Json;
+﻿using PixanKit.LaunchCore.GameModule.LibraryData;
+using PixanKit.LaunchCore.GameModule.Folders;
 
-namespace PixanKit.LaunchCore.GameModule.Game
+namespace PixanKit.LaunchCore.GameModule.Game;
+
+/// <summary>
+/// Represents the Vanilla Minecraft game without Optifine or mod loaders.
+/// </summary>
+public class VanillaGame : GameBase
 {
     /// <summary>
-    /// Represents the Vanilla Minecraft game without Optifine or mod loaders.
+    /// Initializes a new instance of the <see cref="VanillaGame"/> class.
     /// </summary>
-    public class OriginalGame : GameBase
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OriginalGame"/> class.
-        /// </summary>
-        /// <param name="path">The file path to the game directory.</param>
-        /// <param name="jData">The JSON data containing game information.</param>
-        public OriginalGame(string path, JObject jData) : base(path, jData)
-        {
-            _gameType = GameType.Vanilla;
-            assetsID = jData.GetOrDefault(Format.ToString, "assetIndex/id", "");
-            javaVersion = (short)(int)(jData["minimumLauncherVersion"] ?? 0);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OriginalGame"/> class.
-        /// </summary>
-        /// <param name="path">The file path to the game directory.</param>
-        public OriginalGame(string path) : base(path)
-        {
-            _gameType = GameType.Vanilla;
-            assetsID = gameJSONData.GetOrDefault(Format.ToString, "assetIndex/id", "");
-            javaVersion = gameJSONData.GetOrDefault<short>(
-                (a) => (short)a, "minimumLauncherVersion", 0);
-        }
-    }
+    /// <param name="name"></param>
+    /// <param name="folder"></param>
+    /// <param name="param"></param>
+    /// <param name="libraries"></param>
+    public VanillaGame(string name, Folder folder,
+        GameParameter param, LibrariesRef libraries) :
+        base(name, folder, param, libraries)
+    { }
 }

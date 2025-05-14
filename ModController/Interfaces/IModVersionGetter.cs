@@ -10,10 +10,10 @@ namespace PixanKit.ModController.Interfaces
         /// <summary>
         /// Gets the list of versions of the mod.
         /// </summary>
-        /// <param name="modID">The ID of the mod</param>
+        /// <param name="modId">The ID of the mod</param>
         /// <param name="token">Cancel or not</param>
         /// <returns>The array of files.</returns>
-        public Task<JArray> GetVersionsAsync(string modID, CancellationToken token);
+        public Task<JArray> GetVersionsAsync(string modId, CancellationToken token);
     }
 }
 

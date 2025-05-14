@@ -1,10 +1,9 @@
-﻿using PixanKit.LaunchCore.Extention;
+﻿using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.GameModule.Exceptions;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.JavaModule.Java;
 using PixanKit.LaunchCore.Json;
-using PixanKit.LaunchCore.Log;
 using PixanKit.LaunchCore.PlayerModule.Player;
 
 namespace PixanKit.LaunchCore.Core
@@ -17,22 +16,22 @@ namespace PixanKit.LaunchCore.Core
         /// <param name="game"></param>
         /// <returns></returns>
         /// <exception cref="NullReferenceException"></exception>
-        public LaunchSession Launch(GameBase game)
+        public LaunchSession.LaunchSession Launch(GameBase game)
         {
             return Launch(game, PlayerManager.TargetPlayer ??
                 throw new NullReferenceException("Target player not found"));
         }
 
-        public LaunchSession Launch(GameBase game,PlayerBase player)
+        public LaunchSession.LaunchSession Launch(GameBase game,PlayerBase player)
         {
             string cmd = InlineCommand(game, player);
-            Logger.Info("Game Arg Generated Successfully.");
+            Logger.Logger.Info("Game Arg Generated Successfully.");
 
             JavaRuntime java = JavaManager.ChooseRuntime(game) ?? throw new NullReferenceException();
 
             //game.Decompress().Wait();
 
-            return new LaunchSession(game, java, cmd);
+            return new LaunchSession.LaunchSession(game, java, cmd);
         }
 
         /// <summary>
@@ -40,7 +39,7 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NullReferenceException"></exception>
-        public LaunchSession Launch()
+        public LaunchSession.LaunchSession Launch()
         {
             if (GameManager.TargetGame is null) 
                 throw new NullReferenceException();
@@ -55,7 +54,7 @@ namespace PixanKit.LaunchCore.Core
 
             cmd = PlayerInLine(cmd, player);
             string pth = Path.GetDirectoryName(game.GameRootFolderPath) ?? "./";
-            cmd = $"-Xmx{Initors.GetMemory()}m " + cmd;
+            cmd = $"-Xmx{Initers.GetMemory()}m " + cmd;
             cmd = cmd.Replace("${launcher_name}", LauncherName);
             cmd = cmd.Replace("${launcher_version}", VersionName);
             return cmd;

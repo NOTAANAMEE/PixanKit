@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.Json;
-using PixanKit.LaunchCore.Log;
+using PixanKit.LaunchCore.Logger;
 using PixanKit.ModController.Mod;
 using PixanKit.ModController.ModReader;
 
@@ -11,7 +11,7 @@ namespace PixanKit.ModController.Module
     /// Represents a mod collection. This class helps control the mod under
     /// the mod directory.
     /// </summary>
-    public partial class ModCollection : IToJSON
+    public partial class ModCollection : IToJson
     {
         /// <summary>
         /// The modded game of the mods
@@ -40,13 +40,13 @@ namespace PixanKit.ModController.Module
         public ModCollection(JObject cache, ModdedGame game)
         {
             Owner = game;
-            LoadFromJSON(cache);
+            LoadFromJson(cache);
             foreach (var mod in Directory.GetFiles(Owner.ModDir))
             {
                 try
                 {
                     var modfile = ModParser.Parse(mod, this);
-                    ModFiles.TryAdd(modfile.MetaData?.ModID ?? "", modfile);
+                    ModFiles.TryAdd(modfile.MetaData?.ModId ?? "", modfile);
                 }
                 catch (Exception e)
                 {
@@ -101,7 +101,7 @@ namespace PixanKit.ModController.Module
             if (!path.StartsWith(Owner.ModDir)) return;
             var file = ModParser.Parse(path, this);
             if (file.MetaData == null) throw new Exception("WTF");
-            ModFiles.Add(file.MetaData.ModID, file);
+            ModFiles.Add(file.MetaData.ModId, file);
         }
     }
 }

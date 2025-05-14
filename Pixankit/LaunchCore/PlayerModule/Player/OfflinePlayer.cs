@@ -10,7 +10,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// <summary>
         /// Gets the unique identifier (UID) for the offline player.
         /// </summary>
-        public override string UID
+        public override string Uid
         {
             get => "00000FFFFFFFFFFFFFFFFFFFFFF1FF43";
         }
@@ -20,7 +20,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// </summary>
         public override string AccessToken
         {
-            get => UID;
+            get => Uid;
         }
 
         /// <summary>
@@ -31,8 +31,8 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         {
             _name = name;
             _uid = $"uid{name}offline";
-            _accesstoken = "";
-            _type = PlayerType.offline;
+            _accessToken = "";
+            Type = PlayerType.Offline;
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// <param name="jData">The JSON data representing the player.</param>
         public OfflinePlayer(JObject jData) : base(jData)
         {
-            _type = PlayerType.offline;
+            Type = PlayerType.Offline;
         }
 
         /// <summary>

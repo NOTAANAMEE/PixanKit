@@ -40,7 +40,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         /// </summary>
         public class OfficialFabricMirror : ModLoaderMirror
         {
-            HttpClient client = new();
+            HttpClient _client = new();
 
             /// <summary>
             /// Initializes a new instance of the <see cref="OfficialFabricMirror"/> class.
@@ -50,8 +50,8 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// </remarks>
             public OfficialFabricMirror()
             {
-                BaseURL = "https://meta.fabricmc.net/";
-                OriginalURL = "";
+                BaseUrl = "https://meta.fabricmc.net/";
+                OriginalUrl = "";
             }
 
             /// <summary>
@@ -95,7 +95,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// </exception>
             public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
-                var response = await client.GetAsync("https://meta.fabricmc.net/v2/versions", token);
+                var response = await _client.GetAsync("https://meta.fabricmc.net/v2/versions", token);
                 if (token.IsCancellationRequested) return [];
                 var content = await response.Content.ReadAsStringAsync(token);
                 if (token.IsCancellationRequested) return [];
@@ -115,15 +115,15 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <exception cref="HttpRequestException">
             /// Thrown if there is an error during the HTTP request.
             /// </exception>
-            public override async Task<string> GetURL(JObject loaderInf, CancellationToken token)
+            public override async Task<string> GetUrl(JObject loaderInf, CancellationToken token)
             {
-                var response = await client.GetAsync("https://meta.fabricmc.net/v2/versions", token);
+                var response = await _client.GetAsync("https://meta.fabricmc.net/v2/versions", token);
                 if (token.IsCancellationRequested) return "";
                 var content = await response.Content.ReadAsStringAsync(token);
                 if (token.IsCancellationRequested) return "";
                 var jobj = JObject.Parse(content);
                 var url = jobj["installer"]?[0]?["url"]?.ToString() ??
-                    throw new JSONKeyException(jobj, "/installer/0/url", "loader version");
+                    throw new JsonKeyException(jobj, "/installer/0/url", "loader version");
                 return Replace(url);
             }
         }

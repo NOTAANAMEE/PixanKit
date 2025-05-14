@@ -9,37 +9,25 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
     public class LoaderLibrary : LibraryBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="LoaderLibrary"/> class with a specified folder and library JSON data.
-        /// </summary>
-        /// <param name="folder">The directory where the library is located.</param>
-        /// <param name="libraryJData">The JSON data representing the library.</param>
-        public LoaderLibrary(string folder, JObject libraryJData) :
-            base(libraryJData, folder)
-        {
-            libraryType = LibraryType.Mod;
-            try
-            {
-                _url = libraryJData.GetValue(Format.ToString, "url");
-            }
-            catch
-            {
-                _url = "";
-            }
-
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LoaderLibrary"/> class with library JSON data.
-        /// </summary>
-        /// <param name="libraryJData">The JSON data representing the library.</param>
-        public LoaderLibrary(JObject libraryJData) : this("", libraryJData) { }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="LoaderLibrary"/> class for internal use.
         /// </summary>
-        protected LoaderLibrary() : base()
+        private LoaderLibrary() : base()
         {
-            libraryType = LibraryType.Mod;
+            LibraryType = LibraryData.LibraryType.Mod;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jData"></param>
+        /// <param name="library"></param>
+        public static void CreateInstance(JObject jData, out LibraryBase library)
+        {
+            library = new LoaderLibrary()
+            {
+                Url = jData.GetOrDefault(Format.ToString,"url", ""),
+                Name = jData.GetOrDefault(Format.ToString, "name", ""),
+            };
         }
     }
 }

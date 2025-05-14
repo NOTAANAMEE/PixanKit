@@ -1,15 +1,10 @@
 ﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule.Game;
-using PixanKit.LaunchCore.JavaModule.Java;
 using PixanKit.LaunchCore.JavaModule;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PixanKit.LaunchCore.Extention;
+using PixanKit.LaunchCore.JavaModule.Java;
 
-namespace PixanKit.LaunchCore.Core
+namespace PixanKit.LaunchCore.Core.Managers
 {
     public class JavaManager
     {
@@ -93,7 +88,7 @@ namespace PixanKit.LaunchCore.Core
 
         internal JObject Save()
         {
-            var javaRuntimes = JavaRuntimes.Select(r => r.ToJSON());
+            var javaRuntimes = JavaRuntimes.Select(r => r.ToJson());
             return new JObject()
             {
                 { "children", JArray.FromObject(javaRuntimes)},

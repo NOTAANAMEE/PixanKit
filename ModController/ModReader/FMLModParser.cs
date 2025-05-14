@@ -10,7 +10,7 @@ namespace PixanKit.ModController.ModReader
     /// <summary>
     /// The config parser class for the latest(1.13.x-current) Forge and NeoForge mod files.
     /// </summary>
-    public static class FMLModParser
+    public static class FmlModParser
     {
         static readonly object IconLocker = new();
 
@@ -30,19 +30,19 @@ namespace PixanKit.ModController.ModReader
             _ = ModModule.Instance ??
                 throw new InvalidOperationException("ModModule has not being inited");
 
-            var table = Toml.ToModel(tomlContent) ??
+            var table = Tomlyn.Toml.ToModel(tomlContent) ??
                 throw new Exception("Failed to parse TOML");
             var mods = table.GetValue<TomlTableArray>("mods");
 
             var modEntry = mods[0];
-            var modID = GetID(modEntry);
+            var modId = GetId(modEntry);
 
-            LoadModFile(modCollection, modID,
+            LoadModFile(modCollection, modId,
                 table, modEntry, archive,
                 out var depList,
                 out var version, out var releaseDate);
 
-            var metaData = LoadMetaData(modID, modEntry, archive);
+            var metaData = LoadMetaData(modId, modEntry, archive);
 
             ModFile modFile = new(filepath)
             {
@@ -55,21 +55,21 @@ namespace PixanKit.ModController.ModReader
             return modFile;
         }
 
-        private static string GetID(TomlTable modEntry)
+        private static string GetId(TomlTable modEntry)
             => modEntry["modId"]?.ToString() ?? throw new Exception("Missing modId");
 
-        private static ModMetaData LoadMetaData(string modID, TomlTable modEntry, ZipArchive archive)
+        private static ModMetaData LoadMetaData(string modId, TomlTable modEntry, ZipArchive archive)
         {
             if (ModModule.Instance == null) throw new InvalidOperationException();
-            if (!ModModule.Instance.ModDatas.TryGetValue(modID, out var metaData))
+            if (!ModModule.Instance.ModDatas.TryGetValue(modId, out var metaData))
             {
                 var logofile = modEntry.GetIcon();
                 metaData = new ModMetaData
                 {
-                    ModID = modID,
+                    ModId = modId,
                     Description = modEntry.GetDescription(),
                     Authors = [modEntry.GetOrDefault("authors", "")],
-                    ImageCache = LoadIcon(archive, logofile, modID),
+                    ImageCache = LoadIcon(archive, logofile, modId),
                     Name = modEntry.GetOrDefault("displayName", "")
                 };
                 ModModule.Instance?.AddMetaData(metaData);
@@ -78,21 +78,21 @@ namespace PixanKit.ModController.ModReader
             return metaData ?? throw new Exception("Exception avoid null warning");
         }
 
-        private static void LoadModFile(ModCollection modCollection, string modID,
+        private static void LoadModFile(ModCollection modCollection, string modId,
             TomlTable table, TomlTable modEntry, ZipArchive archive,
             out List<string> depList, out string version, out DateTime releaseDate
             )
         {
             var entry = archive.GetEntry("META-INF/MANIFEST.MF");
             releaseDate = entry?.LastWriteTime.UtcDateTime ?? DateTime.UtcNow;
-            modCollection.ModCache.TryGetValue(Format.ToJObject, modID, out var modData);
+            modCollection.ModCache.TryGetValue(Format.ToJObject, modId, out var modData);
 
             if (modData == null)
             {
                 version = modEntry.GetVersion();
                 if (version == "${file.jarVersion}" && entry is not null)
                     version = GetVersionFromManifest(entry);
-                depList = modEntry.GetDeps(modID);
+                depList = modEntry.GetDeps(modId);
                 depList = [.. depList.Except(GetDependenciesUnderJarJar(archive))];
                 return;
             }
@@ -136,7 +136,7 @@ namespace PixanKit.ModController.ModReader
             foreach (var entry in archive.Entries)
             {
                 if (!CheckFile(entry.FullName)) continue;
-                try { ret.Add(GetEachJarID(entry)); }
+                try { ret.Add(GetEachJarId(entry)); }
                 catch { }
             }
             return ret;
@@ -148,7 +148,7 @@ namespace PixanKit.ModController.ModReader
         /// <param name="archiveEntry"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        private static string GetEachJarID(ZipArchiveEntry archiveEntry)
+        private static string GetEachJarId(ZipArchiveEntry archiveEntry)
         {
             var filestream = archiveEntry.Open();
             ZipArchive archive = new(filestream);
@@ -157,21 +157,21 @@ namespace PixanKit.ModController.ModReader
             var entrystream = entry.Open();
             StreamReader streamreader = new(entrystream);
             var tomlContent = streamreader.ReadToEnd();
-            var table = Toml.ToModel(tomlContent) ??
+            var table = Tomlyn.Toml.ToModel(tomlContent) ??
                                throw new Exception("Failed to parse TOML");
             var mods = table["mods"] as TomlTableArray ??
                                throw new Exception("Invalid TOML: No mods found");
             var modEntry = mods[0];
-            return GetID(modEntry);
+            return GetId(modEntry);
         }
 
-        internal static string LoadIcon(ZipArchive archive, string iconPath, string modID)
+        internal static string LoadIcon(ZipArchive archive, string iconPath, string modId)
         {
             if (iconPath == "") return iconPath;
             if (iconPath.StartsWith("http")) return iconPath;
             var entry = archive.GetEntry(iconPath);
             if (entry == null) return iconPath;
-            var path = $"{ModModule.IconCachePath}/{modID}" +
+            var path = $"{ModModule.IconCachePath}/{modId}" +
                 $"{Path.GetExtension(entry.FullName)}";
 
             lock (IconLocker)
@@ -193,11 +193,11 @@ namespace PixanKit.ModController.ModReader
         private static string GetVersion(this TomlTable table)
             => table["version"].ToString() ?? "";
 
-        private static List<string> GetDeps(this TomlTable table, string modID)
+        private static List<string> GetDeps(this TomlTable table, string modId)
         {
             List<string> depList = [];
-            if (!table.ContainsKey("dependencies." + modID)) return depList;
-            if (table["dependencies." + modID] is not TomlArray dependencies)
+            if (!table.ContainsKey("dependencies." + modId)) return depList;
+            if (table["dependencies." + modId] is not TomlArray dependencies)
                 return depList;
 
             foreach (var dep in dependencies.Cast<TomlTable>())

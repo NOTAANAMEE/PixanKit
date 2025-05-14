@@ -1,13 +1,12 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Core;
-using PixanKit.LaunchCore.Extention;
-using PixanKit.LaunchCore.GameModule;
+using PixanKit.LaunchCore.Extension;
+using PixanKit.LaunchCore.GameModule.Folders;
 using PixanKit.LaunchCore.JavaModule;
 using PixanKit.LaunchCore.JavaModule.Java;
 using PixanKit.LaunchCore.Server;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.ResourceDownloader.PostProcess;
-using PixanKit.ResourceDownloader.SystemInf;
 using PixanKit.ResourceDownloader.Tasks.FuncTask;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 
@@ -18,26 +17,26 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// </summary>
     public class OptifineInstaller : SequenceProgressTask
     {
-        readonly string version = "";
+        readonly string _version = "";
 
-        readonly Folder Owner;
+        readonly Folder _owner;
 
-        readonly string Name;
+        readonly string _name;
 
-        static string installerpath { get => $"{Files.CacheDir}/Installer/optifine.jar"; }
+        static string Installerpath { get => $"{Files.CacheDir}/Installer/optifine.jar"; }
 
         //The Java Program I made myself. It is just used to handle the optifine install task
-        static string programpath { get => $"{Files.CacheDir}/Installer/optifineinstaller.jar"; }
+        static string Programpath { get => $"{Files.CacheDir}/Installer/optifineinstaller.jar"; }
 
-        string url = "";
+        string _url = "";
 
-        readonly JObject OptifineVersion;
+        readonly JObject _optifineVersion;
 
-        FuncProgressTask<int> InitProgressTask = new();
+        FuncProgressTask<int> _initProgressTask = new();
 
-        AsyncProgressTask? DownloadTask;
+        AsyncProgressTask? _downloadTask;
 
-        CLITask? CommandTask;
+        CliTask? _commandTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OptifineInstaller"/> class.
@@ -48,10 +47,10 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// <param name="optifineversion">A JSON object containing the Optifine version details.</param>
         public OptifineInstaller(Folder folder, string name, string mcversion, JObject optifineversion)
         {
-            Name = name;
-            Owner = folder;
-            version = mcversion;
-            OptifineVersion = optifineversion;
+            _name = name;
+            _owner = folder;
+            _version = mcversion;
+            _optifineVersion = optifineversion;
             Init();
         }
 
@@ -59,26 +58,26 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         private void Init()
         {
             var file = Localize.PathLocalize($"{Files.CacheDir}/Installer/optifine.jar");
-            InitProgressTask.Function += GetURL;
-            Add(InitProgressTask);
+            _initProgressTask.Function += GetUrl;
+            Add(_initProgressTask);
             AddDownloadTask();
             AddCommandTask();
         }
 
         private void AddDownloadTask()
         {
-            DownloadTask = new();
-            SimpleFileDownloadTask download = new("", installerpath);
-            InitProgressTask.OnFinish += (a) =>
+            _downloadTask = new();
+            SimpleFileDownloadTask download = new("", Installerpath);
+            _initProgressTask.OnFinish += (a) =>
             {
-                download.SetURL(url);
+                download.SetUrl(_url);
             };
-            if (Owner.FindGame(version) == null)
+            if (_owner.FindGame(_version) == null)
             {
-                DownloadTask.Add(new VanillaMinimalInstallTask(Owner, version, version));
+                _downloadTask.Add(new VanillaMinimalInstallTask(_owner, _version, _version));
             }
-            DownloadTask.Add(download);
-            Add(DownloadTask);
+            _downloadTask.Add(download);
+            Add(_downloadTask);
         }
 
         private void AddCommandTask()
@@ -89,22 +88,22 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             if (java == null) throw new Exception("No java found");
 
             var dir =
-                $"{version}-{(OptifineVersion["version"] ?? "").ToString().Replace(" ", "_")}";
+                $"{_version}-{(_optifineVersion["version"] ?? "").ToString().Replace(" ", "_")}";
 
-            CommandTask = new(java.JavaEXE, "-cp " +
-                $"\"{installerpath}{Localize.LocalParser}{programpath}\" Program " +
-                $"\"{Owner.FolderPath}\"");
-            CommandTask.OnFinish += (a) =>
+            _commandTask = new(java.JavaExe, "-cp " +
+                $"\"{Installerpath}{Localize.LocalParser}{Programpath}\" Program " +
+                $"\"{_owner.FolderPath}\"");
+            _commandTask.OnFinish += (a) =>
             {
-                GamePostProcess.Move(Owner, dir, Name);
+                GamePostProcess.Move(_owner, dir, _name);
             };
-            Add(CommandTask);
+            Add(_commandTask);
         }
 
-        private async Task<int> GetURL(Action<double> report, CancellationToken token)
+        private async Task<int> GetUrl(Action<double> report, CancellationToken token)
         {
-            url = await ServerList.ModLoaderServers["optifine"]
-                    .GetURL(OptifineVersion, token);
+            _url = await ServerList.ModLoaderServers["optifine"]
+                    .GetUrl(_optifineVersion, token);
             return 0;
         }
     }

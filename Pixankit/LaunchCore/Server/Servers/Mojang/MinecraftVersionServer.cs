@@ -8,7 +8,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
     /// </summary>
     public class MinecraftVersionServer : ResourceServer
     {
-        private Cache? cache;
+        private Cache? _cache;
 
         private record Cache(JArray Versions, DateTime UpdateTime);
 
@@ -28,12 +28,12 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <returns>The JArray that contains every version</returns>
         public async Task<JArray> GetVersionsAsync(CancellationToken token)
         {
-            if (cache == null || DateTime.Now - cache.UpdateTime > TimeSpan.FromDays(1))
+            if (_cache == null || DateTime.Now - _cache.UpdateTime > TimeSpan.FromDays(1))
             {
                 //UpdateIndex();
                 await GetArrayFromNetwork(token);
             }
-            if (cache != null) return cache.Versions;
+            if (_cache != null) return _cache.Versions;
             throw new Exception();
         }
 
@@ -57,11 +57,11 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <exception cref="Exception"></exception>
         public async Task<JArray> GetVersions(CancellationToken token)
         {
-            if (cache == null || DateTime.Now - cache.UpdateTime > TimeSpan.FromDays(1))
+            if (_cache == null || DateTime.Now - _cache.UpdateTime > TimeSpan.FromDays(1))
             {
                 await Update(token);
             }
-            if (cache != null) return cache.Versions;
+            if (_cache != null) return _cache.Versions;
             throw new Exception();
         }
 
@@ -126,7 +126,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         public string GetJsonUrl(JObject jObject)
         {
             return Replace(jObject["url"]?.ToString() ??
-                throw new JSONKeyException(jObject, "url",
+                throw new JsonKeyException(jObject, "url",
                 "Minecraft JSON Document"));
         }
 
@@ -140,7 +140,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         public string GetMinecraftJarUrl(JObject jObject)
         {
             return Replace(jObject["downloads"]?["client"]?["url"]?.ToString() ??
-                throw new JSONKeyException(jObject, "downloads/client/url",
+                throw new JsonKeyException(jObject, "downloads/client/url",
                 "Minecraft JSON Document"));
         }
 
@@ -152,7 +152,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         public string GetAssetsJsonUrl(JObject jObject)
         {
             return Replace(jObject["assetIndex"]?["url"]?.ToString() ??
-                throw new JSONKeyException(jObject, "/assetIndex/url", "Version JSON document"));
+                throw new JsonKeyException(jObject, "/assetIndex/url", "Version JSON document"));
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
                 Replace("https://piston-meta.mojang.com/mc/game/version_manifest.json"), token);
             string tmp = await ret.Content.ReadAsStringAsync(token);
             JObject jObj = JObject.Parse(tmp);
-            cache = new Cache(jObj["versions"] is JArray array ? array : [], DateTime.Now);
+            _cache = new Cache(jObj["versions"] is JArray array ? array : [], DateTime.Now);
         }
     }
 }

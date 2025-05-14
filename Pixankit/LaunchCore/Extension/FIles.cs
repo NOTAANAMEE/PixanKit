@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
 
-namespace PixanKit.LaunchCore.Extention
+namespace PixanKit.LaunchCore.Extension
 {
     /// <summary>
     /// Some Settings About Files
@@ -20,22 +20,22 @@ namespace PixanKit.LaunchCore.Extention
         /// <summary>
         /// Folder JSON Data  
         /// </summary>
-        public static JObject FolderJData { get; set; } = DefaultJSON.JData;
+        public static JObject FolderJData { get; set; } = DefaultJson.JData;
 
         /// <summary>
         /// Runtime JSON Data
         /// </summary>
-        public static JObject RuntimeJData { get; set; } = DefaultJSON.JData;
+        public static JObject RuntimeJData { get; set; } = DefaultJson.JData;
 
         /// <summary>
         /// Player JSON Data
         /// </summary>
-        public static JObject PlayerJData { get; set; } = DefaultJSON.JData;
+        public static JObject PlayerJData { get; set; } = DefaultJson.JData;
 
         /// <summary>
         /// Setting JSON Data
         /// </summary>
-        public static JObject? SettingsJData { get; set; } = DefaultJSON.JData;
+        public static JObject? SettingsJData { get; set; } = DefaultJson.JData;
 
         /// <summary>
         /// Directory For Launcher Configuration Files.
@@ -87,11 +87,11 @@ namespace PixanKit.LaunchCore.Extention
         /// </summary>
         public static void Generate()
         {
-            FolderJData = (JObject)DefaultJSON.JData.DeepClone();
+            FolderJData = (JObject)DefaultJson.JData.DeepClone();
             PlayerJData = (JObject)FolderJData.DeepClone();
             RuntimeJData = (JObject)FolderJData.DeepClone();
             RuntimeJData.Remove("target");
-            SettingsJData = (JObject)DefaultJSON.SettingJData.DeepClone();
+            SettingsJData = (JObject)DefaultJson.SettingJData.DeepClone();
         }
 
         /// <summary>
@@ -102,14 +102,14 @@ namespace PixanKit.LaunchCore.Extention
         /// </summary>
         public static void Save()
         {
-            FileStream folderFS = new($"{ConfigDir}/Folders.json", FileMode.Create),
-                       playerFS = new($"{ConfigDir}/Players.json", FileMode.Create),
-                       runtimeFS = new($"{ConfigDir}/JavaRuntime.json", FileMode.Create),
-                       settingsFS = new($"{ConfigDir}/Settings.json", FileMode.Create);
-            StreamWriter foldersw = new(folderFS),
-                         playersw = new(playerFS),
-                         runtimesw = new(runtimeFS),
-                         settingsw = new(settingsFS);
+            FileStream folderFs = new($"{ConfigDir}/Folders.json", FileMode.Create),
+                       playerFs = new($"{ConfigDir}/Players.json", FileMode.Create),
+                       runtimeFs = new($"{ConfigDir}/JavaRuntime.json", FileMode.Create),
+                       settingsFs = new($"{ConfigDir}/Settings.json", FileMode.Create);
+            StreamWriter foldersw = new(folderFs),
+                         playersw = new(playerFs),
+                         runtimesw = new(runtimeFs),
+                         settingsw = new(settingsFs);
             foldersw.Write(FolderJData.ToString());
             playersw.Write(PlayerJData.ToString());
             runtimesw.Write(RuntimeJData.ToString());
@@ -118,10 +118,10 @@ namespace PixanKit.LaunchCore.Extention
             playersw.Close();
             runtimesw.Close();
             settingsw.Close();
-            folderFS.Close();
-            playerFS.Close();
-            runtimeFS.Close();
-            settingsFS.Close();
+            folderFs.Close();
+            playerFs.Close();
+            runtimeFs.Close();
+            settingsFs.Close();
         }
 
         /// <summary>
@@ -129,14 +129,14 @@ namespace PixanKit.LaunchCore.Extention
         /// </summary>
         public static void Load()
         {
-            FileStream folderFS = new($"{ConfigDir}/Folders.json", FileMode.Open),
-                       playerFS = new($"{ConfigDir}/Players.json", FileMode.Open),
-                       runtimeFS = new($"{ConfigDir}/JavaRuntime.json", FileMode.Open),
-                       settingsFS = new($"{ConfigDir}/Settings.json", FileMode.Open);
-            StreamReader foldersr = new(folderFS),
-                         playersr = new(playerFS),
-                         runtimesr = new(runtimeFS),
-                         settingsr = new(settingsFS);
+            FileStream folderFs = new($"{ConfigDir}/Folders.json", FileMode.Open),
+                       playerFs = new($"{ConfigDir}/Players.json", FileMode.Open),
+                       runtimeFs = new($"{ConfigDir}/JavaRuntime.json", FileMode.Open),
+                       settingsFs = new($"{ConfigDir}/Settings.json", FileMode.Open);
+            StreamReader foldersr = new(folderFs),
+                         playersr = new(playerFs),
+                         runtimesr = new(runtimeFs),
+                         settingsr = new(settingsFs);
             Task<string> t1 = foldersr.ReadToEndAsync(),
                          t2 = playersr.ReadToEndAsync(),
                          t3 = runtimesr.ReadToEndAsync(),
@@ -146,14 +146,14 @@ namespace PixanKit.LaunchCore.Extention
             PlayerJData = JObject.Parse(t2.Result);
             RuntimeJData = JObject.Parse(t3.Result);
             SettingsJData = JObject.Parse(t4.Result);
-            folderFS.Close();
-            playerFS.Close();
-            runtimeFS.Close();
-            settingsFS.Close();
+            folderFs.Close();
+            playerFs.Close();
+            runtimeFs.Close();
+            settingsFs.Close();
         }
     }
 
-    internal static class DefaultJSON
+    internal static class DefaultJson
     {
         public static JObject JData = new()
         {

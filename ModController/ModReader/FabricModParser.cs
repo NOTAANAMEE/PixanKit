@@ -29,14 +29,14 @@ namespace PixanKit.ModController.ModReader
                 throw new InvalidOperationException("Init ModModule first!");
 
             var modEntry = JObject.Parse(jsonContent);
-            var modID = GetID(modEntry);
+            var modId = GetId(modEntry);
 
-            LoadModFile(modCollection, modID,
+            LoadModFile(modCollection, modId,
                 modEntry, archive,
                 out var dependenciesList,
                 out var version, out var releaseDate);
 
-            var metaData = LoadMetaData(modID, modEntry, archive);
+            var metaData = LoadMetaData(modId, modEntry, archive);
 
             ModFile modFile = new(filepath)
             {
@@ -49,15 +49,15 @@ namespace PixanKit.ModController.ModReader
             return modFile;
         }
 
-        private static string GetID(JObject modEntry)
+        private static string GetId(JObject modEntry)
             => modEntry.GetValue(Format.ToString, "id");
 
-        private static ModMetaData LoadMetaData(string modID, JObject modEntry, ZipArchive archive)
+        private static ModMetaData LoadMetaData(string modId, JObject modEntry, ZipArchive archive)
         {
             if (ModModule.Instance == null)
                 throw new InvalidOperationException("Exception");
 
-            var idInCache = ModModule.Instance.ModDatas.TryGetValue(modID,
+            var idInCache = ModModule.Instance.ModDatas.TryGetValue(modId,
                 out var metaData);
 
             if (idInCache) return metaData ??
@@ -65,25 +65,25 @@ namespace PixanKit.ModController.ModReader
 
             metaData = new ModMetaData()
             {
-                ModID = modID,
+                ModId = modId,
                 Description = modEntry.GetDescription(),
                 Authors = modEntry.GetAuthors(),
                 Name = modEntry.GetName(),
-                ImageCache = FMLModParser.LoadIcon(archive, modEntry.GetIcon(), modID),
+                ImageCache = FmlModParser.LoadIcon(archive, modEntry.GetIcon(), modId),
             };
             ModModule.Instance.AddMetaData(metaData);
 
             return metaData ?? throw new Exception("Exception avoid null warning");
         }
 
-        private static void LoadModFile(ModCollection modCollection, string modID,
+        private static void LoadModFile(ModCollection modCollection, string modId,
             JObject modEntry, ZipArchive archive,
             out List<string> depList, out string version, out DateTime releaseDate
             )
         {
             var entry = archive.GetEntry("META-INF/MANIFEST.MF");
             releaseDate = entry?.LastWriteTime.UtcDateTime ?? DateTime.UtcNow;
-            modCollection.ModCache.TryGetValue(Format.ToJObject, modID, out var modData);
+            modCollection.ModCache.TryGetValue(Format.ToJObject, modId, out var modData);
 
             if (modData == null)
             {
@@ -100,11 +100,11 @@ namespace PixanKit.ModController.ModReader
             if (ModModule.Instance == null)
                 throw new InvalidOperationException("ModModule Not Inited Yet");
 
-            ModModule.Instance.ModDatas.TryGetValue(GetID(modEntry), out var output);
+            ModModule.Instance.ModDatas.TryGetValue(GetId(modEntry), out var output);
             return output ?? ModModule.Instance.ModDatas["unknown"];
         }
 
-        internal static ModFile LoadAllFromJSON(ModCollection collection, string filepath, JObject modEntry)
+        internal static ModFile LoadAllFromJson(ModCollection collection, string filepath, JObject modEntry)
         {
             var metadata = GetFromModEntry(modEntry);
             var depList = modEntry.GetCacheDeps();
@@ -122,11 +122,11 @@ namespace PixanKit.ModController.ModReader
             return modFile;
         }
 
-        internal static ModMetaData ParseModMetaDataFromJSON(JObject modEntry)
+        internal static ModMetaData ParseModMetaDataFromJson(JObject modEntry)
         {
             return new ModMetaData()
             {
-                ModID = GetID(modEntry),
+                ModId = GetId(modEntry),
                 Description = modEntry.GetDescription(),
                 Authors = modEntry.GetAuthors(),
                 ImageCache = modEntry.GetOrDefault(Format.ToString, "icon", ""),

@@ -22,7 +22,7 @@
             if (_status > ProgressStatus.Inited)
                 throw new InvalidOperationException("Add A Process Before The Task Starts");
             ProgressTasks.Add(task);
-            _tasks.Add(task.MainTask);
+            Tasks.Add(task.MainTask);
             task.OnException += ReportException;
             task.OnReport += ReportProgress;
         }
@@ -88,7 +88,7 @@
             if (_status > ProgressStatus.Inited)
                 throw new InvalidOperationException("Add A Process Before The Task Starts");
             ProgressTasks.Add(task);
-            _tasks.Add(task.MainTask);
+            Tasks.Add(task.MainTask);
             task.OnException += ReportException;
             task.OnReport += ReportProgress;
         }

@@ -16,19 +16,19 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// <summary>
         /// The URLs of the files to download.
         /// </summary>
-        protected string[] urls = [];
+        protected string[] Urls = [];
 
         /// <summary>
         /// The file paths where the downloaded files will be saved.
         /// </summary>
-        protected string[] paths = [];
+        protected string[] Paths = [];
 
         /// <summary>
         /// The number of threads to use for downloading.
         /// </summary>
-        protected int threadnum = 1;
+        protected int Threadnum = 1;
 
-        List<FileDownloadTask> files = [];
+        List<FileDownloadTask> _files = [];
 
         /// <inheritdoc/>
         public long Size
@@ -36,7 +36,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             get
             {
                 long ret = 0;
-                foreach (var task in files)
+                foreach (var task in _files)
                 {
                     ret += task.Size;
                 }
@@ -50,7 +50,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             get
             {
                 long ret = 0;
-                foreach (var task in files)
+                foreach (var task in _files)
                 {
                     ret += task.DownloadedBytes;
                 }
@@ -61,7 +61,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// <inheritdoc/>
         public int TotalFiles
         {
-            get => paths.Length;
+            get => Paths.Length;
         }
 
         /// <inheritdoc/>
@@ -70,7 +70,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             get
             {
                 var ret = 0;
-                foreach (var task in files)
+                foreach (var task in _files)
                 {
                     ret += task.DownloadedFiles;
                 }
@@ -104,9 +104,9 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         {
             if (url.Length != path.Length)
                 throw new InvalidOperationException("url Should Contain Same Amount Of path");
-            this.threadnum = threanum;
-            urls = url;
-            paths = path;
+            this.Threadnum = threanum;
+            Urls = url;
+            Paths = path;
             Init();
         }
 
@@ -114,8 +114,8 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
 
         internal void Set(string[] url, string[] path)
         {
-            urls = url;
-            paths = path;
+            Urls = url;
+            Paths = path;
             Init();
         }
 
@@ -135,17 +135,17 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
 
             List<SequenceProgressTask> tasks = [];
 
-            for (var i = 0; i < urls.Length; i++)
+            for (var i = 0; i < Urls.Length; i++)
             {
                 FileDownloadTask? task;
 
                 //If ProgressTasks Does Not Have So Many Tasks, Add A New Task
                 if (ProgressTasks.Count < count + 1) tasks.Add(new SequenceProgressTask());
-                task = new FileDownloadTask(urls[i], paths[i], 1);
-                files.Add(task);
+                task = new FileDownloadTask(Urls[i], Paths[i], 1);
+                _files.Add(task);
                 tasks[count].Add(task);
                 count++;
-                if (count == threadnum) count = 0;
+                if (count == Threadnum) count = 0;
             }
             ProgressTasks = tasks.Cast<ProgressTask>().ToList();
         }

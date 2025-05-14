@@ -9,7 +9,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
     public class SimpleFileDownloadTask : FuncProgressTask<int>, IFileDownload
     {
         /// <inheritdoc/>
-        public long DownloadedBytes => downloadedBytes;
+        public long DownloadedBytes => _downloadedBytes;
 
         /// <inheritdoc/>
         public long Size => throw new NotImplementedException();
@@ -26,7 +26,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
 
         readonly string _path;
 
-        long downloadedBytes = 0;
+        long _downloadedBytes = 0;
 
         /// <summary>
         /// Inits the download task with certain url and path
@@ -67,7 +67,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
                 {
                     //Console.WriteLine($"{_stream.Length} - {_stream.Length + bytesRead - 1}");
                     await _stream.WriteAsync(bytes, 0, bytesRead, token);
-                    downloadedBytes += bytesRead;
+                    _downloadedBytes += bytesRead;
                 }
             }
             catch (OperationCanceledException)
@@ -83,7 +83,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             return 0;
         }
 
-        internal void SetURL(string url)
+        internal void SetUrl(string url)
         {
             _url = url;
         }

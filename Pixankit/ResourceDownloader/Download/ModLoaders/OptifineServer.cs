@@ -34,22 +34,22 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         /// </summary>
         public class OfficialOptifineServer : ModLoaderMirror
         {
-            HttpClient client = new();
+            HttpClient _client = new();
 
             /// <summary>
             /// 
             /// </summary>
             public OfficialOptifineServer()
             {
-                BaseURL = "https://optifine.net";
-                client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                BaseUrl = "https://optifine.net";
+                _client.DefaultRequestHeaders.UserAgent.ParseAdd(
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
                     "(KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36");//UA
             }
 
             private async Task<HtmlNodeCollection?> GetNodes(CancellationToken token)
             {
-                var response = await client.GetAsync("https://optifine.net/downloads", token);
+                var response = await _client.GetAsync("https://optifine.net/downloads", token);
                 if (token.IsCancellationRequested) return null;
                 var content = await response.Content.ReadAsStringAsync(token);
                 if (token.IsCancellationRequested) return null;
@@ -126,9 +126,9 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <param name="modloaderinf"><inheritdoc/></param>
             /// <param name="token"><inheritdoc/></param>
             /// <returns></returns>
-            public override async Task<string> GetURL(JObject modloaderinf, CancellationToken token)
+            public override async Task<string> GetUrl(JObject modloaderinf, CancellationToken token)
             {
-                var response = await client.GetAsync(modloaderinf["url"]?.ToString(), token);
+                var response = await _client.GetAsync(modloaderinf["url"]?.ToString(), token);
                 if (token.IsCancellationRequested) return "";
                 var content = await response.Content.ReadAsStringAsync(token);
                 if (token.IsCancellationRequested) return "";

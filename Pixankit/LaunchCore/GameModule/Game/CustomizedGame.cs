@@ -1,5 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Json;
+﻿using PixanKit.LaunchCore.Core;
+using PixanKit.LaunchCore.GameModule.LibraryData;
+using PixanKit.LaunchCore.GameModule.Folders;
 
 namespace PixanKit.LaunchCore.GameModule.Game
 {
@@ -11,91 +12,76 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <summary>
         /// Whether It Is useBaseGeneration Created
         /// </summary>
-        protected bool useBaseGeneration;
-
+        private readonly bool _useBaseGeneration;
+        
         /// <summary>
-        /// Init A <c>ModifiedGame</c> 
+        /// ThisParameter is the parameter from the local json.
         /// </summary>
-        /// <param name="path"></param>
-        /// <param name="jData"></param>
-        public CustomizedGame(string path, JObject jData) : base(path, jData)
+        protected GameParameter ThisParameter;
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="folder"></param>
+        /// <param name="param"></param>
+        /// <param name="libs"></param>
+        public CustomizedGame(string name, Folder folder, 
+            GameParameter param, LibrariesRef libs) : 
+            base(name, folder, param, libs)
         {
-            _gameType = GameType.Customized;
+            ThisParameter = param;
+            GameType = GameType.Customized;
+            _useBaseGeneration = param.ReliedArgs;
         }
 
-        /// <summary>
-        /// Init A Modified Game With Its Path
-        /// </summary>
-        /// <param name="path"></param>
-        public CustomizedGame(string path) : base(path, true)
+        private LibrariesRef? _libs;
+        private GameParameter? _gameArgs;
+
+        private GameParameter GetGameArgs()
         {
-            _gameType = GameType.Customized;
+            if (_gameArgs != null) return _gameArgs;
+
+            if (!Launcher.Instance.GameManager.TryGetParam(Version,
+                    out var param, out var libs))
+                throw new Exception();
+            _libs = libs;
+            _gameArgs = param;
+            return _gameArgs;
+        }
+        
+        private LibrariesRef GetLibrariesRef()
+        {
+            if (_libs != null) return _libs;
+
+            if(!Launcher.Instance.GameManager.TryGetParam(Version, 
+                    out var param, out var libs)) 
+                throw new Exception();
+            _libs = libs;
+            _gameArgs = param;
+            return _libs;
         }
 
         /// <inheritdoc/>
-        protected override void LoadJSON(JObject Jdata)
+        protected override string GetAssetsId()
         {
-            if (!Jdata.TryGetValue(Format.ToString, "inheritsFrom", out string? output))
-            {
-                useBaseGeneration = true;
-                assetsID =
-                    Jdata.GetOrDefault(Format.ToString, "assetIndex/id", "");
-                _version = Jdata.GetOrDefault(Format.ToString, "clientVersion", "");
-            }
-            else
-            {
-                _version = output ?? "";
-            }
+            return _useBaseGeneration ? GetGameArgs().AssetsId : Params.AssetsId;
         }
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        /// <returns><inheritdoc/></returns>
-        protected override string GetCPArgs()
+        protected override string GetArgument()
         {
-            if (useBaseGeneration) return base.GetCPArgs();
-            return SameVersionCPArgs() + base.GetCPArgs();
+            return _useBaseGeneration?
+                GetGameArgs().GameArgs + base.GetArgument() + GetGameArgs().GameArgs : 
+                base.GetArgument();
         }
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        /// <returns><inheritdoc/></returns>
-        protected override string GetGameArguments()
+        protected override string GetCpArgs()
         {
-            if (useBaseGeneration) return ProcessedGameArgProcess(base.GetGameArguments());
-            return SameVersionGameArguments() + " " + base.GetGameArguments();
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns><inheritdoc/></returns>
-        protected override string GetJVMArguments()
-        {
-            if (useBaseGeneration) return base.GetJVMArguments();
-            return base.GetJVMArguments();
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns><inheritdoc/></returns>
-        protected override string GetAssetsID()
-        {
-            if (useBaseGeneration) return base.GetAssetsID();
-            return base.SameVersionAssetsID();
-        }
-
-        internal string ProcessedGameArgProcess(string args)
-        {
-            if (args.Contains(" --tweakClass optifine.OptiFineForgeTweaker"))
-            {
-                args = args.Replace(" --tweakClass optifine.OptiFineForgeTweaker", "");
-                args += " --tweakClass optifine.OptiFineForgeTweaker";
-            }
-            return args;
+            return _useBaseGeneration ? 
+                base.GetCpArgs() + GetCpArgs(GetLibrariesRef().Libraries): 
+                base.GetCpArgs();
         }
     }
 }

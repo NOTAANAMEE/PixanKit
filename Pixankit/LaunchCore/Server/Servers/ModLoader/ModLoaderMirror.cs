@@ -30,7 +30,7 @@ namespace PixanKit.LaunchCore.Server.Servers.ModLoader
         /// <param name="modloaderinf">A JSON object containing mod loader information.</param>
         /// <param name="token">A cancellation token to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the URL of the mod loader installer.</returns>
-        public abstract Task<string> GetURL(JObject modloaderinf, CancellationToken token);
+        public abstract Task<string> GetUrl(JObject modloaderinf, CancellationToken token);
         #endregion
     }
 }

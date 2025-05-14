@@ -1,4 +1,4 @@
-﻿using PixanKit.LaunchCore.Log;
+﻿using PixanKit.LaunchCore.Logger;
 using PixanKit.ResourceDownloader.Tasks.FuncTask;
 
 namespace PixanKit.ResourceDownloader.Download.DownloadTask
@@ -16,10 +16,10 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         private readonly string _url;
 
         /// <inheritdoc/>
-        public long Size { get => _end - _start + 1; }
+        public long Size { get => End - Start + 1; }
 
         /// <inheritdoc/>
-        public long DownloadedBytes { get => downloadedBytes; }
+        public long DownloadedBytes { get => _downloadedBytes; }
 
         /// <inheritdoc/>
         public int TotalFiles { get => 0; }
@@ -30,14 +30,14 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// <summary>
         /// The starting byte position of the file chunk to download.
         /// </summary>
-        public readonly long _start;
+        public readonly long Start;
 
         /// <summary>
         /// The ending byte position of the file chunk to download.
         /// </summary>
-        public readonly long _end;
+        public readonly long End;
 
-        long downloadedBytes;
+        long _downloadedBytes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileChunkDownloadTask"/> class 
@@ -49,8 +49,8 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         public FileChunkDownloadTask(string url, long start, long end) : base()
         {
             _url = url;
-            _start = start;
-            _end = end;
+            Start = start;
+            End = end;
             Function += DownloadAsync;
         }
 
@@ -63,18 +63,18 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         public FileChunkDownloadTask(string url, long start) : base()
         {
             _url = url;
-            _start = start;
-            _end = start + ChunkSize - 1;
+            Start = start;
+            End = start + ChunkSize - 1;
             Function += DownloadAsync;
         }
 
         private async Task<Stream> DownloadAsync(Action<double> progress, CancellationToken token)
         {
             HttpClient client = new();
-            var totalBytes = _end - _start + 1;
+            var totalBytes = End - Start + 1;
             MemoryStream ret = new();
             HttpResponseMessage? response = null;
-            client.DefaultRequestHeaders.Range = new System.Net.Http.Headers.RangeHeaderValue(_start, _end);
+            client.DefaultRequestHeaders.Range = new System.Net.Http.Headers.RangeHeaderValue(Start, End);
             try
             {
                 response = await client.GetAsync(_url, HttpCompletionOption.ResponseHeadersRead, CancellationToken.Token);
@@ -100,8 +100,8 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
                 && !CancellationToken.IsCancellationRequested)
             {
                 ret.Write(buffer, 0, bytesRead);
-                downloadedBytes += bytesRead;
-                progress((double)downloadedBytes / Size);
+                _downloadedBytes += bytesRead;
+                progress((double)_downloadedBytes / Size);
             }
         }
     }

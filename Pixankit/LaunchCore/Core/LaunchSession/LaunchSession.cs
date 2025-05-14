@@ -1,9 +1,9 @@
-﻿using PixanKit.LaunchCore.Extention;
+﻿using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.JavaModule.Java;
 using System.Diagnostics;
 
-namespace PixanKit.LaunchCore.Core
+namespace PixanKit.LaunchCore.Core.LaunchSession
 {
     /// <summary>
     /// Represents a session for launching a Minecraft game instance.
@@ -38,9 +38,9 @@ namespace PixanKit.LaunchCore.Core
         /// <summary>
         /// Stores the process start information.
         /// </summary>
-        private readonly ProcessStartInfo StartInfo;
+        private readonly ProcessStartInfo _startInfo;
 
-        DateTime time = DateTime.Now;
+        DateTime _time = DateTime.Now;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LaunchSession"/> class.
@@ -53,9 +53,9 @@ namespace PixanKit.LaunchCore.Core
             Game = game;
             Runtime = java;
             Arguments = args;
-            StartInfo = new()
+            _startInfo = new()
             {
-                FileName = java.JavawEXE,
+                FileName = java.JavawExe,
                 Arguments = args,
                 WorkingDirectory = Path.GetFullPath(Files.CacheDir),
                 CreateNoWindow = true,
@@ -69,7 +69,7 @@ namespace PixanKit.LaunchCore.Core
         {
             Process = new()
             {
-                StartInfo = StartInfo,
+                StartInfo = _startInfo,
                 EnableRaisingEvents = true,
             };
             Process.Start();
@@ -97,7 +97,7 @@ namespace PixanKit.LaunchCore.Core
 
         private void Exit(object? sender, EventArgs e)
         {
-            time = DateTime.Now;
+            _time = DateTime.Now;
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace PixanKit.LaunchCore.Core
             string path = "";
             foreach (string dir in Directory.GetDirectories(Files.CacheDir + "/logs"))
             {
-                if (Directory.GetCreationTime(dir) == time)
+                if (Directory.GetCreationTime(dir) == _time)
                 {
                     path = dir;
                     break;
@@ -119,7 +119,7 @@ namespace PixanKit.LaunchCore.Core
             return new()
             {
                 ReturnCode = Process?.ExitCode ?? -1,
-                LogGZPath = path,
+                LogGzPath = path,
                 CrashFilePath = LogPath,
             };
         }

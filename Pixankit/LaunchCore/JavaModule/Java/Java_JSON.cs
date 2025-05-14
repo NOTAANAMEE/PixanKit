@@ -6,7 +6,7 @@ namespace PixanKit.LaunchCore.JavaModule.Java
     public partial class JavaRuntime
     {
         /// <inheritdoc/>
-        public void LoadFromJSON(JObject obj)
+        public void LoadFromJson(JObject obj)
         {
             _javaFolder = obj.GetOrDefault(Format.ToString, "path", "");
             _version = obj.GetOrDefault((a) => (ushort)a, "version", (ushort)0);
@@ -16,7 +16,7 @@ namespace PixanKit.LaunchCore.JavaModule.Java
         /// <inheritdoc/>
         /// </summary>
         /// <returns><inheritdoc/></returns>
-        public JObject ToJSON()
+        public JObject ToJson()
         {
             return new JObject()
             {

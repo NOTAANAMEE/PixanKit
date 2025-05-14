@@ -10,7 +10,7 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
     /// </summary>
     public static class MojangSkin
     {
-        private static HttpClient client = new()
+        private static HttpClient _client = new()
         {
             Timeout = TimeSpan.FromSeconds(20)
         };
@@ -22,8 +22,8 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
         /// <returns></returns>
         public static async Task Delete(MicrosoftPlayer player)
         {
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", player.AccessToken);
-            await client.DeleteAsync($"https://api.mojang.com/user/profile/{player.UID}/skin");
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", player.AccessToken);
+            await _client.DeleteAsync($"https://api.mojang.com/user/profile/{player.Uid}/skin");
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
         public static async Task Upload(MicrosoftPlayer player, string skinPath, bool slim)
         {
             if (skinPath == "") return;
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", player.AccessToken);
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", player.AccessToken);
 
             byte[] skinData = File.ReadAllBytes(skinPath);
 
@@ -46,7 +46,7 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
                 { new ByteArrayContent(File.ReadAllBytes(skinPath)), "file", Path.GetFileName(skinPath) }
             };
 
-            HttpResponseMessage response = await client.PostAsync(
+            HttpResponseMessage response = await _client.PostAsync(
                 $"https://api.minecraftservices.com/minecraft/profile/skins", content);
         }
 
@@ -55,12 +55,12 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
         /// </summary>
         /// <param name="player"></param>
         /// <returns></returns>
-        public static async Task<string> GetCapeURL(MicrosoftPlayer player)
+        public static async Task<string> GetCapeUrl(MicrosoftPlayer player)
         {
-            string response = await client.GetStringAsync($"https://sessionserver.mojang.com/session/minecraft/profile/{player.UID}");
+            string response = await _client.GetStringAsync($"https://sessionserver.mojang.com/session/minecraft/profile/{player.Uid}");
             JObject jData = JObject.Parse(response);
-            string base64code = jData["properties"]?[0]?["value"]?.ToString() ?? "";
-            jData = JObject.Parse(Base64Decode(base64code));
+            string base64Code = jData["properties"]?[0]?["value"]?.ToString() ?? "";
+            jData = JObject.Parse(Base64Decode(base64Code));
             return jData["textures"]?["CAPE"]?["url"]?.ToString() ?? "";
         }
 

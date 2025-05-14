@@ -1,9 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Exceptions;
-using PixanKit.LaunchCore.GameModule;
+using PixanKit.LaunchCore.GameModule.Folders;
 using PixanKit.LaunchCore.Server;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
-using PixanKit.ResourceDownloader.SystemInf;
 using PixanKit.ResourceDownloader.Tasks;
 using PixanKit.ResourceDownloader.Tasks.FuncTask;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
@@ -15,19 +14,19 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// </summary>
     public class VanillaMinimalInstallTask : SequenceProgressTask
     {
-        readonly Folder Owner;
+        readonly Folder _owner;
 
-        readonly string name;
+        readonly string _name;
 
-        readonly string version;
+        readonly string _version;
 
-        readonly string path;
+        readonly string _path;
 
-        readonly FuncProgressTask<int> InitTask = new();
+        readonly FuncProgressTask<int> _initTask = new();
 
-        FileDownloadTask? jsondownload;
+        FileDownloadTask? _jsondownload;
 
-        FileDownloadTask? jardownload;
+        FileDownloadTask? _jardownload;
 
         /// <summary>
         /// Initor
@@ -39,25 +38,25 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// <exception cref="Exception"></exception>
         public VanillaMinimalInstallTask(Folder folder, string name, string version)
         {
-            Owner = folder;
-            this.name = name;
-            this.version = version;
-            path = Path.Combine(folder.VersionDirPath, name);
-            InitTask.Function += GetVersion;
+            _owner = folder;
+            this._name = name;
+            this._version = version;
+            _path = Path.Combine(folder.VersionDirPath, name);
+            _initTask.Function += GetVersion;
             Init();
         }
 
         private void Init()
         {
-            if (Directory.Exists(path)) throw new IOException($"Already Exists {path}");
+            if (Directory.Exists(_path)) throw new IOException($"Already Exists {_path}");
 
-            Directory.CreateDirectory(path);
-            Add(InitTask);
-            Add(jsondownload = new FileDownloadTask("", path + $"/{name}.json"));
+            Directory.CreateDirectory(_path);
+            Add(_initTask);
+            Add(_jsondownload = new FileDownloadTask("", _path + $"/{_name}.json"));
 
-            Add(jardownload = new FileDownloadTask("", path + $"/{name}.jar"));
+            Add(_jardownload = new FileDownloadTask("", _path + $"/{_name}.jar"));
 
-            jsondownload.OnFinish += Task1Finish;
+            _jsondownload.OnFinish += Task1Finish;
         }
 
 
@@ -69,10 +68,10 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                 jArray = await ServerList.MinecraftVersionServer.GetVersionsAsync(token);
                 foreach (var item in jArray)
                 {
-                    if (item["id"]?.ToString() == version)
+                    if (item["id"]?.ToString() == _version)
                     {
-                        jsondownload?.SetURL(item["url"]?.ToString() ??
-                            throw new JSONKeyException(item, "url", "impossible"));
+                        _jsondownload?.SetUrl(item["url"]?.ToString() ??
+                            throw new JsonKeyException(item, "url", "impossible"));
                         report?.Invoke(1);
                         return 0;
                     }
@@ -85,9 +84,9 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         private void Task1Finish(ProgressTask task)
         {
             var mcjData = JObject.Parse(
-                File.ReadAllText(Localize.PathLocalize($"{path}/{name}.json")));
-            jardownload?.SetURL(mcjData["downloads"]?["client"]?["url"]?.ToString() ??
-                throw new JSONKeyException(mcjData, "downloads/client/url", "Version JSON document"));
+                File.ReadAllText(Localize.PathLocalize($"{_path}/{_name}.json")));
+            _jardownload?.SetUrl(mcjData["downloads"]?["client"]?["url"]?.ToString() ??
+                throw new JsonKeyException(mcjData, "downloads/client/url", "Version JSON document"));
         }
     }
 }

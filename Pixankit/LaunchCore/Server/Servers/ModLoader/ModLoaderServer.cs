@@ -54,8 +54,8 @@ namespace PixanKit.LaunchCore.Server.Servers.ModLoader
         /// </summary>
         /// <param name="modloaderinf"></param>
         /// <returns></returns>
-        public Task<string> GetURL(JObject modloaderinf)
-            => GetURL(modloaderinf, CancellationToken.None);
+        public Task<string> GetUrl(JObject modloaderinf)
+            => GetUrl(modloaderinf, CancellationToken.None);
 
         /// <summary>
         /// Get the URL of the mod loader installer.
@@ -64,8 +64,8 @@ namespace PixanKit.LaunchCore.Server.Servers.ModLoader
         /// <param name="modloaderinf">the modloader JSON data</param>
         /// <param name="token">token</param>
         /// <returns>the specific url of the installer</returns>
-        public Task<string> GetURL(JObject modloaderinf, CancellationToken token)
-            => Current.GetURL(modloaderinf, token);
+        public Task<string> GetUrl(JObject modloaderinf, CancellationToken token)
+            => Current.GetUrl(modloaderinf, token);
 
         /// <summary>
         /// Get The Modloader Versions That Are Suitable For The Minecraft Version

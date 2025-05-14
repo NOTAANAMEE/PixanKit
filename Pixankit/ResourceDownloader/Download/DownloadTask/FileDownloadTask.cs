@@ -17,7 +17,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// <inheritdoc/>
         public long Size
         {
-            get => size;
+            get => _size;
         }
 
         /// <inheritdoc/>
@@ -38,23 +38,23 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         public int TotalFiles { get => 1; }
 
         /// <inheritdoc/>
-        public int DownloadedFiles { get => (Status == ProgressStatus.Finished) ? 1 : 0; }
+        public int DownloadedFiles { get => (((ProgressTask)this).Status == ProgressStatus.Finished) ? 1 : 0; }
 
         private string _url = "";
 
-        private readonly string savePath;
+        private readonly string _savePath;
 
         private readonly FileStream _stream;
 
         private readonly object _filelock = new();
 
-        private readonly int threadnum = 1;
+        private readonly int _threadnum = 1;
 
-        private long size;
+        private long _size;
 
-        private FuncProgressTask<int> InitTask = new();
+        private FuncProgressTask<int> _initTask = new();
 
-        private AsyncProgressTask<DownloadThread> DownloadTask = new();
+        private AsyncProgressTask<DownloadThread> _downloadTask = new();
 
 
         /// <summary>
@@ -75,9 +75,9 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         /// <param name="threadnum">The number of threads to use for downloading.</param>
         public FileDownloadTask(string url, string path, int threadnum)
         {
-            this.threadnum = threadnum;
+            this._threadnum = threadnum;
             _url = url;
-            savePath = path;
+            _savePath = path;
             Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "./");
             _stream = new FileStream(path, FileMode.Create);
             OnCancel += CancelRun;
@@ -90,12 +90,12 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
 
         private void Init()
         {
-            Add(InitTask);
-            Add(DownloadTask);
-            InitTask.Function += InitRun;
-            for (var i = 0; i < threadnum; i++)
+            Add(_initTask);
+            Add(_downloadTask);
+            _initTask.Function += InitRun;
+            for (var i = 0; i < _threadnum; i++)
             {
-                DownloadTask.Add(new DownloadThread(_stream, _filelock));
+                _downloadTask.Add(new DownloadThread(_stream, _filelock));
             }
         }
 
@@ -107,16 +107,16 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
                 HttpCompletionOption.ResponseHeadersRead, token);
             response.EnsureSuccessStatusCode();
             length = response.Content.Headers.ContentLength ?? 0;
-            baselength = length / threadnum;
-            mod = baselength % threadnum;
-            size = length;
+            baselength = length / _threadnum;
+            mod = baselength % _threadnum;
+            _size = length;
             response.Dispose();
             client.Dispose();
-            foreach (var thread in DownloadTask.ProgressTasks)
+            foreach (var thread in _downloadTask.ProgressTasks)
             {
                 if (token.IsCancellationRequested) throw new TaskCanceledException();
                 var end = startcounter + baselength + ((--mod >= 0) ? 1 : 0);
-                thread.SetURL(_url, startcounter, end - 1);
+                thread.SetUrl(_url, startcounter, end - 1);
                 startcounter = end;
             }
             return 0;
@@ -133,7 +133,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
             base.Start();
         }
 
-        internal void SetURL(string url)
+        internal void SetUrl(string url)
         {
             _url = url;
         }
@@ -143,7 +143,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask
         private void CancelRun(ProgressTask t)
         {
             _stream.Close();
-            File.Delete(savePath);
+            File.Delete(_savePath);
         }
     }
 }

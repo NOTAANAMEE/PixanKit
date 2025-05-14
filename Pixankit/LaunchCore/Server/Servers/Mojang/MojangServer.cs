@@ -20,14 +20,14 @@ namespace PixanKit.LaunchCore.Server.Servers.Mojang
         /// <summary>
         /// The Base URL Of The Server
         /// </summary>
-        public string BaseURL { get; } = "https://api.minecraftservices.com";
+        public string BaseUrl { get; } = "https://api.minecraftservices.com";
 
         /// <summary>
         /// The HTTP Client
         /// </summary>
         public HttpClient Client { get; } = new HttpClient() { BaseAddress = new Uri("https://api.minecraftservices.com") };
 
-        internal async Task<string> GetAccessToken(XSTSServer.XSTSVerification authorize)
+        internal async Task<string> GetAccessToken(XstsServer.XstsVerification authorize)
         {
             string data, ret;
             {

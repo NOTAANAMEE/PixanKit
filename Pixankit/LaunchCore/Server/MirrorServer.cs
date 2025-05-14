@@ -8,25 +8,25 @@
         /// <summary>
         /// The Vanilla base url of the network assets
         /// </summary>
-        protected string OriginalURL;
+        protected string OriginalUrl;
 
         /// <summary>
         /// The base url of the network assets. It will replace the base url
         /// </summary>
-        public string BaseURL;
+        public string BaseUrl;
 
         /// <summary>
         /// Initor But Do Nothing. Do Not Use That
         /// </summary>
-        public MirrorServer() { OriginalURL = ""; BaseURL = ""; }
+        public MirrorServer() { OriginalUrl = ""; BaseUrl = ""; }
 
         ///<summary>Initor</summary>
-        /// <param name="OriginalURL">The Url Part That Needs To Replace(If No, Make It "")</param>
-        /// <param name="ReplacedURL">The Url That Replacing(Include https://)</param>
-        public MirrorServer(string OriginalURL, string ReplacedURL)
+        /// <param name="originalUrl">The Url Part That Needs To Replace(If No, Make It "")</param>
+        /// <param name="replacedUrl">The Url That Replacing(Include https://)</param>
+        public MirrorServer(string originalUrl, string replacedUrl)
         {
-            this.OriginalURL = OriginalURL;
-            this.BaseURL = ReplacedURL;
+            this.OriginalUrl = originalUrl;
+            this.BaseUrl = replacedUrl;
         }
 
         /// <summary>
@@ -36,7 +36,7 @@
         /// <returns>The Replaced URL</returns>
         public virtual string Replace(string url)
         {
-            return OriginalURL == "" ? url : url.Replace(OriginalURL, BaseURL);
+            return OriginalUrl == "" ? url : url.Replace(OriginalUrl, BaseUrl);
         }
     }
 }

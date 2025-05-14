@@ -1,8 +1,8 @@
 ﻿using PixanKit.LaunchCore.Json;
-using PixanKit.LaunchCore.Log;
 using PixanKit.ModController.Mod;
 using PixanKit.ModController.Module;
 using System.IO.Compression;
+using PixanKit.LaunchCore.Logger;
 
 namespace PixanKit.ModController.ModReader
 {
@@ -31,8 +31,8 @@ namespace PixanKit.ModController.ModReader
         public static readonly List<KeyValuePair<string, ModParserFunc>> ModParsers =
         [
             new("fabric.mod.json", ParseFabric),
-            new("META-INF/mods.toml", ParseFML),
-            new("mcmod.info", ParseFOV),
+            new("META-INF/mods.toml", ParseFml),
+            new("mcmod.info", ParseFov),
         ];
 
         /// <summary>
@@ -70,22 +70,22 @@ namespace PixanKit.ModController.ModReader
             return FabricModParser.ParseJson(content, filepath, collection, archive);
         }
 
-        private static ModFile ParseFML(string filepath, ZipArchive archive, ZipArchiveEntry entry,
+        private static ModFile ParseFml(string filepath, ZipArchive archive, ZipArchiveEntry entry,
             ModCollection collection)
         {
             var stream = entry.Open();
             StreamReader sr = new(stream);
             var content = sr.ReadToEnd();
-            return FMLModParser.ParseToml(content, filepath, collection, archive);
+            return FmlModParser.ParseToml(content, filepath, collection, archive);
         }
 
-        private static ModFile ParseFOV(string filepath, ZipArchive archive, ZipArchiveEntry entry,
+        private static ModFile ParseFov(string filepath, ZipArchive archive, ZipArchiveEntry entry,
             ModCollection collection)
         {
             var stream = entry.Open();
             StreamReader sr = new(stream);
             var content = sr.ReadToEnd();
-            return FOVModParser.ParseJson(content, filepath, collection, archive);
+            return FovModParser.ParseJson(content, filepath, collection, archive);
         }
 
         private static ModFile ParseInv(string filepath, ModCollection collection)
@@ -94,7 +94,7 @@ namespace PixanKit.ModController.ModReader
                 $"ModFile will be loaded as default");
             var filename = Path.GetFileName(filepath);
             if (collection.ModCache.ContainsKey(filename))
-                return FabricModParser.LoadAllFromJSON(
+                return FabricModParser.LoadAllFromJson(
                               collection,
                               filepath,
                               collection.ModCache[filename].ConvertTo(Format.ToJObject, []));

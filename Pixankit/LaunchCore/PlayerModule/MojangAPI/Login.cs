@@ -19,13 +19,13 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
     /// </remarks>
     public static class MojangLogin
     {
-        private static MSLoginServer Msserver => ServerList.MicrosoftLoginServer;
+        private static MsLoginServer Msserver => ServerList.MicrosoftLoginServer;
 
         private static XboxServer Xboxserver => ServerList.XboxLoginServer;
 
-        private static XSTSServer Xstsserver => ServerList.XSTSServer; 
+        private static XstsServer Xstsserver => ServerList.XstsServer; 
 
-        private static MojangLoginServer _loginserver => ServerList.MojangLoginServer;
+        private static MojangLoginServer Loginserver => ServerList.MojangLoginServer;
 
         /// <summary>
         /// Verify Microsoft Account From The Code
@@ -37,47 +37,47 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
         /// Code:M.C529_BL2.2.U.AAAAAAAAAAAAAAAAA
         /// </param>
         /// <returns>
-        /// <see cref="MSLoginServer.MSAuthorize"/>
+        /// <see cref="MsLoginServer.MsAuthorize"/>
         /// </returns>
-        public static async Task<MSLoginServer.MSAuthorize> GetMSToken(string code)
+        public static async Task<MsLoginServer.MsAuthorize> GetMsToken(string code)
             => await Msserver.Authorize(code);
 
         /// <summary>
         /// Refresh MS Token
         /// </summary>
         /// <param name="refreshtoken">
-        /// <see cref="MSLoginServer.MSAuthorize.MSrefreshToken"/>
+        /// <see cref="MsLoginServer.MsAuthorize.MSrefreshToken"/>
         /// </param>
         /// <returns>
-        /// <see cref="MSLoginServer.MSAuthorize"/></returns>
-        public static async Task<MSLoginServer.MSAuthorize> RefreshMSToken(string refreshtoken)
+        /// <see cref="MsLoginServer.MsAuthorize"/></returns>
+        public static async Task<MsLoginServer.MsAuthorize> RefreshMsToken(string refreshtoken)
             => await Msserver.ReAuthorize(refreshtoken);
 
         /// <summary>
         /// Get XBOX Authorize
         /// </summary>
-        /// <param name="MSaccessToken">
-        /// <see cref="MSLoginServer.MSAuthorize.MSaccessToken"/></param>
+        /// <param name="mSaccessToken">
+        /// <see cref="MsLoginServer.MsAuthorize.MSaccessToken"/></param>
         /// <returns>
         /// <see cref="XboxServer.XboxAuthorize"/></returns>
-        public static async Task<XboxServer.XboxAuthorize> XBoxAuthorize(string MSaccessToken)
-            => await Xboxserver.Authorize(MSaccessToken);
+        public static async Task<XboxServer.XboxAuthorize> XBoxAuthorize(string mSaccessToken)
+            => await Xboxserver.Authorize(mSaccessToken);
 
         /// <summary>
         /// XSTS Verification Process
         /// </summary>
-        /// <param name="XboxToken"><see cref="XboxServer.XboxAuthorize.Xboxtoken"/></param>
-        /// <returns><see cref="XSTSServer.XSTSVerification"/></returns>
-        public static async Task<XSTSServer.XSTSVerification> XSTSVerification(string XboxToken)
-            => await Xstsserver.XSTSVerify(XboxToken);
+        /// <param name="xboxToken"><see cref="XboxServer.XboxAuthorize.Xboxtoken"/></param>
+        /// <returns><see cref="XstsServer.XstsVerification"/></returns>
+        public static async Task<XstsServer.XstsVerification> XstsVerification(string xboxToken)
+            => await Xstsserver.XstsVerify(xboxToken);
 
         /// <summary>
         /// Get The Minecraft AccessToken
         /// </summary>
         /// <param name="verification"></param>
         /// <returns>The Minecraft AccessToken</returns>
-        public static async Task<string> MinecraftAccessToken(XSTSServer.XSTSVerification verification)
-            => await _loginserver.GetAccessToken(verification);
+        public static async Task<string> MinecraftAccessToken(XstsServer.XstsVerification verification)
+            => await Loginserver.GetAccessToken(verification);
 
         /// <summary>
         /// Get uuid,Name And Skin url
@@ -86,6 +86,6 @@ namespace PixanKit.LaunchCore.PlayerModule.MojangAPI
         /// <returns><see cref="MojangLoginServer.PlayerInf"/></returns>
         /// <exception cref="InvalidOperationException">If The User Has Not Bought Minecraft Yet, The Exception Will Be Thrown</exception>
         public static async Task<MojangLoginServer.PlayerInf> MinecraftUid(string accessToken)
-            => await _loginserver.GetPlayerInformation(accessToken);
+            => await Loginserver.GetPlayerInformation(accessToken);
     }
 }

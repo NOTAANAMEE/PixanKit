@@ -1,17 +1,20 @@
-﻿using PixanKit.LaunchCore.GameModule.Exceptions;
+﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Extension;
+using PixanKit.LaunchCore.GameModule.Exceptions;
+using PixanKit.LaunchCore.GameModule.Folders;
 using PixanKit.LaunchCore.GameModule.Game;
-using PixanKit.LaunchCore.GameModule;
-using PixanKit.LaunchCore.Log;
-using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Extention;
+using PixanKit.LaunchCore.GameModule.LibraryData;
+using System.Diagnostics.CodeAnalysis;
 
-namespace PixanKit.LaunchCore.Core
+namespace PixanKit.LaunchCore.Core.Managers
 {
     /// <summary>
     /// Manages game folders and game instances for the launcher.
     /// </summary>
     public class GameManager
     {
+        private record GameParams(GameParameter Parameter, LibrariesRef Libraries);
+        
         #region Properties
         /// <summary>
         /// Gets the collection of folders managed by the launcher.
@@ -24,6 +27,8 @@ namespace PixanKit.LaunchCore.Core
         public GameBase? TargetGame { get; set; }
 
         private List<Folder> _folders = [];
+        
+        private Dictionary<string, GameParams> _gameRefs = [];
         #endregion
 
         #region Init
@@ -49,7 +54,7 @@ namespace PixanKit.LaunchCore.Core
             string tmpstr = (Files.FolderJData["target"] ?? "").ToString();
             if (tmpstr != "") TargetGame = FindGame(tmpstr);
             UpdateTargetGame();
-            Logger.Info("Game Module Inited Successfully");
+            Logger.Logger.Info("Game Module Inited Successfully");
         }
         #endregion
 
@@ -62,7 +67,7 @@ namespace PixanKit.LaunchCore.Core
         public bool Contains(GameBase? game)
         {
             if (game == null) return false;
-            return Contains(game.Owner) && (game.Owner?.Contains(game) ?? false);
+            return Contains(game.Owner) && game.Owner.Contains(game);
         }
 
         /// <summary>
@@ -71,10 +76,8 @@ namespace PixanKit.LaunchCore.Core
         /// <param name="folder">The folder to check.</param>
         /// <returns><c>true</c> if the folder exists; otherwise, <c>false</c>.</returns>
         public bool Contains(Folder? folder)
-        {
-            if (folder == null) return false;
-            return _folders.Contains(folder);
-        }
+            =>folder != null && _folders.Contains(folder);
+        
 
         /// <summary>
         /// Adds a folder to the launcher.
@@ -89,7 +92,7 @@ namespace PixanKit.LaunchCore.Core
             }
             _folders.Add(folder);
             UpdateTargetGame();
-            Logger.Info($"Folder {folder.FolderPath} Added");
+            Logger.Logger.Info($"Folder {folder.FolderPath} Added");
         }
 
         /// <summary>
@@ -121,11 +124,9 @@ namespace PixanKit.LaunchCore.Core
         /// <returns>The folder if found; otherwise, <c>null</c>.</returns>
         public Folder? FindFolder(string path)
         {
-            foreach (Folder folder in _folders)
-            {
-                if (folder.FolderPath == path) return folder;
-            }
-            return null;
+            path = path.Replace("\\", "/");
+            return _folders.
+                FirstOrDefault(folder => path.StartsWith(folder.FolderPath));
         }
 
         /// <summary>
@@ -140,13 +141,20 @@ namespace PixanKit.LaunchCore.Core
             UpdateTargetGame();
         }
 
+        public void AddGame(string path)
+        {
+            var name = Path.GetFileName(path);
+            var folder = FindFolder(path);
+            if (folder == null) throw new Exception("Folder hasn't added before");
+            AddGame(Initers.GameIniter(folder, name));
+        }
+
         /// <summary>
         /// Removes a game from its corresponding folder.
         /// </summary>
         /// <param name="game">The game to remove.</param>
         public void RemoveGame(GameBase game)
         {
-            if (game.Owner == null) return;
             game.Owner.RemoveGame(game);
             OnGameRemoved?.Invoke(game.Owner, game);
             if (TargetGame == game) TargetGame = null;
@@ -161,8 +169,9 @@ namespace PixanKit.LaunchCore.Core
         /// <exception cref="ArgumentException">Thrown if the path is invalid.</exception>
         public GameBase? FindGame(string path)
         {
-            string folderpath = path[..path.LastIndexOf("/versions/")];
-            string name = Path.GetDirectoryName(path)
+            path = path.Replace("\\", "/");
+            string folderpath = path[..path.LastIndexOf("/versions/", StringComparison.Ordinal)];
+            string name = Path.GetFileName(path)
                 ?? throw new ArgumentException(path);
             Folder? res = FindFolder(folderpath);
 
@@ -175,9 +184,7 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         private void UpdateTargetGame()
         {
-            if (TargetGame is null) FirstGame();
-            else if (TargetGame.Owner is null) throw new Exception();
-            else if (!_folders.Contains(TargetGame.Owner)) FirstGame();
+            if (TargetGame is null || !_folders.Contains(TargetGame.Owner)) FirstGame();
             else if (TargetGame.Owner.Contains(TargetGame)) return;
             else if (TargetGame.Owner.Count > 0) TargetGame = TargetGame.Owner.First;
             else FirstGame();
@@ -188,11 +195,11 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         private void FirstGame()
         {
-            foreach (Folder folder in _folders) if (folder.Count > 0)
-                {
-                    TargetGame = folder.First;
-                    return;
-                }
+            foreach (var folder in _folders.Where(folder => folder.Count > 0))
+            {
+                TargetGame = folder.First;
+                return;
+            }
         }
 
         /// <summary>
@@ -201,11 +208,11 @@ namespace PixanKit.LaunchCore.Core
         /// <returns>A <see cref="JObject"/> containing the folder data.</returns>
         internal JObject Save()
         {
-            Logger.Info("Game Manager Closing");
+            Logger.Logger.Info("Game Manager Closing");
             JArray folders = [];
             foreach (var folder in _folders)
             {
-                folders.Add(folder.ToJSON());
+                folders.Add(folder.ToJson());
                 folder.Close();
             }
             return new JObject()
@@ -214,6 +221,45 @@ namespace PixanKit.LaunchCore.Core
                 { "target", TargetGame?.GameJarFilePath?? "" }
             };
         }
+        #endregion
+
+        #region GetParams
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param"></param>
+        /// <param name="libraries"></param>
+        /// <exception cref="Exception"></exception>
+        public void AddParam(GameParameter param, LibrariesRef libraries)
+        {
+            if (param.IsModified || _gameRefs.ContainsKey(param.Version)) 
+                throw new Exception();
+            _gameRefs.Add(param.Version, new GameParams(param, libraries));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="version"></param>
+        /// <param name="param"></param>
+        /// <param name="libraries"></param>
+        /// <returns></returns>
+        public bool TryGetParam(string version, 
+            [NotNullWhen(true)]out GameParameter? param, 
+            [NotNullWhen(true)]out LibrariesRef? libraries)
+        {
+            if (_gameRefs.TryGetValue(version, out var p))
+            {
+                param = p.Parameter;
+                libraries = p.Libraries;
+                return true;
+            }
+            param = null;
+            libraries = null;
+            return false;
+        }
+
         #endregion
 
         #region Events

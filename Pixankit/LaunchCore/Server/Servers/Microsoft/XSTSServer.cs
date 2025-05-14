@@ -5,14 +5,14 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
     /// <summary>
     /// XSTS Verification Server
     /// </summary>
-    public class XSTSServer
+    public class XstsServer
     {
         /// <summary>
         /// The Record Class For XSTS Verify Result
         /// </summary>
         /// <param name="Xststoken">The XSTS Token</param>
         /// <param name="UserHash">User Hash</param>
-        public record XSTSVerification(string Xststoken, string UserHash);
+        public record XstsVerification(string Xststoken, string UserHash);
 
         /// <summary>
         /// The HTTP Client
@@ -22,9 +22,9 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
         /// <summary>
         /// Base URL Of The Server
         /// </summary>
-        public string BaseURL { get; } = "https://xsts.auth.xboxlive.com";
+        public string BaseUrl { get; } = "https://xsts.auth.xboxlive.com";
 
-        internal async Task<XSTSVerification> XSTSVerify(string XboxToken)
+        internal async Task<XstsVerification> XstsVerify(string xboxToken)
         {
             string data, ret;
             {
@@ -33,7 +33,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
                         "{\"SandboxId\":\"RETAIL\"," +
                          "\"UserTokens\":" +
                             "[" +
-                            "\"" + XboxToken + "\"" +
+                            "\"" + xboxToken + "\"" +
                             "]" +
                         "}," +
                      "\"RelyingParty\":\"rp://api.minecraftservices.com/\"," +
@@ -46,7 +46,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
             HttpResponseMessage response = await Client.PostAsync("https://xsts.auth.xboxlive.com/xsts/authorize", content);
             ret = await response.Content.ReadAsStringAsync();
             JObject jresponse = JObject.Parse(ret);
-            return new XSTSVerification(jresponse["Token"]?.ToString() ?? "",
+            return new XstsVerification(jresponse["Token"]?.ToString() ?? "",
                 jresponse["DisplayClaims"]?["xui"]?[0]?["uhs"]?.ToString() ?? "");
         }
 
@@ -59,7 +59,7 @@ namespace PixanKit.LaunchCore.Server.Servers.Microsoft
         /// <summary>
         /// Finalizer
         /// </summary>
-        ~XSTSServer()
+        ~XstsServer()
             => Dispose();
     }
 }

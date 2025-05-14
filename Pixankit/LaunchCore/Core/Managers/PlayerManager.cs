@@ -1,14 +1,8 @@
 using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Extention;
-using PixanKit.LaunchCore.Log;
+using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.PlayerModule.Player;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PixanKit.LaunchCore.Core
+namespace PixanKit.LaunchCore.Core.Managers
 {
     /// <summary>
     /// Manages player profiles for the launcher, including adding, removing, and retrieving players.
@@ -26,17 +20,17 @@ namespace PixanKit.LaunchCore.Core
 
         private List<PlayerBase> _players = [];
 
-        private PlayerBase? targetPlayer;
+        private PlayerBase? _targetPlayer;
 
         /// <summary>
         /// Gets or sets the default player used for launching.
         /// </summary>
         public PlayerBase? TargetPlayer 
-        { get => targetPlayer;
+        { get => _targetPlayer;
             set
             {
-                targetPlayer = value;
-                OnTargetPlayerChanged?.Invoke(targetPlayer);
+                _targetPlayer = value;
+                OnTargetPlayerChanged?.Invoke(_targetPlayer);
             }
         }
         #endregion
@@ -56,13 +50,13 @@ namespace PixanKit.LaunchCore.Core
             List<PlayerBase> players = [];
             foreach (JToken jData in Files.PlayerJData["children"] ?? new JArray())
             {
-                PlayerBase ret = Initors.PlayerInitor((JObject)jData) ?? throw new NullReferenceException();
+                PlayerBase ret = Initers.PlayerIniter((JObject)jData) ?? throw new NullReferenceException();
                 players.Add(ret);
                 OnPlayerLoaded?.Invoke(ret);
             }
             _players = players;
-            string targetID = Files.PlayerJData["target"]?.ToString() ?? "";
-            if (targetID != "") TargetPlayer = FindPlayer(targetID);
+            string targetId = Files.PlayerJData["target"]?.ToString() ?? "";
+            if (targetId != "") TargetPlayer = FindPlayer(targetId);
             ResetTargetPlayer();
         }
         #endregion
@@ -83,7 +77,7 @@ namespace PixanKit.LaunchCore.Core
             _players.Add(player);
             ResetTargetPlayer();
             OnPlayerAdded?.Invoke(player);
-            Logger.Info($"Player {player.Name} Added");
+            Logger.Logger.Info($"Player {player.Name} Added");
             ResetTargetPlayer();
         }
 
@@ -94,11 +88,11 @@ namespace PixanKit.LaunchCore.Core
         public void RemovePlayer(PlayerBase player)
         { 
             _players.Remove(player); 
-            if (player == targetPlayer)
-                targetPlayer = null;
+            if (player == _targetPlayer)
+                _targetPlayer = null;
             OnPlayerRemoved?.Invoke(player);
             ResetTargetPlayer();
-            Logger.Info($"Player {player.Name} Removed");
+            Logger.Logger.Info($"Player {player.Name} Removed");
         }
 
         /// <summary>
@@ -110,7 +104,7 @@ namespace PixanKit.LaunchCore.Core
         {
             foreach (PlayerBase player in _players)
             {
-                if (player.UID == uid) return player;
+                if (player.Uid == uid) return player;
             }
             return null;
         }
@@ -133,12 +127,12 @@ namespace PixanKit.LaunchCore.Core
             JArray players = [];
             foreach (var player in _players)
             {
-                players.Add(player.ToJSON());
+                players.Add(player.ToJson());
             }
             return new JObject()
             {
                 { "children", players},
-                { "target", TargetPlayer?.UID ?? "" }
+                { "target", TargetPlayer?.Uid ?? "" }
             };
         }
         #endregion

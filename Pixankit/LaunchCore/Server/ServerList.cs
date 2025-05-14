@@ -12,7 +12,7 @@ namespace PixanKit.LaunchCore.Server
         /// <summary>
         /// Server Instance For Microsoft Account
         /// </summary>
-        public static MSLoginServer MicrosoftLoginServer = new();
+        public static MsLoginServer MicrosoftLoginServer = new();
 
         /// <summary>
         /// Server Instance For XBox
@@ -22,7 +22,7 @@ namespace PixanKit.LaunchCore.Server
         /// <summary>
         /// Server Instance For XSTS
         /// </summary>
-        public static XSTSServer XSTSServer = new();
+        public static XstsServer XstsServer = new();
 
         /// <summary>
         /// Server Instance For Mojang Account

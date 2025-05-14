@@ -1,9 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.GameModule.Game;
-using PixanKit.LaunchCore.Log;
+using PixanKit.LaunchCore.Logger;
 using PixanKit.LaunchCore.Server;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
-using PixanKit.ResourceDownloader.SystemInf;
 using PixanKit.ResourceDownloader.Tasks.MultiProgressTask;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
@@ -16,9 +15,9 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     {
         GameBase? _game;
 
-        string indexpath = "";
+        string _indexpath = "";
 
-        private MultiFileDownloadTask? task2;
+        private MultiFileDownloadTask? _task2;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AssetsCompletionTask"/> class.
@@ -47,15 +46,15 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             var url = jdata["assetIndex"]?["url"]?.ToString() ?? "";
             var index = jdata["assetIndex"]?["id"]?.ToString() ?? "";
 
-            indexpath = $"{_game?.AssetsDirPath}/indexes/{index}.json";
+            _indexpath = $"{_game?.AssetsDirPath}/indexes/{index}.json";
 
-            if (File.Exists(Localize.PathLocalize(indexpath)))
+            if (File.Exists(Localize.PathLocalize(_indexpath)))
             {
-                Add(task = new FileDownloadTask(url, indexpath));
+                Add(task = new FileDownloadTask(url, _indexpath));
                 task.OnFinish += (a) => TaskFinish();
             }
             else TaskFinish();
-            Add(task2 = new MultiFileDownloadTask());
+            Add(_task2 = new MultiFileDownloadTask());
         }
 
         private void TaskFinish()
@@ -63,7 +62,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
             List<string> urls = [], paths = [];
 
             var jobj = JObject.Parse(File.ReadAllText(
-                    Localize.PathLocalize(indexpath)
+                    Localize.PathLocalize(_indexpath)
                     ));
             foreach (var asset in jobj["objects"] ?? new JArray())
             {
@@ -81,7 +80,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                 { Logger.Warn("PixanKit.ResourceDownloader", ex.Message); }
 
             }
-            task2?.Set([.. urls], [.. paths]);
+            _task2?.Set([.. urls], [.. paths]);
         }
 
     }

@@ -1,45 +1,32 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Json;
-using PixanKit.LaunchCore.Log;
 
 namespace PixanKit.LaunchCore.PlayerModule.Player
 {
     /// <summary>
     /// Represents a base class for a player in the Minecraft environment.
     /// </summary>
-    public partial class PlayerBase : IToJSON
+    public partial class PlayerBase : IToJson
     {
         /// <summary>
         /// Gets the player's name. Necessary for launch.
         /// </summary>
-        public string Name
-        {
-            get => _name;
-        }
+        public string Name => _name;
 
         /// <summary>
         /// Gets the player's unique identifier (UID). Necessary for launch.
         /// </summary>
-        public virtual string UID
-        {
-            get => _uid;
-        }
+        public virtual string Uid => _uid;
 
         /// <summary>
         /// Gets the player's access token for verification. Necessary for launch.
         /// </summary>
-        public virtual string AccessToken
-        {
-            get => _accesstoken;
-        }
+        public virtual string AccessToken => _accessToken;
 
         /// <summary>
         /// Gets the player's login type.
         /// </summary>
-        public PlayerType LoginType
-        {
-            get => _type;
-        }
+        public PlayerType LoginType => Type;
 
         /// <summary>
         /// The player's unique identifier.
@@ -54,22 +41,22 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// <summary>
         /// The player's login type.
         /// </summary>
-        protected PlayerType _type;
+        protected PlayerType Type;
 
         /// <summary>
         /// The player's Mojang access token.
         /// </summary>
-        protected string _accesstoken = "";
+        protected string _accessToken = "";
 
         /// <summary>
         /// The player's Microsoft refresh token.
         /// </summary>
-        protected string refreshToken = "";
+        protected string _refreshToken = "";
 
         /// <summary>
         /// The last login time of the player.
         /// </summary>
-        protected DateTime lastLogin;
+        protected DateTime LastLogin;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PlayerBase"/> class with the specified JSON data.
@@ -78,8 +65,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         public PlayerBase(JObject? jData)
         {
             if (jData == null) return;
-            LoadFromJSON(jData);
-            Logger.Info($"Player Init, Name:{Name} UID:{UID}");
+            Logger.Logger.Info($"Player Init, Name:{Name} UID:{_uid}");
         }
 
         /// <summary>
@@ -95,7 +81,7 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         public string InlinePlayer(string arg)
         {
             arg = arg.Replace("${auth_player_name}", Name);
-            arg = arg.Replace("${auth_uuid}", UID);
+            arg = arg.Replace("${auth_uuid}", Uid);
             arg = arg.Replace("${auth_access_token}", AccessToken);
             arg = arg.Replace("${user_type}", "msa");
             return arg;
@@ -168,14 +154,14 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// <summary>
         /// Microsoft Login
         /// </summary>
-        microsoft,
+        Microsoft,
         /// <summary>
         /// Offline Login
         /// </summary>
-        offline,
+        Offline,
         /// <summary>
         /// Third-Party Yggdrasil Server
         /// </summary>
-        yggdrasil
+        Yggdrasil
     }
 }

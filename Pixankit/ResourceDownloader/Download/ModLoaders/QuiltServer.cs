@@ -32,20 +32,20 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         /// </summary>
         public class OfficialQuiltMirror : ModLoaderMirror
         {
-            readonly HttpClient client = new();
+            readonly HttpClient _client = new();
 
             /// <summary>
             /// 
             /// </summary>
             public OfficialQuiltMirror()
             {
-                BaseURL = "https://meta.quiltmc.org";
+                BaseUrl = "https://meta.quiltmc.org";
             }
 
             /// <inheritdoc/>
             public override async Task<bool> CheckBuild(string mcversion, CancellationToken token)
             {
-                var response = await client.GetAsync("https://meta.quiltmc.org/v3/versions/game", token);
+                var response = await _client.GetAsync("https://meta.quiltmc.org/v3/versions/game", token);
                 var content = await response.Content.ReadAsStringAsync(token);
                 var array = JArray.Parse(content);
 
@@ -59,7 +59,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             /// <inheritdoc/>
             public override async Task<JArray> GetBuild(string mcversion, CancellationToken token)
             {
-                var response = await client.GetAsync("https://meta.quiltmc.org/v3/versions/loader", token);
+                var response = await _client.GetAsync("https://meta.quiltmc.org/v3/versions/loader", token);
                 if (token.IsCancellationRequested) return [];
                 var content = await response.Content.ReadAsStringAsync(token);
                 if (token.IsCancellationRequested) return [];
@@ -67,10 +67,10 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             }
 
             /// <inheritdoc/>
-            public override async Task<string> GetURL(JObject modloaderinf, CancellationToken token)
+            public override async Task<string> GetUrl(JObject modloaderinf, CancellationToken token)
             {
                 var url = "https://meta.quiltmc.org/v3/versions/installer";
-                var response = await client.GetAsync(url, token);
+                var response = await _client.GetAsync(url, token);
                 var content = await response.Content.ReadAsStringAsync(token);
                 var array = JArray.Parse(content);
                 return array[0]?["url"]?.ToString() ?? "";

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Log;
 using PixanKit.LaunchCore.Server.Servers.ModLoader;
 using System.Runtime.CompilerServices;
+using PixanKit.LaunchCore.Logger;
 
 namespace PixanKit.ResourceDownloader.Download.ModLoaders
 {
@@ -34,21 +34,21 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
         /// </summary>
         public class OfficialNeoforgeServer : ModLoaderMirror
         {
-            HttpClient client = new();
+            HttpClient _client = new();
 
             /// <summary>
             /// Inits the instance of the official server.
             /// </summary>
             public OfficialNeoforgeServer()
             {
-                BaseURL = "https://maven.neoforged.net";
+                BaseUrl = "https://maven.neoforged.net";
 
             }
 
             private async Task<List<string>> GetBuild(CancellationToken token)
             {
                 //Get Later Versions
-                var response = await client.GetAsync(
+                var response = await _client.GetAsync(
                     "https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/neoforge", token);
                 if (token.IsCancellationRequested) return [];
                 var content = await response.Content.ReadAsStringAsync(token);
@@ -64,7 +64,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             private async Task<List<string>> GetLagacyBuild()
             {
                 //Get 1.20.1 Versions
-                var response = await client.GetAsync(
+                var response = await _client.GetAsync(
                     "https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/forge");
                 var content = await response.Content.ReadAsStringAsync();
                 var arrayl = (JObject.Parse(content)["versions"] as JArray ??
@@ -164,7 +164,7 @@ namespace PixanKit.ResourceDownloader.Download.ModLoaders
             }
 
             /// <inheritdoc/>
-            public override Task<string> GetURL(JObject modloaderinf, CancellationToken token)
+            public override Task<string> GetUrl(JObject modloaderinf, CancellationToken token)
                 => Task.FromResult((modloaderinf["url"] ?? "").ToString());
 
         }

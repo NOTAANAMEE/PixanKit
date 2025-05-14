@@ -1,37 +1,37 @@
-﻿using PixanKit.LaunchCore.Log;
-using PixanKit.ResourceDownloader.Tasks;
+﻿using PixanKit.ResourceDownloader.Tasks;
 using System.Diagnostics;
+using PixanKit.LaunchCore.Logger;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
     /// <summary>
     /// Command Language Running Task
     /// </summary>
-    public class CLITask : ProgressTask
+    public class CliTask : ProgressTask
     {
 
-        ProcessStartInfo StartInfo;
+        ProcessStartInfo _startInfo;
 
-        Process process;
+        Process _process;
 
-        StreamReader Output { get => process.StandardOutput; }
+        StreamReader Output { get => _process.StandardOutput; }
 
         /// <summary>
         /// Inits the instance with the file path and the arguments
         /// </summary>
         /// <param name="file">file path</param>
         /// <param name="args">arguments</param>
-        public CLITask(string file, string args)
+        public CliTask(string file, string args)
         {
-            StartInfo = new ProcessStartInfo()
+            _startInfo = new ProcessStartInfo()
             {
                 FileName = file,
                 Arguments = args,
                 RedirectStandardOutput = true
             };
-            process = new Process()
+            _process = new Process()
             {
-                StartInfo = StartInfo
+                StartInfo = _startInfo
             };
         }
 
@@ -41,18 +41,18 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// <param name="file">the exact path of the file</param>
         /// <param name="args">the arguments</param>
         /// <param name="workingdirectory">the directory where the process is expected to run</param>
-        public CLITask(string file, string args, string workingdirectory)
+        public CliTask(string file, string args, string workingdirectory)
         {
-            StartInfo = new ProcessStartInfo()
+            _startInfo = new ProcessStartInfo()
             {
                 FileName = file,
                 Arguments = args,
                 RedirectStandardOutput = true,
                 WorkingDirectory = workingdirectory
             };
-            process = new Process()
+            _process = new Process()
             {
-                StartInfo = StartInfo
+                StartInfo = _startInfo
             };
         }
 
@@ -61,8 +61,8 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// </summary>
         protected override async Task Running()
         {
-            process.Start();
-            while (!process.HasExited)
+            _process.Start();
+            while (!_process.HasExited)
                 Logger.Info("PixanKit.ResourceDownloader", $"Porcess: {Output.ReadLine()}");
             await base.Running();
         }
@@ -74,7 +74,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         public override void Cancel()
         {
             if (_status >= ProgressStatus.Canceled) throw new InvalidOperationException();
-            process.Kill();
+            _process.Kill();
             base.Cancel();
         }
     }

@@ -1,22 +1,22 @@
 ﻿using PixanKit.LaunchCore.SystemInf;
 
-namespace PixanKit.ResourceDownloader.SystemInf
+namespace PixanKit.ResourceDownloader
 {
     internal static class Localize
     {
-        private static string UserPath;
+        private static string _userPath;
 
         static Localize()
         {
-            UserPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            if (SysInfo.OSName == "windows")
-                UserPath = UserPath[0..UserPath.LastIndexOf('\\')];
+            _userPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            if (SysInfo.OsName == "windows")
+                _userPath = _userPath[0.._userPath.LastIndexOf('\\')];
         }
 
         public static string PathLocalize(string path)
         {
-            if (SysInfo.OSName == "windows") path = path.Replace("~", UserPath);
-            return SysInfo.OSName switch
+            if (SysInfo.OsName == "windows") path = path.Replace("~", _userPath);
+            return SysInfo.OsName switch
             {
                 "windows" => path.Replace("/", "\\"),
                 _ => path,
@@ -32,7 +32,7 @@ namespace PixanKit.ResourceDownloader.SystemInf
         {
             get
             {
-                if (SysInfo.OSName == "windows") return ";";
+                if (SysInfo.OsName == "windows") return ";";
                 else return ":";
             }
         }

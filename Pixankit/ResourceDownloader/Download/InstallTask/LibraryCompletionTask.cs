@@ -1,7 +1,6 @@
 ﻿using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.GameModule.LibraryData;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
-using PixanKit.ResourceDownloader.SystemInf;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask
 {
@@ -34,8 +33,8 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                 urls.Add(library.Url);
                 files.Add(libpath);
             }
-            this.urls = [.. urls];
-            paths = [.. files];
+            this.Urls = [.. urls];
+            Paths = [.. files];
             Init();
         }
     }

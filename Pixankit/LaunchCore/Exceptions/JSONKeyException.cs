@@ -8,7 +8,7 @@ namespace PixanKit.LaunchCore.Exceptions
     /// <param name="token">the token that the value is from</param>
     /// <param name="key">the expected key/path of the value</param>
     /// <param name="message">give some hint?</param>
-    public class JSONKeyException(JToken token, string key, string message) : Exception(message)
+    public class JsonKeyException(JToken token, string key, string message) : Exception(message)
     {
         /// <summary>
         /// Represents the root token to find the value

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Core;
-using PixanKit.LaunchCore.Extention;
-using PixanKit.LaunchCore.GameModule;
+using PixanKit.LaunchCore.Extension;
+using PixanKit.LaunchCore.GameModule.Folders;
 using PixanKit.LaunchCore.JavaModule;
 using PixanKit.LaunchCore.Server;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
@@ -16,28 +16,28 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
     /// </summary>
     public class FabricInstaller : SequenceProgressTask
     {
-        Folder Owner;
+        Folder _owner;
 
-        string Name;
+        string _name;
 
-        string version;
+        string _version;
 
-        JObject fabricversion;
+        JObject _fabricversion;
 
-        string installerpath
+        string Installerpath
         {
             get => $"{Files.CacheDir}/Installer/fabric.jar";
         }
 
-        string fabricversioname = "";
+        string _fabricversioname = "";
 
-        string url = "";
+        string _url = "";
 
-        FuncProgressTask<int> InitTask = new();
+        FuncProgressTask<int> _initTask = new();
 
-        AsyncProgressTask? DownloadTask;
+        AsyncProgressTask? _downloadTask;
 
-        CLITask? CommandTask;
+        CliTask? _commandTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FabricInstaller"/> class.
@@ -48,35 +48,35 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
         /// <param name="fabricversion">A JSON object containing the Fabric version details.</param>
         public FabricInstaller(Folder folder, string name, string mcversion, JObject fabricversion)
         {
-            Owner = folder;
-            Name = name;
-            version = mcversion;
-            this.fabricversion = fabricversion;
+            _owner = folder;
+            _name = name;
+            _version = mcversion;
+            this._fabricversion = fabricversion;
             Init();
         }
 
         private void Init()
         {
-            InitTask.Function += Init;
-            Add(InitTask);
+            _initTask.Function += Init;
+            Add(_initTask);
             AddDownloadTask();
             AddCommandTask();
-            fabricversioname = $"fabric-loader-{fabricversion["version"]}-{version}";
+            _fabricversioname = $"fabric-loader-{_fabricversion["version"]}-{_version}";
             this.OnFinish += (a) => { FinishTask(); };
         }
 
         private void AddDownloadTask()
         {
-            DownloadTask = new();
-            FileDownloadTask download = new("", installerpath);
-            InitTask.OnFinish += (a) =>
+            _downloadTask = new();
+            FileDownloadTask download = new("", Installerpath);
+            _initTask.OnFinish += (a) =>
             {
-                download.SetURL(url);
+                download.SetUrl(_url);
             };
-            DownloadTask.Add(download);
-            if (Owner.FindGame(version) == null)
-                DownloadTask.Add(new VanillaMinimalInstallTask(Owner, version, version));
-            Add(DownloadTask);
+            _downloadTask.Add(download);
+            if (_owner.FindGame(_version) == null)
+                _downloadTask.Add(new VanillaMinimalInstallTask(_owner, _version, _version));
+            Add(_downloadTask);
             //DownloadTask.OnFinish += (a) => { Console.WriteLine("DownloadTask Finish"); };
         }
 
@@ -86,21 +86,21 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask
                 throw new InvalidOperationException("Launcher hasn't inited yet");
             var java = JavaChooser.Newest(Launcher.Instance.JavaManager.JavaRuntimes) ??
                 throw new InvalidOperationException("No java found");
-            CommandTask = new(java.JavaEXE, $"-jar \"{installerpath}\" client " +
-                $"-dir \"{Owner.FolderPath}\" -mcversion {version} -loader {fabricversion["version"]} " +
-                $"\"{Owner.FolderPath}\"");
-            Add(CommandTask);
+            _commandTask = new(java.JavaExe, $"-jar \"{Installerpath}\" client " +
+                $"-dir \"{_owner.FolderPath}\" -mcversion {_version} -loader {_fabricversion["version"]} " +
+                $"\"{_owner.FolderPath}\"");
+            Add(_commandTask);
         }
 
         private void FinishTask()
         {
-            GamePostProcess.Move(Owner, fabricversioname, Name);
+            GamePostProcess.Move(_owner, _fabricversioname, _name);
         }
 
         private async Task<int> Init(Action<double> progress, CancellationToken token)
         {
-            url = await ServerList.ModLoaderServers["fabric"]
-                    .GetURL(fabricversion, token);
+            _url = await ServerList.ModLoaderServers["fabric"]
+                    .GetUrl(_fabricversion, token);
             if (token.IsCancellationRequested) return 1;
             progress(1);
             return 0;

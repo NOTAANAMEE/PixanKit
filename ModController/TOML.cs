@@ -2,7 +2,7 @@
 
 namespace PixanKit.ModController
 {
-    static class TOML
+    static class Toml
     {
         public static object? GetPath(this TomlTable table, string path)
         {

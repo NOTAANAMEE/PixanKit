@@ -1,36 +1,40 @@
 ﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Json;
 
 namespace PixanKit.LaunchCore.GameModule.LibraryData
 {
     /// <summary>
     /// Represents an Vanilla library in the Minecraft environment.
     /// </summary>
-    public class OriginalLibrary : LibraryBase
+    public class DefaultLibrary : LibraryBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="OriginalLibrary"/> class with a specified directory and library JSON data.
+        /// Initializes a new instance of the <see cref="DefaultLibrary"/> class for internal use.
         /// </summary>
-        /// <param name="folder">The directory where the library is located.</param>
-        /// <param name="libraryJData">The JSON data representing the library.</param>
-        public OriginalLibrary(string folder, JObject libraryJData) : base(libraryJData, folder)
+        private DefaultLibrary() : base()
         {
-            libraryType = LibraryType.Vanilla;
-            _url = libraryJData["downloads"]?["artifact"]?["url"]?.ToString() ?? "";
-            _sha1 = libraryJData["downloads"]?["artifact"]?["sha1"]?.ToString() ?? "";
+            LibraryType = LibraryData.LibraryType.Default;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OriginalLibrary"/> class with library JSON data.
+        /// 
         /// </summary>
-        /// <param name="libraryJData">The JSON data representing the library.</param>
-        public OriginalLibrary(JObject libraryJData) : this("", libraryJData) { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OriginalLibrary"/> class for internal use.
-        /// </summary>
-        protected OriginalLibrary() : base()
+        /// <param name="libraryJData"></param>
+        /// <param name="library"></param>
+        /// <returns></returns>
+        public static bool CreateInstance(JObject libraryJData, out LibraryBase library)
         {
-            libraryType = LibraryType.Vanilla;
+            library = new DefaultLibrary()
+            {
+                Url = libraryJData.GetOrDefault(Format.ToString,
+                    "downloads/artifact/url", ""),
+                Sha1 = libraryJData.GetOrDefault(Format.ToString,
+                    "downloads/artifact/sha1", ""),
+                Name = libraryJData.GetOrDefault(Format.ToString,
+                    "name", ""),
+            };
+            return true;
         }
+        
     }
 }

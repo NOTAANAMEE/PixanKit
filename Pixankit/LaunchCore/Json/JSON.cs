@@ -7,7 +7,7 @@ namespace PixanKit.LaunchCore.Json
     /// This class implements some methods that helps read the json
     /// and merge the json
     /// </summary>
-    public static class JSON
+    public static class Json
     {
         /// <summary>
         /// The method reads the JSON data from file
@@ -96,13 +96,13 @@ namespace PixanKit.LaunchCore.Json
         /// <typeparam name="T">The type of the value to be returned.</typeparam>
         /// <param name="obj">The JObject to search.</param>
         /// <param name="format">The function to format the JToken to the desired type.</param>
-        /// <param name="Path">The path to the value in the JObject.</param>
+        /// <param name="path">The path to the value in the JObject.</param>
         /// <param name="output">The output value if found and formatted successfully.</param>
         /// <returns>True if the value was found and formatted successfully, otherwise false.</returns>
-        public static bool TryGetValue<T>(this JObject obj, Func<JToken, T> format, string Path, out T? output)
+        public static bool TryGetValue<T>(this JObject obj, Func<JToken, T> format, string path, out T? output)
         {
             output = default;
-            JToken? tok = GetFromPath(obj, Path);
+            JToken? tok = GetFromPath(obj, path);
             if (tok == null) return false;
             try { output = format(tok); } catch { return false; }
             return true;
@@ -114,12 +114,12 @@ namespace PixanKit.LaunchCore.Json
         /// <typeparam name="T">The type of the value to be returned.</typeparam>
         /// <param name="obj">The JObject to search.</param>
         /// <param name="format">The function to format the JToken to the desired type.</param>
-        /// <param name="Path">The path to the value in the JObject.</param>
+        /// <param name="path">The path to the value in the JObject.</param>
         /// <returns>The formatted value.</returns>
         /// <exception cref="InvalidOperationException">Thrown if the path is not found in the JObject.</exception>
-        public static T GetValue<T>(this JObject obj, Func<JToken, T> format, string Path)
+        public static T GetValue<T>(this JObject obj, Func<JToken, T> format, string path)
         {
-            JToken tok = GetFromPathCheck(obj, Path);
+            JToken tok = GetFromPathCheck(obj, path);
             return format(tok);
         }
 
@@ -129,13 +129,13 @@ namespace PixanKit.LaunchCore.Json
         /// <typeparam name="T">The type of the value to be returned.</typeparam>
         /// <param name="obj">The JObject to search.</param>
         /// <param name="format">The function to format the JToken to the desired type.</param>
-        /// <param name="Path">The path to the value in the JObject.</param>
+        /// <param name="path">The path to the value in the JObject.</param>
         /// <param name="defaultVal">The default value to return if the path is not found.</param>
         /// <returns>The formatted value or the default value.</returns>
-        public static T GetOrDefault<T>(this JObject obj, Func<JToken, T> format, string Path, T defaultVal)
+        public static T GetOrDefault<T>(this JObject obj, Func<JToken, T> format, string path, T defaultVal)
         {
             T ret;
-            JToken? tok = GetFromPath(obj, Path);
+            JToken? tok = GetFromPath(obj, path);
             if (tok == null) return defaultVal;
             try { ret = format(tok); } catch { return defaultVal; }
             return ret;
@@ -145,12 +145,12 @@ namespace PixanKit.LaunchCore.Json
         /// Gets a JToken from the JObject at the specified path.
         /// </summary>
         /// <param name="obj">The JObject to search.</param>
-        /// <param name="Path">The path to the value in the JObject.</param>
+        /// <param name="path">The path to the value in the JObject.</param>
         /// <returns>The JToken at the specified path, or null if not found.</returns>
-        public static JToken? GetFromPath(this JObject obj, string Path)
+        public static JToken? GetFromPath(this JObject obj, string path)
         {
             JToken? token = obj;
-            string[] keys = Path.Split('/');
+            string[] keys = path.Split('/');
             int ind = 0;
             while (ind < keys.Length)
             {
@@ -177,12 +177,12 @@ namespace PixanKit.LaunchCore.Json
         /// Throws an exception if the token does not exist.
         /// </summary>
         /// <param name="obj">The <see cref="JObject"/> to search within.</param>
-        /// <param name="Path">The JSON path to the desired token.</param>
+        /// <param name="path">The JSON path to the desired token.</param>
         /// <returns>The retrieved <see cref="JToken"/>.</returns>
         /// <exception cref="InvalidOperationException">Thrown if the token does not exist at the specified path.</exception>
-        public static JToken GetFromPathCheck(this JObject obj, string Path)
+        public static JToken GetFromPathCheck(this JObject obj, string path)
         {
-            return obj.GetFromPath(Path) ??
+            return obj.GetFromPath(path) ??
                 throw new InvalidOperationException("Token does not exist");
         }
 

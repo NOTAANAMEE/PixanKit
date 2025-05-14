@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Extention;
+using PixanKit.LaunchCore.Core.Managers;
+using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule;
 using PixanKit.LaunchCore.JavaModule.Java;
-using PixanKit.LaunchCore.Log;
 using PixanKit.LaunchCore.PlayerModule.Player;
 
 namespace PixanKit.LaunchCore.Core
@@ -22,9 +22,9 @@ namespace PixanKit.LaunchCore.Core
 
         private Launcher()
         {
-            Logger.Info("Start Initing");
+            Logger.Logger.Info("Start Initing");
             InitSettings();
-            Logger.Info("Launcher Inited Successfully");
+            Logger.Logger.Info("Launcher Inited Successfully");
             OnLauncherInitialized?.Invoke(this);
         }
 
