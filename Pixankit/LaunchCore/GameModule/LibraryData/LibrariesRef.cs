@@ -19,6 +19,8 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         public LibraryBase[] Libraries => [.._libraries];
         
         private readonly List<LibraryBase> _libraries = new();
+        
+        private readonly List<NativeLibrary> nativeLibraries = [];
 
         private LibrariesRef(string version, JObject jData)
         {
@@ -28,10 +30,24 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
             {
                 LibraryHelper.AddLibrary(
                     token.ConvertTo(Format.ToJObject, []), _libraries);
+                var last = _libraries.Last();
+                if (last is NativeLibrary lib) nativeLibraries.Add(lib);
             }
             Logger.Logger.Info($"Libraries Added. Number:{_libraries.Count}");
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="libraryPath"></param>
+        /// <param name="nativePath"></param>
+        public async Task Extract(string libraryPath, string nativePath)
+        {
+            var tasks = nativeLibraries.Select(
+                lib 
+                    => lib.ExtractAsync(libraryPath, nativePath));
+            await Task.WhenAll(tasks);
+        }
         
         /// <summary>
         /// 

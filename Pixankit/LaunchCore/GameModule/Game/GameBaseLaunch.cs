@@ -35,10 +35,18 @@ namespace PixanKit.LaunchCore.GameModule.Game
             };
             return arg;
         }
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         protected virtual string GetArgument()
             => Params.JavaArgs + $" {Params.MainClass} " + Params.GameArgs;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         protected virtual string GetAssetsId()
             => Params.AssetsId;
 
@@ -78,20 +86,10 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// It skips non-native libraries.
         /// </remarks>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-       /* public virtual async Task Decompress()
+        public virtual async Task Decompress()
         {
-            foreach (LibraryBase library in libraries)
-            {
-                if (library.LibraryType != LibraryType.Native) continue;
-                await Task.Run(
-                    () =>
-                    {
-                        (library as NativeLibrary ?? new NativeLibrary())
-                        .Extract(LibrariesDirPath, NativeDirPath);
-                    }
-                );
-            }
-        }*/
+            await LibrariesRef.Extract(this.LibrariesDirPath, this.NativeDirPath);
+        }
 
         private string GetRunningFolder()
         {

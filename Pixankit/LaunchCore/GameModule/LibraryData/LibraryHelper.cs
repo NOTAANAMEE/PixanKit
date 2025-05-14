@@ -126,5 +126,6 @@ public static class LibraryHelper
                 return;
         }
         gamelibraries.Add(library);
+        
     }
 }

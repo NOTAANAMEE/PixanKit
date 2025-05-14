@@ -53,7 +53,9 @@ namespace PixanKit.LaunchCore.Core
         {
             { "java", "closest"},//"overall": the same as the overall settings, "specified": Should be the same version, "closest": The closest version(Bigger / equal), "newest": The largest version, default: user specified
             { "argument", "-XX:+UseG1GC -XX:-UseAdaptiveSizePolicy -XX:-OmitStackTraceInFastThrow -Dfml.ignoreInvalidMinecraftCertificates=True -Dfml.ignorePatchDiscrepancies=True -Dlog4j2.formatMsgNoLookups=true" },//default:user specified
-            { "runningfolder", "self" } //"self": self folder defult: user specified
+            { "runningfolder", "self" }, //"self": self folder defult: user specified
+            { "pre_argument", ""},
+            { "post_argument", ""}
         };
 
         /// <summary>

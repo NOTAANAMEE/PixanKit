@@ -24,9 +24,9 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <summary>
         /// Initializes a new instance of the <see cref="NativeLibrary"/> class for internal use without extraction.
         /// </summary>
-        private NativeLibrary() : base()
+        private NativeLibrary()
         {
-            LibraryType = LibraryData.LibraryType.Native;
+            LibraryType = LibraryType.Native;
         }
         #endregion
 
@@ -63,7 +63,7 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
                 Sha1 = sha1,
                 Url = url,
                 _exclude = [.. excludelist],
-                LibraryType = LibraryData.LibraryType.Native
+                LibraryType = LibraryType.Native
             };
             return true;
         }
@@ -71,21 +71,21 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         
         #region Methods
         /// <summary>
-        /// Extracts the files in the native library's JAR file to the specified directory.
+        /// 
         /// </summary>
-        /// <param name="libraryPath">The library directory</param>
-        /// <param name="nativesPath">The directory to extract files to.</param>
-        public void Extract(string libraryPath, string nativesPath)
+        /// <param name="libraryPath"></param>
+        /// <param name="nativesPath"></param>
+        public async Task ExtractAsync(string libraryPath, string nativesPath)
         {
-            FileStream fs = new(LibraryPath.Replace("${library_directory}", libraryPath + '/'), FileMode.Open);
-            ZipArchive archive = new(fs);
-            foreach (ZipArchiveEntry entry in archive.Entries)
-            {
-                if (!NeedsDecompress(entry.FullName))
-                    continue;
-                Decompress(entry, nativesPath);
-            }
-            fs.Close();
+            await using FileStream fs = new(
+                LibraryPath.Replace("${library_directory}", libraryPath), 
+                FileMode.Open);
+            using ZipArchive archive = new(fs);
+            
+            var tasks = archive.Entries
+                .Where(entry => NeedsDecompress(entry.FullName))
+                .Select(entry => DecompressAsync(entry, nativesPath));
+            await Task.WhenAll(tasks);
         }
 
         /// <summary>
@@ -95,19 +95,33 @@ namespace PixanKit.LaunchCore.GameModule.LibraryData
         /// <returns><c>true</c> if the file should be included; otherwise, <c>false</c>.</returns>
         private bool NeedsDecompress(string fullPath)
         {
-            return _exclude.All(path => !fullPath.StartsWith(path));
+            return !fullPath.EndsWith('/') &&
+                   _exclude.All(path => !fullPath.StartsWith(path));
         }
-
-        private static void Decompress(ZipArchiveEntry entry, string nativesDirPath)
+        
+        private async Task DecompressAsync(ZipArchiveEntry entry, string nativesDirPath)
         {
-            if (entry.FullName.EndsWith('/')) return;
-            string fullPath = $"{nativesDirPath}/{entry.FullName}";
-            Directory.CreateDirectory(Path.GetDirectoryName(fullPath) ?? "./");
-            if (File.Exists(fullPath))
-                Logger.Logger.Info($"{fullPath} Already exists, canceled");
-            else
-                entry.ExtractToFile(fullPath);
-            Logger.Logger.Info($"Finish decompressing {fullPath}");
+            string fullPath = $"{nativesDirPath}{entry.FullName}";
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+
+                if (File.Exists(fullPath)) return;
+
+                await using Stream entryStream = entry.Open();
+                await using FileStream fileStream = 
+                    new(fullPath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+                await entryStream.CopyToAsync(fileStream);
+                Logger.Logger.Info($"Finished decompressing {fullPath}");
+            }
+            catch (IOException ioEx)
+            {
+                Logger.Logger.Error($"IO error while decompressing {entry.FullName}: {ioEx.Message}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Logger.Error($"Error decompressing {entry.FullName}: {ex.Message}");
+            }
         }
         #endregion
     }

@@ -160,7 +160,9 @@ namespace PixanKit.LaunchCore.GameModule.Game
             { "java", "overall"},//"overall": the same as the overall settings, "specified": Should be the same version, "closest": The closest version(Bigger / equal), "newest": The largest version, default: user specified
             { "argument", "overall" },//"overall": the same as the overall settings, default:user specified
             { "runningfolder", "self" }, //"overall":the same as the overall settings, "self": self folder defult: user specified
-            { "description", "A Minecraft Game" }
+            { "description", "A Minecraft Game" },
+            { "pre_argument", "overall"},
+            { "post_argument", "overall"}
         };
 
         /// <summary>
@@ -261,16 +263,18 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </exception>
         public virtual void Close()
         {
-            FileStream fs;
-            StreamWriter sw;
-            string settingpath = SettingsPath;
+            string settingPath = SettingsPath;
+            string directoryPath = Path.GetDirectoryName(settingPath) ?? "";
+
             Logger.Logger.Info($"{GameJarFilePath} Closing");
-            Directory.CreateDirectory(Path.GetDirectoryName(settingpath) ?? "");
-            fs = new(settingpath, FileMode.Create);
-            sw = new(fs);
+
+            if (directoryPath.Length != 0 && !Directory.Exists(directoryPath)) 
+                Directory.CreateDirectory(directoryPath);
+            
+            using FileStream fs = new(settingPath, FileMode.Create);
+            using StreamWriter sw = new(fs);
             sw.Write(Settings.ToString());
-            sw.Close();
-            fs.Close();
+
             Logger.Logger.Info($"{GameJarFilePath} Closed. File Saved");
         }
     }

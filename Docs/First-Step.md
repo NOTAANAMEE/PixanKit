@@ -7,6 +7,7 @@ Start by running:
 ```csharp
 Files.Generate();
 Files.Load();
+Launcher.Instance.Init();
 ```
 
 These methods will set up the default directory structure and load all necessary configuration files for you.
