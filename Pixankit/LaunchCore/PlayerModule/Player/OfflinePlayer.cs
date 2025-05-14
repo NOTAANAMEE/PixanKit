@@ -10,18 +10,12 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// <summary>
         /// Gets the unique identifier (UID) for the offline player.
         /// </summary>
-        public override string Uid
-        {
-            get => "00000FFFFFFFFFFFFFFFFFFFFFF1FF43";
-        }
+        public override string Uid => "00000FFFFFFFFFFFFFFFFFFFFFF1FF43";
 
         /// <summary>
         /// Gets the access token for the offline player, which is the same as the UID.
         /// </summary>
-        public override string AccessToken
-        {
-            get => Uid;
-        }
+        public override string AccessToken => Uid;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OfflinePlayer"/> class with a specified name.

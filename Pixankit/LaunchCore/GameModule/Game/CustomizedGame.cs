@@ -1,6 +1,7 @@
 ﻿using PixanKit.LaunchCore.Core;
 using PixanKit.LaunchCore.GameModule.LibraryData;
 using PixanKit.LaunchCore.GameModule.Folders;
+using PixanKit.LaunchCore.SystemInf;
 
 namespace PixanKit.LaunchCore.GameModule.Game
 {
@@ -80,7 +81,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         protected override string GetCpArgs()
         {
             return _useBaseGeneration ? 
-                base.GetCpArgs() + GetCpArgs(GetLibrariesRef().Libraries): 
+                base.GetCpArgs() + Localize.LocalParser + GetCpArgs(GetLibrariesRef().Libraries): 
                 base.GetCpArgs();
         }
     }

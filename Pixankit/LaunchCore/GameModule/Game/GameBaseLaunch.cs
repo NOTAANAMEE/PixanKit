@@ -25,7 +25,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             arg = arg.Replace("${classpath}", "\"" + GetCpArgs() + "\"");
             arg = arg.Replace("${version_name}", Version);
             arg = arg.Replace("${version_type}", ReleaseType);
-            arg = arg.Replace("${library_directory}", LibrariesDirPath + "/");
+            arg = arg.Replace("${library_directory}", LibrariesDirPath);
             arg = Localize.CpLocalize(arg);
             Logger.Logger.Info($"Arguments Generated. Targeted Game:{GameFolderPath}");
             arg = (Settings["argument"] ?? 1).ToString() switch

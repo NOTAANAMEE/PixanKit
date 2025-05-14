@@ -64,6 +64,9 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         /// <param name="jData">The JSON data of a player.</param>
         public PlayerBase(JObject? jData)
         {
+            _name = (jData?["name"] ?? "").ToString();
+            _uid = (jData?["uid"] ?? "").ToString();
+            _accessToken = (jData?["accesstoken"] ?? "").ToString();
             if (jData == null) return;
             Logger.Logger.Info($"Player Init, Name:{Name} UID:{_uid}");
         }
@@ -121,8 +124,6 @@ namespace PixanKit.LaunchCore.PlayerModule.Player
         {
             return !(player1 == player2);
         }
-
-
 
         /// <summary>
         /// Gets a hash code for the player.
