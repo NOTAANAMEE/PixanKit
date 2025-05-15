@@ -1,6 +1,7 @@
 ﻿using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.JavaModule.Java;
+using PixanKit.LaunchCore.SystemInf;
 using System.Diagnostics;
 
 namespace PixanKit.LaunchCore.Core.LaunchSession
@@ -39,6 +40,12 @@ namespace PixanKit.LaunchCore.Core.LaunchSession
         /// Stores the process start information.
         /// </summary>
         private readonly ProcessStartInfo _startInfo;
+        
+        private string _preArgs;
+        
+        private string _postArgs;
+        
+        private List<KeyValuePair<string, string>> _variables;
 
         DateTime _time = DateTime.Now;
 
@@ -48,19 +55,37 @@ namespace PixanKit.LaunchCore.Core.LaunchSession
         /// <param name="game">The game instance to be launched.</param>
         /// <param name="java">The Java runtime used for launching.</param>
         /// <param name="args">The command-line arguments for the process.</param>
-        public LaunchSession(GameBase game, JavaRuntime java, string args)
+        public LaunchSession(GameBase game, JavaRuntime java, string args):
+            this(game, java, "", args ,"",[]){}
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="game"></param>
+        /// <param name="java"></param>
+        /// <param name="preArgs"></param>
+        /// <param name="args"></param>
+        /// <param name="postArgs"></param>
+        /// <param name="env"></param>
+        public LaunchSession(GameBase game, JavaRuntime java, 
+            string preArgs, string args, string postArgs,
+            List<KeyValuePair<string, string>> env)
         {
             Game = game;
             Runtime = java;
             Arguments = args;
+            _preArgs = preArgs;
+            _postArgs = postArgs;
+            _variables = env;
             _startInfo = new()
             {
-                FileName = java.JavawExe,
-                Arguments = args,
+                FileName = SysInfo.Shell(),
                 WorkingDirectory = Path.GetFullPath(Files.CacheDir),
                 CreateNoWindow = true,
+                RedirectStandardInput = true,
             };
         }
+
 
         /// <summary>
         /// Starts the game process.
@@ -74,6 +99,13 @@ namespace PixanKit.LaunchCore.Core.LaunchSession
             };
             Process.Start();
             Process.Exited += Exit;
+            
+            foreach (var pair in _variables)
+                Process.StandardInput.WriteLine(SysInfo.GetVarCmd(pair.Key, pair.Value));
+            
+            Process.StandardInput.WriteLine(
+                $"{_preArgs} {Runtime.JavawExe} {Arguments} {_postArgs}");
+            Process.StandardInput.WriteLine("exit");
         }
 
         /// <summary>

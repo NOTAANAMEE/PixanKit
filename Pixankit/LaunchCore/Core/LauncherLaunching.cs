@@ -1,6 +1,5 @@
-﻿using PixanKit.LaunchCore.Extension;
-using PixanKit.LaunchCore.GameModule;
-using PixanKit.LaunchCore.GameModule.Exceptions;
+﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.JavaModule.Java;
 using PixanKit.LaunchCore.Json;
@@ -29,9 +28,11 @@ namespace PixanKit.LaunchCore.Core
 
             JavaRuntime java = JavaManager.ChooseRuntime(game) ?? throw new NullReferenceException();
 
-            //game.Decompress().Wait();
+            game.Decompress().Wait();
 
-            return new LaunchSession.LaunchSession(game, java, cmd);
+            return new LaunchSession.LaunchSession(game, java,
+                GetPreArguments(game) ,cmd, 
+                GetPostArguments(game), GetVariables(game));
         }
 
         /// <summary>
@@ -49,11 +50,9 @@ namespace PixanKit.LaunchCore.Core
         private string InlineCommand(GameBase game, PlayerBase player)
         {
             game.LaunchCheck();
-            long timeStamp = DateTime.Now.Ticks;
             string cmd = GenerateCommand(game);
 
             cmd = PlayerInLine(cmd, player);
-            string pth = Path.GetDirectoryName(game.GameRootFolderPath) ?? "./";
             cmd = $"-Xmx{Initers.GetMemory()}m " + cmd;
             cmd = cmd.Replace("${launcher_name}", LauncherName);
             cmd = cmd.Replace("${launcher_version}", VersionName);
@@ -68,8 +67,7 @@ namespace PixanKit.LaunchCore.Core
         public string GenerateCommand(GameBase game)
         {
             string cmd = game.GetLaunchArgument();
-            cmd = cmd.Replace("${arguments}",
-                Settings.GetOrDefault(Format.ToString, "arguments", ""));
+            cmd = cmd.Replace("${jvm_argument}", GetJvmArguments(game));
             return cmd;
         }
 
@@ -91,5 +89,51 @@ namespace PixanKit.LaunchCore.Core
         public string PlayerInLine(string arg)
             => PlayerInLine(arg, PlayerManager.TargetPlayer ??
                 throw new NullReferenceException("Target player not found"));
+        
+        private List<KeyValuePair<string, string>> GetVariables(GameBase game)
+        {
+            if (game.Settings["env_variables"] is JObject tmp)
+            {
+                return tmp.Properties()
+                    .Select(x => new KeyValuePair<string, string>(x.Name, x.Value.ToString()))
+                    .ToList();
+            }
+
+            tmp = game.Settings["env_variables"] as JObject ?? new JObject();
+
+            return tmp.Properties()
+                .Select(x => new KeyValuePair<string,string>(x.Name, x.Value.ToString()))
+                .ToList();
+        }
+        
+        private string GetPreArguments(GameBase game)
+        {
+            var preArg = game.Settings["pre_argument"]?.ToString();
+            if (preArg is null || preArg == "overall")
+                preArg = Settings.GetOrDefault(
+                    Format.ToString, "pre_argument", 
+                    "");
+            return preArg;
+        }
+
+        private string GetPostArguments(GameBase game)
+        {
+            var postArg = game.Settings["post_argument"]?.ToString();
+            if (postArg is null || postArg == "overall")
+                postArg = Settings.GetOrDefault(
+                    Format.ToString, "post_argument", 
+                    "");
+            return postArg;
+        }
+
+        private string GetJvmArguments(GameBase game)
+        {
+            var jvmArg = game.Settings["jvm_argument"]?.ToString();
+            if (jvmArg is null || jvmArg == "overall")
+                jvmArg = Settings.GetOrDefault(
+                    Format.ToString, "jvm_argument", 
+                    "");
+            return jvmArg;
+        }
     }
 }

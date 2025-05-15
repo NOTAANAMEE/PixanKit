@@ -84,7 +84,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         public string GameRunningDirPath
         {
             get => GetRunningFolder().EndsWith('/')? GetRunningFolder() : GetRunningFolder() + '/';
-            set => Settings["runningfolder"] = value;
+            set => Settings["running_folder"] = value;
         }
 
         /// <summary>
@@ -157,12 +157,13 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </remarks>
         public JObject Settings = new()
         {
-            { "java", "overall"},//"overall": the same as the overall settings, "specified": Should be the same version, "closest": The closest version(Bigger / equal), "newest": The largest version, default: user specified
-            { "argument", "overall" },//"overall": the same as the overall settings, default:user specified
-            { "runningfolder", "self" }, //"overall":the same as the overall settings, "self": self folder defult: user specified
+            { "java", "overall"},//"overall": the same as the overall settings, "specified": Should be the same version, "closest": The closest version(Bigger / equal), "newest": The newest java version, default: user specified
+            { "jvm_argument", "overall" },//"overall": the same as the overall settings, default:user specified
+            { "running_folder", "overall" }, //"overall":the same as the overall settings, "self": self folder, default: user specified
             { "description", "A Minecraft Game" },
-            { "pre_argument", "overall"},
-            { "post_argument", "overall"}
+            { "pre_argument", "overall" },
+            { "post_argument", "overall" },
+            { "env_variables", "overall" },
         };
 
         /// <summary>

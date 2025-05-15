@@ -24,26 +24,14 @@ namespace PixanKit.LaunchCore.SystemInf
 
         private static void SetArch()
         {
-            switch (RuntimeInformation.ProcessArchitecture)
+            CpuArch = RuntimeInformation.ProcessArchitecture switch
             {
-                case Architecture.X86:
-                    CpuArch = "x86";
-                    break;
-                case Architecture.X64:
-                    CpuArch = "x86_64";
-                    break;
-                case Architecture.Arm:
-                    CpuArch = "arm";
-                    break;
-                case Architecture.Arm64:
-                    CpuArch = "arm64";
-                    break;
-                default:
-                    CpuArch = "other";
-                    Logger.Logger.Warn("The Program And Minecraft might not be able to run on your PC" +
-                                       ", The game might crash");
-                    break;
-            }
+                Architecture.X86 => "x86",
+                Architecture.X64 => "x86_64",
+                Architecture.Arm => "arm",
+                Architecture.Arm64 => "arm64",
+                _ => "other"
+            };
         }
 
         /// <summary>
@@ -65,6 +53,29 @@ namespace PixanKit.LaunchCore.SystemInf
         /// </summary>
         public static string CpuArch { get; private set; } = "x86_64";
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static string Shell()
+        {
+            if (OsName == "windows") return "cmd";
+            return Environment.GetEnvironmentVariable("SHELL") ?? "/bin/bash";
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static string GetVarCmd(string key, string val)
+        {
+            return OsName == "windows" ? 
+                $"set {key}={val}" : 
+                $"export {key}={val}";
+        }
+        
         /// <summary>
         /// Gets the available memory size in megabytes.
         /// </summary>

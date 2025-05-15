@@ -28,12 +28,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             arg = arg.Replace("${library_directory}", LibrariesDirPath);
             arg = Localize.CpLocalize(arg);
             Logger.Logger.Info($"Arguments Generated. Targeted Game:{GameFolderPath}");
-            arg = (Settings["argument"] ?? 1).ToString() switch
-            {
-                "overall" => "${arguments} " + arg,
-                _ => (Settings["arguments"] ?? "") + " " + arg,
-            };
-            return arg;
+            return "${jvm_argument}" + arg;
         }
         
         /// <summary>
@@ -93,9 +88,9 @@ namespace PixanKit.LaunchCore.GameModule.Game
 
         private string GetRunningFolder()
         {
-            string s = (Settings["runningfolder"] ?? "self").ToString();
+            string s = GameRunningDirPath;
             if (s == "overall") s = 
-                Launcher.Instance.Settings["runningfolder"]?.ToString() 
+                Launcher.Instance.Settings["running_folder"]?.ToString() 
                                     ?? "self";
             return s switch
             {
