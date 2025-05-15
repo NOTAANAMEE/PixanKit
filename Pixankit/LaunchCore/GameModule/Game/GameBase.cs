@@ -83,7 +83,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </remarks>
         public string GameRunningDirPath
         {
-            get => GetRunningFolder().EndsWith('/')? GetRunningFolder() : GetRunningFolder() + '/';
+            get => Settings["running_folder"]?.ToString() ?? "";
             set => Settings["running_folder"] = value;
         }
 
