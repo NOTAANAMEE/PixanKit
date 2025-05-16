@@ -73,7 +73,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <remarks>
         /// This file stores metadata about the game instance.
         /// </remarks>
-        public string GameJsonFilePath => $"{GameFolderPath}/{Name}.json"; 
+        public string GameJsonFilePath => $"{GameFolderPath}{Name}.json"; 
         
         /// <summary>
         /// Gets the folder where library files are stored.
@@ -90,7 +90,6 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// Defaults to the global assets folder derived from the Minecraft directory structure.
         /// </remarks>
         public string AssetsDirPath => _folder.AssetsDirPath;
-        
 
         /// <summary>
         /// Gets the root folder of the Minecraft installation.
@@ -137,13 +136,19 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </remarks>
         public JObject Settings = new()
         {
-            { "java", "overall"},//"overall": the same as the overall settings, "specified": Should be the same version, "closest": The closest version(Bigger / equal), "newest": The newest java version, default: user specified
-            { "jvm_argument", "overall" },//"overall": the same as the overall settings, default:user specified
-            { "running_folder", "overall" }, //"overall":the same as the overall settings, "self": self folder, default: user specified
+            { "java", "overall"},
+            { "custom_java", "" },
+            { "jvm_argument", "overall" },
+            { "custom_jvm_argument", "" },
+            { "running_folder", "overall" },
+            { "custom_running_folder", "" },
             { "description", "A Minecraft Game" },
             { "pre_argument", "overall" },
+            { "custom_pre_argument", "" },
             { "post_argument", "overall" },
+            { "custom_post_argument", "" },
             { "env_variables", "overall" },
+            { "custom_env_variables", "" },
         };
 
         /// <summary>
