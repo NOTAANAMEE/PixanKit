@@ -1,5 +1,4 @@
-﻿using PixanKit.LaunchCore.Core;
-using PixanKit.LaunchCore.GameModule.LibraryData;
+﻿using PixanKit.LaunchCore.GameModule.LibraryData;
 using PixanKit.LaunchCore.SystemInf;
 
 namespace PixanKit.LaunchCore.GameModule.Game
@@ -7,15 +6,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
     public abstract partial class GameBase
     {
         #region LaunchMethods
-        /// <summary>
-        /// Generates the launch arguments for the game.
-        /// </summary>
-        /// <returns>A formatted string containing the full launch arguments.</returns>
-        /// <remarks>
-        /// This method replaces placeholders like <c>${natives_directory}</c> with actual paths
-        /// and applies localization. It also incorporates JVM and game-specific arguments.
-        /// </remarks>
-        public string GetLaunchArgument()
+        public partial string GetLaunchArgument()
         {
             string arg = GetArgument();
             arg = arg.Replace("${natives_directory}", $"\"{NativeDirPath}\"");
@@ -30,36 +21,15 @@ namespace PixanKit.LaunchCore.GameModule.Game
             return "${jvm_argument} " + arg;
         }
         
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        protected virtual string GetArgument()
+        protected virtual partial string GetArgument()
             => Params.JavaArgs + $" {Params.MainClass} " + Params.GameArgs;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        protected virtual string GetAssetsId()
+        
+        protected virtual partial string GetAssetsId()
             => Params.AssetsId;
-
-        /// <summary>
-        /// Checks whether the game is ready to launch.
-        /// </summary>
-        /// <returns><c>true</c> if the game can launch; otherwise, <c>false</c>.</returns>
-        public virtual bool LaunchCheck() => true;
-
-        /// <summary>
-        /// Retrieves the classpath arguments for the game.
-        /// </summary>
-        /// <returns>
-        /// A string containing the classpath arguments, excluding the game JAR file.
-        /// </returns>
-        /// <remarks>
-        /// The classpath includes library paths and the main game JAR path.
-        /// </remarks>
-        protected virtual string GetCpArgs()
+        
+        public virtual partial bool LaunchCheck() => true;
+        
+        protected virtual partial string GetCpArgs()
         {
             string classpath = LibrariesRef.Libraries.Aggregate("", (current, library) => current + (library.LibraryPath + Localize.LocalParser));
             classpath += GameJarFilePath;
@@ -71,16 +41,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             return libs.Aggregate("", (current, library) => current + (library.LibraryPath + Localize.LocalParser));
         }
         
-
-        /// <summary>
-        /// Decompresses native libraries required for the game.
-        /// </summary>
-        /// <remarks>
-        /// This method extracts all native libraries to the <c>NativeDir</c> folder.
-        /// It skips non-native libraries.
-        /// </remarks>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public virtual async Task Decompress()
+        public partial async Task Decompress()
         {
             await LibrariesRef.Extract(this.LibrariesDirPath, this.NativeDirPath);
         }
