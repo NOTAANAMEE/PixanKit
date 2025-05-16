@@ -51,9 +51,11 @@ namespace PixanKit.LaunchCore.Core
         /// </summary>
         public JObject Settings = new()
         {
-            { "java", "closest"},//"overall": the same as the overall settings, "specified": Should be the same version, "closest": The closest version(Bigger / equal), "newest": The largest version, default: user specified
+            { "java", "closest"},//"overall": the same as the overall settings, "specified": Should be the same version, "closest": The closest version(Bigger / equal), "newest": The largest version, "default": user specified
+            { "custom_java", ""},
             { "jvm_argument", "-XX:+UseG1GC -XX:-UseAdaptiveSizePolicy -XX:-OmitStackTraceInFastThrow -Dlog4j2.formatMsgNoLookups=true" },//default:user specified
-            { "runningfolder", "self" }, //"self": self folder defult: user specified
+            { "running_folder", "self" }, //"self": self folder defult: user specified
+            { "custom_running_folder", ""},
             { "pre_argument", "" },
             { "post_argument", "" },
             { "env_variables", new JObject() }

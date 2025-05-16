@@ -76,18 +76,6 @@ namespace PixanKit.LaunchCore.GameModule.Game
         public string GameJsonFilePath => $"{GameFolderPath}/{Name}.json"; 
 
         /// <summary>
-        /// Gets or sets the folder used to store world data, mods, and other runtime files.
-        /// </summary>
-        /// <remarks>
-        /// Also known as the "game directory".
-        /// </remarks>
-        public string GameRunningDirPath
-        {
-            get => GetRunningFolder().EndsWith('/')? GetRunningFolder() : GetRunningFolder() + '/';
-            set => Settings["running_folder"] = value;
-        }
-
-        /// <summary>
         /// Gets the folder where library files are stored.
         /// </summary>
         /// <remarks>
@@ -134,14 +122,6 @@ namespace PixanKit.LaunchCore.GameModule.Game
         public string SettingsPath => GameFolderPath + Files.SettingsPath; 
 
         /// <summary>
-        /// Gets the folder where crash reports are stored.
-        /// </summary>
-        /// <remarks>
-        /// Crash reports are saved as compressed tar.gz files in this directory.
-        /// </remarks>
-        public string CrashReportDirPath => $"{GameRunningDirPath}crash-reports/";
-
-        /// <summary>
         /// Gets the type of the game instance.
         /// </summary>
         /// <remarks>
@@ -157,13 +137,19 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// </remarks>
         public JObject Settings = new()
         {
-            { "java", "overall"},//"overall": the same as the overall settings, "specified": Should be the same version, "closest": The closest version(Bigger / equal), "newest": The newest java version, default: user specified
-            { "jvm_argument", "overall" },//"overall": the same as the overall settings, default:user specified
-            { "running_folder", "overall" }, //"overall":the same as the overall settings, "self": self folder, default: user specified
+            { "java", "overall"},//"overall": the same as the overall settings, "specified": Should be the same version, "closest": The closest version(Bigger / equal), "newest": The newest java version, "custom": user specified
+            { "custom_java", ""},
+            { "jvm_argument", "overall" },//"overall": the same as the overall settings, "custom":user specified
+            { "custom_jvm_argument", ""},
+            { "running_folder", "overall" }, //"overall":the same as the overall settings, "self": self folder, "custom": user specified
+            { "custom_running_folder", ""},
             { "description", "A Minecraft Game" },
             { "pre_argument", "overall" },
+            { "custom_pre_argument", "" },
             { "post_argument", "overall" },
+            { "custom_post_argument", "" },
             { "env_variables", "overall" },
+            { "custom_env_variables", new JObject() }
         };
 
         /// <summary>
@@ -232,19 +218,6 @@ namespace PixanKit.LaunchCore.GameModule.Game
         public LibraryBase[] GetLibraries()
         {
             return LibrariesRef.Libraries;
-        }
-
-        /// <summary>
-        /// Initializes the game instance with the provided JSON configuration.
-        /// </summary>
-        /// <param name="gameJdata">A JSON object containing the game configuration.</param>
-        /// <remarks>
-        /// This method allows convenient subclass initialization by loading configuration details 
-        /// such as assets, libraries, and runtime settings from a JSON file.
-        /// </remarks>
-        protected virtual void LoadJson(JObject gameJdata)
-        {
-
         }
         #endregion
 

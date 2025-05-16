@@ -19,7 +19,6 @@ namespace PixanKit.LaunchCore.GameModule.Game
         {
             string arg = GetArgument();
             arg = arg.Replace("${natives_directory}", $"\"{NativeDirPath}\"");
-            arg = arg.Replace("${game_directory}", $"\"{GameRunningDirPath}\"");
             arg = arg.Replace("${assets_root}", $"\"{AssetsDirPath}\"");
             arg = arg.Replace("${assets_index_name}", GetAssetsId());
             arg = arg.Replace("${classpath}", "\"" + GetCpArgs() + "\"");
@@ -28,7 +27,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
             arg = arg.Replace("${library_directory}", LibrariesDirPath);
             arg = Localize.CpLocalize(arg);
             Logger.Logger.Info($"Arguments Generated. Targeted Game:{GameFolderPath}");
-            return "${jvm_argument}" + arg;
+            return "${jvm_argument} " + arg;
         }
         
         /// <summary>
@@ -84,19 +83,6 @@ namespace PixanKit.LaunchCore.GameModule.Game
         public virtual async Task Decompress()
         {
             await LibrariesRef.Extract(this.LibrariesDirPath, this.NativeDirPath);
-        }
-
-        private string GetRunningFolder()
-        {
-            string s = GameRunningDirPath;
-            if (s == "overall") s = 
-                Launcher.Instance.Settings["running_folder"]?.ToString() 
-                                    ?? "self";
-            return s switch
-            {
-                "self" => GameFolderPath,
-                _ => s
-            };
         }
         #endregion
     }

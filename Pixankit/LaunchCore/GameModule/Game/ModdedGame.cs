@@ -1,4 +1,5 @@
-﻿using PixanKit.LaunchCore.GameModule.LibraryData;
+﻿using PixanKit.LaunchCore.Core;
+using PixanKit.LaunchCore.GameModule.LibraryData;
 using PixanKit.LaunchCore.GameModule.Folders;
 
 namespace PixanKit.LaunchCore.GameModule.Game
@@ -11,7 +12,8 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// <summary>
         /// The Mod path. For instance: C:\Users\Admin\AppData\.minecraft\versions\1.12.2-Forge\mods
         /// </summary>
-        public string ModDir => $"{GameFolderPath}mods/";
+        public string ModDir => 
+            $"{Launcher.Instance.GetGameRunningFolder(this)}mods/";
 
         /// <summary>
         /// Stores the name of the mod loader
