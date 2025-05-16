@@ -74,19 +74,7 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// This file stores metadata about the game instance.
         /// </remarks>
         public string GameJsonFilePath => $"{GameFolderPath}/{Name}.json"; 
-
-        /// <summary>
-        /// Gets or sets the folder used to store world data, mods, and other runtime files.
-        /// </summary>
-        /// <remarks>
-        /// Also known as the "game directory".
-        /// </remarks>
-        public string GameRunningDirPath
-        {
-            get => Settings["running_folder"]?.ToString() ?? "";
-            set => Settings["running_folder"] = value;
-        }
-
+        
         /// <summary>
         /// Gets the folder where library files are stored.
         /// </summary>
@@ -132,14 +120,6 @@ namespace PixanKit.LaunchCore.GameModule.Game
         /// The settings file contains user and game-specific configurations.
         /// </remarks>
         public string SettingsPath => GameFolderPath + Files.SettingsPath; 
-
-        /// <summary>
-        /// Gets the folder where crash reports are stored.
-        /// </summary>
-        /// <remarks>
-        /// Crash reports are saved as compressed tar.gz files in this directory.
-        /// </remarks>
-        public string CrashReportDirPath => $"{GameRunningDirPath}crash-reports/";
 
         /// <summary>
         /// Gets the type of the game instance.
