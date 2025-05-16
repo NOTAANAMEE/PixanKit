@@ -104,7 +104,7 @@ namespace PixanKit.LaunchCore.Core.LaunchSession
                 Process.StandardInput.WriteLine(SysInfo.GetVarCmd(pair.Key, pair.Value));
             
             Process.StandardInput.WriteLine(
-                $"{_preArgs} {Runtime.JavawExe} {Arguments} {_postArgs}");
+                $"{_preArgs} \"{Runtime.JavaExe}\" {Arguments} {_postArgs}");
             Process.StandardInput.WriteLine("exit");
         }
 
