@@ -1,35 +1,34 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Json;
 
-namespace PixanKit.ModController.Module
+namespace PixanKit.ModController.Module;
+
+public partial class ModModule
 {
-    public partial class ModModule
+    /// <inheritdoc/>
+    public void LoadFromJson(JObject obj)
     {
-        /// <inheritdoc/>
-        public void LoadFromJson(JObject obj)
+        OpenContent(obj);
+    }
+
+    /// <inheritdoc/>
+    public JObject ToJson()
+    {
+        JObject moddedGamedata = [];
+        foreach (var item in ModdedGames)
+            moddedGamedata.Add(
+                Json.PathToKey(item.Key.GameFolderPath),
+                item.Value.ToJson());
+
+        JArray modMetadata = [];
+        foreach (var item in ModDatas)
+            modMetadata.Add(item.Value.ToJson());
+
+        return new()
         {
-            OpenContent(obj);
-        }
+            { "metadata", modMetadata },
+            { "games" , moddedGamedata }
+        };
 
-        /// <inheritdoc/>
-        public JObject ToJson()
-        {
-            JObject moddedGamedata = [];
-            foreach (var item in ModdedGames)
-                moddedGamedata.Add(
-                    Json.PathToKey(item.Key.GameFolderPath),
-                    item.Value.ToJson());
-
-            JArray modMetadata = [];
-            foreach (var item in ModDatas)
-                modMetadata.Add(item.Value.ToJson());
-
-            return new()
-            {
-                { "metadata", modMetadata },
-                { "games" , moddedGamedata }
-            };
-
-        }
     }
 }

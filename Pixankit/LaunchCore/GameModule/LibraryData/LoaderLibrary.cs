@@ -1,33 +1,32 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Json;
 
-namespace PixanKit.LaunchCore.GameModule.LibraryData
+namespace PixanKit.LaunchCore.GameModule.LibraryData;
+
+/// <summary>
+/// Represents a library specific to mod loaders.
+/// </summary>
+public class LoaderLibrary : LibraryBase
 {
     /// <summary>
-    /// Represents a library specific to mod loaders.
+    /// Initializes a new instance of the <see cref="LoaderLibrary"/> class for internal use.
     /// </summary>
-    public class LoaderLibrary : LibraryBase
+    private LoaderLibrary() : base()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LoaderLibrary"/> class for internal use.
-        /// </summary>
-        private LoaderLibrary() : base()
-        {
-            LibraryType = LibraryData.LibraryType.Mod;
-        }
+        LibraryType = LibraryData.LibraryType.Mod;
+    }
         
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="jData"></param>
-        /// <param name="library"></param>
-        public static void CreateInstance(JObject jData, out LibraryBase library)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="jData"></param>
+    /// <param name="library"></param>
+    public static void CreateInstance(JObject jData, out LibraryBase library)
+    {
+        library = new LoaderLibrary()
         {
-            library = new LoaderLibrary()
-            {
-                Url = jData.GetOrDefault(Format.ToString,"url", ""),
-                Name = jData.GetOrDefault(Format.ToString, "name", ""),
-            };
-        }
+            Url = jData.GetOrDefault(Format.ToString,"url", ""),
+            Name = jData.GetOrDefault(Format.ToString, "name", ""),
+        };
     }
 }

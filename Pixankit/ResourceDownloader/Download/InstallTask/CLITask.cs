@@ -2,80 +2,79 @@
 using System.Diagnostics;
 using PixanKit.LaunchCore.Logger;
 
-namespace PixanKit.ResourceDownloader.Download.InstallTask
+namespace PixanKit.ResourceDownloader.Download.InstallTask;
+
+/// <summary>
+/// Command Language Running Task
+/// </summary>
+public class CliTask : ProgressTask
 {
+
+    ProcessStartInfo _startInfo;
+
+    Process _process;
+
+    StreamReader Output => _process.StandardOutput;
+
     /// <summary>
-    /// Command Language Running Task
+    /// Inits the instance with the file path and the arguments
     /// </summary>
-    public class CliTask : ProgressTask
+    /// <param name="file">file path</param>
+    /// <param name="args">arguments</param>
+    public CliTask(string file, string args)
     {
-
-        ProcessStartInfo _startInfo;
-
-        Process _process;
-
-        StreamReader Output { get => _process.StandardOutput; }
-
-        /// <summary>
-        /// Inits the instance with the file path and the arguments
-        /// </summary>
-        /// <param name="file">file path</param>
-        /// <param name="args">arguments</param>
-        public CliTask(string file, string args)
+        _startInfo = new ProcessStartInfo()
         {
-            _startInfo = new ProcessStartInfo()
-            {
-                FileName = file,
-                Arguments = args,
-                RedirectStandardOutput = true
-            };
-            _process = new Process()
-            {
-                StartInfo = _startInfo
-            };
-        }
-
-        /// <summary>
-        /// Inits the instance with the file path, the arguments and the running dir
-        /// </summary>
-        /// <param name="file">the exact path of the file</param>
-        /// <param name="args">the arguments</param>
-        /// <param name="workingdirectory">the directory where the process is expected to run</param>
-        public CliTask(string file, string args, string workingdirectory)
+            FileName = file,
+            Arguments = args,
+            RedirectStandardOutput = true
+        };
+        _process = new Process()
         {
-            _startInfo = new ProcessStartInfo()
-            {
-                FileName = file,
-                Arguments = args,
-                RedirectStandardOutput = true,
-                WorkingDirectory = workingdirectory
-            };
-            _process = new Process()
-            {
-                StartInfo = _startInfo
-            };
-        }
+            StartInfo = _startInfo
+        };
+    }
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        protected override async Task Running()
+    /// <summary>
+    /// Inits the instance with the file path, the arguments and the running dir
+    /// </summary>
+    /// <param name="file">the exact path of the file</param>
+    /// <param name="args">the arguments</param>
+    /// <param name="workingdirectory">the directory where the process is expected to run</param>
+    public CliTask(string file, string args, string workingdirectory)
+    {
+        _startInfo = new ProcessStartInfo()
         {
-            _process.Start();
-            while (!_process.HasExited)
-                Logger.Info("PixanKit.ResourceDownloader", $"Porcess: {Output.ReadLine()}");
-            await base.Running();
-        }
+            FileName = file,
+            Arguments = args,
+            RedirectStandardOutput = true,
+            WorkingDirectory = workingdirectory
+        };
+        _process = new Process()
+        {
+            StartInfo = _startInfo
+        };
+    }
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <exception cref="InvalidOperationException"><inheritdoc/></exception>
-        public override void Cancel()
-        {
-            if (_status >= ProgressStatus.Canceled) throw new InvalidOperationException();
-            _process.Kill();
-            base.Cancel();
-        }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    protected override async Task Running()
+    {
+        _process.Start();
+        while (!_process.HasExited)
+            Logger.Info("PixanKit.ResourceDownloader", $"Porcess: {Output.ReadLine()}");
+        await base.Running();
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <exception cref="InvalidOperationException"><inheritdoc/></exception>
+    public override void Cancel()
+    {
+        if (_status >= ProgressStatus.Canceled) throw new InvalidOperationException();
+        _process.Kill();
+        base.Cancel();
     }
 }

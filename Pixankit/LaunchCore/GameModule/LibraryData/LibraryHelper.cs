@@ -36,14 +36,14 @@ public static class LibraryHelper
 
         HashSet<string> osSet = [];
 
-        foreach (JToken ruleData in jData.GetOrDefault(Format.ToJArray, "rules", []))
+        foreach (var ruleData in jData.GetOrDefault(Format.ToJArray, "rules", []))
         {
-            JObject jObj = ruleData.ConvertTo(Format.ToJObject, []);
+            var jObj = ruleData.ConvertTo(Format.ToJObject, []);
 
-            string action = jObj.GetOrDefault(Format.ToString, "action", "");
-            JObject? osData = jObj.GetOrDefault(Format.ToJObject, "os", null);
-            string? osName = jObj.GetOrDefault(Format.ToString, "os/name", null);
-            string? osArch = jObj.GetOrDefault(Format.ToString, "os/arch", null);
+            var action = jObj.GetOrDefault(Format.ToString, "action", "");
+            var osData = jObj.GetOrDefault(Format.ToJObject, "os", null);
+            var osName = jObj.GetOrDefault(Format.ToString, "os/name", null);
+            var osArch = jObj.GetOrDefault(Format.ToString, "os/arch", null);
 
             switch (action)
             {
@@ -81,8 +81,8 @@ public static class LibraryHelper
     public static string GetPath(string name)
     {
         if (name.Contains('/')) return name;
-        string pathInf = name;
-        string[] strings = pathInf.Split(":");
+        var pathInf = name;
+        var strings = pathInf.Split(":");
         strings[^1] = strings[^1].Replace(".jar", "");
         return strings.Length switch
         {
@@ -103,7 +103,7 @@ public static class LibraryHelper
     public static void AddLibrary(JObject jData, List<LibraryBase> gamelibraries)
     {
         if (!LibraryHelper.SystemSupport(jData)) return;
-        LibraryType type = LibraryHelper.GetLibraryType(jData);
+        var type = LibraryHelper.GetLibraryType(jData);
         LibraryBase? library;
         if (type == LibraryType.Native)
         {

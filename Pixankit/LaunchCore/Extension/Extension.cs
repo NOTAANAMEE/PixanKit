@@ -91,8 +91,8 @@ public static class Initers
     {
         long minMemory = 2048; // 2GB
         long maxMemory = 10240; // 10GB
-        long availableMemory = SysInfo.GetAvailableMemSize();
-        long allocatedMemory = Math.Min(maxMemory, Math.Max(minMemory, availableMemory / 2));
+        var availableMemory = SysInfo.GetAvailableMemSize();
+        var allocatedMemory = Math.Min(maxMemory, Math.Max(minMemory, availableMemory / 2));
 
         return allocatedMemory;
     }
@@ -116,7 +116,7 @@ internal class DefaultGameIniter : IGameIniter
         var manager = Launcher.Instance.GameManager;
         var jsonPath = $"{folder.VersionDirPath}{name}/{name}.json";
         var jData = JObject.Parse(File.ReadAllText(jsonPath));
-        var version = GameParameter.GetVersion(jData, out int modified);
+        var version = GameParameter.GetVersion(jData, out var modified);
         if (modified > 0)
         {
             var thisParam = GameParameter.CreateInstance(jData);
@@ -147,10 +147,10 @@ internal class DefaultGameIniter : IGameIniter
     /// </returns>
     private bool JudgeOptifine(GameParameter param)
     {
-        string? entryClass = param.MainClass;
+        var entryClass = param.MainClass;
         if (entryClass != "net.minecraft.launchwrapper.Launch") return false;
-        bool forge = param.GameArgs.Contains("fml");
-        bool optifine = param.GameArgs.Contains("optifine");
+        var forge = param.GameArgs.Contains("fml");
+        var optifine = param.GameArgs.Contains("optifine");
         return !forge && optifine;
     }
 }
