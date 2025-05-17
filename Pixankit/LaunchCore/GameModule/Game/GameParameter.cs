@@ -8,7 +8,7 @@ namespace PixanKit.LaunchCore.GameModule.Game;
 /// <summary>
 /// 
 /// </summary>
-public class GameParameter
+public partial class GameParameter
 {
 
     /// <summary>
@@ -16,40 +16,19 @@ public class GameParameter
     /// </summary>
     public string Version { get; }
 
-    /// <summary>
-    /// Gets the game type.
-    /// </summary>
-    public bool IsModified => _type != 0;
+    public partial bool IsModified => _type != 0;
 
-    /// <summary>
-    /// Decide whether the arguments should be based on Vanilla game arguments
-    /// </summary>
-    public bool ReliedArgs => _type == 1;
+    public partial bool ReliedArgs => _type == 1;
 
-    /// <summary>
-    /// Gets the Java arguments.
-    /// </summary>
-    public string JavaArgs => _javaArgs ?? "";
-
-    /// <summary>
-    /// Gets the game arguments.
-    /// </summary>
-    public string GameArgs => _gameArgs ?? "";
-
-    /// <summary>
-    /// Gets the entry class
-    /// </summary>
-    public string? MainClass { get; }
-        
-    /// <summary>
-    /// Gets the Assets ID of a game
-    /// </summary>
-    public string AssetsId => _assetsId ?? "";
-
-    /// <summary>
-    /// JVM Version
-    /// </summary>
-    public short JvmVersion { get; private set; }
+    public partial string JavaArgs => _javaArgs ?? "";
+    
+    public partial string GameArgs => _gameArgs ?? "";
+    
+    public partial string MainClass => _mainClass;
+    
+    public partial string AssetsId => _assetsId ?? "";
+    
+    public partial short JvmVersion { get => _jvmVersion; private set => _jvmVersion = value; }
 
     private string? _javaArgs;
         
@@ -58,11 +37,15 @@ public class GameParameter
     private string? _assetsId;
         
     private int _type;
+    
+    private short _jvmVersion;
+
+    private string _mainClass;
 
     private GameParameter(string version, JObject jData)
     {
         Version = version;
-        MainClass = 
+        _mainClass = 
             (jData["mainClass"] ?? "net.minecraft.client.main.Main.")
             .ToString();
         SetAssetsId(jData);
@@ -71,12 +54,7 @@ public class GameParameter
         SetJvmVersion(jData);
     }
 
-    /// <summary>
-    /// Create an instance of the GameParameter
-    /// </summary>
-    /// <param name="jData"></param>
-    /// <returns></returns>
-    public static GameParameter CreateInstance(JObject jData)
+    public static partial GameParameter CreateInstance(JObject jData)
     {
         var version = GetVersion(jData, out var modified);
         return new(version, jData) {_type = modified};
@@ -156,19 +134,8 @@ public class GameParameter
             _ => ""
         };
     }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="jData"></param>
-    /// <param name="isModified">
-    /// Explanation:
-    /// 0: It is the original game arguments, not modified.
-    /// 1: It is modified by mod loaders and the args are incomplete
-    /// 2: It is modified by mod loaders but the args are complete
-    /// </param>
-    /// <returns></returns>
-    public static string GetVersion(JObject jData, out int isModified)
+    
+    public static partial string GetVersion(JObject jData, out int isModified)
     {
         isModified = 0;
         if (jData.TryGetValue("inheritsFrom", out var inheritsFrom))

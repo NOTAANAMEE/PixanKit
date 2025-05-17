@@ -3,26 +3,43 @@ using PixanKit.LaunchCore.Json;
 
 namespace PixanKit.LaunchCore.GameModule.Game;
 
+/// <summary>
+///
+/// </summary>
 public struct GameSettings()
 {
-    public readonly bool IsOverall = false;
-    
+    /// <summary></summary>
     public SettingValue JavaSetting;
+    /// <summary></summary>
     public SettingValue RunningFolderSetting;
+    /// <summary></summary>
     public SettingValue JVMArgSetting;
+    /// <summary></summary>
     public SettingValue PreArgSetting;
+    /// <summary></summary>
     public SettingValue PostArgSetting;
+    /// <summary></summary>
     public SettingValue EnvVariableSetting;
 
-    public string CustomJavaSetting = "";    
+    /// <summary></summary>
+    public string CustomJavaSetting = "";
+    /// <summary></summary>
     public string CustomRunningFolderSetting = "";
+    /// <summary></summary>
     public string Description = "";
+    /// <summary></summary>
     public string CustomJVMArgSetting = "";
+    /// <summary></summary>
     public string CustomPreArgSetting = "";
+    /// <summary></summary>
     public string CustomPostArgSetting = "";
-    
+    /// <summary>Launching variables</summary>
     public List<KeyValuePair<string, string>> Variables = [];
 
+    /// <summary>
+    /// Initialize from Json Data
+    /// </summary>
+    /// <param name="obj">The Json Data</param>
     public GameSettings(JObject obj) : this()
     {
         JavaSetting = obj.GetOrDefault(ToSettingValue, 
@@ -55,7 +72,7 @@ public struct GameSettings()
         Variables = obj.GetOrDefault(
             ToVar, "custom_env_variables", []);
     }
-
+    
     private SettingValue ToSettingValue(JToken token)
     {
         return (SettingValue)(int)token;

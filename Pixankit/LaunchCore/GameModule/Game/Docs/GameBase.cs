@@ -160,12 +160,12 @@ public abstract partial class GameBase
     /// <summary>
     /// Initializes the game instance with the provided JSON configuration.
     /// </summary>
-    /// <param name="gameJdata">A JSON object containing the game configuration.</param>
+    /// <param name="gameData">A JSON object containing the game configuration.</param>
     /// <remarks>
     /// This method allows convenient subclass initialization by loading configuration details 
     /// such as assets, libraries, and runtime settings from a JSON file.
     /// </remarks>
-    protected virtual partial void LoadJson(JObject gameJdata);
+    protected virtual partial void LoadJson(JObject gameData);
 
     /// <summary>
     /// Retrieves the classpath arguments for the game.

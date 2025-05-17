@@ -30,8 +30,8 @@ public abstract partial class GameBase
         
     public partial string Description
     {
-        get => Settingses.Description;
-        set => Settingses.Description = value;
+        get => _settings.Description;
+        set => _settings.Description = value;
     }
         
     public partial string GameFolderPath => $"{_folder.VersionDirPath}{_name}/"; 
@@ -55,8 +55,6 @@ public abstract partial class GameBase
     public partial string SettingsPath => GameFolderPath + Files.SettingsPath; 
         
     public partial GameType GameType { get => _gameType; protected set => _gameType = value; }
-
-    
         
     public partial short MinimalJavaVersion => Params.JvmVersion;
 
@@ -66,7 +64,7 @@ public abstract partial class GameBase
     /// <remarks>
     /// The settings define Java version preferences, runtime folder behavior, and custom descriptions.
     /// </remarks>
-    public GameSettings Settings => Settingses;
+    public GameSettings Settings => _settings;
     #endregion
 
     #region Fields
@@ -91,7 +89,7 @@ public abstract partial class GameBase
     /// </summary>
     protected LibrariesRef LibrariesRef;
     
-    protected GameSettings Settingses;
+    private GameSettings _settings;
     #endregion
         
     #region Constructors
@@ -120,10 +118,9 @@ public abstract partial class GameBase
         {
             var settings = JObject.Parse(
                 File.ReadAllText(SettingsPath));
-            Settingses = new(settings);
+            _settings = new(settings);
         }
-            
-        Settingses = new();
+        _settings = new();
     }
     #endregion
 
@@ -133,7 +130,7 @@ public abstract partial class GameBase
         return LibrariesRef.Libraries;
     }
         
-    protected virtual partial void LoadJson(JObject gameJdata)
+    protected virtual partial void LoadJson(JObject gameData)
     {
 
     }
@@ -151,7 +148,7 @@ public abstract partial class GameBase
             
         using FileStream fs = new(settingPath, FileMode.Create);
         using StreamWriter sw = new(fs);
-        sw.Write(Settingses.ToJObject().ToString());
+        sw.Write(_settings.ToJObject().ToString());
 
         Logger.Logger.Info($"{GameJarFilePath} Closed. File Saved");
     }
@@ -161,7 +158,7 @@ public abstract partial class GameBase
 /// Different types of Minecraft
 /// Mod:ModLoader like Fabric, Quilt, Liteloader, Forge and NeoForge
 /// Optifine:Only With Optifine
-/// Vanilla:No modloader or Optifine.
+/// Vanilla:No mod loader or Optifine.
 /// </summary>
 public enum GameType
 {
