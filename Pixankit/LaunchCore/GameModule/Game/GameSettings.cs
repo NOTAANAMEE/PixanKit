@@ -77,6 +77,10 @@ public struct GameSettings()
         return obj;
     }
 
+    /// <summary>
+    /// To JObject
+    /// </summary>
+    /// <returns>To JObject</returns>
     public JObject ToJObject()
     {
         return new()
@@ -98,13 +102,25 @@ public struct GameSettings()
     }
 }
 
+/// <summary>
+/// The set of all possible setting values
+/// </summary>
 public enum SettingValue
 {
+    /// <summary>the same as the Launcher's setting</summary>
     Overall,
+    /// <summary>user customs the setting</summary>
     Custom,
+    /// <summary>use the game folder as the savings folder</summary>
     Self,
+    /// <summary>use the .minecraft folder as the savings folder</summary>
+    Folder,
+    /// <summary>use the latest version of Java</summary>
     Latest,
+    /// <summary>the closest version of Java</summary>
     Closest,
+    /// <summary>use the specified version of Java</summary>
     Specified,
+    /// <summary>Append custom params to the overall params</summary>
     Append
 }
