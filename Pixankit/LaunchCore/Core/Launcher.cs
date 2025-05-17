@@ -19,18 +19,30 @@ public partial class Launcher
 
     private Launcher()
     {
-        Logger.Logger.Info("Start Initing");
+        Logger.Logger.Info("Start initializing launcher");
         _settings = new(Files.SettingsJData ?? []);
-        Logger.Logger.Info("Launcher Inited Successfully");
+        Logger.Logger.Info("Launcher initialized Successfully");
         OnLauncherInitialized?.Invoke(this);
     }
 
+    /// <summary>
+    /// The game manager instance of the launcher.
+    /// </summary>
     public readonly GameManager GameManager = new();
 
+    /// <summary>
+    /// The player manager instance of the launcher.
+    /// </summary>
     public readonly PlayerManager PlayerManager = new();
 
+    /// <summary>
+    /// The java manager instance of the launcher.
+    /// </summary>
     public readonly JavaManager JavaManager = new();
 
+    /// <summary>
+    /// Call to init the launcher.
+    /// </summary>
     public void Init()
     {
         GameManager.InitGameModule();

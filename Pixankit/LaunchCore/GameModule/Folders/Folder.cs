@@ -75,7 +75,7 @@ public partial class Folder : IToJson
     /// Init The <c>Folder</c> With The Path.
     /// </summary>
     /// <param name="path">Folder Path, For Example:
-    /// <c>"C:\\Users\\Admin\\AppData\\Roaming\\.minecrafy"</c></param>
+    /// <c>"C:\\Users\\Admin\\AppData\\Roaming\\.minecraft"</c></param>
     public Folder(string path)
     {
         _folderPath = path.Replace("\\", "/");
@@ -107,8 +107,8 @@ public partial class Folder : IToJson
             {
                     
                 game = 
-                    Initers.GameIniter(this, Path.GetFileName(dir) ?? "") 
-                    ?? throw new Exception();
+                    Initers.GameIniter(this, Path.GetFileName(dir)) ?? 
+                    throw new Exception();
             }
             catch (Exception ex)
             {
@@ -122,8 +122,8 @@ public partial class Folder : IToJson
         }
         Logger.Logger.Info($"Folder {FolderPath} Added");
     }
-
-    public void AddGame(GameBase game)
+    
+    internal void AddGame(GameBase game)
     {
         _games.Add(game);
         OnGameChanged?.Invoke();
@@ -158,7 +158,7 @@ public partial class Folder : IToJson
     }
 
     /// <summary>
-    /// Find The Specific Version And Type Of A Game In The Folder
+    /// Find The Specific Version And Type Of Game In The Folder
     /// </summary>
     /// <param name="version">The Version. Like <c>"1.14"</c></param>
     /// <param name="type">Type Of The Game. Like <c>GameType.Vanilla</c></param>
@@ -180,9 +180,10 @@ public partial class Folder : IToJson
         var dirs = Directory.GetDirectories(VersionDirPath);
         foreach (var dir in dirs)
         {
-            foreach (var game in _games.Where(game => game.Name == dir)) continue;
+            var tmpdir = dir.Replace("\\", "/");
+            if (_games.Any(game => game.GameFolderPath == tmpdir)) continue;
             AddGame(
-                Initers.GameIniter(this, Path.GetFileName(dir) ?? ""));
+                Initers.GameIniter(this, Path.GetFileName(dir)));
         }
     }
 

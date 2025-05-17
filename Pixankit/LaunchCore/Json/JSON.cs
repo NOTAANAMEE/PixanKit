@@ -156,17 +156,12 @@ public static class Json
         {
             var key = keys[ind++];
             if (key == "") continue;
-            switch (token.Type)
+            token = token.Type switch
             {
-                case JTokenType.Object:
-                    token = (token as JObject)[key];
-                    break;
-                case JTokenType.Array:
-                    token = token[int.Parse(key)];
-                    break;
-                default:
-                    return null;
-            }
+                JTokenType.Object => (token as JObject)?[key],
+                JTokenType.Array => token[int.Parse(key)],
+                _ => null,
+            };
             if (token == null) return null;
         }
         return token;

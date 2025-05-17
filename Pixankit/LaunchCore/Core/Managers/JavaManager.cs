@@ -6,6 +6,9 @@ using PixanKit.LaunchCore.JavaModule.Java;
 
 namespace PixanKit.LaunchCore.Core.Managers;
 
+/// <summary>
+/// The java manager instance of the launcher.
+/// </summary>
 public class JavaManager
 {
     #region PropertiesAndFields

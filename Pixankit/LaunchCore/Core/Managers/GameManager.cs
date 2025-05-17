@@ -141,6 +141,15 @@ public class GameManager
         UpdateTargetGame();
     }
 
+    /// <summary>
+    /// Add a new game by its path
+    /// </summary>
+    /// <param name="path">the game folder path. For instance
+    /// <c>C:\Users\Admin\.minecraft\versions\1.20.1</c>
+    /// </param>
+    /// <exception cref="Exception">
+    /// Before adding Minecraft, add folder first!
+    /// </exception>
     public void AddGame(string path)
     {
         var name = Path.GetFileName(path);
