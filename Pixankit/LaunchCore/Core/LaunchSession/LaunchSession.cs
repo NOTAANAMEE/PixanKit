@@ -142,11 +142,11 @@ public class LaunchSession
         var path = "";
         foreach (var dir in Directory.GetDirectories(Files.CacheDir + "/logs"))
         {
-            if (Directory.GetCreationTime(dir) == _time)
-            {
-                path = dir;
-                break;
-            }
+            if (Directory.GetCreationTime(dir) != _time) continue;
+        
+
+            path = dir;
+            break;
         }
         return new()
         {
