@@ -2,6 +2,7 @@
 using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule.LibraryData;
 using PixanKit.LaunchCore.GameModule.Folders;
+using PixanKit.LaunchCore.Core.Managers;
 
 namespace PixanKit.LaunchCore.GameModule.Game;
 
@@ -71,7 +72,7 @@ public abstract partial class GameBase
 
     private readonly string _name;
 
-    private GameType _gameType = GameType.Vanilla;
+    private readonly GameType _gameType = GameType.Vanilla;
 
     /// <summary>
     /// 
@@ -107,13 +108,11 @@ public abstract partial class GameBase
         _folder = folder;
         Params = param;
         LibrariesRef = libraries;
+        var settings = new JObject();
         if (File.Exists(SettingsPath))
-        {
-            var settings = JObject.Parse(
-                File.ReadAllText(SettingsPath));
-            Settings = new(settings);
-        }
-        Settings = new();
+            settings = JObject.Parse(File.ReadAllText(SettingsPath));
+        Settings = new(settings);
+        GameManager.OnSettingsRead?.Invoke(this, settings);
     }
     #endregion
 
@@ -141,6 +140,10 @@ public abstract partial class GameBase
             
         using FileStream fs = new(settingPath, FileMode.Create);
         using StreamWriter sw = new(fs);
+        var setting = Settings.ToJObject();
+        var key = Initers.SettingModifier.Key;
+        if (key != "")
+            setting[key] = Initers.SettingModifier.WriteValue(this);
         sw.Write(Settings.ToJObject().ToString());
 
         Logger.Logger.Info($"{GameJarFilePath} Closed. File Saved");

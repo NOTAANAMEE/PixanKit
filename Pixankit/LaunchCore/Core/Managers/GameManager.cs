@@ -301,5 +301,10 @@ public class GameManager
     /// Occurs when a folder is removed.
     /// </summary>
     public static Action<Folder>? OnFolderRemoved;
+
+    /// <summary>
+    /// Occurs when the settings are read from a JSON object.
+    /// </summary>
+    public static Action<GameBase, JObject>? OnSettingsRead;
     #endregion
 }
