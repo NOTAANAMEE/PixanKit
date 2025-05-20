@@ -72,7 +72,7 @@ public abstract partial class GameBase
 
     private readonly string _name;
 
-    private readonly GameType _gameType = GameType.Vanilla;
+    private GameType _gameType = GameType.Vanilla;
 
     /// <summary>
     /// 
