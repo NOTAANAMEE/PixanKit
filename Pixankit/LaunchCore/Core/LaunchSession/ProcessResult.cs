@@ -19,27 +19,4 @@ public struct ProcessResult
     /// Gets or sets the path to the log file, which is a .tar.gz archive.
     /// </summary>
     public string LogGzPath;
-
-    /// <summary>
-    /// Gets or sets the path to the crash file, if applicable.
-    /// </summary>
-    public string? CrashFilePath;
-
-    /// <summary>
-    /// Gets or sets the output stream of the Minecraft process.
-    /// </summary>
-    public Stream OutputStream;
-
-    /// <summary>
-    /// Gets or sets the output stream of the Minecraft process.
-    /// </summary>
-    public Stream ErrorStream;
-
-    /// <summary>
-    /// Closes the output stream associated with the Minecraft process.
-    /// </summary>
-    public readonly void Close()
-    {
-        OutputStream.Close();
-    }
 }
