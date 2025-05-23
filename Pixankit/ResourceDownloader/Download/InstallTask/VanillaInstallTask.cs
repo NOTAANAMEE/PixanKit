@@ -28,9 +28,9 @@ public class VanillaInstallTask : SequenceProgressTask
 
     readonly string _path;
 
-    FuncProgressTask<int> _initTask = new();
+    private readonly FuncProgressTask<int> _initTask = new();
 
-    FileDownloadTask? _jsondownload;
+    FileDownloadTask? _jsonTask;
 
     readonly AsyncProgressTask _asyncTask = new();
 
@@ -64,14 +64,14 @@ public class VanillaInstallTask : SequenceProgressTask
 
         Directory.CreateDirectory(_path);
         Add(_initTask);
-        Add(_jsondownload = new FileDownloadTask("", _path + $"/{_name}.json"));
+        Add(_jsonTask = new FileDownloadTask("", _path + $"/{_name}.json"));
 
         _asyncTask.Add(_jarTask = new FileDownloadTask("", _path + $"/{_name}.jar"));
         _asyncTask.Add(_libraryTask = new LibraryCompletionTask());
         _asyncTask.Add(_assetsTask = new AssetsCompletionTask());
         Add(_asyncTask);
 
-        _jsondownload.OnFinish += Task1Finish;
+        _jsonTask.OnFinish += Task1Finish;
     }
 
     private void Task1Finish(ProgressTask task)
@@ -80,7 +80,7 @@ public class VanillaInstallTask : SequenceProgressTask
 
         var mcjData = JObject.Parse(
             File.ReadAllText(Localize.PathLocalize($"{_path}/{_name}.json")));
-        Launcher.Instance.GameManager.AddGame(_path);
+        _game = Launcher.Instance.GameManager.AddGameAndReturn(_path);
         _jarTask?.SetUrl(mcjData["downloads"]?["client"]?["url"]?.ToString() ?? "");
         _libraryTask?.Set(_game);
         _assetsTask?.Set(mcjData, _game);
@@ -88,13 +88,13 @@ public class VanillaInstallTask : SequenceProgressTask
 
     private async Task<int> GetVersion(Action<double> report, CancellationToken token)
     {
-        var jarray = await ServerList.MinecraftVersionServer.GetVersionsAsync(token);
+        var jArray = await ServerList.MinecraftVersionServer.GetVersionsAsync(token);
         if (token.IsCancellationRequested) return 1;
-        foreach (var item in jarray)
+        foreach (var item in jArray)
         {
             if (item["id"]?.ToString() != _version) continue;
-            _jsondownload?.SetUrl(item["url"]?.ToString() ?? throw new Exception());
-            report?.Invoke(1);
+            _jsonTask?.SetUrl(item["url"]?.ToString() ?? throw new Exception());
+            report.Invoke(1);
             return 0;
         }
         throw new Exception();

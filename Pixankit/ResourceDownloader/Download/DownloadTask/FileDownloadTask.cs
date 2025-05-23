@@ -35,23 +35,23 @@ public class FileDownloadTask : SequenceProgressTask, IFileDownload
     public int TotalFiles => 1;
 
     /// <inheritdoc/>
-    public int DownloadedFiles => (((ProgressTask)this).Status == ProgressStatus.Finished) ? 1 : 0;
+    public int DownloadedFiles => (this.Status == ProgressStatus.Finished) ? 1 : 0;
 
-    private string _url = "";
+    private string _url;
 
     private readonly string _savePath;
 
     private readonly FileStream _stream;
 
-    private readonly object _filelock = new();
+    private readonly Lock _fileLock = new();
 
-    private readonly int _threadnum = 1;
+    private readonly int _threadNum;
 
     private long _size;
 
-    private FuncProgressTask<int> _initTask = new();
+    private readonly FuncProgressTask<int> _initTask = new();
 
-    private AsyncProgressTask<DownloadThread> _downloadTask = new();
+    private readonly AsyncProgressTask<DownloadThread> _downloadTask = new();
 
 
     /// <summary>
@@ -69,16 +69,16 @@ public class FileDownloadTask : SequenceProgressTask, IFileDownload
     /// </summary>
     /// <param name="url">The URL of the file to download.</param>
     /// <param name="path">The path where the file will be saved.</param>
-    /// <param name="threadnum">The number of threads to use for downloading.</param>
-    public FileDownloadTask(string url, string path, int threadnum)
+    /// <param name="threadNum">The number of threads to use for downloading.</param>
+    public FileDownloadTask(string url, string path, int threadNum)
     {
-        this._threadnum = threadnum;
+        this._threadNum = threadNum;
         _url = url;
         _savePath = path;
         Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "./");
         _stream = new FileStream(path, FileMode.Create);
         OnCancel += CancelRun;
-        OnFinish += (a) =>
+        OnFinish += _ =>
         {
             _stream.Close();
         };
@@ -90,31 +90,31 @@ public class FileDownloadTask : SequenceProgressTask, IFileDownload
         Add(_initTask);
         Add(_downloadTask);
         _initTask.Function += InitRun;
-        for (var i = 0; i < _threadnum; i++)
+        for (var i = 0; i < _threadNum; i++)
         {
-            _downloadTask.Add(new DownloadThread(_stream, _filelock));
+            _downloadTask.Add(new DownloadThread(_stream, _fileLock));
         }
     }
 
     private async Task<int> InitRun(Action<double> report, CancellationToken token)
     {
         HttpClient client = new();
-        long length, baselength, mod, startcounter = 0;
+        long threadCounter = 0;
         var response = await client.GetAsync(_url,
             HttpCompletionOption.ResponseHeadersRead, token);
         response.EnsureSuccessStatusCode();
-        length = response.Content.Headers.ContentLength ?? 0;
-        baselength = length / _threadnum;
-        mod = baselength % _threadnum;
+        var length = response.Content.Headers.ContentLength ?? 0;
+        var threadSize = length / _threadNum;
+        var mod = length % _threadNum;
         _size = length;
         response.Dispose();
         client.Dispose();
         foreach (var thread in _downloadTask.ProgressTasks)
         {
             if (token.IsCancellationRequested) throw new TaskCanceledException();
-            var end = startcounter + baselength + ((--mod >= 0) ? 1 : 0);
-            thread.SetUrl(_url, startcounter, end - 1);
-            startcounter = end;
+            var end = threadCounter + threadSize + ((--mod >= 0) ? 1 : 0);
+            thread.SetUrl(_url, threadCounter, end - 1);
+            threadCounter = end;
         }
         return 0;
     }

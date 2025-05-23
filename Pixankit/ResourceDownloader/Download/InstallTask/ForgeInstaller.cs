@@ -16,38 +16,37 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask;
 /// </summary>
 public class ForgeInstaller : SequenceProgressTask
 {
+    private readonly Folder _owner;
 
-    Folder _owner;
+    private readonly string _name;
 
-    string _name;
+    private readonly string _version;
 
-    string _version;
+    private readonly JObject _forgeVerObj;
 
-    JObject _forgeversion;
+    private static string InstallerPath => $"{Files.CacheDir}Installer/forge.jar";
 
-    string Installerpath => $"{Files.CacheDir}/Installer/forge.jar";
+    private string _url = "";
 
-    string _url = "";
+    private readonly FuncProgressTask<int> _initTask = new();
 
-    FuncProgressTask<int> _initTask = new();
+    private AsyncProgressTask? _downloadTask;
 
-    AsyncProgressTask? _downloadTask;
-
-    CliTask? _commandTask;
+    private CliTask? _commandTask;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ForgeInstaller"/> class.
     /// </summary>
     /// <param name="folder">The folder where Forge will be installed.</param>
     /// <param name="name">The name of the Forge installation.</param>
-    /// <param name="mcversion">The Minecraft version for which Forge is being installed.</param>
-    /// <param name="forgeversion">The JSON object containing the Forge version details.</param>
-    public ForgeInstaller(Folder folder, string name, string mcversion, JObject forgeversion)
+    /// <param name="gameVersion">The Minecraft version for which Forge is being installed.</param>
+    /// <param name="forgeVerObj">The JSON object containing the Forge version details.</param>
+    public ForgeInstaller(Folder folder, string name, string gameVersion, JObject forgeVerObj)
     {
         _owner = folder;
         _name = name;
-        _version = mcversion;
-        this._forgeversion = forgeversion;
+        _version = gameVersion;
+        _forgeVerObj = forgeVerObj;
         Init();
     }
 
@@ -62,11 +61,8 @@ public class ForgeInstaller : SequenceProgressTask
     private void AddDownloadTask()
     {
         _downloadTask = new();
-        FileDownloadTask download = new("", Installerpath);
-        _initTask.OnFinish += (a) =>
-        {
-            download.SetUrl(_url);
-        };
+        FileDownloadTask download = new("", InstallerPath);
+        _initTask.OnFinish += _ => download.SetUrl(_url);
         if (_owner.FindGame(_version) == null)
             _downloadTask.Add(new VanillaMinimalInstallTask(_owner, _version, _version));
         _downloadTask.Add(download);
@@ -78,19 +74,17 @@ public class ForgeInstaller : SequenceProgressTask
         if (Launcher.Instance == null) throw new Exception();
         var java = JavaChooser.Newest(Launcher.Instance.JavaManager.JavaRuntimes) ??
                    throw new Exception();
-        _commandTask = new(java.JavaExe, $"-jar \"{Installerpath}\" --installClient " +
+        _commandTask = new(java.JavaExe, $"-jar \"{InstallerPath}\" --installClient " +
                                          $"\"{_owner.FolderPath}\"");
         ProgressTasks.Add(_commandTask);
-        _commandTask.OnFinish += (a) =>
-        {
-            GamePostProcess.Move(_owner, $"{_version}-forge-{_forgeversion["version"]}", _name);
-        };
+        _commandTask.OnFinish += _ =>
+            GamePostProcess.Move(_owner, $"{_version}-forge-{_forgeVerObj["version"]}", _name);
     }
 
     private async Task<int> Init(Action<double> progress, CancellationToken token)
     {
         _url = await ServerList.ModLoaderServers["forge"]
-            .GetUrl(_forgeversion, token);
+            .GetUrl(_forgeVerObj, token);
         if (token.IsCancellationRequested) return 1;
         progress(1.0);
         return 0;

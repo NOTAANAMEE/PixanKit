@@ -16,10 +16,9 @@ public partial class ModCollection
         JObject jsonData = [];
         foreach (var item in ModFiles)
         {
-            if (item.Value.ValidStructure)
-                jsonData.Add(item.Key, item.Value.ToJson());
-            else
-                jsonData.Add(item.Value.FileName, item.Value.ToJson());
+            jsonData.Add(item.Value.ValidStructure ? 
+                item.Key : item.Value.FileName, 
+                item.Value.ToJson());
         }
         return jsonData;
     }

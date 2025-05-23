@@ -6,7 +6,7 @@ namespace PixanKit.ResourceDownloader.Download.DownloadTask;
 /// <summary>
 /// 
 /// </summary>
-public class DownloadThread : FuncProgressTask<int>
+public class DownloadThread : FuncProgressTask<int>, IFileDownload
 {
     /// <inheritdoc/>
     public long Size => _end - _start + 1;
@@ -30,7 +30,7 @@ public class DownloadThread : FuncProgressTask<int>
 
     string _url = "";
 
-    object _lock;
+    readonly Lock _lock;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DownloadThread"/> class 
@@ -40,9 +40,9 @@ public class DownloadThread : FuncProgressTask<int>
     /// <param name="stream"></param>
     /// <param name="start">The starting byte position of the chunk.</param>
     /// <param name="end">The ending byte position of the chunk.</param>
-    /// <param name="lockobj"></param>
-    public DownloadThread(string url, Stream stream, long start, long end, object lockobj) :
-        this(stream, lockobj)
+    /// <param name="locker"></param>
+    public DownloadThread(string url, Stream stream, long start, long end, Lock locker) :
+        this(stream, locker)
     {
         SetUrl(url, start, end);
     }
@@ -52,11 +52,11 @@ public class DownloadThread : FuncProgressTask<int>
     /// with a specified URL, starting byte position, and ending byte position.
     /// </summary>
     /// <param name="stream"></param>
-    /// <param name="lockobj"></param>
-    public DownloadThread(Stream stream, object lockobj) : base()
+    /// <param name="locker"></param>
+    public DownloadThread(Stream stream, Lock locker)
     {
         _stream = stream;
-        _lock = lockobj;
+        _lock = locker;
         Function += DownloadAsync;
     }
 

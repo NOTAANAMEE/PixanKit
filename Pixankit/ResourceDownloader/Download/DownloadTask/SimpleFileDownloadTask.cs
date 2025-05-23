@@ -20,13 +20,11 @@ public class SimpleFileDownloadTask : FuncProgressTask<int>, IFileDownload
     /// <inheritdoc/>
     public int TotalFiles => 1;
 
-    string _url = "";
+    string _url;
 
     readonly FileStream _stream;
 
-    readonly string _path;
-
-    long _downloadedBytes = 0;
+    long _downloadedBytes;
 
     /// <summary>
     /// Inits the download task with certain url and path
@@ -37,15 +35,14 @@ public class SimpleFileDownloadTask : FuncProgressTask<int>, IFileDownload
     {
         Function += DownloadAsync;
         _url = url;
-        _path = path;
         Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "");
         _stream = new FileStream(path, FileMode.Create);
-        OnCancel += (a) =>
+        OnCancel += _ =>
         {
             _stream.Dispose();
             File.Delete(path);
         };
-        OnFinish += (a) =>
+        OnFinish += _ =>
         {
             _stream.Close();
         };
@@ -55,14 +52,14 @@ public class SimpleFileDownloadTask : FuncProgressTask<int>, IFileDownload
     {
         HttpClient client = new();
         var bytes = new byte[8192];
-        int bytesRead;
 
         try
         {
             using var response = await client.GetAsync(_url, HttpCompletionOption.ResponseHeadersRead, token);
             response.EnsureSuccessStatusCode();
-            using var stream = await response.Content.ReadAsStreamAsync(token);
+            await using var stream = await response.Content.ReadAsStreamAsync(token);
 
+            int bytesRead;
             while ((bytesRead = await stream.ReadAsync(bytes, 0, bytes.Length, token)) > 0)
             {
                 //Console.WriteLine($"{_stream.Length} - {_stream.Length + bytesRead - 1}");

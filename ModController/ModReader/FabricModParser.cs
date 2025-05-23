@@ -2,7 +2,6 @@
 using PixanKit.LaunchCore.Json;
 using PixanKit.ModController.Mod;
 using PixanKit.ModController.Module;
-using System.Data;
 using System.IO.Compression;
 
 namespace PixanKit.ModController.ModReader;
@@ -57,7 +56,7 @@ public static class FabricModParser
         if (ModModule.Instance == null)
             throw new InvalidOperationException("Exception");
 
-        var idInCache = ModModule.Instance.ModDatas.TryGetValue(modId,
+        var idInCache = ModModule.Instance.ModData.TryGetValue(modId,
             out var metaData);
 
         if (idInCache) return metaData ??
@@ -98,10 +97,10 @@ public static class FabricModParser
     internal static ModMetaData GetFromModEntry(JObject modEntry)
     {
         if (ModModule.Instance == null)
-            throw new InvalidOperationException("ModModule Not Inited Yet");
+            throw new InvalidOperationException("ModModule Not initialized Yet");
 
-        ModModule.Instance.ModDatas.TryGetValue(GetId(modEntry), out var output);
-        return output ?? ModModule.Instance.ModDatas["unknown"];
+        ModModule.Instance.ModData.TryGetValue(GetId(modEntry), out var output);
+        return output ?? ModModule.Instance.ModData["unknown"];
     }
 
     internal static ModFile LoadAllFromJson(ModCollection collection, string filepath, JObject modEntry)

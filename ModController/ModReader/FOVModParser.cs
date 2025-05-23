@@ -36,7 +36,7 @@ public static class FovModParser
 
         LoadModFile(modCollection, modId,
             modEntry, archive,
-            out var deplist,
+            out var dependencies,
             out var version, out var releaseDate);
 
         var metaData = LoadMetaData(modId, modEntry, archive);
@@ -45,7 +45,7 @@ public static class FovModParser
         {
             Owner = modCollection,
             Version = version,
-            Dependencies = deplist,
+            Dependencies = dependencies,
             ReleaseDate = releaseDate
         };
         metaData.Register(modFile);
@@ -59,7 +59,7 @@ public static class FovModParser
     {
         if (ModModule.Instance == null) throw new InvalidOperationException();
 
-        if (!ModModule.Instance.ModDatas.TryGetValue(modId, out var metaData))
+        if (!ModModule.Instance.ModData.TryGetValue(modId, out var metaData))
         {
             metaData = new ModMetaData
             {
@@ -70,7 +70,7 @@ public static class FovModParser
                     LoadIcon(archive, modEntry.GetIcon(), modId),
                 Name = modEntry.GetName()
             };
-            ModModule.Instance?.AddMetaData(metaData);
+            ModModule.Instance.AddMetaData(metaData);
         }
         return metaData ?? throw new Exception("Exception avoid null warning");
     }
@@ -90,7 +90,7 @@ public static class FovModParser
             depList = modEntry.GetDataDeps();
             return;
         }
-        FabricModParser.ReadFromCache(modData, releaseDate,
+        modData.ReadFromCache(releaseDate,
             out depList, out version, out releaseDate);
     }
     #endregion

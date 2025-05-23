@@ -3,7 +3,6 @@ using PixanKit.LaunchCore.Core;
 using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule.Folders;
 using PixanKit.LaunchCore.JavaModule;
-using PixanKit.LaunchCore.JavaModule.Java;
 using PixanKit.LaunchCore.Server;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.ResourceDownloader.PostProcess;
@@ -17,47 +16,46 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask;
 /// </summary>
 public class OptifineInstaller : SequenceProgressTask
 {
-    readonly string _version = "";
+    private readonly string _version;
 
-    readonly Folder _owner;
+    private readonly Folder _owner;
 
-    readonly string _name;
+    private readonly string _name;
 
-    static string Installerpath => $"{Files.CacheDir}/Installer/optifine.jar";
+    private static string InstallerPath => $"{Files.CacheDir}Installer/optifine.jar";
 
     //The Java Program I made myself. It is just used to handle the optifine install task
-    static string Programpath => $"{Files.CacheDir}/Installer/optifineinstaller.jar";
+    private static string HelperPath => $"{Files.CacheDir}Installer/optifineinstaller.jar";
 
-    string _url = "";
+    private string _url = "";
 
-    readonly JObject _optifineVersion;
+    private readonly JObject _optifineVersion;
 
-    FuncProgressTask<int> _initProgressTask = new();
+    private readonly FuncProgressTask<int> _initProgressTask = new();
 
-    AsyncProgressTask? _downloadTask;
+    private AsyncProgressTask? _downloadTask;
 
-    CliTask? _commandTask;
+    private CliTask? _commandTask;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OptifineInstaller"/> class.
     /// </summary>
     /// <param name="folder">The target folder where Minecraft is located.</param>
     /// <param name="name">The name of the Minecraft instance. The JAR file will be located at <c>folder\name\name.jar</c>.</param>
-    /// <param name="mcversion">The Minecraft version for which Optifine is being installed.</param>
-    /// <param name="optifineversion">A JSON object containing the Optifine version details.</param>
-    public OptifineInstaller(Folder folder, string name, string mcversion, JObject optifineversion)
+    /// <param name="gameVersion">The Minecraft version for which Optifine is being installed.</param>
+    /// <param name="optifineVerObj">A JSON object containing the Optifine version details.</param>
+    public OptifineInstaller(Folder folder, string name, string gameVersion, JObject optifineVerObj)
     {
         _name = name;
         _owner = folder;
-        _version = mcversion;
-        _optifineVersion = optifineversion;
+        _version = gameVersion;
+        _optifineVersion = optifineVerObj;
         Init();
     }
 
 
     private void Init()
     {
-        var file = Localize.PathLocalize($"{Files.CacheDir}/Installer/optifine.jar");
         _initProgressTask.Function += GetUrl;
         Add(_initProgressTask);
         AddDownloadTask();
@@ -67,11 +65,8 @@ public class OptifineInstaller : SequenceProgressTask
     private void AddDownloadTask()
     {
         _downloadTask = new();
-        SimpleFileDownloadTask download = new("", Installerpath);
-        _initProgressTask.OnFinish += (a) =>
-        {
-            download.SetUrl(_url);
-        };
+        SimpleFileDownloadTask download = new("", InstallerPath);
+        _initProgressTask.OnFinish += _ => download.SetUrl(_url);
         if (_owner.FindGame(_version) == null)
         {
             _downloadTask.Add(new VanillaMinimalInstallTask(_owner, _version, _version));
@@ -82,21 +77,18 @@ public class OptifineInstaller : SequenceProgressTask
 
     private void AddCommandTask()
     {
-        JavaRuntime? java;
         if (Launcher.Instance == null) throw new InvalidOperationException("Init Launcher first");
-        java = JavaChooser.Newest(Launcher.Instance.JavaManager.JavaRuntimes);
+        var java = JavaChooser.Newest(Launcher.Instance.JavaManager.JavaRuntimes);
         if (java == null) throw new Exception("No java found");
 
         var dir =
             $"{_version}-{(_optifineVersion["version"] ?? "").ToString().Replace(" ", "_")}";
 
         _commandTask = new(java.JavaExe, "-cp " +
-                                         $"\"{Installerpath}{Localize.LocalParser}{Programpath}\" Program " +
+                                         $"\"{InstallerPath}{Localize.LocalParser}{HelperPath}\" Program " +
                                          $"\"{_owner.FolderPath}\"");
-        _commandTask.OnFinish += (a) =>
-        {
+        _commandTask.OnFinish += _ => 
             GamePostProcess.Move(_owner, dir, _name);
-        };
         Add(_commandTask);
     }
 

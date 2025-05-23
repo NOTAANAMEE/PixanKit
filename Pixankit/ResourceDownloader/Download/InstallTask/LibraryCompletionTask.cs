@@ -26,12 +26,12 @@ public class LibraryCompletionTask : MultiFileDownloadTask
         List<string> files = [];
         foreach (var library in game.GetLibraries())
         {
-            var libpath = library.LibraryPath.Replace("${library_directory}",
+            var path = library.LibraryPath.Replace("${library_directory}",
                 game.LibrariesDirPath);
             if (library.LibraryType == LibraryType.Mod) continue;
-            if (File.Exists(Localize.PathLocalize(libpath))) continue;
+            if (File.Exists(Localize.PathLocalize(path))) continue;
             urls.Add(library.Url);
-            files.Add(libpath);
+            files.Add(path);
         }
         this.Urls = [.. urls];
         Paths = [.. files];

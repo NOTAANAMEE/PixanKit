@@ -6,7 +6,7 @@ namespace PixanKit.ModController.Mod;
 /// <summary>
 /// Represents metadata for a mod.
 /// </summary>
-public class ModMetaData()
+public class ModMetaData
 {
     /// <summary>
     /// Gets or sets the list of authors of the mod.
@@ -16,17 +16,17 @@ public class ModMetaData()
     /// <summary>
     /// Gets or sets the unique identifier of the mod.
     /// </summary>
-    public string ModId { get; set; } = "Unkonwn";
+    public string ModId { get; set; } = "Unknown";
 
     /// <summary>
     /// Gets or sets the name of the mod.
     /// </summary>
-    public string Name { get; set; } = "Unkonwn";
+    public string Name { get; set; } = "Unknown";
 
     /// <summary>
     /// Gets or sets the description of the mod.
     /// </summary>
-    public string Description { get; set; } = "Unkonwn";
+    public string Description { get; set; } = "Unknown";
 
     /// <summary>
     /// Gets the dictionary of mod files, where the key is the Minecraft version and the value is a list of mod files for that version.
@@ -60,14 +60,13 @@ public class ModMetaData()
     /// <exception cref="NullReferenceException">Thrown if the Minecraft version cannot be retrieved.</exception>
     public void Register(ModFile modFile)
     {
-        string mcversion;
         modFile.MetaData = this;
-        mcversion = modFile.Owner?.Owner?.Version ??
-                    throw new NullReferenceException();
+        var ownerVersion = modFile.Owner?.Owner.Version ??
+                        throw new NullReferenceException();
         lock (ModFilesLocker)
         {
-            if (!ModFiles.TryGetValue(mcversion, out var list))
-                ModFiles.Add(mcversion, [modFile]);
+            if (!ModFiles.TryGetValue(ownerVersion, out var list))
+                ModFiles.Add(ownerVersion, [modFile]);
             else list.Add(modFile);
         }
     }
@@ -83,9 +82,9 @@ public class ModMetaData()
         if (ModModule.Instance?.ModVersionGetter == null)
             throw new InvalidOperationException(
                 "Please implement IModVersionGetter before using this method");
-        var jarray = await ModModule.Instance.ModVersionGetter.
+        var jArray = await ModModule.Instance.ModVersionGetter.
             GetVersionsAsync(ModId, token);
-        ReadUpdate(jarray);
+        ReadUpdate(jArray);
     }
 
     /// <summary>
@@ -94,17 +93,17 @@ public class ModMetaData()
     /// <param name="versions">The JSON data containing mod versions retrieved from a remote API.</param>
     private void ReadUpdate(JArray versions)
     {
-        Dictionary<string, List<ModFile>> tmpdata = new(ModFiles);
+        Dictionary<string, List<ModFile>> dictionary = new(ModFiles);
         NewestVersions = [];
-        foreach (var modversion in versions)
+        foreach (var modVerToken in versions)
         {
-            var mcversion = modversion["game_versions"]?[0]?.ToString() ?? "";
-            if (tmpdata.ContainsKey(mcversion))
+            var mcVersion = modVerToken["game_versions"]?[0]?.ToString() ?? "";
+            if (dictionary.ContainsKey(mcVersion))
             {
-                NewestVersions.Add(mcversion, modversion["version_number"]?.ToString() ?? "");
-                tmpdata.Remove(mcversion);
+                NewestVersions.Add(mcVersion, modVerToken["version_number"]?.ToString() ?? "");
+                dictionary.Remove(mcVersion);
             }
-            if (tmpdata.Count == 0) return;
+            if (dictionary.Count == 0) return;
         }
     }
 

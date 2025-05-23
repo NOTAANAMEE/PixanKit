@@ -12,7 +12,7 @@ namespace PixanKit.ModController.Mod;
 public class ModFile(string filepath)
 {
     /// <summary>
-    /// The meta data of the mod file. For example, the description and authors
+    /// The metadata of the mod file. For example, the description and authors
     /// </summary>
     public ModMetaData? MetaData;
 

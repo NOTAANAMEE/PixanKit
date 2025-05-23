@@ -34,7 +34,7 @@ public class NeoForgeServer : ModLoaderServer
     /// </summary>
     public class OfficialNeoforgeServer : ModLoaderMirror
     {
-        HttpClient _client = new();
+        private readonly HttpClient _client = new();
 
         /// <summary>
         /// Inits the instance of the official server.
@@ -61,21 +61,21 @@ public class NeoForgeServer : ModLoaderServer
             return array;
         }
 
-        private async Task<List<string>> GetLagacyBuild()
+        private async Task<List<string>> GetLegacyBuild()
         {
             //Get 1.20.1 Versions
             var response = await _client.GetAsync(
                 "https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/forge");
             var content = await response.Content.ReadAsStringAsync();
-            var arrayl = (JObject.Parse(content)["versions"] as JArray ??
+            var versionList = (JObject.Parse(content)["versions"] as JArray ??
                           []).ToObject<List<string>>()//Parse The Content To List<string>
                          ?? throw new Exception("Impossible exception");
 
 
-            return arrayl;
+            return versionList;
         }
 
-        private JObject Parse(string version)
+        /*private JObject Parse(string version)
         {
             return new JObject()
             {
@@ -84,31 +84,27 @@ public class NeoForgeServer : ModLoaderServer
                          $"{version}/neoforge-{version}-installer.jar" }
             };
 
-        }
+        }*/
 
-        private int FindBuildsStart(List<string> array, string mcpatch, int lft, int rgh)
+        private int FindBuildsStart(List<string> array, string gamePatch, int lft, int rgh)
         {
-            if (array == null || array.Count == 0) return -1;
+            if (array.Count == 0) return -1;
             if (lft > rgh) return -1;
             var current = (lft + rgh) / 2;
 
-            var currentbuild = array[current];
-            var currentbuildmcver = currentbuild[..currentbuild.LastIndexOf('.')];
+            var currentBuild = array[current];
+            var currentBuildGameVer = currentBuild[..currentBuild.LastIndexOf('.')];
 
-            var beforebuild = array[current - 1];
-            var beforebuildmcver = beforebuild[..beforebuild.LastIndexOf('.')];
+            var beforeBuild = array[current - 1];
+            var beforeBuildGameVer = beforeBuild[..beforeBuild.LastIndexOf('.')];
 
-            Logger.Info("PixanKit.ResourceDownloader", $"Checking: {currentbuildmcver}, Target: {mcpatch}");
+            Logger.Info("PixanKit.ResourceDownloader", $"Checking: {currentBuildGameVer}, Target: {gamePatch}");
 
-            if (currentbuildmcver == mcpatch && beforebuildmcver != mcpatch)
+            if (currentBuildGameVer == gamePatch && beforeBuildGameVer != gamePatch)
                 return current;
 
 
-            if (currentbuildmcver.CompareTo(mcpatch) >= 0)
-                return FindBuildsStart(array, mcpatch, lft, current - 1);
-
-
-            return FindBuildsStart(array, mcpatch, current + 1, rgh);
+            return string.Compare(currentBuildGameVer, gamePatch, StringComparison.Ordinal) >= 0 ? FindBuildsStart(array, gamePatch, lft, current - 1) : FindBuildsStart(array, gamePatch, current + 1, rgh);
         }
 
         /// <summary>
@@ -155,7 +151,7 @@ public class NeoForgeServer : ModLoaderServer
             List<string> builds;
             if (mcversion == "1.20.1")
             {
-                builds = await GetLagacyBuild();
+                builds = await GetLegacyBuild();
                 return GetBuildsObject(builds, "", 0);
             }
             builds = await GetBuild(token);

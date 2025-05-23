@@ -1,6 +1,4 @@
-﻿using PixanKit.LaunchCore.Core;
-using PixanKit.LaunchCore.Extension;
-using PixanKit.LaunchCore.GameModule.Folders;
+﻿using PixanKit.LaunchCore.GameModule.Folders;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.Json;
 
@@ -19,7 +17,7 @@ public class GamePostProcess(Folder folder, string name, string version, bool pr
 
     readonly string _version = version;
 
-    readonly string _versiondir = folder.VersionDirPath;
+    readonly string _versionDir = folder.VersionDirPath;
 
     readonly bool _processjson = processJson;
 
@@ -36,28 +34,23 @@ public class GamePostProcess(Folder folder, string name, string version, bool pr
 
     private void ProcessGame()
     {
-        File.Copy($"{_versiondir}/{_version}/{_version}.jar",
-            $"{_versiondir}/{_name}/{_name}.jar");
+        File.Copy($"{_versionDir}/{_version}/{_version}.jar",
+            $"{_versionDir}/{_name}/{_name}.jar");
         if (_owner.FindGame(_version) != null) return;
-        if (_owner.FindVersion(_version, GameType.Vanilla) != null)
-        {
-            Directory.Delete($"{_versiondir}/{_version}");
-            return;
-        }
-        //var game = Initers.GameIniter($"{_versiondir}/{_name}");
-        //if (!_processjson) 
-        //  Launcher.Instance.GameManager.AddGame(game);
+        if (_owner.FindVersion(_version, GameType.Vanilla) != null) 
+            Directory.Delete($"{_versionDir}/{_version}");
+        
     }
 
     private void ProcessJson()
     {
-        var target = Json.ReadFromFile($"{_versiondir}/{_version}/{_version}.json");
-        var merge = Json.ReadFromFile($"{_versiondir}/{_name}/{_name}.json");
+        var target = Json.ReadFromFile($"{_versionDir}/{_version}/{_version}.json");
+        var merge = Json.ReadFromFile($"{_versionDir}/{_name}/{_name}.json");
 
-        Json.MergeJObject(target, merge);
+        target.MergeJObject(merge);
         Json.SaveFile(_name, target);
 
-        Directory.Delete($"{_versiondir}/{_version}");
+        Directory.Delete($"{_versionDir}/{_version}");
     }
 
     /// <summary>
@@ -75,13 +68,11 @@ public class GamePostProcess(Folder folder, string name, string version, bool pr
         foreach (var entry in Directory.GetFileSystemEntries(folderpath))
         {
             var filename = Path.GetFileName(entry);
-            string newname;
-            string newpath;
             if (!filename.StartsWith(loaderversion)) continue;
-            newname = filename.Replace(loaderversion, name);
-            newpath = $"{Path.GetDirectoryName(entry)}/{newname}";
-            if (newname.EndsWith('/')) Directory.Move(entry, newpath);
-            else File.Move(entry, newpath);
+            var newName = filename.Replace(loaderversion, name);
+            var destDirName = $"{Path.GetDirectoryName(entry)}/{newName}";
+            if (newName.EndsWith('/')) Directory.Move(entry, destDirName);
+            else File.Move(entry, destDirName);
         }
         return folderpath;
     }

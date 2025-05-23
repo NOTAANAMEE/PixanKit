@@ -16,39 +16,39 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask;
 /// </summary>
 public class FabricInstaller : SequenceProgressTask
 {
-    Folder _owner;
+    private readonly Folder _owner;
 
-    string _name;
+    private readonly string _name;
 
-    string _version;
+    private readonly string _version;
 
-    JObject _fabricversion;
+    private readonly JObject _fabricVerObj;
 
-    string Installerpath => $"{Files.CacheDir}/Installer/fabric.jar";
+    private static string installerPath => $"{Files.CacheDir}Installer/fabric.jar";
 
-    string _fabricversioname = "";
+    private string _fabricVersion = "";
 
-    string _url = "";
+    private string _url = "";
 
-    FuncProgressTask<int> _initTask = new();
+    private readonly FuncProgressTask<int> _initTask = new();
 
-    AsyncProgressTask? _downloadTask;
+    private AsyncProgressTask? _downloadTask;
 
-    CliTask? _commandTask;
+    private CliTask? _commandTask;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FabricInstaller"/> class.
     /// </summary>
     /// <param name="folder">The target folder where Minecraft is located.</param>
     /// <param name="name">The name of the Minecraft instance for which Fabric is being installed.</param>
-    /// <param name="mcversion">The Minecraft version for which Fabric is being installed.</param>
-    /// <param name="fabricversion">A JSON object containing the Fabric version details.</param>
-    public FabricInstaller(Folder folder, string name, string mcversion, JObject fabricversion)
+    /// <param name="gameVersion">The Minecraft version for which Fabric is being installed.</param>
+    /// <param name="fabricVerObj">A JSON object containing the Fabric version details.</param>
+    public FabricInstaller(Folder folder, string name, string gameVersion, JObject fabricVerObj)
     {
         _owner = folder;
         _name = name;
-        _version = mcversion;
-        this._fabricversion = fabricversion;
+        _version = gameVersion;
+        this._fabricVerObj = fabricVerObj;
         Init();
     }
 
@@ -58,18 +58,16 @@ public class FabricInstaller : SequenceProgressTask
         Add(_initTask);
         AddDownloadTask();
         AddCommandTask();
-        _fabricversioname = $"fabric-loader-{_fabricversion["version"]}-{_version}";
-        this.OnFinish += (a) => { FinishTask(); };
+        _fabricVersion = $"fabric-loader-{_fabricVerObj["version"]}-{_version}";
+        this.OnFinish += _ => { FinishTask(); };
     }
 
     private void AddDownloadTask()
     {
         _downloadTask = new();
-        FileDownloadTask download = new("", Installerpath);
-        _initTask.OnFinish += (a) =>
-        {
-            download.SetUrl(_url);
-        };
+        FileDownloadTask download = new("", installerPath);
+        _initTask.OnFinish += _ => download.SetUrl(_url);
+        
         _downloadTask.Add(download);
         if (_owner.FindGame(_version) == null)
             _downloadTask.Add(new VanillaMinimalInstallTask(_owner, _version, _version));
@@ -80,24 +78,24 @@ public class FabricInstaller : SequenceProgressTask
     private void AddCommandTask()
     {
         if (Launcher.Instance == null)
-            throw new InvalidOperationException("Launcher hasn't inited yet");
+            throw new InvalidOperationException("Launcher hasn't initialized yet");
         var java = JavaChooser.Newest(Launcher.Instance.JavaManager.JavaRuntimes) ??
                    throw new InvalidOperationException("No java found");
-        _commandTask = new(java.JavaExe, $"-jar \"{Installerpath}\" client " +
-                                         $"-dir \"{_owner.FolderPath}\" -mcversion {_version} -loader {_fabricversion["version"]} " +
+        _commandTask = new(java.JavaExe, $"-jar \"{installerPath}\" client " +
+                                         $"-dir \"{_owner.FolderPath}\" -mcversion {_version} -loader {_fabricVerObj["version"]} " +
                                          $"\"{_owner.FolderPath}\"");
         Add(_commandTask);
     }
 
     private void FinishTask()
     {
-        GamePostProcess.Move(_owner, _fabricversioname, _name);
+        GamePostProcess.Move(_owner, _fabricVersion, _name);
     }
 
     private async Task<int> Init(Action<double> progress, CancellationToken token)
     {
         _url = await ServerList.ModLoaderServers["fabric"]
-            .GetUrl(_fabricversion, token);
+            .GetUrl(_fabricVerObj, token);
         if (token.IsCancellationRequested) return 1;
         progress(1);
         return 0;

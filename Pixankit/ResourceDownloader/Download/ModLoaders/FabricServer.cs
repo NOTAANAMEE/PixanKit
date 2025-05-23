@@ -40,7 +40,7 @@ public class FabricServer : ModLoaderServer
     /// </summary>
     public class OfficialFabricMirror : ModLoaderMirror
     {
-        HttpClient _client = new();
+        private readonly HttpClient _client = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OfficialFabricMirror"/> class.
@@ -70,15 +70,15 @@ public class FabricServer : ModLoaderServer
         }
 
 
-        private Task<bool> CheckReleaseBuild(string mcversion)
+        private Task<bool> CheckReleaseBuild(string gameVersion)
         {
-            var version = mcversion.Split('.');
+            var version = gameVersion.Split('.');
             return Task.FromResult(int.Parse(version[1]) >= 14);
         }
 
-        private Task<bool> CheckSnapBuild(string mcversion)
+        private Task<bool> CheckSnapBuild(string gameVersion)
         {
-            return Task.FromResult(mcversion.CompareTo("18w43b") >= 0);
+            return Task.FromResult(string.Compare(gameVersion, "18w43b", StringComparison.Ordinal) >= 0);
         }
 
         /// <summary>
@@ -99,8 +99,8 @@ public class FabricServer : ModLoaderServer
             if (token.IsCancellationRequested) return [];
             var content = await response.Content.ReadAsStringAsync(token);
             if (token.IsCancellationRequested) return [];
-            var jobj = JObject.Parse(content);
-            return jobj["loader"] as JArray ?? [];
+            var jObject = JObject.Parse(content);
+            return jObject["loader"] as JArray ?? [];
         }
 
         /// <summary>
@@ -121,9 +121,9 @@ public class FabricServer : ModLoaderServer
             if (token.IsCancellationRequested) return "";
             var content = await response.Content.ReadAsStringAsync(token);
             if (token.IsCancellationRequested) return "";
-            var jobj = JObject.Parse(content);
-            var url = jobj["installer"]?[0]?["url"]?.ToString() ??
-                      throw new JsonKeyException(jobj, "/installer/0/url", "loader version");
+            var jObject = JObject.Parse(content);
+            var url = jObject["installer"]?[0]?["url"]?.ToString() ??
+                      throw new JsonKeyException(jObject, "/installer/0/url", "loader version");
             return Replace(url);
         }
     }

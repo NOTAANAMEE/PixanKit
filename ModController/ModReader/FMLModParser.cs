@@ -2,7 +2,6 @@
 using PixanKit.ModController.Mod;
 using PixanKit.ModController.Module;
 using System.IO.Compression;
-using Tomlyn;
 using Tomlyn.Model;
 
 namespace PixanKit.ModController.ModReader;
@@ -12,7 +11,7 @@ namespace PixanKit.ModController.ModReader;
 /// </summary>
 public static class FmlModParser
 {
-    static readonly object IconLocker = new();
+    static readonly Lock IconLocker = new();
 
     #region Logic
     /// <summary>
@@ -28,7 +27,7 @@ public static class FmlModParser
     public static ModFile ParseToml(string tomlContent, string filepath, ModCollection modCollection, ZipArchive archive)
     {
         _ = ModModule.Instance ??
-            throw new InvalidOperationException("ModModule has not being inited");
+            throw new InvalidOperationException("ModModule has not being initialized");
 
         var table = Tomlyn.Toml.ToModel(tomlContent) ??
                     throw new Exception("Failed to parse TOML");
@@ -56,24 +55,23 @@ public static class FmlModParser
     }
 
     private static string GetId(TomlTable modEntry)
-        => modEntry["modId"]?.ToString() ?? throw new Exception("Missing modId");
+        => modEntry["modId"].ToString() ?? throw new Exception("Missing modId");
 
     private static ModMetaData LoadMetaData(string modId, TomlTable modEntry, ZipArchive archive)
     {
         if (ModModule.Instance == null) throw new InvalidOperationException();
-        if (!ModModule.Instance.ModDatas.TryGetValue(modId, out var metaData))
+        if (ModModule.Instance.ModData.TryGetValue(modId, out var metaData))
+            return metaData ?? throw new Exception("Exception avoid null warning");
+        var iconPath = modEntry.GetIcon();
+        metaData = new ModMetaData
         {
-            var logofile = modEntry.GetIcon();
-            metaData = new ModMetaData
-            {
-                ModId = modId,
-                Description = modEntry.GetDescription(),
-                Authors = [modEntry.GetOrDefault("authors", "")],
-                ImageCache = LoadIcon(archive, logofile, modId),
-                Name = modEntry.GetOrDefault("displayName", "")
-            };
-            ModModule.Instance?.AddMetaData(metaData);
-        }
+            ModId = modId,
+            Description = modEntry.GetDescription(),
+            Authors = [modEntry.GetOrDefault("authors", "")],
+            ImageCache = LoadIcon(archive, iconPath, modId),
+            Name = modEntry.GetOrDefault("displayName", "")
+        };
+        ModModule.Instance.AddMetaData(metaData);
 
         return metaData ?? throw new Exception("Exception avoid null warning");
     }
@@ -97,7 +95,7 @@ public static class FmlModParser
             return;
         }
 
-        FabricModParser.ReadFromCache(modData, releaseDate,
+        modData.ReadFromCache(releaseDate,
             out depList, out version, out releaseDate);
     }
 
@@ -113,16 +111,16 @@ public static class FmlModParser
         while (!sr.EndOfStream)
         {
             var line = sr.ReadLine() ?? "";
-            const string impVerkey = "Implementation-Version: ",
-                speVerkey = "Specification-Version: ";
+            const string implementVersion = "Implementation-Version: ",
+                specificationVersion = "Specification-Version: ";
 
-            if (line.StartsWith(impVerkey))
-                return line[impVerkey.Length..].Trim();
+            if (line.StartsWith(implementVersion))
+                return line[implementVersion.Length..].Trim();
 
-            if (line.StartsWith(speVerkey))
-                return line[speVerkey.Length..].Trim();
+            if (line.StartsWith(specificationVersion))
+                return line[specificationVersion.Length..].Trim();
         }
-        return "Unkonwn";
+        return "Unknown";
     }
 
     /// <summary>
@@ -137,7 +135,7 @@ public static class FmlModParser
         {
             if (!CheckFile(entry.FullName)) continue;
             try { ret.Add(GetEachJarId(entry)); }
-            catch { }
+            catch { Console.WriteLine("Error"); }
         }
         return ret;
     }
@@ -154,9 +152,9 @@ public static class FmlModParser
         ZipArchive archive = new(filestream);
         var entry = archive.GetEntry("META-INF/mods.toml") ??
                     throw new Exception("Not Invalid Mod");
-        var entrystream = entry.Open();
-        StreamReader streamreader = new(entrystream);
-        var tomlContent = streamreader.ReadToEnd();
+        var entryStream = entry.Open();
+        StreamReader reader = new(entryStream);
+        var tomlContent = reader.ReadToEnd();
         var table = Tomlyn.Toml.ToModel(tomlContent) ??
                     throw new Exception("Failed to parse TOML");
         var mods = table["mods"] as TomlTableArray ??
@@ -167,8 +165,8 @@ public static class FmlModParser
 
     internal static string LoadIcon(ZipArchive archive, string iconPath, string modId)
     {
-        if (iconPath == "") return iconPath;
-        if (iconPath.StartsWith("http")) return iconPath;
+        if (iconPath == "" || iconPath.StartsWith("http")) 
+            return iconPath;
         var entry = archive.GetEntry(iconPath);
         if (entry == null) return iconPath;
         var path = $"{ModModule.IconCachePath}/{modId}" +

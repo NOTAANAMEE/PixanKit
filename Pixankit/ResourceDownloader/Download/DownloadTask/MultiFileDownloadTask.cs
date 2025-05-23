@@ -35,12 +35,7 @@ public class MultiFileDownloadTask : AsyncProgressTask, IFileDownload
     {
         get
         {
-            long ret = 0;
-            foreach (var task in _files)
-            {
-                ret += task.Size;
-            }
-            return ret;
+            return _files.Sum(task => task.Size);
         }
     }
 
@@ -49,12 +44,7 @@ public class MultiFileDownloadTask : AsyncProgressTask, IFileDownload
     {
         get
         {
-            long ret = 0;
-            foreach (var task in _files)
-            {
-                ret += task.DownloadedBytes;
-            }
-            return ret;
+            return _files.Sum(task => task.DownloadedBytes);
         }
     }
 
@@ -62,18 +52,7 @@ public class MultiFileDownloadTask : AsyncProgressTask, IFileDownload
     public int TotalFiles => Paths.Length;
 
     /// <inheritdoc/>
-    public int DownloadedFiles
-    {
-        get
-        {
-            var ret = 0;
-            foreach (var task in _files)
-            {
-                ret += task.DownloadedFiles;
-            }
-            return ret;
-        }
-    }
+    public int DownloadedFiles  => _files.Sum(task => task.DownloadedFiles);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MultiFileDownloadTask"/> class 
@@ -134,11 +113,9 @@ public class MultiFileDownloadTask : AsyncProgressTask, IFileDownload
 
         for (var i = 0; i < Urls.Length; i++)
         {
-            FileDownloadTask? task;
-
             //If ProgressTasks Does Not Have So Many Tasks, Add A New Task
             if (ProgressTasks.Count < count + 1) tasks.Add(new SequenceProgressTask());
-            task = new FileDownloadTask(Urls[i], Paths[i], 1);
+            var task = new FileDownloadTask(Urls[i], Paths[i], 1);
             _files.Add(task);
             tasks[count].Add(task);
             count++;

@@ -21,7 +21,7 @@ public partial class ModModule
                 item.Value.ToJson());
 
         JArray modMetadata = [];
-        foreach (var item in ModDatas)
+        foreach (var item in ModData)
             modMetadata.Add(item.Value.ToJson());
 
         return new()

@@ -33,7 +33,7 @@ public class ForgeServer : ModLoaderServer
     /// </summary>
     public class OfficialForgeMirror : ModLoaderMirror
     {
-        HttpClient _client = new();
+        private readonly HttpClient _client = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OfficialForgeMirror"/> class.

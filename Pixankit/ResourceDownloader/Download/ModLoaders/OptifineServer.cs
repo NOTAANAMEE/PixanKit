@@ -34,7 +34,7 @@ public class OptifineServer : ModLoaderServer
     /// </summary>
     public class OfficialOptifineServer : ModLoaderMirror
     {
-        HttpClient _client = new();
+        private readonly HttpClient _client = new();
 
         /// <summary>
         /// 
@@ -56,7 +56,7 @@ public class OptifineServer : ModLoaderServer
             //var versions = new List<string>();
             HtmlDocument document = new();
             document.LoadHtml(content);
-            File.WriteAllText("a.html", content);
+            await File.WriteAllTextAsync("a.html", content, token);
             if (token.IsCancellationRequested) return null;
             var xpath = "/html/body/table/tr[2]/td/span//tr | " +
                         "/html/body/table/tr[2]/td/span//h2";//WTF no tbody
@@ -74,12 +74,12 @@ public class OptifineServer : ModLoaderServer
             };
         }
 
-        private static int GetStartIndex(HtmlNodeCollection collection, string mcversion)
+        private static int GetStartIndex(HtmlNodeCollection collection, string gameVersion)
         {
             for (var i = 0; i < collection.Count; i++)
             {
                 var node = collection[i];
-                if (node.Name == "h2" && node.InnerText == $"Minecraft {mcversion}")
+                if (node.Name == "h2" && node.InnerText == $"Minecraft {gameVersion}")
                     return i;
             }
             return -1;

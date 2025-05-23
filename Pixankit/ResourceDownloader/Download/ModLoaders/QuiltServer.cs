@@ -73,7 +73,7 @@ public class QuiltServer : ModLoaderServer
             var response = await _client.GetAsync(url, token);
             var content = await response.Content.ReadAsStringAsync(token);
             var array = JArray.Parse(content);
-            return array[0]?["url"]?.ToString() ?? "";
+            return array[0]["url"]?.ToString() ?? "";
         }
     }
 }

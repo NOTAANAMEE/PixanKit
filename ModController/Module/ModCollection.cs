@@ -29,7 +29,7 @@ public partial class ModCollection : IToJson
     /// The JSON cache of each mod. <c>key</c> is the ID
     /// and <c>value</c> is the JSON cache of each mod file
     /// </summary>
-    internal JObject ModCache = [];
+    internal JObject ModCache;
 
     /// <summary>
     /// Inits the <see cref="ModCollection"/> through the cache and the 
@@ -45,8 +45,8 @@ public partial class ModCollection : IToJson
         {
             try
             {
-                var modfile = ModParser.Parse(mod, this);
-                ModFiles.TryAdd(modfile.MetaData?.ModId ?? "", modfile);
+                var modFile = ModParser.Parse(mod, this);
+                ModFiles.TryAdd(modFile.MetaData?.ModId ?? "", modFile);
             }
             catch (Exception e)
             {

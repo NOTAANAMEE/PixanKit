@@ -15,43 +15,42 @@ public class AssetsCompletionTask : SequenceProgressTask
 {
     GameBase? _game;
 
-    string _indexpath = "";
+    string _indexPath = "";
 
     private MultiFileDownloadTask? _task2;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AssetsCompletionTask"/> class.
     /// </summary>
-    /// <param name="jdata">The JSON data containing the asset index information.</param>
+    /// <param name="JObject">The JSON data containing the asset index information.</param>
     /// <param name="game">The game context to manage assets.</param>
-    public AssetsCompletionTask(JObject jdata, GameBase game)
+    public AssetsCompletionTask(JObject JObject, GameBase game)
     {
         _game = game;
-        Init(jdata);
+        Init(JObject);
     }
 
 
     internal AssetsCompletionTask() { }
 
-    internal void Set(JObject jdata, GameBase game)
+    internal void Set(JObject jObject, GameBase game)
     {
         _game = game;
-        Init(jdata);
+        Init(jObject);
     }
 
-    private void Init(JObject jdata)
+    private void Init(JObject jObject)
     {
-        FileDownloadTask task;
+        var url = jObject["assetIndex"]?["url"]?.ToString() ?? "";
+        var index = jObject["assetIndex"]?["id"]?.ToString() ?? "";
 
-        var url = jdata["assetIndex"]?["url"]?.ToString() ?? "";
-        var index = jdata["assetIndex"]?["id"]?.ToString() ?? "";
+        _indexPath = $"{_game?.AssetsDirPath}/indexes/{index}.json";
 
-        _indexpath = $"{_game?.AssetsDirPath}/indexes/{index}.json";
-
-        if (File.Exists(Localize.PathLocalize(_indexpath)))
+        if (File.Exists(Localize.PathLocalize(_indexPath)))
         {
-            Add(task = new FileDownloadTask(url, _indexpath));
-            task.OnFinish += (a) => TaskFinish();
+            FileDownloadTask task;
+            Add(task = new FileDownloadTask(url, _indexPath));
+            task.OnFinish += _ => TaskFinish();
         }
         else TaskFinish();
         Add(_task2 = new MultiFileDownloadTask());
@@ -61,16 +60,16 @@ public class AssetsCompletionTask : SequenceProgressTask
     {
         List<string> urls = [], paths = [];
 
-        var jobj = JObject.Parse(File.ReadAllText(
-            Localize.PathLocalize(_indexpath)
+        var jObject = JObject.Parse(File.ReadAllText(
+            Localize.PathLocalize(_indexPath)
         ));
-        foreach (var asset in jobj["objects"] ?? new JArray())
+        foreach (var asset in jObject["objects"] ?? new JArray())
         {
             try
             {
                 var hash = asset.First?["hash"]?.ToString() ?? "";
-                var rpath = $"{hash[0..2]}/{hash}";
-                var path = $"{_game?.AssetsDirPath}/objects/{rpath}";
+                var s = $"{hash[0..2]}/{hash}";
+                var path = $"{_game?.AssetsDirPath}/objects/{s}";
                 //Console.WriteLine(++count);
                 if (File.Exists(Localize.PathLocalize(path))) continue;
                 urls.Add(ServerList.MinecraftAssetsServer.GetAssetsUrl(hash));
@@ -82,5 +81,4 @@ public class AssetsCompletionTask : SequenceProgressTask
         }
         _task2?.Set([.. urls], [.. paths]);
     }
-
 }

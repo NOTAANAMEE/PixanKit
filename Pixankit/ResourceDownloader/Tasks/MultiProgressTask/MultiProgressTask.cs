@@ -41,15 +41,7 @@ public class MultiProgressTask : ProgressTask
         }
         base.Cancel();
     }
-
-    /// <summary>
-    /// Marks the multi-progress task and its sub-tasks as finished.
-    /// </summary>
-    protected override void Finish()
-    {
-        base.Finish();
-    }
-
+    
     /// <summary>
     /// Reports the combined progress of all tasks managed by this multi-progress task.
     /// </summary>
@@ -106,14 +98,6 @@ public class MultiProgressTask<T> : ProgressTask where T : ProgressTask
             if (progressTask.Status < ProgressStatus.Canceled) progressTask.Cancel();
         }
         base.Cancel();
-    }
-
-    /// <summary>
-    /// Marks the multi-progress task and its sub-tasks as finished.
-    /// </summary>
-    protected override void Finish()
-    {
-        base.Finish();
     }
 
     /// <summary>

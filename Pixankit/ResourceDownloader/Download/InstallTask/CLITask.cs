@@ -9,10 +9,7 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask;
 /// </summary>
 public class CliTask : ProgressTask
 {
-
-    ProcessStartInfo _startInfo;
-
-    Process _process;
+    private readonly Process _process;
 
     StreamReader Output => _process.StandardOutput;
 
@@ -23,7 +20,7 @@ public class CliTask : ProgressTask
     /// <param name="args">arguments</param>
     public CliTask(string file, string args)
     {
-        _startInfo = new ProcessStartInfo()
+        var startInfo = new ProcessStartInfo()
         {
             FileName = file,
             Arguments = args,
@@ -31,7 +28,7 @@ public class CliTask : ProgressTask
         };
         _process = new Process()
         {
-            StartInfo = _startInfo
+            StartInfo = startInfo
         };
     }
 
@@ -40,19 +37,19 @@ public class CliTask : ProgressTask
     /// </summary>
     /// <param name="file">the exact path of the file</param>
     /// <param name="args">the arguments</param>
-    /// <param name="workingdirectory">the directory where the process is expected to run</param>
-    public CliTask(string file, string args, string workingdirectory)
+    /// <param name="workingDir">the directory where the process is expected to run</param>
+    public CliTask(string file, string args, string workingDir)
     {
-        _startInfo = new ProcessStartInfo()
+        var startInfo = new ProcessStartInfo()
         {
             FileName = file,
             Arguments = args,
             RedirectStandardOutput = true,
-            WorkingDirectory = workingdirectory
+            WorkingDirectory = workingDir
         };
         _process = new Process()
         {
-            StartInfo = _startInfo
+            StartInfo = startInfo
         };
     }
 
@@ -63,7 +60,9 @@ public class CliTask : ProgressTask
     {
         _process.Start();
         while (!_process.HasExited)
-            Logger.Info("PixanKit.ResourceDownloader", $"Porcess: {Output.ReadLine()}");
+            Logger.Info("PixanKit.ResourceDownloader", 
+                $"Process: " +
+                         $"{await Output.ReadLineAsync()}");
         await base.Running();
     }
 

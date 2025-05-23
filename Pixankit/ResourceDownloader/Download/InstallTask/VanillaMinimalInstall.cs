@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Exceptions;
 using PixanKit.LaunchCore.GameModule.Folders;
+using PixanKit.LaunchCore.Json;
 using PixanKit.LaunchCore.Server;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 using PixanKit.ResourceDownloader.Tasks;
@@ -14,7 +15,6 @@ namespace PixanKit.ResourceDownloader.Download.InstallTask;
 /// </summary>
 public class VanillaMinimalInstallTask : SequenceProgressTask
 {
-    readonly Folder _owner;
 
     readonly string _name;
 
@@ -24,9 +24,9 @@ public class VanillaMinimalInstallTask : SequenceProgressTask
 
     readonly FuncProgressTask<int> _initTask = new();
 
-    FileDownloadTask? _jsondownload;
+    FileDownloadTask? _jsonTask;
 
-    FileDownloadTask? _jardownload;
+    FileDownloadTask? _jarTask;
 
     /// <summary>
     /// Initor
@@ -38,7 +38,6 @@ public class VanillaMinimalInstallTask : SequenceProgressTask
     /// <exception cref="Exception"></exception>
     public VanillaMinimalInstallTask(Folder folder, string name, string version)
     {
-        _owner = folder;
         this._name = name;
         this._version = version;
         _path = Path.Combine(folder.VersionDirPath, name);
@@ -52,29 +51,26 @@ public class VanillaMinimalInstallTask : SequenceProgressTask
 
         Directory.CreateDirectory(_path);
         Add(_initTask);
-        Add(_jsondownload = new FileDownloadTask("", _path + $"/{_name}.json"));
+        Add(_jsonTask = new FileDownloadTask("", _path + $"/{_name}.json"));
 
-        Add(_jardownload = new FileDownloadTask("", _path + $"/{_name}.jar"));
+        Add(_jarTask = new FileDownloadTask("", _path + $"/{_name}.jar"));
 
-        _jsondownload.OnFinish += Task1Finish;
+        _jsonTask.OnFinish += Task1Finish;
     }
 
 
     private async Task<int> GetVersion(Action<double> report, CancellationToken token)
     {
-        JArray jArray;
         try
         {
-            jArray = await ServerList.MinecraftVersionServer.GetVersionsAsync(token);
+            var jArray = await ServerList.MinecraftVersionServer.GetVersionsAsync(token);
             foreach (var item in jArray)
             {
-                if (item["id"]?.ToString() == _version)
-                {
-                    _jsondownload?.SetUrl(item["url"]?.ToString() ??
-                                          throw new JsonKeyException(item, "url", "impossible"));
-                    report?.Invoke(1);
-                    return 0;
-                }
+                if (item["id"]?.ToString() != _version) continue;
+                _jsonTask?.SetUrl(item["url"]?.ToString() ??
+                                  throw new JsonKeyException(item, "url", "impossible"));
+                report.Invoke(1);
+                return 0;
             }
             return 1;
         }
@@ -85,7 +81,7 @@ public class VanillaMinimalInstallTask : SequenceProgressTask
     {
         var mcjData = JObject.Parse(
             File.ReadAllText(Localize.PathLocalize($"{_path}/{_name}.json")));
-        _jardownload?.SetUrl(mcjData["downloads"]?["client"]?["url"]?.ToString() ??
+        _jarTask?.SetUrl(mcjData.GetValue(Format.ToString, "downloads/client/url") ??
                              throw new JsonKeyException(mcjData, "downloads/client/url", "Version JSON document"));
     }
 }

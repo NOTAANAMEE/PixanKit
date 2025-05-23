@@ -14,7 +14,7 @@ public class LaunchSession
     /// <summary>
     /// Gets the path to the log directory. Java process will run under <see cref="Files.CacheDir"/>.
     /// </summary>
-    public static string LogPath => Files.CacheDir + "/logs";
+    public static string LogPath => Files.CacheDir + "logs";
 
     /// <summary>
     /// Gets the process associated with the game launch.
@@ -41,11 +41,11 @@ public class LaunchSession
     /// </summary>
     private readonly ProcessStartInfo _startInfo;
         
-    private string _preArgs;
+    private readonly string _preArgs;
         
-    private string _postArgs;
+    private readonly string _postArgs;
         
-    private List<KeyValuePair<string, string>> _variables;
+    private readonly List<KeyValuePair<string, string>> _variables;
 
     DateTime _time = DateTime.Now;
 
@@ -151,7 +151,6 @@ public class LaunchSession
         {
             ReturnCode = Process?.ExitCode ?? -1,
             LogGzPath = _logPath,
-            CrashFilePath = LogPath,
         };
     }
 }

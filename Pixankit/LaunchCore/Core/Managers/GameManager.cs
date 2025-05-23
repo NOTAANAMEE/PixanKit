@@ -26,9 +26,9 @@ public class GameManager
     /// </summary>
     public GameBase? TargetGame { get; set; }
 
-    private List<Folder> _folders = [];
+    private readonly List<Folder> _folders = [];
         
-    private Dictionary<string, GameParams> _gameRefs = [];
+    private readonly Dictionary<string, GameParams> _gameRefs = [];
     #endregion
 
     #region Init
@@ -54,7 +54,7 @@ public class GameManager
         var tmpstr = (Files.FolderJData["target"] ?? "").ToString();
         if (tmpstr != "") TargetGame = FindGame(tmpstr);
         UpdateTargetGame();
-        Logger.Logger.Info("Game Module Inited Successfully");
+        Logger.Logger.Info("Game Module Initialized Successfully");
     }
     #endregion
 
@@ -157,6 +157,21 @@ public class GameManager
         if (folder == null) throw new Exception("Folder hasn't added before");
         AddGame(Initers.GameIniter(folder, name));
     }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="path"></param>
+    /// <exception cref="Exception"></exception>
+    public GameBase AddGameAndReturn(string path)
+    {
+        var name = Path.GetFileName(path);
+        var folder = FindFolder(path);
+        if (folder == null) throw new Exception("Folder hasn't added before");
+        GameBase ret;
+        AddGame( ret =Initers.GameIniter(folder, name));
+        return ret;
+    }
 
     /// <summary>
     /// Removes a game from its corresponding folder.
@@ -179,10 +194,10 @@ public class GameManager
     public GameBase? FindGame(string path)
     {
         path = path.Replace("\\", "/");
-        var folderpath = path[..path.LastIndexOf("/versions/", StringComparison.Ordinal)];
+        var s = path[..path.LastIndexOf("/versions/", StringComparison.Ordinal)];
         var name = Path.GetFileName(path)
                    ?? throw new ArgumentException(path);
-        var res = FindFolder(folderpath);
+        var res = FindFolder(s);
 
         if (res == null) return null;
         return res.FindGame(name);

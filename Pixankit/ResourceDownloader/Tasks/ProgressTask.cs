@@ -81,9 +81,9 @@ public abstract class ProgressTask
     protected Lock _progressLock = new();
 
     /// <summary>
-    /// Constructor, initialize the task status to ProgressStatus.Inited
+    /// Constructor, initialize the task status to ProgressStatus.Initialized
     /// </summary>
-    public ProgressTask() { _status = ProgressStatus.Inited; }
+    protected ProgressTask() { _status = ProgressStatus.Inited; }
 
     /// <summary>
     /// Starts the task

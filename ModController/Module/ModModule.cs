@@ -28,9 +28,8 @@ public partial class ModModule : IToJson
         GameManager.OnGameAdded         += (_, a) => { Instance?.AddJudgeGame(a); };
         GameManager.OnGameRemoved       += (_, a) =>
         {
-            if (a is ModdedGame)
-                Instance?.ModdedGames.Remove(a as ModdedGame ??
-                                             throw new Exception("Impossible exception"));
+            if (a is ModdedGame game)
+                Instance?.ModdedGames.Remove(game ?? throw new Exception("Impossible exception"));
         };
         //Remove game. Check whether game in the dictionary.
     }
@@ -56,7 +55,7 @@ public partial class ModModule : IToJson
     /// </summary>
     public static string SettingsPath
     {
-        get => Paths.GetOrAdd("ModController_SettingsPath", "${ConfigDir}/Modsettings.json");
+        get => Paths.GetOrAdd("ModController_SettingsPath", "${ConfigDir}/modsettings.json");
         set => Paths.TrySet("ModController_SettingsPath", value);
     }
 
@@ -73,12 +72,12 @@ public partial class ModModule : IToJson
     /// <summary>
     /// A cache for storing mod-related data as a JSON object.
     /// </summary>
-    private JObject _modCache = [];
+    private JObject _modCache;
 
     /// <summary>
     /// A dictionary containing metadata for mods.
     /// </summary>
-    public ConcurrentDictionary<string, ModMetaData> ModDatas = [];
+    public ConcurrentDictionary<string, ModMetaData> ModData = [];
 
     /// <summary>
     /// A list of the tasks. Use Task.WhenAll() to wait.
@@ -90,7 +89,7 @@ public partial class ModModule : IToJson
     /// </summary>
     public Dictionary<ModdedGame, ModCollection> ModdedGames = [];
 
-    readonly object _locker = new();
+    readonly Lock _locker = new();
 
     /// <summary>
     /// Initializes a new instance of the ModModule class.
@@ -100,7 +99,6 @@ public partial class ModModule : IToJson
     {
         //Initialize
         Instance = this;//Single-Instance
-        if (Launcher.Instance == null) return;//Need to wait until Launcher inits
         Logger.Info("PixanKit.ModController.Module", "Mod module starts to init");
         //lock (MetaDataLocker) 
         ReadFile();
@@ -129,8 +127,8 @@ public partial class ModModule : IToJson
     /// </summary>
     private void ReadFile()
     {
-        var jsoncontent = JObject.Parse(File.ReadAllText(SettingsPath));
-        LoadFromJson(jsoncontent);
+        var jObject = JObject.Parse(File.ReadAllText(SettingsPath));
+        LoadFromJson(jObject);
     }
 
     /// <summary>
@@ -162,18 +160,15 @@ public partial class ModModule : IToJson
     /// <summary>
     /// Reads the mod settings JObject and loads it into the cache.
     /// </summary>
-    /// <param name="jsoncontent">The settings JObject</param>
+    /// <param name="jObject">The settings JObject</param>
     /// <exception cref="JsonException"></exception>
-    public void OpenContent(JObject jsoncontent)
+    public void OpenContent(JObject jObject)
     {
-        _modCache = jsoncontent["games"] as JObject ??
-                    throw new JsonException();
-        foreach (var jsondata in jsoncontent["metadata"] ??
-                                 throw new JsonException())
+        _modCache = jObject["games"] as JObject ?? throw new JsonException();
+        foreach (var jToken in jObject["metadata"] ?? throw new JsonException())
         {
             var metadata = FabricModParser.ParseModMetaDataFromJson(
-                jsondata as JObject ??
-                throw new JsonException());
+                jToken as JObject ?? throw new JsonException());
             AddMetaData(metadata);
         }
     }
@@ -184,7 +179,7 @@ public partial class ModModule : IToJson
     /// <param name="data">The metadata to add.</param>
     public void AddMetaData(ModMetaData data)
     {
-        if (!ModDatas.TryAdd(data.ModId, data))
+        if (!ModData.TryAdd(data.ModId, data))
             throw new Exception("Unsuccess");
     }
 
@@ -232,10 +227,10 @@ public partial class ModModule : IToJson
     /// </summary>
     public void CleanMetaData()
     {
-        var removingId = ModDatas
+        var removingId = ModData
             .Where(pair => pair.Value.ReferenceTime == 0)
             .Select(pair => pair.Key).ToArray();//LINQ
-        foreach (var item in removingId) ModDatas.Remove(item, out _);
+        foreach (var item in removingId) ModData.Remove(item, out _);
     }
 
     /// <summary>

@@ -90,7 +90,7 @@ public static class ModParser
 
     private static ModFile ParseInv(string filepath, ModCollection collection)
     {
-        Logger.Warn("PianKit.ModController", $"No parser found for {filepath}." +
+        Logger.Warn("PixanKit.ModController", $"No parser found for {filepath}." +
                                              $"ModFile will be loaded as default");
         var filename = Path.GetFileName(filepath);
         if (collection.ModCache.ContainsKey(filename))
