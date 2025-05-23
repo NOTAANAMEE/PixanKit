@@ -49,6 +49,8 @@ public class LaunchSession
 
     DateTime _time = DateTime.Now;
 
+    private string _logPath = "";
+
     /// <summary>
     /// Initializes a new instance of the <see cref="LaunchSession"/> class.
     /// </summary>
@@ -97,6 +99,7 @@ public class LaunchSession
             StartInfo = _startInfo,
             EnableRaisingEvents = true,
         };
+        _time = DateTime.Now;
         Process.Start();
         Process.Exited += Exit;
             
@@ -129,7 +132,7 @@ public class LaunchSession
 
     private void Exit(object? sender, EventArgs e)
     {
-        _time = DateTime.Now;
+        
     }
 
     /// <summary>
@@ -139,19 +142,15 @@ public class LaunchSession
     public ProcessResult GetResult()
     {
         if (Process?.HasExited ?? true) return new();
-        var path = "";
-        foreach (var dir in Directory.GetDirectories(Files.CacheDir + "/logs"))
-        {
-            if (Directory.GetCreationTime(dir) == _time)
-            {
-                path = dir;
-                break;
-            }
-        }
+        _logPath = Directory.GetDirectories(LogPath)
+               .Where(str => str.EndsWith(".gz"))
+               .FirstOrDefault(str =>
+                   Directory.GetCreationTime(str) == _time)
+                   ?? "";
         return new()
         {
             ReturnCode = Process?.ExitCode ?? -1,
-            LogGzPath = path,
+            LogGzPath = _logPath,
             CrashFilePath = LogPath,
         };
     }

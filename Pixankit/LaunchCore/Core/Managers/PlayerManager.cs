@@ -111,8 +111,8 @@ public class PlayerManager
     /// </summary>
     private void ResetTargetPlayer()
     {
-        if (TargetPlayer == null && _players.Count != 0)
-            TargetPlayer = _players.First();
+        if (TargetPlayer == null)
+            TargetPlayer = _players.FirstOrDefault();
     }
 
     /// <summary>

@@ -2,6 +2,7 @@
 using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule.LibraryData;
 using PixanKit.LaunchCore.GameModule.Folders;
+using PixanKit.LaunchCore.Core.Managers;
 
 namespace PixanKit.LaunchCore.GameModule.Game;
 
@@ -30,8 +31,8 @@ public abstract partial class GameBase
         
     public partial string Description
     {
-        get => _settings.Description;
-        set => _settings.Description = value;
+        get => Settings.Description;
+        set => Settings.Description = value;
     }
         
     public partial string GameFolderPath => $"{_folder.VersionDirPath}{_name}/"; 
@@ -58,13 +59,7 @@ public abstract partial class GameBase
         
     public partial short MinimalJavaVersion => Params.JvmVersion;
 
-    /// <summary>
-    /// Gets the settings for this game instance.
-    /// </summary>
-    /// <remarks>
-    /// The settings define Java version preferences, runtime folder behavior, and custom descriptions.
-    /// </remarks>
-    public GameSettings Settings => _settings;
+    
     #endregion
 
     #region Fields
@@ -89,7 +84,13 @@ public abstract partial class GameBase
     /// </summary>
     protected LibrariesRef LibrariesRef;
     
-    private GameSettings _settings;
+    /// <summary>
+    /// Gets the settings for this game instance.
+    /// </summary>
+    /// <remarks>
+    /// The settings define Java version preferences, runtime folder behavior, and custom descriptions.
+    /// </remarks>
+    public GameSettings Settings;
     #endregion
         
     #region Constructors
@@ -107,20 +108,11 @@ public abstract partial class GameBase
         _folder = folder;
         Params = param;
         LibrariesRef = libraries;
-        SetSettings();
-    }
-    #endregion
-
-    #region InitorUsingMethods
-    private void SetSettings()
-    {
+        var settings = new JObject();
         if (File.Exists(SettingsPath))
-        {
-            var settings = JObject.Parse(
-                File.ReadAllText(SettingsPath));
-            _settings = new(settings);
-        }
-        _settings = new();
+            settings = JObject.Parse(File.ReadAllText(SettingsPath));
+        Settings = new(settings);
+        GameManager.OnSettingsRead?.Invoke(this, settings);
     }
     #endregion
 
@@ -148,7 +140,11 @@ public abstract partial class GameBase
             
         using FileStream fs = new(settingPath, FileMode.Create);
         using StreamWriter sw = new(fs);
-        sw.Write(_settings.ToJObject().ToString());
+        var setting = Settings.ToJObject();
+        var key = Initers.SettingModifier.Key;
+        if (key != "")
+            setting[key] = Initers.SettingModifier.WriteValue(this);
+        sw.Write(Settings.ToJObject().ToString());
 
         Logger.Logger.Info($"{GameJarFilePath} Closed. File Saved");
     }

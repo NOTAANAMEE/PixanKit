@@ -19,6 +19,11 @@ public static class Initers
     public static IGameIniter GameIniterInstance = new DefaultGameIniter();
 
     /// <summary>
+    /// Gets or sets the instance of the custom setting modifier.
+    /// </summary>
+    public static ISettingModifier SettingModifier = new DefaultSettingModifier();
+
+    /// <summary>
     /// Initializes a game instance using the specified path.
     /// </summary>
     /// <param name="folder"></param>
@@ -152,6 +157,21 @@ internal class DefaultGameIniter : IGameIniter
         var forge = param.GameArgs.Contains("fml");
         var optifine = param.GameArgs.Contains("optifine");
         return !forge && optifine;
+    }
+}
+
+internal class DefaultSettingModifier : ISettingModifier
+{
+    string ISettingModifier.Key => "";
+
+    public void ReadValue(GameBase game, JToken? token)
+    {
+        // Do nothing as this is the default implementation.
+    }
+
+    public JToken WriteValue(GameBase game)
+    {
+        return "";
     }
 }
 
