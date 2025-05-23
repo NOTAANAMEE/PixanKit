@@ -15,10 +15,22 @@ public static class SysInfo
 
     private static void SetOs()
     {
+        #if !NATIVE_AOT
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) OsName = "windows";
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) OsName = "linux";
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) OsName = "osx";
         else OsName = "others";
+        #else
+        #if WINDOWS
+        OsName = "windows";
+        #elif LINUX
+        OsName = "linux";
+        #elif OSX
+        OsName = "osx";
+        #else
+        OsName = "others";
+        #endif
+        #endif
     }
 
     private static void SetArch()
@@ -36,19 +48,27 @@ public static class SysInfo
     /// <summary>
     /// Represents the name of the operating system<br/>
     /// windows: Windows7 -> Latest Windows<br/>
-    /// linux: Ubuntu, Debian, Arch, ChromeOS, Fedora, RedHat...<br/>
-    /// osx: OSX, MacOS 11 -> Latest MacOS<br/>
-    /// unix: others<br/>
+    /// linux: Ubuntu, Debian, Arch, Fedora, RedHat...<br/>
+    /// osx: OSX, macOS 11 -> Latest macOS <br/>
+    /// unix, BSD: others<br/>
+    /// Mojang does not officially support the Minecraft client
+    /// running on operating systems other than Linux, macOS, and Windows.
+    /// Running on other operating systems may cause serious
+    /// compatibility issues
     /// </summary>
     public static string OsName { get; private set; } = "windows";
 
     /// <summary>
     /// Represents the architecture of the cpu
     /// <br/>
-    /// x86: x86 i386<br/>
+    /// x86: x86, i386<br/>
     /// x86_64: x86_64, AMD64<br/>
-    /// arm64: Arm64 AArch64 Arm_v8
-    /// arm: Arm A32
+    /// arm64: Arm64, AArch64, Arm_v8<br/>
+    /// arm: Arm, A32 <br/>
+    /// Mojang does not officially
+    /// support Minecraft client running on CPU architectures
+    /// other than x86, amd64 and arm64
+    /// <see href="https://www.minecraft.net/en-us/store/minecraft-deluxe-collection-pc?tabs=%7B%22details%22%3A1%7D#accordionv1-b6c8df09da-item-7739893325"/>
     /// </summary>
     public static string CpuArch { get; private set; } = "x86_64";
 

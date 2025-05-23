@@ -82,7 +82,7 @@ public partial class JavaRuntime : IToJson
         var p = Process.Start(processStartInfo);
         if (p == null) return;
         var versionInf = "";
-        while (!p.HasExited && p.StandardError != null)
+        while (!p.HasExited)
         {
             versionInf += p.StandardError.ReadLine();
         }
@@ -93,7 +93,7 @@ public partial class JavaRuntime : IToJson
          *Java HotSpot(TM) 64-Bit Server VM (build 17.0.11+7-LTS-207, mixed mode, sharing)
          *java version "1.8.0_421"
          *Java(TM) SE Runtime Environment (build 1.8.0_421-b09)
-         (Java HotSpot(TM) 64-Bit Server VM (build 25.421-b09, mixed mode) => Fuck You Java 8
+         *Java HotSpot(TM) 64-Bit Server VM (build 25.421-b09, mixed mode) => That's Java 8
          */
 
         _version = VersionParse(versionInf);
