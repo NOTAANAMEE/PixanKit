@@ -34,11 +34,11 @@ public class GamePostProcess(Folder folder, string name, string version, bool pr
 
     private void ProcessGame()
     {
-        File.Copy($"{_versionDir}/{_version}/{_version}.jar",
-            $"{_versionDir}/{_name}/{_name}.jar");
+        File.Copy($"{_versionDir}{_version}/{_version}.jar",
+            $"{_versionDir}{_name}/{_name}.jar");
         if (_owner.FindGame(_version) != null) return;
         if (_owner.FindVersion(_version, GameType.Vanilla) != null) 
-            Directory.Delete($"{_versionDir}/{_version}");
+            Directory.Delete($"{_versionDir}{_version}");
         
     }
 
@@ -62,8 +62,8 @@ public class GamePostProcess(Folder folder, string name, string version, bool pr
     /// <returns>the new directory of the game</returns>
     public static string Move(Folder folder, string loaderversion, string name)
     {
-        var folderpath = $"{folder.VersionDirPath}/{name}";
-        var folderpathOld = $"{folder.VersionDirPath}/{loaderversion}";
+        var folderpath = $"{folder.VersionDirPath}{name}";
+        var folderpathOld = $"{folder.VersionDirPath}{loaderversion}";
         Directory.Move(folderpathOld, folderpath);
         foreach (var entry in Directory.GetFileSystemEntries(folderpath))
         {
