@@ -1,8 +1,8 @@
-![PixanKit Logo](https://img.shields.io/badge/C%23-.NET%208-blueviolet)
+![PixanKit Logo](https://img.shields.io/badge/C%23-.NET%209-blueviolet)
 ![LICENSE](https://img.shields.io/badge/License-MIT-blue)
 ![No Contributions Yet](https://img.shields.io/badge/Contributions-None%20yet-lightgrey)
 ![Stand With Ukraine](https://img.shields.io/badge/Stand%20With-Ukraine-0057B7?logo=united-nations&logoColor=white)
-> A modular .NET 8 library for building Minecraft launchers.
+> A modular .NET 9 library for building Minecraft launchers.
 
 # PixanKit
 
