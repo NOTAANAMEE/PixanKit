@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "478hfzfeOUs=",
+  "success": true,
+  "projectFilePath": "/Users/ruoyu/RiderProjects/PixanKit/Pixankit/LaunchCore/LaunchCore.csproj",
+  "expectedPackageFiles": [
+    "/Users/ruoyu/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

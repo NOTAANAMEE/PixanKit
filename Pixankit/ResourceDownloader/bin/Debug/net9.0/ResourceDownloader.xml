@@ -1,0 +1,1044 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ResourceDownloader</name>
+    </assembly>
+    <members>
+        <member name="T:PixanKit.ResourceDownloader.Download.DownloadTask.FileChunkDownloadTask">
+            <summary>
+            Represents a task for downloading a specific chunk of a file from a given URL.
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Download.DownloadTask.FileChunkDownloadTask.ChunkSize">
+            <summary>
+            The default size of a file chunk in bytes.
+            </summary>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.FileChunkDownloadTask.Size">
+            <inheritdoc/>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.FileChunkDownloadTask.DownloadedBytes">
+            <inheritdoc/>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.FileChunkDownloadTask.TotalFiles">
+            <inheritdoc/>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.FileChunkDownloadTask.DownloadedFiles">
+            <inheritdoc/>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Download.DownloadTask.FileChunkDownloadTask.Start">
+            <summary>
+            The starting byte position of the file chunk to download.
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Download.DownloadTask.FileChunkDownloadTask.End">
+            <summary>
+            The ending byte position of the file chunk to download.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.DownloadTask.FileChunkDownloadTask.#ctor(System.String,System.Int64,System.Int64)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.DownloadTask.FileChunkDownloadTask"/> class 
+            with a specified URL, starting byte position, and ending byte position.
+            </summary>
+            <param name="url">The URL of the file to download.</param>
+            <param name="start">The starting byte position of the chunk.</param>
+            <param name="end">The ending byte position of the chunk.</param>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.DownloadTask.FileChunkDownloadTask.#ctor(System.String,System.Int64)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.DownloadTask.FileChunkDownloadTask"/> class 
+            with a specified URL and starting byte position. The chunk size is set to the default value.
+            </summary>
+            <param name="url">The URL of the file to download.</param>
+            <param name="start">The starting byte position of the chunk.</param>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.DownloadTask.DownloadThread">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.DownloadThread.Size">
+            <inheritdoc/>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.DownloadThread.DownloadedBytes">
+            <inheritdoc/>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.DownloadThread.TotalFiles">
+            <inheritdoc/>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.DownloadThread.DownloadedFiles">
+            <inheritdoc/>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.DownloadTask.DownloadThread.#ctor(System.String,System.IO.Stream,System.Int64,System.Int64,System.Object)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.DownloadTask.DownloadThread"/> class 
+            with a specified URL, starting byte position, and ending byte position.
+            </summary>
+            <param name="url">The URL of the file to download.</param>
+            <param name="stream"></param>
+            <param name="start">The starting byte position of the chunk.</param>
+            <param name="end">The ending byte position of the chunk.</param>
+            <param name="lockobj"></param>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.DownloadTask.DownloadThread.#ctor(System.IO.Stream,System.Object)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.DownloadTask.DownloadThread"/> class 
+            with a specified URL, starting byte position, and ending byte position.
+            </summary>
+            <param name="stream"></param>
+            <param name="lockobj"></param>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.DownloadTask.DownloadThread.SetUrl(System.String,System.Int64,System.Int64)">
+            <summary>
+            
+            </summary>
+            <param name="url"></param>
+            <param name="start"></param>
+            <param name="end"></param>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.DownloadTask.FileDownloadTask">
+            <summary>
+            Represents a task for downloading a file from a given URL using multiple threads.
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Download.DownloadTask.FileDownloadTask.ThreadNum">
+            <summary>
+            The default number of threads to use for downloading.
+            </summary>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.FileDownloadTask.Size">
+            <inheritdoc/>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.FileDownloadTask.DownloadedBytes">
+            <inheritdoc/>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.FileDownloadTask.TotalFiles">
+            <inheritdoc/>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.FileDownloadTask.DownloadedFiles">
+            <inheritdoc/>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.DownloadTask.FileDownloadTask.#ctor(System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.DownloadTask.FileDownloadTask"/> class 
+            with a specified URL, file path, and the default number of threads.
+            </summary>
+            <param name="url">The URL of the file to download.</param>
+            <param name="path">The path where the file will be saved.</param>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.DownloadTask.FileDownloadTask.#ctor(System.String,System.String,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.DownloadTask.FileDownloadTask"/> class 
+            with a specified URL, file path, and the number of threads to use.
+            </summary>
+            <param name="url">The URL of the file to download.</param>
+            <param name="path">The path where the file will be saved.</param>
+            <param name="threadnum">The number of threads to use for downloading.</param>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.DownloadTask.FileDownloadTask.Start">
+            <summary>
+            Start The Task<br/>
+            It will first check whether the url is not blank, then start the task.
+            </summary>
+            <exception cref="T:System.InvalidOperationException"></exception>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.DownloadTask.IFileDownload">
+            <summary>
+            The interface defines the methods that help track the progress of the downloading task
+            </summary>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.IFileDownload.DownloadedBytes">
+            <summary>
+            Retrieves the number of bytes that has downloaded during the task
+            </summary>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.IFileDownload.Size">
+            <summary>
+            Retrieves the total size that needs to download during the task
+            </summary>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.IFileDownload.DownloadedFiles">
+            <summary>
+            Retrieves the number of files that has downloaded during the task
+            </summary>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.IFileDownload.TotalFiles">
+            <summary>
+            Retrieves the number of files that needs to download
+            </summary>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.DownloadTask.MultiFileDownloadTask">
+            <summary>
+            Represents a task for downloading multiple files concurrently using multiple threads.
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Download.DownloadTask.MultiFileDownloadTask.ThreadNum">
+            <summary>
+            The default number of threads to use for downloading.
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Download.DownloadTask.MultiFileDownloadTask.Urls">
+            <summary>
+            The URLs of the files to download.
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Download.DownloadTask.MultiFileDownloadTask.Paths">
+            <summary>
+            The file paths where the downloaded files will be saved.
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Download.DownloadTask.MultiFileDownloadTask.Threadnum">
+            <summary>
+            The number of threads to use for downloading.
+            </summary>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.MultiFileDownloadTask.Size">
+            <inheritdoc/>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.MultiFileDownloadTask.DownloadedBytes">
+            <inheritdoc/>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.MultiFileDownloadTask.TotalFiles">
+            <inheritdoc/>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.MultiFileDownloadTask.DownloadedFiles">
+            <inheritdoc/>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.DownloadTask.MultiFileDownloadTask.#ctor(System.String[],System.String[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.DownloadTask.MultiFileDownloadTask"/> class 
+            with specified URLs and file paths, using the default number of threads.
+            </summary>
+            <param name="url">An array of file URLs to download.</param>
+            <param name="path">An array of file paths where the files will be saved.</param>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if the length of <paramref name="url"/> and <paramref name="path"/> are not equal.
+            </exception>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.DownloadTask.MultiFileDownloadTask.#ctor(System.String[],System.String[],System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.DownloadTask.MultiFileDownloadTask"/> class 
+            with specified URLs, file paths, and the number of threads to use.
+            </summary>
+            <param name="url">An array of file URLs to download.</param>
+            <param name="path">An array of file paths where the files will be saved.</param>
+            <param name="threanum">The number of threads to use for downloading.</param>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if the length of <paramref name="url"/> and <paramref name="path"/> are not equal.
+            </exception>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.DownloadTask.MultiFileDownloadTask.Init">
+            <summary>
+            Initializes the download tasks by dividing the files across multiple threads.
+            </summary>
+            <remarks>
+            Each file is assigned to a sequence task, ensuring that downloads are grouped based on the available threads.
+            If more files are present than threads, files are distributed cyclically.
+            </remarks>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if there is a mismatch between the number of URLs and paths.
+            </exception>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.DownloadTask.SimpleFileDownloadTask">
+            <summary>
+            The class represents a task to download a file which is small 
+            or the resource that the size is not being sent by the server
+            </summary>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.SimpleFileDownloadTask.DownloadedBytes">
+            <inheritdoc/>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.SimpleFileDownloadTask.Size">
+            <inheritdoc/>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.SimpleFileDownloadTask.DownloadedFiles">
+            <inheritdoc/>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.DownloadTask.SimpleFileDownloadTask.TotalFiles">
+            <inheritdoc/>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.DownloadTask.SimpleFileDownloadTask.#ctor(System.String,System.String)">
+            <summary>
+            Inits the download task with certain url and path
+            </summary>
+            <param name="url">the url of the resource</param>
+            <param name="path">the target path</param>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.InstallTask.AssetsCompletionTask">
+            <summary>
+            Represents a task for completing Minecraft game assets, including downloading the asset index
+            and the associated asset files.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.InstallTask.AssetsCompletionTask.#ctor(Newtonsoft.Json.Linq.JObject,PixanKit.LaunchCore.GameModule.Game.GameBase)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.InstallTask.AssetsCompletionTask"/> class.
+            </summary>
+            <param name="jdata">The JSON data containing the asset index information.</param>
+            <param name="game">The game context to manage assets.</param>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.InstallTask.CliTask">
+            <summary>
+            Command Language Running Task
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.InstallTask.CliTask.#ctor(System.String,System.String)">
+            <summary>
+            Inits the instance with the file path and the arguments
+            </summary>
+            <param name="file">file path</param>
+            <param name="args">arguments</param>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.InstallTask.CliTask.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Inits the instance with the file path, the arguments and the running dir
+            </summary>
+            <param name="file">the exact path of the file</param>
+            <param name="args">the arguments</param>
+            <param name="workingdirectory">the directory where the process is expected to run</param>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.InstallTask.CliTask.Running">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.InstallTask.CliTask.Cancel">
+            <summary>
+            <inheritdoc/>
+            </summary>
+            <exception cref="T:System.InvalidOperationException"><inheritdoc/></exception>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.InstallTask.FabricInstaller">
+            <summary>
+            Represents a task for installing the Fabric mod loader for Minecraft.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.InstallTask.FabricInstaller.#ctor(PixanKit.LaunchCore.GameModule.Folders.Folder,System.String,System.String,Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.InstallTask.FabricInstaller"/> class.
+            </summary>
+            <param name="folder">The target folder where Minecraft is located.</param>
+            <param name="name">The name of the Minecraft instance for which Fabric is being installed.</param>
+            <param name="mcversion">The Minecraft version for which Fabric is being installed.</param>
+            <param name="fabricversion">A JSON object containing the Fabric version details.</param>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.InstallTask.ForgeInstaller">
+            <summary>
+            Represents a task for installing the Forge mod loader for Minecraft.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.InstallTask.ForgeInstaller.#ctor(PixanKit.LaunchCore.GameModule.Folders.Folder,System.String,System.String,Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.InstallTask.ForgeInstaller"/> class.
+            </summary>
+            <param name="folder">The folder where Forge will be installed.</param>
+            <param name="name">The name of the Forge installation.</param>
+            <param name="mcversion">The Minecraft version for which Forge is being installed.</param>
+            <param name="forgeversion">The JSON object containing the Forge version details.</param>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.InstallTask.LibraryCompletionTask">
+            <summary>
+            Represents a task for completing the download of necessary libraries for a Minecraft game instance.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.InstallTask.LibraryCompletionTask.#ctor(PixanKit.LaunchCore.GameModule.Game.GameBase)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.InstallTask.LibraryCompletionTask"/> class.
+            </summary>
+            <param name="game">The <see cref="T:PixanKit.LaunchCore.GameModule.Game.GameBase"/> instance representing the Minecraft game for which libraries are being downloaded.</param>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.InstallTask.NeoForgeInstaller">
+            <summary>
+            Represents a task for installing the NeoForge mod loader for Minecraft.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.InstallTask.NeoForgeInstaller.#ctor(PixanKit.LaunchCore.GameModule.Folders.Folder,System.String,System.String,Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.InstallTask.NeoForgeInstaller"/> class.
+            </summary>
+            <param name="folder">The folder where NeoForge will be installed.</param>
+            <param name="name">The name of the NeoForge installation.</param>
+            <param name="mcversion">The Minecraft version for which NeoForge is being installed.</param>
+            <param name="neoforgeversion">The JSON object containing the NeoForge version details.</param>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.InstallTask.OptifineInstaller">
+            <summary>
+            Represents a task for installing Optifine, a Minecraft optimization mod.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.InstallTask.OptifineInstaller.#ctor(PixanKit.LaunchCore.GameModule.Folders.Folder,System.String,System.String,Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.InstallTask.OptifineInstaller"/> class.
+            </summary>
+            <param name="folder">The target folder where Minecraft is located.</param>
+            <param name="name">The name of the Minecraft instance. The JAR file will be located at <c>folder\name\name.jar</c>.</param>
+            <param name="mcversion">The Minecraft version for which Optifine is being installed.</param>
+            <param name="optifineversion">A JSON object containing the Optifine version details.</param>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.InstallTask.QuiltInstaller">
+            <summary>
+            Represents a task for installing the Quilt mod loader for Minecraft.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.InstallTask.QuiltInstaller.#ctor(PixanKit.LaunchCore.GameModule.Folders.Folder,System.String,System.String,Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.InstallTask.QuiltInstaller"/> class.
+            </summary>
+            <param name="folder">The target folder where Minecraft is located.</param>
+            <param name="name">The name of the Minecraft instance for which Quilt is being installed.</param>
+            <param name="mcversion">The Minecraft version for which Quilt is being installed.</param>
+            <param name="quiltversion">A JSON object containing the Quilt version details.</param>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.InstallTask.VanillaInstallTask">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Download.InstallTask.VanillaInstallTask.Game">
+            <summary>
+            The Return Game
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.InstallTask.VanillaInstallTask.#ctor(PixanKit.LaunchCore.GameModule.Folders.Folder,System.String,System.String)">
+            <summary>
+            Initor
+            </summary>
+            <param name="folder">The Owner Of The Game</param>
+            <param name="name">The Name Of The Game</param>
+            <param name="version">The Version Of Minecraft</param>
+            <exception cref="T:System.ArgumentException"></exception>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.InstallTask.VanillaMinimalInstallTask">
+            <summary>
+            Represents the task that only install the JSON file and the jar file of Minecraft
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.InstallTask.VanillaMinimalInstallTask.#ctor(PixanKit.LaunchCore.GameModule.Folders.Folder,System.String,System.String)">
+            <summary>
+            Initor
+            </summary>
+            <param name="folder">The Owner Of The Game</param>
+            <param name="name">The Name Of The Game</param>
+            <param name="version">The Version Of Minecraft</param>
+            <exception cref="T:System.ArgumentException"></exception>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.ModLoaders.FabricServer">
+            <summary>
+            Represents a Fabric mod loader server for managing Fabric installations.
+            </summary>
+            <remarks>
+            This class handles the initialization and management of Fabric mod loader mirrors
+            and provides functionality to fetch build information and URLs for Fabric installations.
+            </remarks>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.FabricServer.Init">
+            <summary>
+            Initor. Do not touch it
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.FabricServer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.ModLoaders.FabricServer"/> class.
+            </summary>
+            <remarks>
+            By default, this class uses the official Fabric mirror and updates the index on initialization.
+            </remarks>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.ModLoaders.FabricServer.OfficialFabricMirror">
+            <summary>
+            Represents the official Fabric mirror used for fetching build and installer information.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.FabricServer.OfficialFabricMirror.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.ModLoaders.FabricServer.OfficialFabricMirror"/> class.
+            </summary>
+            <remarks>
+            The base URL and Vanilla URL properties are initialized as empty by default.
+            </remarks>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.FabricServer.OfficialFabricMirror.CheckBuild(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Checks if a build is available for the specified Minecraft version.
+            </summary>
+            <param name="mcversion">The Minecraft version to check.</param>
+            <param name="token">A <see cref="T:System.Threading.CancellationToken"/> to observe while waiting for the task to complete.</param>
+            <returns>
+            A task that represents the asynchronous operation. 
+            The task result contains <c>true</c> if a build is available; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.FabricServer.OfficialFabricMirror.GetBuild(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the build information for the specified Minecraft version.
+            </summary>
+            <param name="mcversion">The Minecraft version to fetch builds for.</param>
+            <param name="token">A <see cref="T:System.Threading.CancellationToken"/> to observe while waiting for the task to complete.</param>
+            <returns>
+            A task that represents the asynchronous operation. 
+            The task result contains a <see cref="T:Newtonsoft.Json.Linq.JArray"/> of build information.
+            </returns>
+            <exception cref="T:System.Net.Http.HttpRequestException">
+            Thrown if there is an error during the HTTP request.
+            </exception>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.FabricServer.OfficialFabricMirror.GetUrl(Newtonsoft.Json.Linq.JObject,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the download URL for the specified Fabric loader information.
+            </summary>
+            <param name="loaderInf">The JSON object containing loader information.</param>
+            <param name="token">A <see cref="T:System.Threading.CancellationToken"/> to observe while waiting for the task to complete.</param>
+            <returns>
+            A task that represents the asynchronous operation. 
+            The task result contains the download URL as a string.
+            </returns>
+            <exception cref="T:System.Net.Http.HttpRequestException">
+            Thrown if there is an error during the HTTP request.
+            </exception>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.ModLoaders.ForgeServer">
+            <summary>
+            Represents a Forge mod loader server.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.ForgeServer.Init">
+            <summary>
+            Initor. Do not touch it
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.ForgeServer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.ModLoaders.ForgeServer"/> class.
+            </summary>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.ModLoaders.ForgeServer.OfficialForgeMirror">
+            <summary>
+            Represents the official Forge mirror server.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.ForgeServer.OfficialForgeMirror.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.ModLoaders.ForgeServer.OfficialForgeMirror"/> class.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.ForgeServer.OfficialForgeMirror.CheckBuild(System.String,System.Threading.CancellationToken)">
+            <inheritdoc/>
+            <param name="mcversion">The Minecraft version to check builds for.</param>
+            <param name="token">A cancellation token to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the builds exist.</returns>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.ForgeServer.OfficialForgeMirror.GetBuild(System.String,System.Threading.CancellationToken)">
+            <inheritdoc/>
+            <param name="mcversion">The Minecraft version to retrieve builds for.</param>
+            <param name="token">A cancellation token to cancel the operation.</param>
+            <returns>
+            A task that represents the asynchronous operation. The task result contains a JSON array of mod loader versions.
+            </returns>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.ForgeServer.OfficialForgeMirror.GetUrl(Newtonsoft.Json.Linq.JObject,System.Threading.CancellationToken)">
+            <inheritdoc/>
+            <param name="modloaderinf">A JSON object containing mod loader information.</param>
+            <param name="token">A cancellation token to cancel the operation.</param>
+            <returns>
+            A task that represents the asynchronous operation. The task result contains the URL of the mod loader installer.
+            </returns>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.ModLoaders.NeoForgeServer">
+            <summary>
+            Represents a NeoForge mod loader server.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.NeoForgeServer.Init">
+            <summary>
+            Initor. Dont touch it
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.NeoForgeServer.#ctor">
+            <summary>
+            Initor
+            </summary>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.ModLoaders.NeoForgeServer.OfficialNeoforgeServer">
+            <summary>
+            Represents the official NeoForge mirror server.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.NeoForgeServer.OfficialNeoforgeServer.#ctor">
+            <summary>
+            Inits the instance of the official server.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.NeoForgeServer.OfficialNeoforgeServer.GetPatch(System.String)">
+            <summary>
+            The method gets the patch version number of Minecraft
+            For example: 1.20.1 it will return 20.1
+            </summary>
+            <param name="version"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.NeoForgeServer.OfficialNeoforgeServer.CheckBuild(System.String,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.NeoForgeServer.OfficialNeoforgeServer.GetBuild(System.String,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.NeoForgeServer.OfficialNeoforgeServer.GetUrl(Newtonsoft.Json.Linq.JObject,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.ModLoaders.OptifineServer">
+            <summary>
+            Optifine Server
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.OptifineServer.Init">
+            <summary>
+            Initor. Dont touch it
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.OptifineServer.#ctor">
+            <summary>
+            Initor
+            </summary>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.ModLoaders.OptifineServer.OfficialOptifineServer">
+            <summary>
+            Official Optifine Mirror Server
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.OptifineServer.OfficialOptifineServer.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.OptifineServer.OfficialOptifineServer.CheckBuild(System.String,System.Threading.CancellationToken)">
+            <summary>
+            <inheritdoc/>
+            </summary>
+            <param name="mcversion"><inheritdoc/></param>
+            <param name="token"><inheritdoc/></param>
+            <returns><inheritdoc/></returns>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.OptifineServer.OfficialOptifineServer.GetBuild(System.String,System.Threading.CancellationToken)">
+            <summary>
+            <inheritdoc/>
+            </summary>
+            <param name="token"><inheritdoc/></param>
+            <param name="mcversion"><inheritdoc/></param>
+            <returns><inheritdoc/></returns>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.OptifineServer.OfficialOptifineServer.GetUrl(Newtonsoft.Json.Linq.JObject,System.Threading.CancellationToken)">
+            <summary>
+            <inheritdoc/>
+            </summary>
+            <param name="modloaderinf"><inheritdoc/></param>
+            <param name="token"><inheritdoc/></param>
+            <returns></returns>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.ModLoaders.QuiltServer">
+            <summary>
+            Represents a Quilt mod loader server.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.QuiltServer.Init">
+            <summary>
+            Initor. Don't touch it
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.QuiltServer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.ResourceDownloader.Download.ModLoaders.QuiltServer"/> class.
+            </summary>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Download.ModLoaders.QuiltServer.OfficialQuiltMirror">
+            <summary>
+            Represents the official Quilt mirror server.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.QuiltServer.OfficialQuiltMirror.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.QuiltServer.OfficialQuiltMirror.CheckBuild(System.String,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.QuiltServer.OfficialQuiltMirror.GetBuild(System.String,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Download.ModLoaders.QuiltServer.OfficialQuiltMirror.GetUrl(Newtonsoft.Json.Linq.JObject,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.PostProcess.GamePostProcess">
+            <summary>
+            This class helps to process the game after downloading
+            </summary>
+            <param name="folder">the folder which contains the game</param>
+            <param name="name">the expected name of the game</param>
+            <param name="version">the version of the game</param>
+            <param name="processJson">whether process JSON document or not</param>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.PostProcess.GamePostProcess.#ctor(PixanKit.LaunchCore.GameModule.Folders.Folder,System.String,System.String,System.Boolean)">
+            <summary>
+            This class helps to process the game after downloading
+            </summary>
+            <param name="folder">the folder which contains the game</param>
+            <param name="name">the expected name of the game</param>
+            <param name="version">the version of the game</param>
+            <param name="processJson">whether process JSON document or not</param>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.PostProcess.GamePostProcess.Process">
+            <summary>
+            Start the process
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.PostProcess.GamePostProcess.Move(PixanKit.LaunchCore.GameModule.Folders.Folder,System.String,System.String)">
+            <summary>
+            Move the version folder to the new name
+            </summary>
+            <param name="folder">the foler which contains the game</param>
+            <param name="loaderversion">the old name of the game</param>
+            <param name="name">the name of the game</param>
+            <returns>the new directory of the game</returns>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Tasks.FuncTask.FuncProgressTask`1">
+            <summary>
+            Represents a progress task that executes a user-defined function and tracks its progress.
+            </summary>
+            <typeparam name="T">The type of the result returned by the function.</typeparam>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.FuncTask.FuncProgressTask`1.Function">
+            <summary>
+            Gets or sets the user-defined asynchronous function to execute.
+            </summary>
+            <remarks>
+            The function accepts an <see cref="T:System.Action`1"/> for reporting progress and 
+            a <see cref="T:System.Threading.CancellationToken"/> to handle cancellation.
+            </remarks>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.FuncTask.FuncProgressTask`1.Return">
+            <summary>
+            Gets the result returned by the executed function.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.FuncTask.FuncProgressTask`1.Running">
+            <summary>
+            Executes the user-defined function and handles progress reporting and exceptions.
+            </summary>
+            <remarks>
+            This method invokes the <see cref="F:PixanKit.ResourceDownloader.Tasks.FuncTask.FuncProgressTask`1.Function"/> asynchronously, passing the 
+            <see cref="M:PixanKit.ResourceDownloader.Tasks.ProgressTask.ReportProgress(System.Double)"/> method to allow progress updates and the 
+            <see cref="T:System.Threading.CancellationToken"/> to handle cancellations. If an exception occurs, 
+            it triggers the <see cref="F:PixanKit.ResourceDownloader.Tasks.ProgressTask.OnException"/> event.
+            </remarks>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if the function is not defined (i.e., <see cref="F:PixanKit.ResourceDownloader.Tasks.FuncTask.FuncProgressTask`1.Function"/> is null).
+            </exception>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.AsyncProgressTask">
+            <summary>
+            Represents a progress task that executes all its sub-tasks asynchronously and concurrently.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.AsyncProgressTask.Start">
+            <summary>
+            Starts all sub-tasks concurrently and then starts the main task.
+            </summary>
+            <remarks>
+            This method ensures that each task in the <see cref="T:PixanKit.ResourceDownloader.Tasks.ProgressTask"/> list is started 
+            before the main task begins its execution. Tasks are executed asynchronously, 
+            allowing them to run concurrently.
+            </remarks>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if the task has already been started or is in a state other than <see cref="F:PixanKit.ResourceDownloader.Tasks.ProgressStatus.Inited"/>.
+            </exception>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.AsyncProgressTask`1">
+            <summary>
+            Represents a progress task that executes all its sub-tasks asynchronously and concurrently.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.AsyncProgressTask`1.Start">
+            <summary>
+            Starts all sub-tasks concurrently and then starts the main task.
+            </summary>
+            <remarks>
+            This method ensures that each task in the <see cref="T:PixanKit.ResourceDownloader.Tasks.ProgressTask"/> list is started 
+            before the main task begins its execution. Tasks are executed asynchronously, 
+            allowing them to run concurrently.
+            </remarks>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if the task has already been started or is in a state other than <see cref="F:PixanKit.ResourceDownloader.Tasks.ProgressStatus.Inited"/>.
+            </exception>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.MultiProgressTask">
+            <summary>
+            Represents a task that combines and tracks multiple progress tasks.
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.MultiProgressTask.ProgressTasks">
+            <summary>
+            Gets the list of progress tasks managed by this multi-progress task.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.MultiProgressTask.Add(PixanKit.ResourceDownloader.Tasks.ProgressTask)">
+            <summary>
+            Adds a progress task to the multi-progress task.
+            </summary>
+            <param name="task">The progress task to add.</param>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if the multi-progress task has already started.
+            </exception>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.MultiProgressTask.Cancel">
+            <summary>
+            Cancels all tasks within the multi-progress task.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if a task has already been canceled.
+            </exception>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.MultiProgressTask.Finish">
+            <summary>
+            Marks the multi-progress task and its sub-tasks as finished.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.MultiProgressTask.ReportProgress(System.Double)">
+            <summary>
+            Reports the combined progress of all tasks managed by this multi-progress task.
+            </summary>
+            <param name="progress">The combined progress of all sub-tasks.</param>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.MultiProgressTask`1">
+            <summary>
+            Represents a task that combines and tracks multiple progress tasks.
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.MultiProgressTask`1.ProgressTasks">
+            <summary>
+            Gets the list of progress tasks managed by this multi-progress task.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.MultiProgressTask`1.Add(`0)">
+            <summary>
+            Adds a progress task to the multi-progress task.
+            </summary>
+            <param name="task">The progress task to add.</param>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if the multi-progress task has already started.
+            </exception>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.MultiProgressTask`1.Cancel">
+            <summary>
+            Cancels all tasks within the multi-progress task.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if a task has already been canceled.
+            </exception>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.MultiProgressTask`1.Finish">
+            <summary>
+            Marks the multi-progress task and its sub-tasks as finished.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.MultiProgressTask`1.ReportProgress(System.Double)">
+            <summary>
+            Reports the combined progress of all tasks managed by this multi-progress task.
+            </summary>
+            <param name="progress">The combined progress of all sub-tasks.</param>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.SequenceProgressTask">
+            <summary>
+            Represents a sequence of progress tasks that are executed one after another.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.SequenceProgressTask.Running">
+            <summary>
+            Executes all progress tasks in the sequence one by one.
+            </summary>
+            <remarks>
+            Each task in the <see cref="T:PixanKit.ResourceDownloader.Tasks.ProgressTask"/> list will start sequentially. 
+            If a cancellation is requested, the sequence will stop execution.
+            After all tasks are completed or the sequence is canceled, 
+            the base <see cref="M:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.SequenceProgressTask.Running"/> logic will finalize the task.
+            </remarks>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.SequenceProgressTask`1">
+            <summary>
+            Represents a sequence of progress tasks that are executed one after another.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.SequenceProgressTask`1.Running">
+            <summary>
+            Executes all progress tasks in the sequence one by one.
+            </summary>
+            <remarks>
+            Each task in the <see cref="T:PixanKit.ResourceDownloader.Tasks.ProgressTask"/> list will start sequentially. 
+            If a cancellation is requested, the sequence will stop execution.
+            After all tasks are completed or the sequence is canceled, 
+            the base <see cref="M:PixanKit.ResourceDownloader.Tasks.MultiProgressTask.SequenceProgressTask`1.Running"/> logic will finalize the task.
+            </remarks>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Tasks.ProgressTask">
+            <summary>
+            This class defines a task base class for tracking progress, 
+            supporting callback mechanisms for progress updates, task start, 
+            cancellation, and completion
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.ProgressTask.OnReport">
+            <summary>
+            Progress Make Event, Call When Progress Is Updated
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.ProgressTask.OnStart">
+            <summary>
+            Start Event, Call When Task Starts
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.ProgressTask.OnCancel">
+            <summary>
+            Cancel Event, Call When Task Is Cancelled
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.ProgressTask.OnFinish">
+            <summary>
+            Finish Event, Call When Task Is Finished
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.ProgressTask.OnException">
+            <summary>
+            Exception Event, Not Using...
+            </summary>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Tasks.ProgressTask.Progress">
+            <summary>
+            Store Current Progress
+            </summary>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Tasks.ProgressTask.MainTask">
+            <summary>
+            The Task corresponding to the current task,
+            will wait for the task to be completed or cancelled
+            </summary>
+        </member>
+        <member name="P:PixanKit.ResourceDownloader.Tasks.ProgressTask.Status">
+            <summary>
+            The status of the current task
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.ProgressTask.CancellationToken">
+            <summary>
+            The CancellationTokenSource used to signal task cancellation.
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.ProgressTask.TaskStopped">
+            <summary>
+            The TaskCompletionSource used to signal the completion of the task.
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.ProgressTask._progress">
+            <summary>
+            The progress of the current task.
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.ProgressTask.Tasks">
+            <summary>
+            The subtasks of the current task.
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.ProgressTask._status">
+            <summary>
+            The status of the current task.
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.ProgressTask._progressLock">
+            <summary>
+            Lock object for progress reporting.
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.ProgressTask.#ctor">
+            <summary>
+            Constructor, initialize the task status to ProgressStatus.Inited
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.ProgressTask.Start">
+            <summary>
+            Starts the task
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            When the status of the task is not <c>ProgressStatus.Inited</c>
+            the exception will be thrown
+            </exception>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.ProgressTask.Cancel">
+            <summary>
+            Cancel the task
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            If the task has been canceled, an InvalidOperationException will be thrown</exception>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.ProgressTask.ReportException(System.Exception)">
+            <summary>
+            Reports an exception that occurs during the task's execution.
+            </summary>
+            <param name="ex">The exception to report.</param>
+            <remarks>
+            This method cancels the task and triggers the <see cref="F:PixanKit.ResourceDownloader.Tasks.ProgressTask.OnException"/> event 
+            to notify listeners about the exception.
+            </remarks>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.ProgressTask.Running">
+            <summary>
+            Execute the main logic of the task.<br/>
+            Wait for all subtasks to complete. If the task is not cancelled, 
+            call the Finish() method. Finally, set the task completion mark.
+            </summary>
+            
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.ProgressTask.Finish">
+            <summary>
+            The callback logic when the task is completed triggers 
+            the OnFinish event and updates the status to ProgressStatus.Finished
+            </summary>
+        </member>
+        <member name="M:PixanKit.ResourceDownloader.Tasks.ProgressTask.ReportProgress(System.Double)">
+            <summary>
+            Reports the progress of the current task.
+            </summary>
+            <param name="progress">current progress value (double)</param>
+        </member>
+        <member name="T:PixanKit.ResourceDownloader.Tasks.ProgressStatus">
+            <summary>
+            Task status enumeration.
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.ProgressStatus.Initing">
+            <summary>
+            Initializing
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.ProgressStatus.Inited">
+            <summary>
+            Initialization completed, task not started
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.ProgressStatus.Running">
+            <summary>
+            Task running
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.ProgressStatus.Canceled">
+            <summary>
+            Task canceled
+            </summary>
+        </member>
+        <member name="F:PixanKit.ResourceDownloader.Tasks.ProgressStatus.Finished">
+            <summary>
+            Task completed
+            </summary>
+        </member>
+    </members>
+</doc>

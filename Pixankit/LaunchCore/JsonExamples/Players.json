@@ -1,0 +1,21 @@
+﻿{
+  "children": [
+    {
+      "uid": "uidMyName",
+      "name": "MyName",
+      "accesstoken": "",
+      "type": "offline"
+    },
+    {
+      "uid": "ajlkdfjlsajfdla098e0qrlk",
+      "name": "steve",//It is just random data
+      "accesstoken": "dafjladjlfa.akd80314.adf091",
+      "type": "microsoft",
+      "logintime": "08-27-2023 11:02:10",
+      "skinurl": "https://...",
+      "capeurl": "https://...",
+      "refreshtoken": "akjdfladjf;a"
+    }
+  ],
+  "target": ""
+}

@@ -1,0 +1,7 @@
+{
+  "//": "This setting config file is for every minecraft version",
+  "java": "overall",
+  "argument": "overall",
+  "runningfolder": "self",
+  "description": "A Minecraft Version"
+}

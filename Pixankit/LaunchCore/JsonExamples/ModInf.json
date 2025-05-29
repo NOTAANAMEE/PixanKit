@@ -1,0 +1,41 @@
+﻿{
+  "children": [
+    {
+      "name": "JEI",
+      "id": "jei",
+      "iconuri": "https://media.forgecdn.net/avatars/thumbnails/29/69/256/256/635838945588716414.jpeg",
+      "description": "View Items and Recipes",
+      "import": false,
+      "website": "",
+      "authors": ["mezz"]
+    },
+    {
+      "name": "MyMod",
+      "id": "mod0",
+      "iconuri": "file:///C:/Users...",
+      "description": "",
+      "import": true
+    }
+  ],
+  "games":
+    {
+      "C:\\Users\\Admin\\AppData\\Roaming\\.minecraft\\versions\\1.20.4-fabric": [
+        {
+          "name": "JEI-fabric-1.1.0.jar",
+          "sha1": "648614a246a82273e5a64f84de37cf2121dfe2af",
+          "publish": "04-01-2024 25:61:65",
+          "modloader": [ 2 ],
+          "id": "jei",
+          "dependencies": []
+        },
+        {
+          "path": "MyMod.jar",
+          "sha1": "464f7e87866706f7e5d995525eabe40ce8de5e14",
+          "publish": "11-04-5141 09:19:81",
+          "modloader": [ 2 ],
+          "id": "mod0",
+          "dependencies": []
+        }
+      ]
+  }
+}

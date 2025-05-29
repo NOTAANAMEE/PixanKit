@@ -1,0 +1,2914 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PixanKit.LaunchCore</name>
+    </assembly>
+    <members>
+        <member name="T:PixanKit.LaunchCore.Core.Launcher">
+            <summary>
+            Represents the main launcher class for managing games, players, Java runtimes, and settings.
+            Provides a variety of events for interaction and lifecycle management.    
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Core.Launcher.Instance">
+            <summary>
+            Gets the single instance of the <see cref="T:PixanKit.LaunchCore.Core.Launcher"/> class.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Core.Launcher.Setting">
+            <summary>
+            Gets or sets the settings of the launcher instance.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Launcher.LauncherName">
+            <summary>
+            The name of the launcher.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Launcher.VersionName">
+            <summary>
+            The version of the launcher.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Launcher.Close">
+            <summary>
+            Closes the launcher and saves the current state of folders, Java runtimes, and players into the respective data structures.
+            Note: The actual saving to disk must be handled separately by calling <see cref="M:PixanKit.LaunchCore.Extension.Files.Save"/> or other appropriate methods.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Launcher.GamePreLaunch">
+            <summary>
+            Occurs before launching a game. Allows modification of the launch parameters.
+            </summary>
+            <remarks>
+            The first parameter is the game being launched, and the second is the Vanilla launch arguments.
+            The method should return the modified launch arguments.
+            </remarks>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Launcher.GamePostLaunch">
+            <summary>
+            Occurs after a game is launched.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Launcher.GameExit">
+            <summary>
+            Occurs when a game exits.
+            </summary>
+            <remarks>
+            The first parameter is the game that exited, and the second is the process result.
+            </remarks>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Launcher.OnLauncherClosed">
+            <summary>
+            Occurs when the launcher is closed.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Launcher.OnLauncherInitialized">
+            <summary>
+            Occurs when a new launcher instance is initialized.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Launcher.Launch(PixanKit.LaunchCore.GameModule.Game.GameBase)">
+            <summary>
+            Launch the game
+            </summary>
+            <param name="game"></param>
+            <returns></returns>
+            <exception cref="T:System.NullReferenceException"></exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Launcher.Launch(PixanKit.LaunchCore.GameModule.Game.GameBase,PixanKit.LaunchCore.PlayerModule.Player.PlayerBase)">
+            <summary>
+            
+            </summary>
+            <param name="game"></param>
+            <param name="player"></param>
+            <returns></returns>
+            <exception cref="T:System.NullReferenceException"></exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Launcher.Launch">
+            <summary>
+            Launch the default game
+            </summary>
+            <returns></returns>
+            <exception cref="T:System.NullReferenceException"></exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Launcher.PlayerInLine(System.String,PixanKit.LaunchCore.PlayerModule.Player.PlayerBase)">
+            <summary>
+            Inlines player information into a command string.
+            </summary>
+            <param name="arg">The base command string.</param>
+            <param name="player">The player whose information is to be inlined.</param>
+            <returns>The command string with the player's information inlined.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when the provided player is null.</exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Launcher.PlayerInLine(System.String)">
+            <summary>
+            Inlines the default player's information into a command string.
+            </summary>
+            <param name="arg">The base command string.</param>
+            <returns>The command string with the default player's information inlined.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Launcher.GetGameRunningFolder(PixanKit.LaunchCore.GameModule.Game.GameBase)">
+            <summary>
+            
+            </summary>
+            <param name="game"></param>
+            <returns></returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Core.LaunchSession.LaunchSession">
+            <summary>
+            Represents a session for launching a Minecraft game instance.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Core.LaunchSession.LaunchSession.LogPath">
+            <summary>
+            Gets the path to the log directory. Java process will run under <see cref="P:PixanKit.LaunchCore.Extension.Files.CacheDir"/>.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Core.LaunchSession.LaunchSession.Process">
+            <summary>
+            Gets the process associated with the game launch.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Core.LaunchSession.LaunchSession.Game">
+            <summary>
+            Gets the game instance being launched.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Core.LaunchSession.LaunchSession.Arguments">
+            <summary>
+            Gets the arguments used to launch the game.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Core.LaunchSession.LaunchSession.Runtime">
+            <summary>
+            Gets the Java runtime used to launch the game.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.LaunchSession.LaunchSession._startInfo">
+            <summary>
+            Stores the process start information.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.LaunchSession.LaunchSession.#ctor(PixanKit.LaunchCore.GameModule.Game.GameBase,PixanKit.LaunchCore.JavaModule.Java.JavaRuntime,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.LaunchCore.Core.LaunchSession.LaunchSession"/> class.
+            </summary>
+            <param name="game">The game instance to be launched.</param>
+            <param name="java">The Java runtime used for launching.</param>
+            <param name="args">The command-line arguments for the process.</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.LaunchSession.LaunchSession.#ctor(PixanKit.LaunchCore.GameModule.Game.GameBase,PixanKit.LaunchCore.JavaModule.Java.JavaRuntime,System.String,System.String,System.String,System.Collections.Generic.List{System.Collections.Generic.KeyValuePair{System.String,System.String}})">
+            <summary>
+            
+            </summary>
+            <param name="game"></param>
+            <param name="java"></param>
+            <param name="preArgs"></param>
+            <param name="args"></param>
+            <param name="postArgs"></param>
+            <param name="env"></param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.LaunchSession.LaunchSession.Start">
+            <summary>
+            Starts the game process.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.LaunchSession.LaunchSession.Stop">
+            <summary>
+            Stops the running game process.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.LaunchSession.LaunchSession.WaitForExit">
+            <summary>
+            Waits for the game process to exit.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.LaunchSession.LaunchSession.GetResult">
+            <summary>
+            Gets the result of the game launch.
+            </summary>
+            <returns>The game result</returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Core.LaunchSession.ProcessResult">
+            <summary>
+            Represents the result of a Minecraft process.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.LaunchSession.ProcessResult.ReturnCode">
+            <summary>
+            Gets or sets the return code of the Minecraft process.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Core.LaunchSession.ProcessResult.Successful">
+            <summary>
+            Gets a value indicating whether the process exited successfully.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.LaunchSession.ProcessResult.LogGzPath">
+            <summary>
+            Gets or sets the path to the log file, which is a .tar.gz archive.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.LaunchSession.ProcessResult.CrashFilePath">
+            <summary>
+            Gets or sets the path to the crash file, if applicable.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.LaunchSession.ProcessResult.OutputStream">
+            <summary>
+            Gets or sets the output stream of the Minecraft process.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.LaunchSession.ProcessResult.ErrorStream">
+            <summary>
+            Gets or sets the output stream of the Minecraft process.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.LaunchSession.ProcessResult.Close">
+            <summary>
+            Closes the output stream associated with the Minecraft process.
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Core.Managers.GameManager">
+            <summary>
+            Manages game folders and game instances for the launcher.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Core.Managers.GameManager.Folders">
+            <summary>
+            Gets the collection of folders managed by the launcher.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Core.Managers.GameManager.TargetGame">
+            <summary>
+            Gets or sets the default game to be launched.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.GameManager.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.LaunchCore.Core.Managers.GameManager"/> class.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.GameManager.InitGameModule">
+            <summary>
+            Initializes the game module by loading folder data from a JSON file.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.GameManager.Contains(PixanKit.LaunchCore.GameModule.Game.GameBase)">
+            <summary>
+            Checks whether the specified game exists in any folder.
+            </summary>
+            <param name="game">The game to check.</param>
+            <returns><c>true</c> if the game exists; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.GameManager.Contains(PixanKit.LaunchCore.GameModule.Folders.Folder)">
+            <summary>
+            Checks whether the specified folder exists in the folder collection.
+            </summary>
+            <param name="folder">The folder to check.</param>
+            <returns><c>true</c> if the folder exists; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.GameManager.AddFolder(PixanKit.LaunchCore.GameModule.Folders.Folder)">
+            <summary>
+            Adds a folder to the launcher.
+            </summary>
+            <param name="folder">The folder to add.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown if the folder has already been added.</exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.GameManager.RemoveFolder(PixanKit.LaunchCore.GameModule.Folders.Folder)">
+            <summary>
+            Removes the specified folder from the launcher.
+            </summary>
+            <param name="folder">The folder to remove.</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.GameManager.RemoveFolder(System.String)">
+            <summary>
+            Removes the folder with the specified path.
+            </summary>
+            <param name="path">The path of the folder to remove.</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.GameManager.FindFolder(System.String)">
+            <summary>
+            Finds the folder with the specified path.
+            </summary>
+            <param name="path">The path of the folder to find.</param>
+            <returns>The folder if found; otherwise, <c>null</c>.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.GameManager.AddGame(PixanKit.LaunchCore.GameModule.Game.GameBase)">
+            <summary>
+            Adds a game to its corresponding folder.
+            </summary>
+            <param name="game">The game to add.</param>
+            <exception cref="T:PixanKit.LaunchCore.GameModule.Exceptions.NoFolderException">Thrown if the folder for the game cannot be found.</exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.GameManager.RemoveGame(PixanKit.LaunchCore.GameModule.Game.GameBase)">
+            <summary>
+            Removes a game from its corresponding folder.
+            </summary>
+            <param name="game">The game to remove.</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.GameManager.FindGame(System.String)">
+            <summary>
+            Finds a game by its path.
+            </summary>
+            <param name="path">The path of the game directory.</param>
+            <returns>The game if found; otherwise, <c>null</c>.</returns>
+            <exception cref="T:System.ArgumentException">Thrown if the path is invalid.</exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.GameManager.UpdateTargetGame">
+            <summary>
+            Updates the target game to ensure it is valid.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.GameManager.FirstGame">
+            <summary>
+            Sets the target game to the first available game in the folder collection.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.GameManager.Save">
+            <summary>
+            Saves the folder data to a JSON object.
+            </summary>
+            <returns>A <see cref="T:Newtonsoft.Json.Linq.JObject"/> containing the folder data.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.GameManager.AddParam(PixanKit.LaunchCore.GameModule.Game.GameParameter,PixanKit.LaunchCore.GameModule.LibraryData.LibrariesRef)">
+            <summary>
+            
+            </summary>
+            <param name="param"></param>
+            <param name="libraries"></param>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.GameManager.TryGetParam(System.String,PixanKit.LaunchCore.GameModule.Game.GameParameter@,PixanKit.LaunchCore.GameModule.LibraryData.LibrariesRef@)">
+            <summary>
+            
+            </summary>
+            <param name="version"></param>
+            <param name="param"></param>
+            <param name="libraries"></param>
+            <returns></returns>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Managers.GameManager.OnGameLoaded">
+            <summary>
+            Occurs when a game is loaded from a file.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Managers.GameManager.OnGameAdded">
+            <summary>
+            Occurs when a new game is added to a folder.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Managers.GameManager.OnGameRemoved">
+            <summary>
+            Occurs when a game is removed from a folder.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Managers.GameManager.OnTargetGameChanged">
+            <summary>
+            Occurs when the default game is changed.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Managers.GameManager.OnFolderAdded">
+            <summary>
+            Occurs when a new folder is added.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Managers.GameManager.OnFolderRemoved">
+            <summary>
+            Occurs when a folder is removed.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Core.Managers.JavaManager.JavaRuntimes">
+            <summary>
+            Gets the collection of Java runtimes added to the launcher.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.JavaManager.AddJavaRuntime(PixanKit.LaunchCore.JavaModule.Java.JavaRuntime)">
+            <summary>
+            Adds a Java runtime to the launcher.
+            </summary>
+            <param name="runtime">A valid <see cref="T:PixanKit.LaunchCore.JavaModule.Java.JavaRuntime"/> instance.</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.JavaManager.AddJavaRuntime(System.String)">
+            <summary>
+            Adds a Java runtime to the launcher by specifying its installation path.
+            </summary>
+            <param name="path">The folder path of the Java runtime installation.
+            For example: "C:\\Program Files\\Java\\jdk-21"</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.JavaManager.RemoveJavaRuntime(PixanKit.LaunchCore.JavaModule.Java.JavaRuntime)">
+            <summary>
+            Removes a Java runtime from the launcher.
+            </summary>
+            <param name="runtime">A valid <see cref="T:PixanKit.LaunchCore.JavaModule.Java.JavaRuntime"/> instance that is already added to the launcher.</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.JavaManager.ChooseRuntime(PixanKit.LaunchCore.GameModule.Game.GameBase)">
+            <summary>
+            Chooses an appropriate Java runtime for a specified Minecraft game.
+            </summary>
+            <param name="game">The <see cref="T:PixanKit.LaunchCore.GameModule.Game.GameBase"/> instance representing the Minecraft game.</param>
+            <returns>A <see cref="T:PixanKit.LaunchCore.JavaModule.Java.JavaRuntime"/> instance that is selected based on the game's settings, or <c>null</c> if no runtime matches.</returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Core.Managers.PlayerManager">
+            <summary>
+            Manages player profiles for the launcher, including adding, removing, and retrieving players.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Core.Managers.PlayerManager.Players">
+            <summary>
+            Gets the collection of players added to the launcher.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Core.Managers.PlayerManager.TargetPlayer">
+            <summary>
+            Gets or sets the default player used for launching.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.PlayerManager.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.LaunchCore.Core.Managers.PlayerManager"/> class.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.PlayerManager.InitPlayerModule">
+            <summary>
+            Initializes the player module by loading player data from a JSON file.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.PlayerManager.AddPlayer(PixanKit.LaunchCore.PlayerModule.Player.PlayerBase)">
+            <summary>
+            Adds a new player to the launcher.
+            </summary>
+            <param name="player">The player to add.</param>
+            <exception cref="T:System.ArgumentException">Thrown if a player with the same UID already exists.</exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.PlayerManager.RemovePlayer(PixanKit.LaunchCore.PlayerModule.Player.PlayerBase)">
+            <summary>
+            Removes a player from the launcher.
+            </summary>
+            <param name="player">The player to remove.</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.PlayerManager.FindPlayer(System.String)">
+            <summary>
+            Finds a player by their unique identifier (UID).
+            </summary>
+            <param name="uid">The unique identifier of the player.</param>
+            <returns>The player if found; otherwise, <c>null</c>.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.PlayerManager.ResetTargetPlayer">
+            <summary>
+            Resets the target player to the first player in the list if no target player is set.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Core.Managers.PlayerManager.Save">
+            <summary>
+            Saves the current player data to a JSON object.
+            </summary>
+            <returns>A <see cref="T:Newtonsoft.Json.Linq.JObject"/> containing the player data.</returns>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Managers.PlayerManager.OnPlayerLoaded">
+            <summary>
+            Occurs when a player profile is loaded from a JSON file.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Managers.PlayerManager.OnPlayerAdded">
+            <summary>
+            Occurs when a new player is added.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Managers.PlayerManager.OnPlayerRemoved">
+            <summary>
+            Occurs when a player is removed.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Managers.PlayerManager.OnProfileChanged">
+            <summary>
+            Occurs when a player's profile is changed.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Core.Managers.PlayerManager.OnTargetPlayerChanged">
+            <summary>
+            Occurs when the target player is changed.
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Exceptions.JsonKeyException">
+            <summary>
+            Represents the exception that some keys might not contains in the JSON document
+            </summary>
+            <param name="token">the token that the value is from</param>
+            <param name="key">the expected key/path of the value</param>
+            <param name="message">give some hint?</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Exceptions.JsonKeyException.#ctor(Newtonsoft.Json.Linq.JToken,System.String,System.String)">
+            <summary>
+            Represents the exception that some keys might not contains in the JSON document
+            </summary>
+            <param name="token">the token that the value is from</param>
+            <param name="key">the expected key/path of the value</param>
+            <param name="message">give some hint?</param>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Exceptions.JsonKeyException.Token">
+            <summary>
+            Represents the root token to find the value
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Exceptions.JsonKeyException.Key">
+            <summary>
+            Represents the path to find the value
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Extension.Initers">
+            <summary>
+            Provides custom initialization methods for games, players, and system settings.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Extension.Initers.GameIniterInstance">
+            <summary>
+            Gets or sets the instance of the custom game initializer.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.Initers.GameIniter(PixanKit.LaunchCore.GameModule.Folders.Folder,System.String)">
+            <summary>
+            Initializes a game instance using the specified path.
+            </summary>
+            <param name="folder"></param>
+            <param name="name">The name of the game. </param>
+            <returns>An instance of <see cref="T:PixanKit.LaunchCore.GameModule.Game.GameBase"/> representing the initialized game.</returns>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Extension.Initers.PlayerIniter">
+            <summary>
+            A delegate for initializing a player from a JSON object.
+            </summary>
+            <remarks>
+            This delegate allows customization of player initialization logic.
+            </remarks>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Extension.Initers.GetMemory">
+            <summary>
+            A delegate for retrieving the system's memory allocation.
+            </summary>
+            <remarks>
+            This delegate allows customization of memory allocation logic.
+            </remarks>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.Initers.#cctor">
+            <summary>
+            Initializes static members of the <see cref="T:PixanKit.LaunchCore.Extension.Initers"/> class.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.Initers.DefaultPlayerInitor(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            The default implementation for initializing a player from a JSON object.
+            </summary>
+            <param name="jData">A JSON object containing player data. Example:
+            <code>
+            {
+              "name": "PlayerName",
+              "uid": "UniqueID",
+              "type": "offline",
+              "refreshtoken": "RefreshToken",
+              "accesstoken": "AccessToken"
+            }
+            </code>
+            </param>
+            <returns>
+            An instance of <see cref="T:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase"/> if the player type is recognized; otherwise, <c>null</c>.
+            </returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.Initers.GetMem">
+            <summary>
+            Retrieves the default memory allocation for the system.
+            </summary>
+            <returns>
+            The allocated memory in megabytes. The value is determined based on the system's available memory,
+            with a minimum of 2048 MB and a maximum of 10240 MB.
+            </returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Extension.DefaultGameIniter">
+            <summary>
+            The default implementation of the <see cref="T:PixanKit.LaunchCore.Extension.IGameIniter"/> interface.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.DefaultGameIniter.InitGame(PixanKit.LaunchCore.GameModule.Folders.Folder,System.String)">
+            <summary>
+            Initializes a game instance from the specified path.
+            </summary>
+            <param name="folder"></param>
+            <param name="name">The path to the game folder. For example: <c>"C:/Games/Minecraft"</c>.</param>
+            <returns>
+            An instance of <see cref="T:PixanKit.LaunchCore.GameModule.Game.GameBase"/> representing the initialized game.
+            </returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.DefaultGameIniter.JudgeOptifine(PixanKit.LaunchCore.GameModule.Game.GameParameter)">
+            <summary>
+            Determines whether the game is an OptiFine-modified version.
+            </summary>
+            <param name="param"></param>
+            <returns>
+            <c>true</c> if the game is an OptiFine-modified version; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Extension.Files">
+            <summary>
+            Some Settings About Files
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Extension.Files.FolderJData">
+            <summary>
+            Folder JSON Data  
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Extension.Files.RuntimeJData">
+            <summary>
+            Runtime JSON Data
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Extension.Files.PlayerJData">
+            <summary>
+            Player JSON Data
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Extension.Files.SettingsJData">
+            <summary>
+            Setting JSON Data
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Extension.Files.ConfigDir">
+            <summary>
+            Directory For Launcher Configuration Files.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Extension.Files.CacheDir">
+            <summary>
+            Dir For Cache
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Extension.Files.SettingsPath">
+            <summary>
+            The native setting for every game. 
+            For example:C:\Users\admin\AppData\Roaming\.minecraft\versions\1.20.4\settings.json
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Extension.Files.ManifestDir">
+            <summary>
+            Dir For Minecraft Version Manifest
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Extension.Files.SkinCacheDir">
+            <summary>
+            Dir For Skin Cache
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.Files.GetSha1(System.String)">
+            <summary>
+            Get SHA1 From File
+            </summary>
+            <param name="path">File Path</param>
+            <returns>SHA1 String</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.Files.Generate">
+            <summary>
+            Generate Default JSON Data
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.Files.Save">
+            <summary>
+            Save JSON to default path.<br/>
+            This method is intended for simple save operations only 
+            and is not suitable for encrypted storage or other complex operations.
+            It is recommended to use encrypted storage when saving Player data.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.Files.Load">
+            <summary>
+            Load Data From Default Path
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Extension.IGameIniter">
+            <summary>
+            Defines the interface for initializing a game instance.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.IGameIniter.InitGame(PixanKit.LaunchCore.GameModule.Folders.Folder,System.String)">
+            <summary>
+            Initializes a game instance from the specified path.
+            </summary>
+            <param name="folder"></param>
+            <param name="name">The path to the game folder. For example: <c>"C:/Users/Admin/AppData/Roaming/.minecraft/versions/1.20.1"</c>.</param>
+            <returns>
+            An instance of <see cref="T:PixanKit.LaunchCore.GameModule.Game.GameBase"/> representing the initialized game.
+            </returns>
+            <remarks>
+            This method is responsible for creating and configuring a game instance based on the provided path.
+            It may involve reading configuration files, setting up libraries, and preparing runtime arguments.
+            </remarks>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Extension.Paths">
+            <summary>
+            Path Dictionary
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.Paths.Add(System.String,System.String)">
+            <summary>
+            Add A New Path
+            </summary>
+            <param name="key">Key For Finding And Replacing</param>
+            <param name="value">The Actual Path</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.Paths.Set(System.String,System.String)">
+            <summary>
+            Set The Path
+            </summary>
+            <param name="key"></param>
+            <param name="value">The Final Path</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.Paths.TrySet(System.String,System.String)">
+            <summary>
+            If it Has Key, call Set() else call Add()
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.Paths.TryGetValue(System.String,System.String@)">
+            <summary>
+            Try to get the value. If exists, value will be he path. Else, value
+            will be null and return false
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.Paths.Get(System.String)">
+            <summary>
+            Get The Processed Path
+            </summary>
+            <param name="key"></param>
+            <returns>THe Final Path After Replacement</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.Paths.GetOrAdd(System.String,System.String)">
+            <summary>
+            Get the Path. If not exist, add the item.
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Extension.Paths.MyRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>\\${(.*?)}</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match the string "${".<br/>
+            ○ 1st capture group.<br/>
+                ○ Match a character other than '\n' lazily any number of times.<br/>
+            ○ Match '}'.<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.Exceptions.SystemNotSupportedException">
+            <summary>
+            Library/Token Does Not Support Your System
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Exceptions.SystemNotSupportedException.#ctor(System.String,System.String)">
+            <summary>
+            Initor
+            </summary>
+            <param name="aimedsystem">Aimed System</param>
+            <param name="currentsystem">The Current System</param>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Exceptions.SystemNotSupportedException.SupportedSystem">
+            <summary>
+            Supported System
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Exceptions.SystemNotSupportedException.CurrentSystem">
+            <summary>
+            Current System
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.Exceptions.NoFolderException">
+            <summary>
+            Represents an exception that is thrown when a Folder instance is not found.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Exceptions.NoFolderException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.LaunchCore.GameModule.Exceptions.NoFolderException"/> class with a specified error message.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Exceptions.NoFolderException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.LaunchCore.GameModule.Exceptions.NoFolderException"/> class with a default error message.
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.Folders.Folder">
+            <summary>
+            Folder Class<br/> An Abstraction For A .minecraft Folder
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Folders.Folder.FolderPath">
+            <summary>
+            The path of the folder. Like C:/Users/admin/AppData/Roaming/.minecraft
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Folders.Folder.LibraryDirPath">
+            <summary>
+            The path of the library folder. FolderPath + "/libraries"
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Folders.Folder.AssetsDirPath">
+            <summary>
+            The path of the Assets folder. FolderPath + "/assets"
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Folders.Folder.VersionDirPath">
+            <summary>
+            The path of the version folder. <c>FolderPath</c> + "/versions"
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Folders.Folder.Alias">
+            <summary>
+            An Alias Of The Folder<br/>
+            Alias Will Help User Manage Their Games
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Folders.Folder.Games">
+            <summary>
+            The Array Of The Minecraft Games In The <c>Folder</c>
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Folders.Folder.Count">
+            <summary>
+            The Count Of Minecraft Games In The <c>Folder</c>
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Folders.Folder.First">
+            <summary>
+            Provides the first Minecraft in the folder
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Folders.Folder.Last">
+            <summary>
+            Provide the last Minecraft in the folder
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Folders.Folder.Owner">
+            <summary>
+            The <c>Launcher</c> That The <c>Folder</c> Belongs To
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Folders.Folder.#ctor(System.String)">
+            <summary>
+            Init The <c>Folder</c> With The Path.
+            </summary>
+            <param name="path">Folder Path, For Example:
+            <c>"C:\\Users\\Admin\\AppData\\Roaming\\.minecrafy"</c></param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Folders.Folder.#ctor(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Init A <c>Folder</c> With JSON Object
+            </summary>
+            <param name="jData">
+            JSON Object Of The Folder, For Example:
+            <br/>
+            <c>{<br/>
+            "path":"C:/Users/Admin/AppData/Roaming/.minecraft",<br/>
+            "alias":"New Folder"<br/>
+            }</c></param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Folders.Folder.Contains(PixanKit.LaunchCore.GameModule.Game.GameBase)">
+            <summary>
+            This method will return whether the game exists in this folder
+            </summary>
+            <param name="game">The <c>GameBase</c> You Want To Check</param>
+            <returns></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Folders.Folder.FindGame(System.String)">
+            <summary>
+            This method will return the game with specific name if exists.
+            </summary>
+            <param name="name">The Name Of The Game</param>
+            <returns>If Exists, Return The Game. Else, Return <c>null</c></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Folders.Folder.FindVersion(System.String,PixanKit.LaunchCore.GameModule.Game.GameType)">
+            <summary>
+            Find The Specific Version And Type Of A Game In The Folder
+            </summary>
+            <param name="version">The Version. Like <c>"1.14"</c></param>
+            <param name="type">Type Of The Game. Like <c>GameType.Vanilla</c></param>
+            <returns>Return The GameBase If Exists</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Folders.Folder.Scan">
+            <summary>
+            This method will scan the folder again and add the game that does not exist in the <c>_games</c> 
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Folders.Folder.Close">
+            <summary>
+            This method will close every game.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Folders.Folder.OnGameChanged">
+            <summary>
+            Event Triggered When A Game Is Added/Removed
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Folders.Folder.LoadFromJson(Newtonsoft.Json.Linq.JObject)">
+            <inheritdoc/>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Folders.Folder.ToJson">
+            <inheritdoc/>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.Game.CustomizedGame">
+            <summary>
+            Modified Game. Game With ModLoader/ Optifine
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.CustomizedGame._useBaseGeneration">
+            <summary>
+            Whether It Is useBaseGeneration Created
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.CustomizedGame.ThisParameter">
+            <summary>
+            ThisParameter is the parameter from the local json.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.CustomizedGame.#ctor(System.String,PixanKit.LaunchCore.GameModule.Folders.Folder,PixanKit.LaunchCore.GameModule.Game.GameParameter,PixanKit.LaunchCore.GameModule.LibraryData.LibrariesRef)">
+            <summary>
+            
+            </summary>
+            <param name="name"></param>
+            <param name="folder"></param>
+            <param name="param"></param>
+            <param name="libs"></param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.CustomizedGame.GetAssetsId">
+            <inheritdoc/>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.CustomizedGame.GetArgument">
+            <inheritdoc/>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.CustomizedGame.GetCpArgs">
+            <inheritdoc/>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.Game.GameBase">
+            <summary>
+            Represents the base class for managing Minecraft game instances.
+            </summary>
+            <remarks>
+            This abstract class provides core functionality for handling Minecraft game instances, 
+            including managing game files, libraries, settings, and runtime arguments. 
+            It serves as a foundation for derived classes that implement specific game types, 
+            such as modded or vanilla versions.
+            
+            Key features of this class include:
+            - Managing paths for game resources (e.g., JAR files, libraries, and assets).
+            - Generating launch arguments for starting the game.
+            - Supporting runtime settings and configuration management.
+            - Handling native library extraction and version-specific operations.
+            
+            Derived classes are expected to implement additional functionality as needed, 
+            while reusing the core capabilities provided by this base class.
+            </remarks>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameBase.Name">
+            <summary>
+            Gets the name of the Minecraft game.
+            </summary>
+            <remarks>
+            This is derived from the folder name containing the game files.
+            </remarks>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameBase.Description">
+            <summary>
+            Gets or sets the description of the Minecraft game.
+            </summary>
+            <remarks>
+            Default value is "Minecraft" if not specified.
+            </remarks>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameBase.GameFolderPath">
+            <summary>
+            Gets the folder where the main game files (e.g., game.jar) are located.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameBase.Owner">
+            <summary>
+            Gets the owner folder of the Minecraft game.
+            </summary>
+            <remarks>
+            This represents the parent directory of the game folder.
+            </remarks>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameBase.GameJarFilePath">
+            <summary>
+            Gets the full path to the game JAR file.
+            </summary>
+            <remarks>
+            Combines the <see cref="P:PixanKit.LaunchCore.GameModule.Game.GameBase.GameFolderPath"/> and the <see cref="P:PixanKit.LaunchCore.GameModule.Game.GameBase.Name"/> to locate the JAR file.
+            </remarks>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameBase.GameJsonFilePath">
+            <summary>
+            Gets the full path to the game's JSON configuration file.
+            </summary>
+            <remarks>
+            This file stores metadata about the game instance.
+            </remarks>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameBase.LibrariesDirPath">
+            <summary>
+            Gets the folder where library files are stored.
+            </summary>
+            <remarks>
+            Defaults to the global libraries folder if no specific owner folder is defined.
+            </remarks>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameBase.AssetsDirPath">
+            <summary>
+            Gets the folder where texture packs and assets are stored.
+            </summary>
+            <remarks>
+            Defaults to the global assets folder derived from the Minecraft directory structure.
+            </remarks>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameBase.GameRootFolderPath">
+            <summary>
+            Gets the root folder of the Minecraft installation.
+            </summary>
+            <remarks>
+            This is the base directory containing all versions and global assets.
+            </remarks>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameBase.Version">
+            <summary>
+            Gets the Minecraft version for this game instance.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameBase.GameType">
+            <summary>
+            Gets the type of the game instance.
+            </summary>
+            <remarks>
+            The game type defines whether the instance is a vanilla, modded, or other variant.
+            </remarks>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameBase.NativeDirPath">
+            <summary>
+            Gets the folder where native binary libraries are stored.
+            </summary>
+            <remarks>
+            These binaries are required for platform-specific functionality.
+            </remarks>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameBase.SettingsPath">
+            <summary>
+            Gets the path to the settings configuration file.
+            </summary>
+            <remarks>
+            The settings file contains user and game-specific configurations.
+            </remarks>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameBase.MinimalJavaVersion">
+            <summary>
+            Gets the minimal java version for choosing the java runtime
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.GameBase.GetLibraries">
+            <summary>
+            Retrieves all libraries associated with this game instance.
+            </summary>
+            <returns>An array of <see cref="T:PixanKit.LaunchCore.GameModule.LibraryData.LibraryBase"/> objects representing the libraries.</returns>
+            <remarks>
+            This method returns the complete list of libraries required for the game, including runtime and mod libraries.
+            </remarks>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.GameBase.GetLaunchArgument">
+            <summary>
+            Generates the launch arguments for the game.
+            </summary>
+            <returns>A formatted string containing the full launch arguments.</returns>
+            <remarks>
+            This method replaces placeholders like <c>${natives_directory}</c> with actual paths
+            and applies localization. It also incorporates JVM and game-specific arguments.
+            </remarks>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.GameBase.Decompress">
+            <summary>
+            Decompresses native libraries required for the game.
+            </summary>
+            <remarks>
+            This method extracts all native libraries to the <c>NativeDir</c> folder.
+            It skips non-native libraries.
+            </remarks>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> representing the asynchronous operation.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.GameBase.Close">
+            <summary>
+            Saves the current settings to a file and closes the game instance.
+            </summary>
+            <remarks>
+            This method writes the <see cref="P:PixanKit.LaunchCore.GameModule.Game.GameBase.Settings"/> object to the settings file specified by <see cref="P:PixanKit.LaunchCore.GameModule.Game.GameBase.SettingsPath"/>.
+            If the settings directory does not exist, it will be created. 
+            Proper logging is performed before and after saving the file.
+            </remarks>
+            <exception cref="T:System.IO.IOException">
+            Thrown if an error occurs while writing to the file.
+            </exception>
+            <exception cref="T:System.UnauthorizedAccessException">
+            Thrown if the application does not have permission to write to the specified path.
+            </exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.GameBase.LoadJson(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Initializes the game instance with the provided JSON configuration.
+            </summary>
+            <param name="gameData">A JSON object containing the game configuration.</param>
+            <remarks>
+            This method allows convenient subclass initialization by loading configuration details 
+            such as assets, libraries, and runtime settings from a JSON file.
+            </remarks>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.GameBase.GetCpArgs">
+            <summary>
+            Retrieves the classpath arguments for the game.
+            </summary>
+            <returns>
+            A string containing the classpath arguments, excluding the game JAR file.
+            </returns>
+            <remarks>
+            The classpath includes library paths and the main game JAR path.
+            </remarks>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.GameBase.GetArgument">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.GameBase.GetAssetsId">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.GameBase.LaunchCheck">
+            <summary>
+            Checks whether the game is ready to launch.
+            </summary>
+            <returns><c>true</c> if the game can launch; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameBase.Settings">
+            <summary>
+            Gets the settings for this game instance.
+            </summary>
+            <remarks>
+            The settings define Java version preferences, runtime folder behavior, and custom descriptions.
+            </remarks>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameBase.Params">
+            <summary>
+            The parameters of the game instance.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameBase.ReleaseType">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameBase.LibrariesRef">
+            <summary>
+            The reference of library
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.GameBase.#ctor(System.String,PixanKit.LaunchCore.GameModule.Folders.Folder,PixanKit.LaunchCore.GameModule.Game.GameParameter,PixanKit.LaunchCore.GameModule.LibraryData.LibrariesRef)">
+            <summary>
+            
+            </summary>
+            <param name="name"></param>
+            <param name="folder"></param>
+            <param name="param"></param>
+            <param name="libraries"></param>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.Game.GameParameter">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameParameter.JvmVersion">
+            <summary>
+            Gets the JVM Version
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameParameter.IsModified">
+            <summary>
+            Gets the game type.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameParameter.ReliedArgs">
+            <summary>
+            Decide whether the arguments should be based on Vanilla game arguments
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameParameter.JavaArgs">
+            <summary>
+            Gets the Java arguments.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameParameter.GameArgs">
+            <summary>
+            Gets the game arguments.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameParameter.MainClass">
+            <summary>
+            Gets the entry class
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameParameter.AssetsId">
+            <summary>
+            Gets the Assets ID of a game
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.GameParameter.GetVersion(Newtonsoft.Json.Linq.JObject,System.Int32@)">
+            <summary>
+             Judge the game is original or modified
+            </summary>
+            <param name="jData">the jsonData of the game</param>
+            <param name="isModified">
+            Explanation:
+            0: It is the original game arguments, not modified.
+            1: It is modified by mod loaders and the args are incomplete
+            2: It is modified by mod loaders but the args are complete
+            </param>
+            <returns>the based version of the game</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.GameParameter.CreateInstance(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Create an instance of the GameParameter
+            </summary>
+            <param name="jData"></param>
+            <returns></returns>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.GameParameter.Version">
+            <summary>
+            Gets the game version.
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.Game.GameType">
+            <summary>
+            Different types of Minecraft
+            Mod:ModLoader like Fabric, Quilt, Liteloader, Forge and NeoForge
+            Optifine:Only With Optifine
+            Vanilla:No mod loader or Optifine.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameType.Vanilla">
+            <summary>
+            Vanilla Game
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameType.Customized">
+            <summary>
+            Customized Game. Usually optifine
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameType.Modded">
+            <summary>
+            Mod Game
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.Game.GameSettings">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.GameSettings.#ctor">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameSettings.JavaSetting">
+            <summary></summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameSettings.RunningFolderSetting">
+            <summary></summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameSettings.JVMArgSetting">
+            <summary></summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameSettings.PreArgSetting">
+            <summary></summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameSettings.PostArgSetting">
+            <summary></summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameSettings.EnvVariableSetting">
+            <summary></summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameSettings.CustomJavaSetting">
+            <summary></summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameSettings.CustomRunningFolderSetting">
+            <summary></summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameSettings.Description">
+            <summary></summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameSettings.CustomJVMArgSetting">
+            <summary></summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameSettings.CustomPreArgSetting">
+            <summary></summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameSettings.CustomPostArgSetting">
+            <summary></summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.GameSettings.Variables">
+            <summary>Launching variables</summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.GameSettings.#ctor(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Initialize from Json Data
+            </summary>
+            <param name="obj">The Json Data</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.GameSettings.ToJObject">
+            <summary>
+            To JObject
+            </summary>
+            <returns>To JObject</returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.Game.SettingValue">
+            <summary>
+            The set of all possible setting values
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.SettingValue.Overall">
+            <summary>the same as the Launcher's setting</summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.SettingValue.Custom">
+            <summary>user customs the setting</summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.SettingValue.Self">
+            <summary>use the game folder as the savings folder</summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.SettingValue.Folder">
+            <summary>use the .minecraft folder as the savings folder</summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.SettingValue.Latest">
+            <summary>use the latest version of Java</summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.SettingValue.Closest">
+            <summary>the closest version of Java</summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.SettingValue.Specified">
+            <summary>use the specified version of Java</summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.SettingValue.Append">
+            <summary>Append custom params to the overall params</summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.Game.ModdedGame">
+            <summary>
+            Minecraft Game With Mod Loader
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.Game.ModdedGame.ModDir">
+            <summary>
+            The Mod path. For instance: C:\Users\Admin\AppData\.minecraft\versions\1.12.2-Forge\mods
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.Game.ModdedGame.ModLoader">
+            <summary>
+            Stores the name of the mod loader
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.ModdedGame.#ctor(System.String,PixanKit.LaunchCore.GameModule.Folders.Folder,PixanKit.LaunchCore.GameModule.Game.GameParameter,PixanKit.LaunchCore.GameModule.LibraryData.LibrariesRef)">
+            <inheritdoc/>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.Game.VanillaGame">
+            <summary>
+            Represents the Vanilla Minecraft game without Optifine or mod loaders.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.Game.VanillaGame.#ctor(System.String,PixanKit.LaunchCore.GameModule.Folders.Folder,PixanKit.LaunchCore.GameModule.Game.GameParameter,PixanKit.LaunchCore.GameModule.LibraryData.LibrariesRef)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.LaunchCore.GameModule.Game.VanillaGame"/> class.
+            </summary>
+            <param name="name"></param>
+            <param name="folder"></param>
+            <param name="param"></param>
+            <param name="libraries"></param>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.LibraryData.LibrariesRef">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.LibraryData.LibrariesRef.Version">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.LibraryData.LibrariesRef.Libraries">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.LibraryData.LibrariesRef.Extract(System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="libraryPath"></param>
+            <param name="nativePath"></param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.LibraryData.LibrariesRef.CreateInstance(System.String,Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            
+            </summary>
+            <param name="version"></param>
+            <param name="jData"></param>
+            <returns></returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.LibraryData.LibraryBase">
+            <summary>
+            Represents the base class for managing libraries in a Minecraft environment.
+            </summary>
+            <remarks>
+            This abstract class defines the structure and behavior of various library types, 
+            such as Vanilla libraries, native libraries, and mod libraries. 
+            It includes functionality for initializing libraries from JSON data, 
+            determining their type and compatibility, and managing their paths and URLs.
+            </remarks>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.LibraryData.LibraryBase.Name">
+            <summary>
+            Library Name Like <c>com.ibm.icu:icu4j:73.2</c>
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.LibraryData.LibraryBase.LibraryPath">
+            <summary>
+            The Absolute Path Of The Library
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.LibraryData.LibraryBase.Url">
+            <summary>
+            Download URL Of The Library
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.LibraryData.LibraryBase.LibraryType">
+            <summary>
+            The Type Of The Library
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.LibraryData.LibraryBase.Sha1">
+            <summary>
+            SHA1 Of The Folder
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.LibraryData.LibraryBase.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.LibraryData.LibraryType">
+            <summary>
+            Several library types
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.LibraryData.LibraryType.Default">
+            <summary>
+            Vanilla Library Type. Just Download
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.LibraryData.LibraryType.Native">
+            <summary>
+            Native Library Type. Need Extract
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.GameModule.LibraryData.LibraryType.Mod">
+            <summary>
+            Mod Loader Generated. Just download
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.LibraryData.LibraryHelper.SystemSupport(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Checks whether the system suits for the argument or library
+            </summary>
+            <param name="libraryToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.LibraryData.LibraryHelper.GetAllowedSystem(Newtonsoft.Json.Linq.JObject)">
+             <summary>
+             This is for judging which system is suitable for this library
+             </summary>
+             <param name="jData">The Library Json Data. Like <br/><c>
+             {
+            "downloads": {
+             "artifact": {
+              "path": "org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar",
+              "sha1": "7cf2726fdcfbc8610f9a71fb3ed639871f315340",
+              "size": 64579,
+              "url": "https://libraries.minecraft.net/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar"
+             }
+             },
+            "name":"org:slf4j:slf4j-api:2.0.9"
+            },</c></param>
+             <returns></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.LibraryData.LibraryHelper.GetLibraryType(Newtonsoft.Json.Linq.JToken)">
+            <summary>
+            This is for judging which library type the library is
+            </summary>
+            <param name="jData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.LibraryData.LibraryHelper.GetPath(System.String)">
+            <summary>
+            Get The Path Of The Library
+            </summary>
+            <param name="name">Name Like <c>"com.mojang:logging:1.4.9"</c></param>
+            <returns>Path Of The Library. Like 
+            <c>"/com/mojang/logging/1.4.9/logging-1.4.9.jar"</c></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.LibraryData.LibraryHelper.AddLibrary(Newtonsoft.Json.Linq.JObject,System.Collections.Generic.List{PixanKit.LaunchCore.GameModule.LibraryData.LibraryBase})">
+            <summary>
+            Parses the library according to the JSON data
+            </summary>
+            <param name="jData">the JSON data of the object</param>
+            <param name="gamelibraries">The list of the library</param>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.LibraryData.LoaderLibrary">
+            <summary>
+            Represents a library specific to mod loaders.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.LibraryData.LoaderLibrary.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.LaunchCore.GameModule.LibraryData.LoaderLibrary"/> class for internal use.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.LibraryData.LoaderLibrary.CreateInstance(Newtonsoft.Json.Linq.JObject,PixanKit.LaunchCore.GameModule.LibraryData.LibraryBase@)">
+            <summary>
+            
+            </summary>
+            <param name="jData"></param>
+            <param name="library"></param>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.LibraryData.NativeLibrary">
+            <summary>
+            Represents a native library used in the Minecraft environment.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.GameModule.LibraryData.NativeLibrary.LibraryPath">
+            <summary>
+            Gets the path of the library.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.LibraryData.NativeLibrary.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.LaunchCore.GameModule.LibraryData.NativeLibrary"/> class for internal use without extraction.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.LibraryData.NativeLibrary.CreateInstance(Newtonsoft.Json.Linq.JObject,PixanKit.LaunchCore.GameModule.LibraryData.LibraryBase@)">
+            <summary>
+            
+            </summary>
+            <param name="libraryJData"></param>
+            <param name="library"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.LibraryData.NativeLibrary.ExtractAsync(System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="libraryPath"></param>
+            <param name="nativesPath"></param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.LibraryData.NativeLibrary.NeedsDecompress(System.String)">
+            <summary>
+            Determines whether the specified file path should be excluded from extraction.
+            </summary>
+            <param name="fullPath">The full path of the file.</param>
+            <returns><c>true</c> if the file should be included; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.GameModule.LibraryData.DefaultLibrary">
+            <summary>
+            Represents an Vanilla library in the Minecraft environment.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.LibraryData.DefaultLibrary.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.LaunchCore.GameModule.LibraryData.DefaultLibrary"/> class for internal use.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.GameModule.LibraryData.DefaultLibrary.CreateInstance(Newtonsoft.Json.Linq.JObject,PixanKit.LaunchCore.GameModule.LibraryData.LibraryBase@)">
+            <summary>
+            
+            </summary>
+            <param name="libraryJData"></param>
+            <param name="library"></param>
+            <returns></returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.JavaModule.Java.JavaRuntime">
+            <summary>
+            The JavaRuntime Class To Choose suitable Java runtime
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.JavaModule.Java.JavaRuntime.Version">
+            <summary>
+            From Java 8 to Java 11 or later
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.JavaModule.Java.JavaRuntime.JavaFolder">
+            <summary>
+            The directory of Java
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.JavaModule.Java.JavaRuntime.BinaryFolder">
+            <summary>
+            The binary folder of Java
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.JavaModule.Java.JavaRuntime.JavaExe">
+            <summary>
+            The path of java.exe
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.JavaModule.Java.JavaRuntime.JavawExe">
+            <summary>
+            The path of javaw.exe
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.JavaModule.Java.JavaRuntime.#ctor(System.String)">
+            <summary>
+            Init a JavaRuntime instance. It will automatically run Java and get the version
+            </summary>
+            <param name="javafolder">C:\Program Files\Java\JDK-21\</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.JavaModule.Java.JavaRuntime.#ctor(System.String,System.UInt16)">
+            <summary>
+            Init a JavaRuntime instance with Directory And Version
+            </summary>
+            <param name="javafolder">Directory Of /bin/java.exe</param>
+            <param name="version">Java Version (8-23)</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.JavaModule.Java.JavaRuntime.#ctor(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Init A JavaRuntime Instance With JSON Data
+            </summary>
+            <param name="jData"></param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.JavaModule.Java.JavaRuntime.LoadFromJson(Newtonsoft.Json.Linq.JObject)">
+            <inheritdoc/>
+        </member>
+        <member name="M:PixanKit.LaunchCore.JavaModule.Java.JavaRuntime.ToJson">
+            <summary>
+            <inheritdoc/>
+            </summary>
+            <returns><inheritdoc/></returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.JavaModule.JavaChooser">
+            <summary>
+            Choose Specific Java With Settings
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.JavaModule.JavaChooser.Specified(System.Collections.Generic.IEnumerable{PixanKit.LaunchCore.JavaModule.Java.JavaRuntime},PixanKit.LaunchCore.GameModule.Game.GameBase)">
+            <summary>
+            Choose The Runtime That Is The Same As The Version That JSON Specified
+            </summary>
+            <param name="runtimes">Java Runtime Collection</param>
+            <param name="game">Game Needed To Launch</param>
+            <returns>Returns A JavaRuntime If Exisits. Else Return null</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.JavaModule.JavaChooser.Closest(System.Collections.Generic.IEnumerable{PixanKit.LaunchCore.JavaModule.Java.JavaRuntime},PixanKit.LaunchCore.GameModule.Game.GameBase)">
+            <summary>
+            Choose The Runtime That Is Close To The Version That JSON Specified.<br/>
+            The Chosen Runtime >= The Specified Version
+            </summary>
+            <param name="runtimes">Java Runtime Collection</param>
+            <param name="game">Game Needed To Launch</param>
+            <returns>Returns A JavaRuntime If Exisits. Else Return null</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.JavaModule.JavaChooser.Newest(System.Collections.Generic.IEnumerable{PixanKit.LaunchCore.JavaModule.Java.JavaRuntime},PixanKit.LaunchCore.GameModule.Game.GameBase)">
+            <summary>
+            This function will choose the latest JavaRuntime
+            according to its major version
+            </summary>
+            <param name="runtimes">A collection of Java runtimes</param>
+            <param name="game">The game that is needed to launch</param>
+            <returns>
+            The JavaRuntime instance which is in the collection and 
+            matches the requirement.<br/>
+            If no JavaRuntime fits, it will return <c>null</c>
+            </returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.JavaModule.JavaChooser.Newest(System.Collections.Generic.IEnumerable{PixanKit.LaunchCore.JavaModule.Java.JavaRuntime})">
+            <summary>
+            This function will choose the latest JavaRuntime
+            according to its major version
+            </summary>
+            <param name="runtimes">A collection of Java runtimes</param>
+            <returns>
+            The JavaRuntime instance which is in the collection and 
+            matches the requirement.<br/>
+            If no JavaRuntime fits, it will return <c>null</c>
+            </returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Json.IToJson">
+            <summary>
+            Defines a method to convert an object to a JSON representation.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.IToJson.LoadFromJson(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Load the data from a JSON object
+            </summary>
+            <param name="obj">The JSON object</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.IToJson.ToJson">
+            <summary>
+            Converts the implementing object to a JSON object.
+            </summary>
+            <returns>A <see cref="T:Newtonsoft.Json.Linq.JObject"/> representing the object's data.</returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Json.Json">
+            <summary>
+            This class implements some methods that helps read the json
+            and merge the json
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Json.ReadFromFile(System.String)">
+            <summary>
+            The method reads the JSON data from file
+            </summary>
+            <remarks>File should start with '{' and end with '}'</remarks>
+            <param name="file">The path of the JSON file</param>
+            <returns>The JSON data</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Json.SaveFile(System.String,Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            The method saves the JObject to the file
+            </summary>
+            <param name="file">the exact path of the file</param>
+            <param name="obj">the JObject JSON data</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Json.MergeJObject(Newtonsoft.Json.Linq.JObject,Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            The method merges the 2 JObjects.
+            The result will be stored in target
+            </summary>
+            <param name="target">the target JSON data</param>
+            <param name="needtomerge">the JSON data that needs to merge to the target</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Json.MergeJArray(Newtonsoft.Json.Linq.JArray,Newtonsoft.Json.Linq.JArray)">
+            <summary>
+            The method merges the 2 JArrays.
+            It will append the needtomerge array at the end of target array
+            </summary>
+            <param name="target">The target JArray</param>
+            <param name="needtomerge">The array that needs to append</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Json.TryGetValue``1(Newtonsoft.Json.Linq.JObject,System.Func{Newtonsoft.Json.Linq.JToken,``0},System.String,``0@)">
+            <summary>
+            Tries to get a value from the JObject at the specified path and formats it.
+            </summary>
+            <typeparam name="T">The type of the value to be returned.</typeparam>
+            <param name="obj">The JObject to search.</param>
+            <param name="format">The function to format the JToken to the desired type.</param>
+            <param name="path">The path to the value in the JObject.</param>
+            <param name="output">The output value if found and formatted successfully.</param>
+            <returns>True if the value was found and formatted successfully, otherwise false.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Json.GetValue``1(Newtonsoft.Json.Linq.JObject,System.Func{Newtonsoft.Json.Linq.JToken,``0},System.String)">
+            <summary>
+            Gets a value from the JObject at the specified path and formats it.
+            </summary>
+            <typeparam name="T">The type of the value to be returned.</typeparam>
+            <param name="obj">The JObject to search.</param>
+            <param name="format">The function to format the JToken to the desired type.</param>
+            <param name="path">The path to the value in the JObject.</param>
+            <returns>The formatted value.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if the path is not found in the JObject.</exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Json.GetOrDefault``1(Newtonsoft.Json.Linq.JObject,System.Func{Newtonsoft.Json.Linq.JToken,``0},System.String,``0)">
+            <summary>
+            Gets a value from the JObject at the specified path and formats it, or returns a default value if the path is not found.
+            </summary>
+            <typeparam name="T">The type of the value to be returned.</typeparam>
+            <param name="obj">The JObject to search.</param>
+            <param name="format">The function to format the JToken to the desired type.</param>
+            <param name="path">The path to the value in the JObject.</param>
+            <param name="defaultVal">The default value to return if the path is not found.</param>
+            <returns>The formatted value or the default value.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Json.GetFromPath(Newtonsoft.Json.Linq.JObject,System.String)">
+            <summary>
+            Gets a JToken from the JObject at the specified path.
+            </summary>
+            <param name="obj">The JObject to search.</param>
+            <param name="path">The path to the value in the JObject.</param>
+            <returns>The JToken at the specified path, or null if not found.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Json.GetFromPathCheck(Newtonsoft.Json.Linq.JObject,System.String)">
+            <summary>
+            Retrieves a <see cref="T:Newtonsoft.Json.Linq.JToken"/> from the specified JSON path. 
+            Throws an exception if the token does not exist.
+            </summary>
+            <param name="obj">The <see cref="T:Newtonsoft.Json.Linq.JObject"/> to search within.</param>
+            <param name="path">The JSON path to the desired token.</param>
+            <returns>The retrieved <see cref="T:Newtonsoft.Json.Linq.JToken"/>.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if the token does not exist at the specified path.</exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Json.ConvertTo``1(Newtonsoft.Json.Linq.JToken,System.Func{Newtonsoft.Json.Linq.JToken,``0},``0)">
+            <summary>
+            Converts a <see cref="T:Newtonsoft.Json.Linq.JToken"/> to the specified type. 
+            Returns a default value if the token is null.
+            </summary>
+            <typeparam name="T">The target type.</typeparam>
+            <param name="token">The <see cref="T:Newtonsoft.Json.Linq.JToken"/> to convert, which can be null.</param>
+            <param name="format">A conversion function that transforms the <see cref="T:Newtonsoft.Json.Linq.JToken"/> into the target type.</param>
+            <param name="defaultVal">The default value to return if the token is null.</param>
+            <returns>The converted value, or the default value if the token is null.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Json.ToList``1(Newtonsoft.Json.Linq.JArray,System.Func{Newtonsoft.Json.Linq.JToken,``0})">
+            <summary>
+            Converts a <see cref="T:Newtonsoft.Json.Linq.JArray"/> to a <see cref="T:System.Collections.Generic.List`1"/>.
+            </summary>
+            <typeparam name="T">The type of elements in the resulting list.</typeparam>
+            <param name="array">The <see cref="T:Newtonsoft.Json.Linq.JArray"/> to convert.</param>
+            <param name="format">A function that converts each <see cref="T:Newtonsoft.Json.Linq.JToken"/> to <typeparamref name="T"/>.</param>
+            <returns>A <see cref="T:System.Collections.Generic.List`1"/> containing the converted elements.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Json.PathToKey(System.String)">
+            <summary>
+            Converts a path to a key by replacing slashes with colons.
+            </summary>
+            <param name="path"></param>
+            <returns></returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Json.Format">
+            <summary>
+            This class provides some functions that converts JToken
+            to other classes
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Format.ToString(Newtonsoft.Json.Linq.JToken)">
+            <summary>
+            Converts the JToken to string
+            </summary>
+            <param name="tok">The token that needed to convert</param>
+            <returns>the result of convert</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Format.ToInt32(Newtonsoft.Json.Linq.JToken)">
+            <summary>
+            Converts a <see cref="T:Newtonsoft.Json.Linq.JToken"/> to an <see cref="T:System.Int32"/>.
+            </summary>
+            <param name="tok">The <see cref="T:Newtonsoft.Json.Linq.JToken"/> to convert.</param>
+            <returns>The integer value of the token.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if the token is not of type <see cref="F:Newtonsoft.Json.Linq.JTokenType.Integer"/>.</exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Format.ToDateTime(Newtonsoft.Json.Linq.JToken)">
+            <summary>
+            Converts a <see cref="T:Newtonsoft.Json.Linq.JToken"/> to a <see cref="T:System.DateTime"/>.
+            </summary>
+            <param name="tok">The <see cref="T:Newtonsoft.Json.Linq.JToken"/> to convert.</param>
+            <returns>The <see cref="T:System.DateTime"/> value of the token.</returns>
+            <exception cref="T:System.FormatException">Thrown if the token cannot be parsed as a valid date-time string.</exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Format.ToBool(Newtonsoft.Json.Linq.JToken)">
+            <summary>
+            Converts a <see cref="T:Newtonsoft.Json.Linq.JToken"/> to a <see cref="T:System.Boolean"/>.
+            </summary>
+            <param name="tok">The <see cref="T:Newtonsoft.Json.Linq.JToken"/> to convert.</param>
+            <returns>The boolean value of the token.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if the token is not of type <see cref="F:Newtonsoft.Json.Linq.JTokenType.Boolean"/>.</exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Format.ToDouble(Newtonsoft.Json.Linq.JToken)">
+            <summary>
+            Converts a <see cref="T:Newtonsoft.Json.Linq.JToken"/> to a <see cref="T:System.Double"/>.
+            </summary>
+            <param name="tok">The <see cref="T:Newtonsoft.Json.Linq.JToken"/> to convert.</param>
+            <returns>The double value of the token.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if the token is not of type <see cref="F:Newtonsoft.Json.Linq.JTokenType.Float"/>.</exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Format.ToJObject(Newtonsoft.Json.Linq.JToken)">
+            <summary>
+            Converts a <see cref="T:Newtonsoft.Json.Linq.JToken"/> to a <see cref="T:Newtonsoft.Json.Linq.JObject"/>.
+            </summary>
+            <param name="tok">The <see cref="T:Newtonsoft.Json.Linq.JToken"/> to convert.</param>
+            <returns>The <see cref="T:Newtonsoft.Json.Linq.JObject"/> representation of the token.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if the token is not of type <see cref="F:Newtonsoft.Json.Linq.JTokenType.Object"/>.</exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Json.Format.ToJArray(Newtonsoft.Json.Linq.JToken)">
+            <summary>
+            Converts a <see cref="T:Newtonsoft.Json.Linq.JToken"/> to a <see cref="T:Newtonsoft.Json.Linq.JArray"/>.
+            </summary>
+            <param name="tok">The <see cref="T:Newtonsoft.Json.Linq.JToken"/> to convert.</param>
+            <returns>The <see cref="T:Newtonsoft.Json.Linq.JArray"/> representation of the token.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if the token is not of type <see cref="F:Newtonsoft.Json.Linq.JTokenType.Array"/>.</exception>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Logger.Logger">
+            <summary>
+            Logger Output Class
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Logger.Logger.Output">
+            <summary>
+            The output of the logger. The logger will use this writer for log
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Logger.Logger.Info(System.String,System.String)">
+            <summary>
+            Add A Info Message
+            </summary>
+            <param name="from">The Package Name</param>
+            <param name="message">The Message</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Logger.Logger.Warn(System.String,System.String)">
+            <summary>
+            Add A Warn Message
+            </summary>
+            <param name="from">The Package Name</param>
+            <param name="message">The Message</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Logger.Logger.Error(System.String,System.String)">
+            <summary>
+            Add An Error Message
+            </summary>
+            <param name="from">The Package Name</param>
+            <param name="message">The Message</param>
+        </member>
+        <member name="T:PixanKit.LaunchCore.PlayerModule.MojangAPI.MojangLogin">
+            <summary>
+            This class implements the Microsoft OAuth authorization code login functionality.
+            </summary>
+            <remarks>
+            Microsoft has changed the login verification method. You need to register an application on Azure and obtain a Client ID.<br/>
+            Before performing the login operation, you must provide your Client ID and Redirect URL.<br/>
+            Since the developer does not have the time and resources to apply for a Client ID
+            and request application approval from Mojang, this class has not been tested.
+            We sincerely ask developers to help with testing.<br/>
+            The good news is that before Mojang changes the 
+            <see href="https://help.minecraft.net/hc/en-us/articles/16254801392141">application approval process</see>,
+            this class should work as expected.<br/>
+            </remarks>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.MojangAPI.MojangLogin.GetMsToken(System.String)">
+            <summary>
+            Verify Microsoft Account From The Code
+            </summary>
+            <param name="code">
+            The Code From The Browser<br/>
+            For example: 
+            <see href="https://login.live.com/oauth20_desktop.srf?code=M.C529_BL2.2.U.AAAAAAAAAAAAAAAAA...."/> 
+            Code:M.C529_BL2.2.U.AAAAAAAAAAAAAAAAA
+            </param>
+            <returns>
+            <see cref="T:PixanKit.LaunchCore.Server.Servers.Microsoft.MsLoginServer.MsAuthorize"/>
+            </returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.MojangAPI.MojangLogin.RefreshMsToken(System.String)">
+            <summary>
+            Refresh MS Token
+            </summary>
+            <param name="refreshtoken">
+            <see cref="P:PixanKit.LaunchCore.Server.Servers.Microsoft.MsLoginServer.MsAuthorize.MSrefreshToken"/>
+            </param>
+            <returns>
+            <see cref="T:PixanKit.LaunchCore.Server.Servers.Microsoft.MsLoginServer.MsAuthorize"/></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.MojangAPI.MojangLogin.XBoxAuthorize(System.String)">
+            <summary>
+            Get XBOX Authorize
+            </summary>
+            <param name="mSaccessToken">
+            <see cref="P:PixanKit.LaunchCore.Server.Servers.Microsoft.MsLoginServer.MsAuthorize.MSaccessToken"/></param>
+            <returns>
+            <see cref="T:PixanKit.LaunchCore.Server.Servers.Microsoft.XboxServer.XboxAuthorize"/></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.MojangAPI.MojangLogin.XstsVerification(System.String)">
+            <summary>
+            XSTS Verification Process
+            </summary>
+            <param name="xboxToken"><see cref="P:PixanKit.LaunchCore.Server.Servers.Microsoft.XboxServer.XboxAuthorize.Xboxtoken"/></param>
+            <returns><see cref="T:PixanKit.LaunchCore.Server.Servers.Microsoft.XstsServer.XstsVerification"/></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.MojangAPI.MojangLogin.MinecraftAccessToken(PixanKit.LaunchCore.Server.Servers.Microsoft.XstsServer.XstsVerification)">
+            <summary>
+            Get The Minecraft AccessToken
+            </summary>
+            <param name="verification"></param>
+            <returns>The Minecraft AccessToken</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.MojangAPI.MojangLogin.MinecraftUid(System.String)">
+            <summary>
+            Get uuid,Name And Skin url
+            </summary>
+            <param name="accessToken">Minecraft Access Token</param>
+            <returns><see cref="T:PixanKit.LaunchCore.Server.Servers.Mojang.MojangLoginServer.PlayerInf"/></returns>
+            <exception cref="T:System.InvalidOperationException">If The User Has Not Bought Minecraft Yet, The Exception Will Be Thrown</exception>
+        </member>
+        <member name="T:PixanKit.LaunchCore.PlayerModule.MojangAPI.MojangSkin">
+            <summary>
+            Skin Class For Launchers To Change The Skin
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.MojangAPI.MojangSkin.Delete(PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer)">
+            <summary>
+            Change the skin to steve/alex
+            </summary>
+            <param name="player"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.MojangAPI.MojangSkin.Upload(PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer,System.String,System.Boolean)">
+            <summary>
+            Upload the skin
+            </summary>
+            <param name="player"></param>
+            <param name="skinPath"></param>
+            <param name="slim"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.MojangAPI.MojangSkin.GetCapeUrl(PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer)">
+            <summary>
+            Get The Cape Code
+            </summary>
+            <param name="player"></param>
+            <returns></returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer">
+            <summary>
+            Represents a Microsoft account player in the Minecraft environment.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer.LatestLoginTime">
+            <summary>
+            Gets the latest login time. Re-login is required after 1 day.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer.SkinUrl">
+            <summary>
+            Gets the URL of the player's skin. Different images correspond to different URLs.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer.CapeUrl">
+            <summary>
+            Gets the URL of the player's cape.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer.SkinCachePath">
+            <summary>
+            Gets the local cache path of the skin. It automatically updates if the <see cref="P:PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer.SkinUrl"/> changes.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer.#ctor(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer"/> class using JSON data.
+            </summary>
+            <param name="jData">The JSON data representing the player.</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer"/> class for internal use.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer.Login(System.String)">
+            <summary>
+            Logs in a player using a login code.
+            </summary>
+            <param name="loginCode">The login code for Microsoft authentication.</param>
+            <returns>A task representing the asynchronous operation, with a <see cref="T:PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer"/> as the result.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer.ReLogin">
+            <summary>
+            Re-logs in the player using the refresh token.
+            </summary>
+            <returns>A task representing the asynchronous operation.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer.RefreshSkinCache">
+            <summary>
+            Refreshes the local skin cache.
+            </summary>
+            <returns>A task representing the asynchronous operation.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer.LoadFromJson(Newtonsoft.Json.Linq.JObject)">
+            <inheritdoc/>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.MicrosoftPlayer.ToJson">
+            <summary>
+            Converts the player's data to a JSON object.
+            </summary>
+            <returns>A <see cref="T:Newtonsoft.Json.Linq.JObject"/> representing the player's data.</returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.PlayerModule.Player.OfflinePlayer">
+            <summary>
+            Represents an offline player in the Minecraft environment.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.PlayerModule.Player.OfflinePlayer.Uid">
+            <summary>
+            Gets the unique identifier (UID) for the offline player.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.PlayerModule.Player.OfflinePlayer.AccessToken">
+            <summary>
+            Gets the access token for the offline player, which is the same as the UID.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.OfflinePlayer.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.LaunchCore.PlayerModule.Player.OfflinePlayer"/> class with a specified name.
+            </summary>
+            <param name="name">The name of the player.</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.OfflinePlayer.#ctor(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.LaunchCore.PlayerModule.Player.OfflinePlayer"/> class with JSON data.
+            </summary>
+            <param name="jData">The JSON data representing the player.</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.OfflinePlayer.SetName(System.String)">
+            <summary>
+            Sets the name of the offline player.
+            </summary>
+            <param name="name"></param>
+        </member>
+        <member name="T:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase">
+            <summary>
+            Represents a base class for a player in the Minecraft environment.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase.Name">
+            <summary>
+            Gets the player's name. Necessary for launch.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase.Uid">
+            <summary>
+            Gets the player's unique identifier (UID). Necessary for launch.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase.AccessToken">
+            <summary>
+            Gets the player's access token for verification. Necessary for launch.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase.LoginType">
+            <summary>
+            Gets the player's login type.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase._uid">
+            <summary>
+            The player's unique identifier.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase._name">
+            <summary>
+            The player's name.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase.Type">
+            <summary>
+            The player's login type.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase._accessToken">
+            <summary>
+            The player's Mojang access token.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase._refreshToken">
+            <summary>
+            The player's Microsoft refresh token.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase.LastLogin">
+            <summary>
+            The last login time of the player.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase.#ctor(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase"/> class with the specified JSON data.
+            </summary>
+            <param name="jData">The JSON data of a player.</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase"/> class.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase.InlinePlayer(System.String)">
+            <summary>
+            Inlines the player's data into a command string.
+            </summary>
+            <param name="arg">The command string.</param>
+            <returns>The command string with the player's data inlined.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase.SamePlayer(PixanKit.LaunchCore.PlayerModule.Player.PlayerBase,PixanKit.LaunchCore.PlayerModule.Player.PlayerBase)">
+            <summary>
+            Determines whether two players are the same.
+            </summary>
+            <param name="player1">The first player.</param>
+            <param name="player2">The second player.</param>
+            <returns><c>true</c> if the players are the same; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase.op_Equality(PixanKit.LaunchCore.PlayerModule.Player.PlayerBase,PixanKit.LaunchCore.PlayerModule.Player.PlayerBase)">
+            <summary>
+            Determines whether two <see cref="T:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase"/> objects are equal.
+            </summary>
+            <param name="player1">The first player.</param>
+            <param name="player2">The second player.</param>
+            <returns><c>true</c> if the players are equal; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase.op_Inequality(PixanKit.LaunchCore.PlayerModule.Player.PlayerBase,PixanKit.LaunchCore.PlayerModule.Player.PlayerBase)">
+            <summary>
+            Determines whether two <see cref="T:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase"/> objects are not equal.
+            </summary>
+            <param name="player1">The first player.</param>
+            <param name="player2">The second player.</param>
+            <returns><c>true</c> if the players are not equal; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase.GetHashCode">
+            <summary>
+            Gets a hash code for the player.
+            </summary>
+            <returns>A hash code for the player.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase.Equals(System.Object)">
+            <summary>
+            Determines whether the specified object is equal to the current player.
+            </summary>
+            <param name="obj">The object to compare with the current player.</param>
+            <returns><c>true</c> if the specified object is equal to the current player; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase.LoadFromJson(Newtonsoft.Json.Linq.JObject)">
+            <inheritdoc/>
+        </member>
+        <member name="M:PixanKit.LaunchCore.PlayerModule.Player.PlayerBase.ToJson">
+            <summary>
+            Converts the player's data to a JSON object.
+            </summary>
+            <returns>A <see cref="T:Newtonsoft.Json.Linq.JObject"/> representing the player's data.</returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.PlayerModule.Player.PlayerType">
+            <summary>
+            Player Login Type
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.PlayerModule.Player.PlayerType.Microsoft">
+            <summary>
+            Microsoft Login
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.PlayerModule.Player.PlayerType.Offline">
+            <summary>
+            Offline Login
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.PlayerModule.Player.PlayerType.Yggdrasil">
+            <summary>
+            Third-Party Yggdrasil Server
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Server.MirrorServer">
+            <summary>
+            Mirror Server
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Server.MirrorServer.OriginalUrl">
+            <summary>
+            The Vanilla base url of the network assets
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Server.MirrorServer.BaseUrl">
+            <summary>
+            The base url of the network assets. It will replace the base url
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.MirrorServer.#ctor">
+            <summary>
+            Initor But Do Nothing. Do Not Use That
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.MirrorServer.#ctor(System.String,System.String)">
+            <summary>Initor</summary>
+             <param name="originalUrl">The Url Part That Needs To Replace(If No, Make It "")</param>
+             <param name="replacedUrl">The Url That Replacing(Include https://)</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.MirrorServer.Replace(System.String)">
+            <summary>
+            Replace The URL
+            </summary>
+            <param name="url">The Vanilla URL</param>
+            <returns>The Replaced URL</returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Server.ResourceServer">
+            <summary>
+            Represents an abstract resource server that manages mirror servers
+            and handles server selection based on ping times.
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Server.ResourceServer.Mirrors">
+            <summary>
+            The list of available mirror servers.
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.ResourceServer.Current">
+            <summary>
+            Current Mirror Server
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.ResourceServer.UpdateIndex">
+            <summary>
+            Selects the best mirror server from the list based on ping times.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.ResourceServer.UpdateIndex(System.Int32)">
+            <summary>
+            Selects a specific mirror server from the list based on its index.
+            </summary>
+            <param name="index">The index of the server in the <see cref="F:PixanKit.LaunchCore.Server.ResourceServer.Mirrors"/> list.</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.ResourceServer.Ping">
+            <summary>
+            Gets the ping time for the current mirror server.
+            </summary>
+            <returns>The round-trip time in milliseconds to ping the current server, or -1 if the ping fails.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.ResourceServer.GetPing(System.String)">
+            <summary>
+            Gets the ping time for a specific server URL.
+            </summary>
+            <param name="url">The URL of the server to ping. The method will automatically extract the host from the URL.</param>
+            <returns>The round-trip time in milliseconds to ping the server, or -1 if the ping fails.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.ResourceServer.Add(PixanKit.LaunchCore.Server.MirrorServer)">
+            <summary>
+            Adds a new mirror server to the list of available servers.
+            </summary>
+            <param name="server">The <see cref="T:PixanKit.LaunchCore.Server.MirrorServer"/> to add.</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.ResourceServer.Replace(System.String)">
+            <summary>
+            Replaces the Vanilla URL of a resource with the corresponding URL from the current mirror server.
+            </summary>
+            <param name="originalUrl">The Vanilla URL of the resource.</param>
+            <returns>The URL of the resource on the current mirror server.</returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Server.ServerList">
+            <summary>
+            Collection Of Servers
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Server.ServerList.MicrosoftLoginServer">
+            <summary>
+            Server Instance For Microsoft Account
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Server.ServerList.XboxLoginServer">
+            <summary>
+            Server Instance For XBox
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Server.ServerList.XstsServer">
+            <summary>
+            Server Instance For XSTS
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Server.ServerList.MojangLoginServer">
+            <summary>
+            Server Instance For Mojang Account
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Server.ServerList.MinecraftVersionServer">
+            <summary>
+            Server Instance For Minecraft Versions
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Server.ServerList.MinecraftAssetsServer">
+            <summary>
+            Server Instance For Minecraft Assets
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Server.ServerList.ModLoaderServers">
+            <summary>
+            The list of <see cref="T:PixanKit.LaunchCore.Server.Servers.ModLoader.ModLoaderServer"/>. The keys are the name of the mod loaders
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Server.Servers.Microsoft.MsLoginServer">
+            <summary>
+            The Microsoft Certification Server
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Server.Servers.Microsoft.MsLoginServer.ClientId">
+             <summary>
+             The Azure Client ID
+             <br/>
+             Developers have to apply for an 
+            <see href="https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps">Azure Client ID</see>
+             before publishing.
+             <br/>
+             <seealso href="https://help.minecraft.net/hc/en-us/articles/16254801392141">Java Game Service API</seealso>
+             </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Server.Servers.Microsoft.MsLoginServer.RedirectUrl">
+            <summary>
+            The Redirect URI
+            <br/>
+            this will not be redirected during certification process
+            <br/>
+            Default is https://localhost:8080<br/>
+            <seealso href="https://help.minecraft.net/hc/en-us/articles/16254801392141">Java Game Service API</seealso>
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Server.Servers.Microsoft.MsLoginServer.MsAuthorize">
+            <summary>
+            The Record Class For Microsoft Login
+            </summary>
+            <param name="MSaccessToken">accesstoken From Microsoft</param>
+            <param name="MSrefreshToken">refreshtoken From Microsoft</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Microsoft.MsLoginServer.MsAuthorize.#ctor(System.String,System.String)">
+            <summary>
+            The Record Class For Microsoft Login
+            </summary>
+            <param name="MSaccessToken">accesstoken From Microsoft</param>
+            <param name="MSrefreshToken">refreshtoken From Microsoft</param>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Microsoft.MsLoginServer.MsAuthorize.MSaccessToken">
+            <summary>accesstoken From Microsoft</summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Microsoft.MsLoginServer.MsAuthorize.MSrefreshToken">
+            <summary>refreshtoken From Microsoft</summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Microsoft.MsLoginServer.Client">
+            <summary>
+            The HTTP Client
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Microsoft.MsLoginServer.BaseUrl">
+            <summary>
+            The Base URL Of The Server
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Microsoft.MsLoginServer.Dispose">
+            <summary>
+            Dispose
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Microsoft.MsLoginServer.Finalize">
+            <summary>
+            Finalizer
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Server.Servers.Microsoft.XboxServer">
+            <summary>
+            XBOX Authorize Server
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Server.Servers.Microsoft.XboxServer.XboxAuthorize">
+            <summary>
+            The XBox Authorize Record Class
+            </summary>
+            <param name="Xboxtoken">XBox token</param>
+            <param name="UserHash">User Hash Used To Verify The User's Ientity</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Microsoft.XboxServer.XboxAuthorize.#ctor(System.String,System.String)">
+            <summary>
+            The XBox Authorize Record Class
+            </summary>
+            <param name="Xboxtoken">XBox token</param>
+            <param name="UserHash">User Hash Used To Verify The User's Ientity</param>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Microsoft.XboxServer.XboxAuthorize.Xboxtoken">
+            <summary>XBox token</summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Microsoft.XboxServer.XboxAuthorize.UserHash">
+            <summary>User Hash Used To Verify The User's Ientity</summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Microsoft.XboxServer.Client">
+            <summary>
+            The HTTP Client
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Microsoft.XboxServer.BaseUrl">
+            <summary>
+            The Base URL
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Microsoft.XboxServer.Dispose">
+            <summary>
+            Dispose The Client
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Microsoft.XboxServer.Finalize">
+            <summary>
+            Finalizer
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Server.Servers.Microsoft.XstsServer">
+            <summary>
+            XSTS Verification Server
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Server.Servers.Microsoft.XstsServer.XstsVerification">
+            <summary>
+            The Record Class For XSTS Verify Result
+            </summary>
+            <param name="Xststoken">The XSTS Token</param>
+            <param name="UserHash">User Hash</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Microsoft.XstsServer.XstsVerification.#ctor(System.String,System.String)">
+            <summary>
+            The Record Class For XSTS Verify Result
+            </summary>
+            <param name="Xststoken">The XSTS Token</param>
+            <param name="UserHash">User Hash</param>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Microsoft.XstsServer.XstsVerification.Xststoken">
+            <summary>The XSTS Token</summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Microsoft.XstsServer.XstsVerification.UserHash">
+            <summary>User Hash</summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Microsoft.XstsServer.Client">
+            <summary>
+            The HTTP Client
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Microsoft.XstsServer.BaseUrl">
+            <summary>
+            Base URL Of The Server
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Microsoft.XstsServer.Dispose">
+            <summary>
+            Dispose The Client
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Microsoft.XstsServer.Finalize">
+            <summary>
+            Finalizer
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Server.Servers.ModLoader.ModLoaderMirror">
+            <summary>
+            Represents an abstract base class for a mod loader mirror server.
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.ModLoader.ModLoaderMirror.CheckBuild(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Checks whether the builds exist for a specific Minecraft version.
+            </summary>
+            <param name="mcversion">The Minecraft version to check builds for.</param>
+            <param name="token">A cancellation token to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the builds exist.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.ModLoader.ModLoaderMirror.GetBuild(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the build list for a specific Minecraft version.
+            </summary>
+            <param name="mcversion">The Minecraft version to retrieve builds for.</param>
+            <param name="token">A cancellation token to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains a JSON array of mod loader versions.</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.ModLoader.ModLoaderMirror.GetUrl(Newtonsoft.Json.Linq.JObject,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the URL of the mod loader installer.
+            </summary>
+            <param name="modloaderinf">A JSON object containing mod loader information.</param>
+            <param name="token">A cancellation token to cancel the operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the URL of the mod loader installer.</returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Server.Servers.ModLoader.ModLoaderServer">
+            <summary>
+            Server Layer For Mod Loader Installer
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.ModLoader.ModLoaderServer.Current">
+            <summary>
+            Current Server
+            </summary>
+        </member>
+        <member name="F:PixanKit.LaunchCore.Server.Servers.ModLoader.ModLoaderServer.Name">
+            <summary>
+            The Name Of The Mo Loader
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.ModLoader.ModLoaderServer.#ctor(System.String)">
+            <summary>
+            Init A Mod Loader Server
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.ModLoader.ModLoaderServer.CheckBuild(System.String)">
+            <summary>
+            Check Whether Minecraft Version Is Supported
+            </summary>
+            <param name="minecraftversion"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.ModLoader.ModLoaderServer.CheckBuild(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Check Whether Minecraft Version Is Supported
+            </summary>
+            <param name="cancellationToken">Cancel Token</param>
+            <param name="minecraftversion"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.ModLoader.ModLoaderServer.GetUrl(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Get The URL Of The Mod Loader Installer
+            </summary>
+            <param name="modloaderinf"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.ModLoader.ModLoaderServer.GetUrl(Newtonsoft.Json.Linq.JObject,System.Threading.CancellationToken)">
+            <summary>
+            Get the URL of the mod loader installer.
+            This is a cancellable task
+            </summary>
+            <param name="modloaderinf">the modloader JSON data</param>
+            <param name="token">token</param>
+            <returns>the specific url of the installer</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.ModLoader.ModLoaderServer.GetVersionsForMinecraft(System.String)">
+            <summary>
+            Get The Modloader Versions That Are Suitable For The Minecraft Version
+            </summary>
+            <param name="minecraftversion">Minecraft Version</param>
+            <returns>List Of The ModLoader Versions</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.ModLoader.ModLoaderServer.GetVersionsForMinecraft(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Get suitable versions for supported Minecraft version
+            </summary>
+            <param name="minecraftversion">the version of Minecraft</param>
+            <param name="token">the cancellation token</param>
+            <returns>the list that contains the information of the modloaders</returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftAssetsServer">
+            <summary>
+            Assets Server Abstraction Download Assets From The Server
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftAssetsServer.#ctor">
+            <summary>
+            Initor With 1 Default Official Server
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftAssetsServer.GetAssetsUrl(System.String)">
+            <summary>
+            Get The URL Of The Asset
+            </summary>
+            <param name="hash">{"hash":"This is the hash parameter", "size":8964}</param>
+            <returns>The URL</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftAssetsServer.GetAssetsUrl(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Get The URL Of The Assets
+            </summary>
+            <param name="jData"></param>
+            <returns>The URL Of The Asset</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftAssetsServer.GetFileLocation(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Get The Target Location Of The Asset File
+            </summary>
+            <param name="jData"></param>
+            <returns></returns>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftVersionServer">
+            <summary>
+            Mirror Servers For Minecraft Version Resources
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftVersionServer.#ctor">
+            <summary>
+            Init A MinecraftVersionServer
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftVersionServer.GetVersionsAsync(System.Threading.CancellationToken)">
+            <summary>
+            Get The Versions from the Mojang server.
+            After called, the cache will be saved for 1 day
+            </summary>
+            <returns>The JArray that contains every version</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftVersionServer.GetVersions">
+            <summary>
+            Get The Versions from the Mojang server.
+            After called, the cache will be saved for 1 day
+            </summary>
+            <returns>The JArray that contains every version</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftVersionServer.GetVersions(System.Threading.CancellationToken)">
+            <summary>
+            Get the version from the Mojang Server
+            </summary>
+            <param name="token"></param>
+            <returns></returns>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftVersionServer.GetLatestRelease(Newtonsoft.Json.Linq.JArray)">
+            <summary>
+            Get the latest release from the JArray that contains all the versions
+            </summary>
+            <param name="jArray">The return from GetVersions</param>
+            <returns>JObject from the JArray returned by GetVersions</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftVersionServer.GetLatestSnapshot(Newtonsoft.Json.Linq.JArray)">
+            <summary>
+            Get the latest Snapshot from the JArray that contains all the versions
+            </summary>
+            <param name="jArray">The return from GetVersions</param>
+            <returns>JObject from the JArray returned by GetVersions</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftVersionServer.GetLatestRelease(System.Threading.CancellationToken)">
+            <summary>
+            Get the latest release minecraft from the server
+            This is a cancellable task
+            </summary>
+            <param name="token"></param>
+            <returns>The JSON data of the minecraft</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftVersionServer.GetLatestSnapshot(System.Threading.CancellationToken)">
+            <summary>
+            Get the latest snapshot minecraft from the server
+            This is a cancellable task
+            </summary>
+            <param name="token"></param>
+            <returns>The JSON data of the minecraft</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftVersionServer.GetJsonUrl(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Get the URL of Json for Specific Minecraft Version
+            </summary>
+            <param name="jObject">The JObject from the Array returned by GetVersions
+            </param>
+            <returns>The URL for Json</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftVersionServer.GetMinecraftJarUrl(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Get the URL of Minecraft Jar File
+            </summary>
+            <param name="jObject">The Json Object parsed from the Json file for 
+            the specific Minecraft Version</param>
+            <returns>The URL</returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftVersionServer.GetAssetsJsonUrl(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Get The URL Of Json For Assets
+            </summary>
+            <param name="jObject">Official Json For Specific Version</param>
+            <returns>The URL</returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MinecraftVersionServer.Update(System.Threading.CancellationToken)">
+            <summary>
+            Update The Cache
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Server.Servers.Mojang.MojangLoginServer">
+            <summary>
+            Mojang Login Server
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.Server.Servers.Mojang.MojangLoginServer.PlayerInf">
+            <summary>
+            The Record Class For Player Information
+            </summary>
+            <param name="Uid">Player ID</param>
+            <param name="Name">Player Name</param>
+            <param name="SkinUrl">Player Skin</param>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MojangLoginServer.PlayerInf.#ctor(System.String,System.String,System.String)">
+            <summary>
+            The Record Class For Player Information
+            </summary>
+            <param name="Uid">Player ID</param>
+            <param name="Name">Player Name</param>
+            <param name="SkinUrl">Player Skin</param>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Mojang.MojangLoginServer.PlayerInf.Uid">
+            <summary>Player ID</summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Mojang.MojangLoginServer.PlayerInf.Name">
+            <summary>Player Name</summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Mojang.MojangLoginServer.PlayerInf.SkinUrl">
+            <summary>Player Skin</summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Mojang.MojangLoginServer.BaseUrl">
+            <summary>
+            The Base URL Of The Server
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.Server.Servers.Mojang.MojangLoginServer.Client">
+            <summary>
+            The HTTP Client
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.Server.Servers.Mojang.MojangLoginServer.Dispose">
+            <summary>
+            Dispose The HTTP Client
+            </summary>
+        </member>
+        <member name="T:PixanKit.LaunchCore.SystemInf.SysInfo">
+            <summary>
+            Provides Information Like Operating System And Computer Architecture
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.SystemInf.SysInfo.OsName">
+            <summary>
+            Represents the name of the operating system<br/>
+            windows: Windows7 -> Latest Windows<br/>
+            linux: Ubuntu, Debian, Arch, ChromeOS, Fedora, RedHat...<br/>
+            osx: OSX, MacOS 11 -> Latest MacOS<br/>
+            unix: others<br/>
+            </summary>
+        </member>
+        <member name="P:PixanKit.LaunchCore.SystemInf.SysInfo.CpuArch">
+            <summary>
+            Represents the architecture of the cpu
+            <br/>
+            x86: x86 i386<br/>
+            x86_64: x86_64, AMD64<br/>
+            arm64: Arm64 AArch64 Arm_v8
+            arm: Arm A32
+            </summary>
+        </member>
+        <member name="M:PixanKit.LaunchCore.SystemInf.SysInfo.Shell">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.SystemInf.SysInfo.GetVarCmd(System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="key"></param>
+            <param name="val"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PixanKit.LaunchCore.SystemInf.SysInfo.GetAvailableMemSize">
+            <summary>
+            Gets the available memory size in megabytes.
+            </summary>
+            <returns>
+            A long value representing the available memory size in megabytes.
+            </returns>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.MyRegex_0">
+            <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the MyRegex method.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.MyRegex_0.Instance">
+            <summary>Cached, thread-safe singleton instance.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MyRegex_0.#ctor">
+            <summary>Initializes the instance.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory">
+            <summary>Provides a factory for creating <see cref="T:System.Text.RegularExpressions.RegexRunner"/> instances to be used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory.CreateInstance">
+            <summary>Creates an instance of a <see cref="T:System.Text.RegularExpressions.RegexRunner"/> used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory.Runner">
+            <summary>Provides the runner that contains the custom logic implementing the specified regular expression.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory.Runner.Scan(System.ReadOnlySpan{System.Char})">
+            <summary>Scan the <paramref name="inputSpan"/> starting from base.runtextstart for the next match.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory.Runner.TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Search <paramref name="inputSpan"/> starting from base.runtextpos for the next location a match could possibly start.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if a possible match was found; false if no more matches are possible.</returns>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory.Runner.TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Determine whether <paramref name="inputSpan"/> at base.runtextpos is a match for the regular expression.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if the regular expression matches at the current position; otherwise, false.</returns>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.Utilities">
+            <summary>Helper methods used by generated <see cref="T:System.Text.RegularExpressions.Regex"/>-derived implementations.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout">
+            <summary>Default timeout value set in <see cref="T:System.AppContext"/>, or <see cref="F:System.Text.RegularExpressions.Regex.InfiniteMatchTimeout"/> if none was set.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_hasTimeout">
+            <summary>Whether <see cref="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout"/> is non-infinite.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_indexOfString_0EB7C57F1E1613EE8D069A853AC87996AAC4AB66EE1DBD194489F3BEE08ED9A3">
+            <summary>Supports searching for the string "${".</summary>
+        </member>
+    </members>
+</doc>
