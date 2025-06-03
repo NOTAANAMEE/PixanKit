@@ -48,7 +48,7 @@ public class GamePostProcess(Folder folder, string name, string version, bool pr
         var merge = Json.ReadFromFile($"{_versionDir}/{_name}/{_name}.json");
 
         target.MergeJObject(merge);
-        Json.SaveFile(_name, target);
+        Json.SaveFile($"{_versionDir}{_name}/{_name}.json", target);
 
         Directory.Delete($"{_versionDir}/{_version}");
     }
@@ -71,7 +71,7 @@ public class GamePostProcess(Folder folder, string name, string version, bool pr
             if (!filename.StartsWith(loaderversion)) continue;
             var newName = filename.Replace(loaderversion, name);
             var destDirName = $"{Path.GetDirectoryName(entry)}/{newName}";
-            if (newName.EndsWith('/')) Directory.Move(entry, destDirName);
+            if (Directory.Exists(entry)) Directory.Move(entry, destDirName);
             else File.Move(entry, destDirName);
         }
         return folderpath;
