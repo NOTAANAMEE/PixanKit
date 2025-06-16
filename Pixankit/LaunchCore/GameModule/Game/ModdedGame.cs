@@ -1,6 +1,6 @@
 ﻿using PixanKit.LaunchCore.Core;
-using PixanKit.LaunchCore.GameModule.LibraryData;
 using PixanKit.LaunchCore.GameModule.Folders;
+using PixanKit.LaunchCore.GameModule.Library;
 
 namespace PixanKit.LaunchCore.GameModule.Game;
 
@@ -22,8 +22,11 @@ public class ModdedGame : CustomizedGame
 
     /// <inheritdoc/>
     public ModdedGame(string name, Folder folder,
-        GameParameter param, LibrariesRef libs):
-        base(name, folder, param, libs)
+        GameParameter baseParam,
+        GameParameter param, 
+        LibraryCollection baseLibrary,
+        LibraryCollection libraries):
+        base(name, folder, baseParam, param, baseLibrary, libraries)
     {
         GameType = GameType.Modded;
         SetModLoader(param);

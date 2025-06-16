@@ -1,5 +1,4 @@
-﻿using PixanKit.LaunchCore.GameModule.LibraryData;
-using PixanKit.LaunchCore.SystemInf;
+﻿using PixanKit.LaunchCore.SystemInf;
 
 namespace PixanKit.LaunchCore.GameModule.Game;
 
@@ -31,19 +30,16 @@ public abstract partial class GameBase
         
     protected virtual partial string GetCpArgs()
     {
-        var classpath = LibrariesRef.Libraries.Aggregate("", (current, library) => current + (library.LibraryPath + Localize.LocalParser));
-        classpath += GameJarFilePath;
+        var classpath = 
+            string.Join("${classpath_separator}", 
+                GetLibraries().Select(a => a.LibraryPath));
+        classpath += "${classpath_separator}" + GameJarFilePath;
         return classpath;
     }
-
-    internal static string GetCpArgs(IEnumerable<LibraryBase> libs)
-    {
-        return libs.Aggregate("", (current, library) => current + (library.LibraryPath + Localize.LocalParser));
-    }
         
-    public partial async Task Decompress()
-    {
-        await LibrariesRef.Extract(this.LibrariesDirPath, this.NativeDirPath);
-    }
+    //public partial async Task Decompress()
+    //{
+        //await LibrariesRef.Extract(this.LibrariesDirPath, this.NativeDirPath);
+    //}
     #endregion
 }

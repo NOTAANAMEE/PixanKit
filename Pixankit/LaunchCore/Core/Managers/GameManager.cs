@@ -3,8 +3,6 @@ using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule.Exceptions;
 using PixanKit.LaunchCore.GameModule.Folders;
 using PixanKit.LaunchCore.GameModule.Game;
-using PixanKit.LaunchCore.GameModule.LibraryData;
-using System.Diagnostics.CodeAnalysis;
 
 namespace PixanKit.LaunchCore.Core.Managers;
 
@@ -13,8 +11,6 @@ namespace PixanKit.LaunchCore.Core.Managers;
 /// </summary>
 public class GameManager
 {
-    private record GameParams(GameParameter Parameter, LibrariesRef Libraries);
-        
     #region Properties
     /// <summary>
     /// Gets the collection of folders managed by the launcher.
@@ -27,9 +23,9 @@ public class GameManager
     public GameBase? TargetGame { get; set; }
 
     private readonly List<Folder> _folders = [];
-        
-    private readonly Dictionary<string, GameParams> _gameRefs = [];
     #endregion
+
+    public static GameManager? Instance;
 
     #region Init
     /// <summary>
@@ -37,7 +33,7 @@ public class GameManager
     /// </summary>
     internal GameManager()
     {
-            
+        Instance = this;
     }
 
     /// <summary>
@@ -245,45 +241,19 @@ public class GameManager
             { "target", TargetGame?.GameJarFilePath?? "" }
         };
     }
-    #endregion
-
-    #region GetParams
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="param"></param>
-    /// <param name="libraries"></param>
-    /// <exception cref="Exception"></exception>
-    public void AddParam(GameParameter param, LibrariesRef libraries)
-    {
-        if (param.IsModified || _gameRefs.ContainsKey(param.Version)) 
-            throw new Exception();
-        _gameRefs.Add(param.Version, new GameParams(param, libraries));
-    }
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="version"></param>
-    /// <param name="param"></param>
-    /// <param name="libraries"></param>
     /// <returns></returns>
-    public bool TryGetParam(string version, 
-        [NotNullWhen(true)]out GameParameter? param, 
-        [NotNullWhen(true)]out LibrariesRef? libraries)
+    public GameBase? GetFirstGameByVersion(string version)
     {
-        if (_gameRefs.TryGetValue(version, out var p))
-        {
-            param = p.Parameter;
-            libraries = p.Libraries;
-            return true;
-        }
-        param = null;
-        libraries = null;
-        return false;
+        foreach (var game in _folders.SelectMany(folder => folder.Games))
+            if (game.Version == version && game is VanillaGame) 
+                return game;
+        return null;
     }
-
     #endregion
 
     #region Events

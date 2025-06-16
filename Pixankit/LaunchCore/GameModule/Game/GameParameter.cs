@@ -1,5 +1,5 @@
 using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.GameModule.LibraryData;
+using PixanKit.LaunchCore.GameModule.Library;
 using PixanKit.LaunchCore.Json;
 using System.Text;
 

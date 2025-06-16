@@ -2,8 +2,11 @@ using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Json;
 using PixanKit.LaunchCore.SystemInf;
 
-namespace PixanKit.LaunchCore.GameModule.LibraryData;
+namespace PixanKit.LaunchCore.GameModule.Library;
 
+/// <summary>
+/// Static class for library helper methods
+/// </summary>
 public static class LibraryHelper
 {
     /// <summary>
@@ -58,74 +61,5 @@ public static class LibraryHelper
             }
         }
         return [.. osSet];
-    }
-
-    /// <summary>
-    /// This is for judging which library type the library is
-    /// </summary>
-    /// <param name="jData"></param>
-    /// <returns></returns>
-    public static LibraryType GetLibraryType(JToken jData)
-    {
-        if (jData["natives"] != null) return LibraryData.LibraryType.Native;
-        if (jData["downloads"] != null) return LibraryData.LibraryType.Default;
-        return LibraryData.LibraryType.Mod;
-    }
-
-    /// <summary>
-    /// Get The Path Of The Library
-    /// </summary>
-    /// <param name="name">Name Like <c>"com.mojang:logging:1.4.9"</c></param>
-    /// <returns>Path Of The Library. Like 
-    /// <c>"/com/mojang/logging/1.4.9/logging-1.4.9.jar"</c></returns>
-    public static string GetPath(string name)
-    {
-        if (name.Contains('/')) return name;
-        var pathInf = name;
-        var strings = pathInf.Split(":");
-        strings[^1] = strings[^1].Replace(".jar", "");
-        return strings.Length switch
-        {
-            3 => $"{strings[0].Replace('.', '/')}/{strings[1]}/{strings[2]}/{strings[1]}-{strings[2]}.jar",
-            4 => $"{strings[0].Replace('.', '/')}/{strings[1]}/{strings[2]}/{strings[1]}-{strings[2]}-{strings[3]}.jar",
-            _ => name
-        };
-    }
-
-    private static string GetName(JObject jData)
-        => (jData["name"] ?? "").ToString();
-    
-    /// <summary>
-    /// Parses the library according to the JSON data
-    /// </summary>
-    /// <param name="jData">the JSON data of the object</param>
-    /// <param name="gamelibraries">The list of the library</param>
-    public static void AddLibrary(JObject jData, List<LibraryBase> gamelibraries)
-    {
-        if (!LibraryHelper.SystemSupport(jData)) return;
-        var type = LibraryHelper.GetLibraryType(jData);
-        LibraryBase? library;
-        if (type == LibraryType.Native)
-        {
-            DefaultLibrary.CreateInstance(jData, out library);
-            gamelibraries.Add(library);
-        }
-            
-        switch (type)
-        {
-            case LibraryData.LibraryType.Default:
-                DefaultLibrary.CreateInstance(jData, out library);
-                break;
-            case LibraryData.LibraryType.Native:
-                if (!NativeLibrary.CreateInstance(jData, out library)) return;
-                break;
-            case LibraryData.LibraryType.Mod:
-                LoaderLibrary.CreateInstance(jData, out library);
-                break;
-            default:
-                return;
-        }
-        gamelibraries.Add(library);
-        
     }
 }

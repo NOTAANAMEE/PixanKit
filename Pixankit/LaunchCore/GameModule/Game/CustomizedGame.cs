@@ -1,7 +1,5 @@
-﻿using PixanKit.LaunchCore.Core;
-using PixanKit.LaunchCore.GameModule.LibraryData;
-using PixanKit.LaunchCore.GameModule.Folders;
-using PixanKit.LaunchCore.SystemInf;
+﻿using PixanKit.LaunchCore.GameModule.Folders;
+using PixanKit.LaunchCore.GameModule.Library;
 
 namespace PixanKit.LaunchCore.GameModule.Game;
 
@@ -18,70 +16,52 @@ public class CustomizedGame : GameBase
     /// <summary>
     /// ThisParameter is the parameter from the local json.
     /// </summary>
-    protected GameParameter ThisParameter;
+    protected GameParameter BaseParameter;
         
     /// <summary>
     /// 
     /// </summary>
     /// <param name="name"></param>
     /// <param name="folder"></param>
+    /// <param name="baseParam"></param>
     /// <param name="param"></param>
-    /// <param name="libs"></param>
-    public CustomizedGame(string name, Folder folder, 
-        GameParameter param, LibrariesRef libs) : 
-        base(name, folder, param, libs)
+    /// <param name="baseLibrary"></param>
+    /// <param name="libraries"></param>
+    public CustomizedGame(string name, Folder folder,
+        GameParameter baseParam,
+        GameParameter param, 
+        LibraryCollection baseLibrary,
+        LibraryCollection libraries) :
+        base(name, folder, param, libraries)
     {
-        ThisParameter = param;
+        BaseParameter = baseParam;
         GameType = GameType.Customized;
+        this.baseLibrary = baseLibrary;
         _useBaseGeneration = param.ReliedArgs;
     }
 
-    private LibrariesRef? _libs;
-    private GameParameter? _gameArgs;
-
-    private GameParameter GetGameArgs()
-    {
-        if (_gameArgs != null) return _gameArgs;
-
-        if (!Launcher.Instance.GameManager.TryGetParam(Version,
-                out var param, out var libs))
-            throw new Exception();
-        _libs = libs;
-        _gameArgs = param;
-        return _gameArgs;
-    }
-        
-    private LibrariesRef GetLibrariesRef()
-    {
-        if (_libs != null) return _libs;
-
-        if(!Launcher.Instance.GameManager.TryGetParam(Version, 
-               out var param, out var libs)) 
-            throw new Exception();
-        _libs = libs;
-        _gameArgs = param;
-        return _libs;
-    }
-
-    /// <inheritdoc/>
-    protected override string GetAssetsId()
-    {
-        return _useBaseGeneration ? GetGameArgs().AssetsId : Params.AssetsId;
-    }
+    private LibraryCollection? baseLibrary;
 
     /// <inheritdoc/>
     protected override string GetArgument()
     {
         return _useBaseGeneration?
-            GetGameArgs().GameArgs + base.GetArgument() + GetGameArgs().GameArgs : 
+            Params.JavaArgs + BaseParameter.JavaArgs + 
+            $" {Params.MainClass} " + BaseParameter.GameArgs + Params.GameArgs:
             base.GetArgument();
     }
 
     /// <inheritdoc/>
     protected override string GetCpArgs()
     {
-        return _useBaseGeneration ? 
-            base.GetCpArgs() + Localize.LocalParser + GetCpArgs(GetLibrariesRef().Libraries): 
-            base.GetCpArgs();
+        if (!_useBaseGeneration) return base.GetCpArgs();
+        var classpath = 
+            string.Join("${classpath_separator}", 
+                GetLibraries().Select(a => a.LibraryPath)) + "${classpath_separator}";
+        if (baseLibrary is not null)
+            classpath += string.Join("${classpath_separator}",
+                baseLibrary.Libraries.Select(a => a.LibraryPath)) + "${classpath_separator}";
+        classpath += GameJarFilePath;
+        return classpath;
     }
 }

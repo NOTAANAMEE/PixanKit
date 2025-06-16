@@ -1,6 +1,5 @@
 using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.GameModule.Folders;
-using PixanKit.LaunchCore.GameModule.LibraryData;
 
 // ReSharper disable once CheckNamespace
 namespace PixanKit.LaunchCore.GameModule.Game;
@@ -119,7 +118,7 @@ public abstract partial class GameBase
     /// <remarks>
     /// This method returns the complete list of libraries required for the game, including runtime and mod libraries.
     /// </remarks>
-    public partial LibraryBase[] GetLibraries();
+    public partial Library.Library[] GetLibraries();
 
     /// <summary>
     /// Generates the launch arguments for the game.
@@ -139,7 +138,7 @@ public abstract partial class GameBase
     /// It skips non-native libraries.
     /// </remarks>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    public partial Task Decompress();
+    //public partial Task Decompress();
 
     /// <summary>
     /// Saves the current settings to a file and closes the game instance.

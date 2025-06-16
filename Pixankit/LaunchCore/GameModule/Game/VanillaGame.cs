@@ -1,4 +1,4 @@
-﻿using PixanKit.LaunchCore.GameModule.LibraryData;
+﻿using PixanKit.LaunchCore.GameModule.Library;
 using PixanKit.LaunchCore.GameModule.Folders;
 
 namespace PixanKit.LaunchCore.GameModule.Game;
@@ -16,7 +16,7 @@ public class VanillaGame : GameBase
     /// <param name="param"></param>
     /// <param name="libraries"></param>
     public VanillaGame(string name, Folder folder,
-        GameParameter param, LibrariesRef libraries) :
+        GameParameter param, LibraryCollection libraries) :
         base(name, folder, param, libraries)
     { }
 }

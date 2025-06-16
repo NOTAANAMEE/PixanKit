@@ -33,7 +33,7 @@ public partial class Launcher
 
         var java = JavaManager.ChooseRuntime(game) ?? throw new NullReferenceException();
 
-        game.Decompress().Wait();
+        //game.Decompress().Wait();
 
         return new LaunchSession.LaunchSession(game, java,
             GetPreArguments(game) ,cmd, 

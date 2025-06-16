@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Core;
+using PixanKit.LaunchCore.Core.Managers;
 using PixanKit.LaunchCore.GameModule.Folders;
 using PixanKit.LaunchCore.GameModule.Game;
-using PixanKit.LaunchCore.GameModule.LibraryData;
+using PixanKit.LaunchCore.GameModule.Library;
 using PixanKit.LaunchCore.PlayerModule.Player;
 using PixanKit.LaunchCore.SystemInf;
 
@@ -118,30 +118,42 @@ internal class DefaultGameIniter : IGameIniter
     /// </returns>
     public GameBase InitGame(Folder folder, string name)
     {
-        var manager = Launcher.Instance.GameManager;
         var jsonPath = $"{folder.VersionDirPath}{name}/{name}.json";
         var jData = JObject.Parse(File.ReadAllText(jsonPath));
         var version = GameParameter.GetVersion(jData, out var modified);
         if (modified > 0)
+            return InitCustomizedGame(folder, name, jData, version);
+
+        var cache = GameManager.Instance?.GetFirstGameByVersion(version);
+        if (cache != null)
         {
-            var thisParam = GameParameter.CreateInstance(jData);
-            var thisLib = LibrariesRef.CreateInstance(version, jData);
-            return JudgeOptifine(thisParam)?
-                new CustomizedGame(name, folder, thisParam, thisLib) :
-                new ModdedGame(name, folder, thisParam, thisLib);
+            return new VanillaGame(name, folder, cache.Params, cache.Libraries);
         }
 
-        if (manager.TryGetParam(version, 
-                out var param, out var lib))
-        {
-            return new VanillaGame(name, folder, param, lib);
-        }
-
-        param = GameParameter.CreateInstance(jData);
-        lib = LibrariesRef.CreateInstance(version, jData);
+        var param = GameParameter.CreateInstance(jData);
+        var lib = new LibraryCollection(
+            $"{folder.VersionDirPath}{name}/{name}.json");
         return new VanillaGame(name, folder, param, lib);
         
     }
+    
+    private GameBase InitCustomizedGame(Folder folder, string name, JObject jData, string version)
+    {
+        var thisParam = GameParameter.CreateInstance(jData);
+        var thisLib = new LibraryCollection($"{folder.VersionDirPath}{name}/{name}.json");
+        var cache = GameManager.Instance?.GetFirstGameByVersion(version);
+        if (cache == null) throw new Exception("Unable to find game cache for version");
+        return JudgeOptifine(thisParam)?
+            new CustomizedGame(name, folder, 
+                cache.Params, thisParam,
+                cache.Libraries, thisLib) :
+            new ModdedGame(name, folder, 
+                cache.Params, thisParam,
+                cache.Libraries, thisLib);
+    }
+    
+    
+    
 
     /// <summary>
     /// Determines whether the game is an OptiFine-modified version.

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Extension;
-using PixanKit.LaunchCore.GameModule.LibraryData;
+using PixanKit.LaunchCore.GameModule.Library;
 using PixanKit.LaunchCore.GameModule.Folders;
 using PixanKit.LaunchCore.Core.Managers;
 
@@ -66,7 +66,7 @@ public abstract partial class GameBase
     /// <summary>
     /// The parameters of the game instance.
     /// </summary>
-    protected GameParameter Params;
+    public readonly GameParameter Params;
 
     private readonly Folder _folder;
 
@@ -78,11 +78,11 @@ public abstract partial class GameBase
     /// 
     /// </summary>
     protected string ReleaseType = "release";
-
+    
     /// <summary>
-    /// The reference of library
+    /// 
     /// </summary>
-    protected LibrariesRef LibrariesRef;
+    public readonly LibraryCollection Libraries;
     
     /// <summary>
     /// Gets the settings for this game instance.
@@ -102,12 +102,12 @@ public abstract partial class GameBase
     /// <param name="param"></param>
     /// <param name="libraries"></param>
     protected GameBase(string name, Folder folder, 
-        GameParameter param, LibrariesRef libraries)
+        GameParameter param, LibraryCollection libraries)
     {
         _name = name;
         _folder = folder;
         Params = param;
-        LibrariesRef = libraries;
+        Libraries = libraries;
         var settings = new JObject();
         if (File.Exists(SettingsPath))
             settings = JObject.Parse(File.ReadAllText(SettingsPath));
@@ -117,9 +117,10 @@ public abstract partial class GameBase
     #endregion
 
     #region Others
-    public partial LibraryBase[] GetLibraries()
+    public partial Library.Library[] GetLibraries()
     {
-        return LibrariesRef.Libraries;
+        Libraries.Load();
+        return Libraries.Libraries.ToArray();
     }
         
     protected virtual partial void LoadJson(JObject gameData)
