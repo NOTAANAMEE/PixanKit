@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using PixanKit.LaunchCore.Exceptions;
 using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule.Exceptions;
 using PixanKit.LaunchCore.GameModule.Folders;
@@ -41,14 +42,28 @@ public class GameManager
     /// </summary>
     public void InitGameModule()
     {
+        List<string> reInit = [];
         foreach (var jData in Files.FolderJData["children"] ?? new JObject())
         {
             Folder tmp = new((JObject)jData);
             _folders.Add(tmp);
-            tmp.InitGames();
+            reInit.AddRange(tmp.InitGames());
         }
-        var tmpstr = (Files.FolderJData["target"] ?? "").ToString();
-        if (tmpstr != "") TargetGame = FindGame(tmpstr);
+
+        foreach (var dir in reInit)
+        {
+            try
+            {
+                AddGame(dir);
+            }
+            catch (RedirectInitException)
+            {
+                throw new Exception("Vanilla game not found.");
+            }
+        }
+            
+        var targetGameDir = (Files.FolderJData["target"] ?? "").ToString();
+        if (targetGameDir != "") TargetGame = FindGame(targetGameDir);
         UpdateTargetGame();
         Logger.Logger.Info("Game Module Initialized Successfully");
     }
@@ -205,9 +220,11 @@ public class GameManager
     private void UpdateTargetGame()
     {
         if (TargetGame is null || !_folders.Contains(TargetGame.Owner)) FirstGame();
-        else if (TargetGame.Owner.Contains(TargetGame)) return;
-        else if (TargetGame.Owner.Count > 0) TargetGame = TargetGame.Owner.First;
-        else FirstGame();
+        else if (!TargetGame.Owner.Contains(TargetGame))
+        {
+            if (TargetGame.Owner.Count > 0) TargetGame = TargetGame.Owner.First;
+            else FirstGame();
+        }
     }
 
     /// <summary>

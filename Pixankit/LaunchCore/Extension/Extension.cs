@@ -5,6 +5,7 @@ using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.GameModule.Library;
 using PixanKit.LaunchCore.PlayerModule.Player;
 using PixanKit.LaunchCore.SystemInf;
+using PixanKit.LaunchCore.Exceptions;
 
 namespace PixanKit.LaunchCore.Extension;
 
@@ -134,7 +135,6 @@ internal class DefaultGameIniter : IGameIniter
         var lib = new LibraryCollection(
             $"{folder.VersionDirPath}{name}/{name}.json");
         return new VanillaGame(name, folder, param, lib);
-        
     }
     
     private GameBase InitCustomizedGame(Folder folder, string name, JObject jData, string version)
@@ -142,7 +142,7 @@ internal class DefaultGameIniter : IGameIniter
         var thisParam = GameParameter.CreateInstance(jData);
         var thisLib = new LibraryCollection($"{folder.VersionDirPath}{name}/{name}.json");
         var cache = GameManager.Instance?.GetFirstGameByVersion(version);
-        if (cache == null) throw new Exception("Unable to find game cache for version");
+        if (cache == null) throw new RedirectInitException();
         return JudgeOptifine(thisParam)?
             new CustomizedGame(name, folder, 
                 cache.Params, thisParam,
@@ -151,9 +151,6 @@ internal class DefaultGameIniter : IGameIniter
                 cache.Params, thisParam,
                 cache.Libraries, thisLib);
     }
-    
-    
-    
 
     /// <summary>
     /// Determines whether the game is an OptiFine-modified version.

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Core;
+using PixanKit.LaunchCore.Exceptions;
 using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.Json;
@@ -96,19 +97,25 @@ public partial class Folder : IToJson
         LoadFromJson(jData);
     }
 
-    internal void InitGames()
+    internal List<string> InitGames()
     {
         _games.Clear();
         var dirs = Directory.GetDirectories(VersionDirPath);
+        List<string> reInit = [];
         foreach (var dir in dirs)
         {
             GameBase game;
             try
             {
-                    
-                game = 
-                    Initers.GameIniter(this, Path.GetFileName(dir)) ?? 
+
+                game =
+                    Initers.GameIniter(this, Path.GetFileName(dir)) ??
                     throw new Exception();
+            }
+            catch (RedirectInitException)
+            {
+                reInit.Add(dir);
+                continue;
             }
             catch (Exception ex)
             {
@@ -121,6 +128,7 @@ public partial class Folder : IToJson
             Logger.Logger.Info("Game Initialized");
         }
         Logger.Logger.Info($"Folder {FolderPath} Added");
+        return reInit;
     }
     
     internal void AddGame(GameBase game)
