@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Extension;
-using PixanKit.LaunchCore.GameModule.Library;
 using PixanKit.LaunchCore.GameModule.Folders;
 using PixanKit.LaunchCore.Core.Managers;
 
@@ -48,41 +47,27 @@ public abstract partial class GameBase
     public partial string AssetsDirPath => _folder.AssetsDirPath;
         
     public partial string GameRootFolderPath => _folder.FolderPath;
-        
-    public partial string Version => Params.Version;
+
+    /// <summary>
+    /// Gets the Minecraft version for this game instance.
+    /// </summary>
+    public string Version { get; set; }
 
     public partial string NativeDirPath => $"{GameFolderPath}{Name}-natives/";
 
     public partial string SettingsPath => GameFolderPath + Files.SettingsPath; 
         
     public partial GameType GameType { get => _gameType; protected set => _gameType = value; }
-        
-    public partial short MinimalJavaVersion => Params.JvmVersion;
 
     
     #endregion
 
     #region Fields
-    /// <summary>
-    /// The parameters of the game instance.
-    /// </summary>
-    public readonly GameParameter Params;
-
     private readonly Folder _folder;
 
     private readonly string _name;
 
     private GameType _gameType = GameType.Vanilla;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    protected string ReleaseType = "release";
-    
-    /// <summary>
-    /// 
-    /// </summary>
-    public readonly LibraryCollection Libraries;
     
     /// <summary>
     /// Gets the settings for this game instance.
@@ -99,33 +84,18 @@ public abstract partial class GameBase
     /// </summary>
     /// <param name="name"></param>
     /// <param name="folder"></param>
-    /// <param name="param"></param>
-    /// <param name="libraries"></param>
+    /// <param name="version"></param>
     protected GameBase(string name, Folder folder, 
-        GameParameter param, LibraryCollection libraries)
+        string version)
     {
         _name = name;
         _folder = folder;
-        Params = param;
-        Libraries = libraries;
+        Version = version;
         var settings = new JObject();
         if (File.Exists(SettingsPath))
             settings = JObject.Parse(File.ReadAllText(SettingsPath));
         Settings = new(settings);
         GameManager.OnSettingsRead?.Invoke(this, settings);
-    }
-    #endregion
-
-    #region Others
-    public partial Library.Library[] GetLibraries()
-    {
-        Libraries.Load();
-        return Libraries.Libraries.ToArray();
-    }
-        
-    protected virtual partial void LoadJson(JObject gameData)
-    {
-
     }
     #endregion
         

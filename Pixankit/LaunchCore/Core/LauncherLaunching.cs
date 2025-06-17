@@ -1,6 +1,6 @@
 ﻿using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule.Game;
-using PixanKit.LaunchCore.Json;
+using PixanKit.LaunchCore.GameModule.Param;
 using PixanKit.LaunchCore.PlayerModule.Player;
 
 namespace PixanKit.LaunchCore.Core;
@@ -26,12 +26,12 @@ public partial class Launcher
     /// <param name="player"></param>
     /// <returns></returns>
     /// <exception cref="NullReferenceException"></exception>
-    public LaunchSession.LaunchSession Launch(GameBase game,PlayerBase player)
+    public LaunchSession.LaunchSession Launch(GameBase game, PlayerBase player)
     {
         var cmd = InlineCommand(game, player);
         Logger.Logger.Info("Game Arg Generated Successfully.");
-
-        var java = JavaManager.ChooseRuntime(game) ?? throw new NullReferenceException();
+        var gameParam = ParameterManager.Instance.GetParameter(game);
+        var java = JavaManager.ChooseRuntime(game, gameParam) ?? throw new NullReferenceException();
 
         //game.Decompress().Wait();
 
@@ -54,8 +54,7 @@ public partial class Launcher
 
     private string InlineCommand(GameBase game, PlayerBase player)
     {
-        game.LaunchCheck();
-        var cmd = game.GetLaunchArgument();
+        var cmd = ParameterManager.Instance.GenerateGameArg(game);
 
         cmd = PlayerInLine(cmd, player);
         cmd = $"-Xmx{Initers.GetMemory()}m " + cmd;

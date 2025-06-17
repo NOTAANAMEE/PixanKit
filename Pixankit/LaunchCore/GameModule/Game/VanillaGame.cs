@@ -13,10 +13,9 @@ public class VanillaGame : GameBase
     /// </summary>
     /// <param name="name"></param>
     /// <param name="folder"></param>
-    /// <param name="param"></param>
-    /// <param name="libraries"></param>
+    /// <param name="version"></param>
     public VanillaGame(string name, Folder folder,
-        GameParameter param, LibraryCollection libraries) :
-        base(name, folder, param, libraries)
+        string version) :
+        base(name, folder, version)
     { }
 }

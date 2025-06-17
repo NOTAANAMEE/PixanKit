@@ -12,11 +12,11 @@ public static class JavaChooser
     /// Choose The Runtime That Is The Same As The Version That JSON Specified
     /// </summary>
     /// <param name="runtimes">Java Runtime Collection</param>
-    /// <param name="game">Game Needed To Launch</param>
+    /// <param name="gameParam">Game Needed To Launch</param>
     /// <returns>Returns A JavaRuntime If Exisits. Else Return null</returns>
-    public static JavaRuntime? Specified(IEnumerable<JavaRuntime?> runtimes, GameBase game)
+    public static JavaRuntime? Specified(IEnumerable<JavaRuntime?> runtimes, GameParameter gameParam)
         => runtimes.FirstOrDefault(
-            runtime => runtime?.Version == game.MinimalJavaVersion, 
+            runtime => runtime?.Version == gameParam.JvmVersion, 
             null);
 
     /// <summary>
@@ -24,12 +24,12 @@ public static class JavaChooser
     /// The Chosen Runtime >= The Specified Version
     /// </summary>
     /// <param name="runtimes">Java Runtime Collection</param>
-    /// <param name="game">Game Needed To Launch</param>
+    /// <param name="gameParam">Game Needed To Launch</param>
     /// <returns>Returns A JavaRuntime If Exisits. Else Return null</returns>
-    public static JavaRuntime? Closest(IEnumerable<JavaRuntime> runtimes, GameBase game)
+    public static JavaRuntime? Closest(IEnumerable<JavaRuntime> runtimes, GameParameter gameParam)
         => runtimes
-            .Where(runtime => runtime.Version >= game.MinimalJavaVersion)
-            .OrderBy(runtimes => runtimes.Version)
+            .Where(runtime => runtime.Version >= gameParam.JvmVersion)
+            .OrderBy(javaRuntime => javaRuntime.Version)
             .FirstOrDefault();
 
     /// <summary>

@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Exceptions;
 using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule.Exceptions;
 using PixanKit.LaunchCore.GameModule.Folders;
@@ -26,6 +25,9 @@ public class GameManager
     private readonly List<Folder> _folders = [];
     #endregion
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static GameManager? Instance;
 
     #region Init
@@ -50,17 +52,9 @@ public class GameManager
             reInit.AddRange(tmp.InitGames());
         }
 
-        foreach (var dir in reInit)
-        {
-            try
-            {
-                AddGame(dir);
-            }
-            catch (RedirectInitException)
-            {
-                throw new Exception("Vanilla game not found.");
-            }
-        }
+        foreach (var dir in reInit) 
+            AddGame(dir);
+
             
         var targetGameDir = (Files.FolderJData["target"] ?? "").ToString();
         if (targetGameDir != "") TargetGame = FindGame(targetGameDir);

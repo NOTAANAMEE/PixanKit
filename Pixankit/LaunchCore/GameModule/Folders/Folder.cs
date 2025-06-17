@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
 using PixanKit.LaunchCore.Core;
-using PixanKit.LaunchCore.Exceptions;
 using PixanKit.LaunchCore.Extension;
 using PixanKit.LaunchCore.GameModule.Game;
 using PixanKit.LaunchCore.Json;
@@ -111,11 +110,6 @@ public partial class Folder : IToJson
                 game =
                     Initers.GameIniter(this, Path.GetFileName(dir)) ??
                     throw new Exception();
-            }
-            catch (RedirectInitException)
-            {
-                reInit.Add(dir);
-                continue;
             }
             catch (Exception ex)
             {

@@ -9,6 +9,13 @@ namespace PixanKit.LaunchCore.GameModule.Param;
 /// </summary>
 public class ParameterManager
 {
+    private static readonly Lazy<ParameterManager> instance = new(() => new());
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public static ParameterManager Instance => instance.Value;
+    
     private record GameParam(GameParameter parameter,
         LibraryCollection collection);
 
@@ -47,7 +54,7 @@ public class ParameterManager
             return param.parameter;
         throw new Exception("Parameter not found for the game.");
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -56,6 +63,18 @@ public class ParameterManager
     /// <exception cref="Exception"></exception>
     public LibraryCollection GetLibrary(GameBase game)
         => GetLibrary(game.Version);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="game"></param>
+    /// <returns></returns>
+    public LibraryCollection GetBaseLibrary(CustomizedGame game)
+    {
+        return game.UseBaseGeneration?
+            GetLibrary(game.InheritsFrom):
+            GetLibrary(game);
+    }
     
     /// <summary>
     /// 
@@ -104,6 +123,16 @@ public class ParameterManager
 
         var retArg = $"{javaArgs} {mainClass} {gameArgs}";
         return InlineArg(retArg, assetsIndex, libArgs, game);
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="version"></param>
+    /// <returns></returns>
+    public bool ContainsVersion(string version)
+    {
+        return dict.ContainsKey(version);
     }
 
     private static string InlineArg(string arg, string assetsIndex, IEnumerable<string> libraries, GameBase game)

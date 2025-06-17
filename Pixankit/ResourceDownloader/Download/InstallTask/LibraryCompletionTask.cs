@@ -1,4 +1,5 @@
 ﻿using PixanKit.LaunchCore.GameModule.Game;
+using PixanKit.LaunchCore.GameModule.Param;
 using PixanKit.ResourceDownloader.Download.DownloadTask;
 
 namespace PixanKit.ResourceDownloader.Download.InstallTask;
@@ -23,7 +24,10 @@ public class LibraryCompletionTask : MultiFileDownloadTask
     {
         List<string> urls = [];
         List<string> files = [];
-        foreach (var library in game.GetLibraries())
+        var lib = game is CustomizedGame customized?
+            ParameterManager.Instance.GetBaseLibrary(customized) :
+            ParameterManager.Instance.GetLibrary(game);
+        foreach (var library in lib.Libraries)
         {
             var path = library.LibraryPath.Replace("${library_directory}",
                 game.LibrariesDirPath);
