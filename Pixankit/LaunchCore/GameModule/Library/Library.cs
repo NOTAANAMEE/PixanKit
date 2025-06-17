@@ -25,6 +25,11 @@ public class Library
     /// </summary>
     public string Url { get; private set; } = "";
 
+    /// <summary>
+    /// Whether the library is a native library or not
+    /// </summary>
+    public bool Extract => nativeName != null;
+
     private string libName = "";
 
     private string? nativeName;
@@ -37,10 +42,11 @@ public class Library
         var package = parts[0].Replace('.', '/');
         var name = parts[1];
         var version = parts[2];
-        if (nativeName == null && parts.Length > 3) 
-            nativeName = parts[3];
-        return nativeName != null ? 
-            $"{package}/{name}/{nativeName}-{version}-{nativeName}" : 
+        var native = nativeName;
+        if (native == null && parts.Length > 3) 
+            native = parts[3];
+        return native != null ? 
+            $"{package}/{name}/{name}-{version}-{native}" : 
             $"{parts}/{name}/{name}-{version}";
     }
     

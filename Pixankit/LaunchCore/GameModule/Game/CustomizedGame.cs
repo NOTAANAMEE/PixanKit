@@ -17,6 +17,16 @@ public class CustomizedGame : GameBase
     /// ThisParameter is the parameter from the local json.
     /// </summary>
     protected GameParameter BaseParameter;
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public bool UseBaseGeneration => _useBaseGeneration;
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public string InheritsFrom => "";
         
     /// <summary>
     /// 
