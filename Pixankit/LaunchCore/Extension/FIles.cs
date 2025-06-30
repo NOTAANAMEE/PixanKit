@@ -10,11 +10,11 @@ public static class Files
 {
     static Files()
     {
-        ConfigDir = "./Launcher/Config";
-        CacheDir = "./Launcher/Cache";
+        ConfigDir = "./Launcher/Config/";
+        CacheDir = "./Launcher/Cache/";
         SettingsPath = "/Launcher/settings.json";
-        ManifestDir = "${CacheDir}/manifest.json";
-        SkinCacheDir = "${CacheDir}/Skin";
+        ManifestDir = "${CacheDir}manifest.json";
+        SkinCacheDir = "${CacheDir}Skin";
     }
 
     /// <summary>
@@ -102,10 +102,11 @@ public static class Files
     /// </summary>
     public static void Save()
     {
-        FileStream folderFs = new($"{ConfigDir}/Folders.json", FileMode.Create),
-            playerFs = new($"{ConfigDir}/Players.json", FileMode.Create),
-            runtimeFs = new($"{ConfigDir}/JavaRuntime.json", FileMode.Create),
-            settingsFs = new($"{ConfigDir}/Settings.json", FileMode.Create);
+        if (!Directory.Exists(ConfigDir)) Directory.CreateDirectory(ConfigDir);
+        FileStream folderFs = new($"{ConfigDir}Folders.json", FileMode.Create),
+            playerFs = new($"{ConfigDir}Players.json", FileMode.Create),
+            runtimeFs = new($"{ConfigDir}JavaRuntime.json", FileMode.Create),
+            settingsFs = new($"{ConfigDir}Settings.json", FileMode.Create);
         StreamWriter foldersw = new(folderFs),
             playersw = new(playerFs),
             runtimesw = new(runtimeFs),
@@ -129,10 +130,10 @@ public static class Files
     /// </summary>
     public static void Load()
     {
-        FileStream folderFs = new($"{ConfigDir}/Folders.json", FileMode.Open),
-            playerFs = new($"{ConfigDir}/Players.json", FileMode.Open),
-            runtimeFs = new($"{ConfigDir}/JavaRuntime.json", FileMode.Open),
-            settingsFs = new($"{ConfigDir}/Settings.json", FileMode.Open);
+        FileStream folderFs = new($"{ConfigDir}Folders.json", FileMode.Open),
+            playerFs = new($"{ConfigDir}Players.json", FileMode.Open),
+            runtimeFs = new($"{ConfigDir}JavaRuntime.json", FileMode.Open),
+            settingsFs = new($"{ConfigDir}Settings.json", FileMode.Open);
         StreamReader foldersr = new(folderFs),
             playersr = new(playerFs),
             runtimesr = new(runtimeFs),

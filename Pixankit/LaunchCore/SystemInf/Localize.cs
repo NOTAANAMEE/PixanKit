@@ -7,7 +7,7 @@ internal static class Localize
         return SysInfo.OsName switch
         {
             "windows" => classpathArg.Replace("${classpath_separator}", ";"),
-            _ => classpathArg,
+            _ => classpathArg.Replace("${classpath_separator}", ":")
         };
     }
 

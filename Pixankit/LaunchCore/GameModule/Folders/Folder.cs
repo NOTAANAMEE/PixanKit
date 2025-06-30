@@ -96,18 +96,19 @@ public partial class Folder : IToJson
         LoadFromJson(jData);
     }
 
-    internal void InitGames()
+    internal List<string> InitGames()
     {
         _games.Clear();
         var dirs = Directory.GetDirectories(VersionDirPath);
+        List<string> reInit = [];
         foreach (var dir in dirs)
         {
             GameBase game;
             try
             {
-                    
-                game = 
-                    Initers.GameIniter(this, Path.GetFileName(dir)) ?? 
+
+                game =
+                    Initers.GameIniter(this, Path.GetFileName(dir)) ??
                     throw new Exception();
             }
             catch (Exception ex)
@@ -121,6 +122,7 @@ public partial class Folder : IToJson
             Logger.Logger.Info("Game Initialized");
         }
         Logger.Logger.Info($"Folder {FolderPath} Added");
+        return reInit;
     }
     
     internal void AddGame(GameBase game)

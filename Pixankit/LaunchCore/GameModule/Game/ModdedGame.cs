@@ -1,5 +1,4 @@
 ﻿using PixanKit.LaunchCore.Core;
-using PixanKit.LaunchCore.GameModule.LibraryData;
 using PixanKit.LaunchCore.GameModule.Folders;
 
 namespace PixanKit.LaunchCore.GameModule.Game;
@@ -18,24 +17,30 @@ public class ModdedGame : CustomizedGame
     /// <summary>
     /// Stores the name of the mod loader
     /// </summary>
-    public string ModLoader = "quilt";
+    public string ModLoader;
 
     /// <inheritdoc/>
-    public ModdedGame(string name, Folder folder,
-        GameParameter param, LibrariesRef libs):
-        base(name, folder, param, libs)
+    public ModdedGame(string name, Folder folder, 
+        string version, string inheritsFrom, string modLoader, bool modified):
+        base(name, folder, version, inheritsFrom, modified)
     {
         GameType = GameType.Modded;
-        SetModLoader(param);
+        ModLoader = modLoader;
     }
 
-    private void SetModLoader(GameParameter param)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="param"></param>
+    /// <returns></returns>
+    public static string SetModLoader(GameParameter param)
     {
         if (param.JavaArgs.Contains("fabric")) 
-            ModLoader = "fabric";
-        else if (param.GameArgs.Contains("neoForge")) 
-            ModLoader = "neoforge";
-        else if (param.GameArgs.Contains("forge")) 
-            ModLoader = "forge";
+            return "fabric";
+        if (param.GameArgs.Contains("neoForge")) 
+            return "neoforge";
+        if (param.GameArgs.Contains("forge")) 
+            return "forge";
+        return "quilt";
     }
 }

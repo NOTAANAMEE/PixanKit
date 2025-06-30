@@ -69,9 +69,10 @@ public class JavaManager
     /// <summary>
     /// Chooses an appropriate Java runtime for a specified Minecraft game.
     /// </summary>
+    /// <param name="gameParam"></param>
     /// <param name="game">The <see cref="GameBase"/> instance representing the Minecraft game.</param>
     /// <returns>A <see cref="JavaRuntime"/> instance that is selected based on the game's settings, or <c>null</c> if no runtime matches.</returns>
-    public JavaRuntime? ChooseRuntime(GameBase game)
+    public JavaRuntime? ChooseRuntime(GameBase game, GameParameter gameParam)
     {
         var javaSetting = game.Settings.JavaSetting;
 
@@ -82,9 +83,9 @@ public class JavaManager
 
         return javaSetting switch
         {
-            SettingValue.Specified => JavaChooser.Specified(_javaRuntimes, game),
-            SettingValue.Closest   => JavaChooser.Closest(JavaRuntimes, game),
-            _                      => JavaChooser.Newest(JavaRuntimes, game),
+            SettingValue.Specified => JavaChooser.Specified(_javaRuntimes, gameParam),
+            SettingValue.Closest   => JavaChooser.Closest(JavaRuntimes, gameParam),
+            _                      => JavaChooser.Newest(JavaRuntimes),
         };
     }
 

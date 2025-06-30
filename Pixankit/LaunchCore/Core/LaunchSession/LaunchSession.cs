@@ -79,6 +79,7 @@ public class LaunchSession
         _preArgs = preArgs;
         _postArgs = postArgs;
         _variables = env;
+        Directory.CreateDirectory(Files.CacheDir);
         _startInfo = new()
         {
             FileName = SysInfo.Shell(),
@@ -133,6 +134,18 @@ public class LaunchSession
     private void Exit(object? sender, EventArgs e)
     {
         
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void SaveToFile()
+    {
+        FileStream fs = new("./a.bat", FileMode.Create);
+        StreamWriter sw = new(fs);
+        sw.Write($"{_preArgs} \"{Runtime.JavaExe}\" {Arguments} {_postArgs}");
+        sw.Close();
+        fs.Close();
     }
 
     /// <summary>

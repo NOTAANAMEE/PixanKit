@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Core.Managers;
 using PixanKit.LaunchCore.Json;
 
 namespace PixanKit.LaunchCore.GameModule.Game;

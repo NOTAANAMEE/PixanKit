@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json.Linq;
-using PixanKit.LaunchCore.Core;
 using PixanKit.LaunchCore.GameModule.Folders;
 using PixanKit.LaunchCore.GameModule.Game;
-using PixanKit.LaunchCore.GameModule.LibraryData;
+using PixanKit.LaunchCore.GameModule.Library;
 using PixanKit.LaunchCore.PlayerModule.Player;
 using PixanKit.LaunchCore.SystemInf;
+using PixanKit.LaunchCore.GameModule.Param;
 
 namespace PixanKit.LaunchCore.Extension;
 
@@ -79,8 +79,8 @@ public static class Initers
         if (jData == null) return null;
         return (jData["type"]?.ToString()) switch
         {
-            "offline" => new OfflinePlayer(jData),
-            "microsoft" => new MicrosoftPlayer(jData),
+            "Offline" => new OfflinePlayer(jData),
+            "Microsoft" => new MicrosoftPlayer(jData),
             _ => null,
         };
     }
@@ -118,29 +118,28 @@ internal class DefaultGameIniter : IGameIniter
     /// </returns>
     public GameBase InitGame(Folder folder, string name)
     {
-        var manager = Launcher.Instance.GameManager;
         var jsonPath = $"{folder.VersionDirPath}{name}/{name}.json";
         var jData = JObject.Parse(File.ReadAllText(jsonPath));
         var version = GameParameter.GetVersion(jData, out var modified);
         if (modified > 0)
         {
+            var thisVersion = folder.FolderPath.GetHashCode() + name;
+            var thisLib = new LibraryCollection(jsonPath);
             var thisParam = GameParameter.CreateInstance(jData);
-            var thisLib = LibrariesRef.CreateInstance(version, jData);
-            return JudgeOptifine(thisParam)?
-                new CustomizedGame(name, folder, thisParam, thisLib) :
-                new ModdedGame(name, folder, thisParam, thisLib);
+            ParameterManager.Instance.AddParameter(thisVersion, thisParam, thisLib);
+            return JudgeOptifine(thisParam) ? 
+                new CustomizedGame(name, folder, thisVersion, version, modified == 1) : 
+                new ModdedGame(name, folder, thisVersion, version, 
+                    ModdedGame.SetModLoader(thisParam),
+                    modified == 1);
         }
-
-        if (manager.TryGetParam(version, 
-                out var param, out var lib))
+        if (!ParameterManager.Instance.ContainsVersion(version))
         {
-            return new VanillaGame(name, folder, param, lib);
-        }
-
-        param = GameParameter.CreateInstance(jData);
-        lib = LibrariesRef.CreateInstance(version, jData);
-        return new VanillaGame(name, folder, param, lib);
-        
+            var param = GameParameter.CreateInstance(jData);
+            var lib = new LibraryCollection(jsonPath);
+            ParameterManager.Instance.AddParameter(version, param, lib);
+        } 
+        return new VanillaGame(name, folder, version);
     }
 
     /// <summary>
