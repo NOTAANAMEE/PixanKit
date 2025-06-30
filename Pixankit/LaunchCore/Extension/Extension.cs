@@ -79,8 +79,8 @@ public static class Initers
         if (jData == null) return null;
         return (jData["type"]?.ToString()) switch
         {
-            "offline" => new OfflinePlayer(jData),
-            "microsoft" => new MicrosoftPlayer(jData),
+            "Offline" => new OfflinePlayer(jData),
+            "Microsoft" => new MicrosoftPlayer(jData),
             _ => null,
         };
     }

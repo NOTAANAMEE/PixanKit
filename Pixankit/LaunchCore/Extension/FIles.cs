@@ -102,6 +102,7 @@ public static class Files
     /// </summary>
     public static void Save()
     {
+        if (!Directory.Exists(ConfigDir)) Directory.CreateDirectory(ConfigDir);
         FileStream folderFs = new($"{ConfigDir}/Folders.json", FileMode.Create),
             playerFs = new($"{ConfigDir}/Players.json", FileMode.Create),
             runtimeFs = new($"{ConfigDir}/JavaRuntime.json", FileMode.Create),

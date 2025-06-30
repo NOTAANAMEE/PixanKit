@@ -13,7 +13,7 @@ public class Library
     /// <summary>
     /// The Absolute Path Of The Library
     /// </summary>
-    public string LibraryPath => $"${{library_directory}}/{GetPath()}.jar";
+    public string LibraryPath => $"${{library_directory}}{GetPath()}.jar";
     
     /// <summary>
     /// Get the SHA1 of the library
@@ -46,8 +46,8 @@ public class Library
         if (native == null && parts.Length > 3) 
             native = parts[3];
         return native != null ? 
-            $"{package}/{name}/{name}-{version}-{native}" : 
-            $"{parts}/{name}/{name}-{version}";
+            $"{package}/{name}/{version}/{name}-{version}-{native}" : 
+            $"{package}/{name}/{version}/{name}-{version}";
     }
     
     /// <summary>
@@ -113,7 +113,7 @@ public class Library
         {
             libName = 
                 libraryData.GetOrDefault(Format.ToString, 
-                "downloads/artifact/name", ""),
+                "name", ""),
             Url = 
                 libraryData.GetOrDefault(Format.ToString, 
                 "downloads/artifact/url", ""),

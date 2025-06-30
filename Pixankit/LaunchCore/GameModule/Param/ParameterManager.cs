@@ -138,7 +138,7 @@ public class ParameterManager
     private static string InlineArg(string arg, string assetsIndex, IEnumerable<string> libraries, GameBase game)
     {
         var libs = string.Join("${classpath_separator}", libraries) 
-                      + $"{{classpath_separator}}{game.GameJarFilePath}";
+                      + $"${{classpath_separator}}{game.GameJarFilePath}";
         arg = arg.Replace("${natives_directory}", $"\"{game.NativeDirPath}\"");
         arg = arg.Replace("${assets_root}", $"\"{game.AssetsDirPath}\"");
         arg = arg.Replace("${assets_index_name}", assetsIndex);
