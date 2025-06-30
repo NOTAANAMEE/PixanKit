@@ -6,7 +6,7 @@
 
 # PixanKit
 
-PixanKit is a modular, .NET 8-based toolkit crafted to streamline the development of custom Minecraft launchers and automation tools. The library is structured into three separate C# projects:
+PixanKit is a modular, .NET 9-based toolkit crafted to streamline the development of custom Minecraft launchers and automation tools. The library is structured into three separate C# projects:
 
 For Simplified Chinese, see [README.zh-CN.md](README.zh-CN.md).
 
