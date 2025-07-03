@@ -26,14 +26,15 @@ public partial class JavaRuntime : IToJson
     public string BinaryFolder => JavaFolder + "/bin";
 
     /// <summary>
-    /// The path of java.exe
+    /// The path of java executable
     /// </summary>
-    public string JavaExe => BinaryFolder + "/java.exe";
+    public string JavaExe => BinaryFolder + "/java";
 
     /// <summary>
-    /// The path of javaw.exe
+    /// The path of javaw executable
     /// </summary>
-    public string JavawExe => BinaryFolder + "/javaw.exe";
+    public string JavawExe => BinaryFolder + "/javaw"; 
+    //.exe is unnecessary on Windows
 
     private string _javaFolder = "";
 
@@ -42,21 +43,21 @@ public partial class JavaRuntime : IToJson
     /// <summary>
     /// Init a JavaRuntime instance. It will automatically run Java and get the version
     /// </summary>
-    /// <param name="javafolder">C:\Program Files\Java\JDK-21\</param>
-    public JavaRuntime(string javafolder)
+    /// <param name="javaFolder">C:\Program Files\Java\JDK-21\</param>
+    public JavaRuntime(string javaFolder)
     {
-        _javaFolder = javafolder;
+        _javaFolder = javaFolder;
         GetVersion();
     }
 
     /// <summary>
     /// Init a JavaRuntime instance with Directory And Version
     /// </summary>
-    /// <param name="javafolder">Directory Of /bin/java.exe</param>
+    /// <param name="javaFolder">Directory Of /bin/java.exe</param>
     /// <param name="version">Java Version (8-23)</param>
-    public JavaRuntime(string javafolder, ushort version)
+    public JavaRuntime(string javaFolder, ushort version)
     {
-        _javaFolder = javafolder;
+        _javaFolder = javaFolder;
         _version = version;
     }
 

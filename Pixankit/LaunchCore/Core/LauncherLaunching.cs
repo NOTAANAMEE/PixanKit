@@ -60,7 +60,7 @@ public partial class Launcher
         cmd = $"-Xmx{Initers.GetMemory()}m " + cmd;
         cmd = cmd.Replace("${launcher_name}", LauncherName);
         cmd = cmd.Replace("${launcher_version}", VersionName);
-        cmd = cmd.Replace("${game_directory", GetGameRunningFolder(game));
+        cmd = cmd.Replace("${game_directory}", GetGameRunningFolder(game));
         cmd = cmd.Replace("${jvm_argument}", GetJvmArguments(game));
         return cmd;
     }
